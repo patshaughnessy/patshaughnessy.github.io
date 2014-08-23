@@ -1,0 +1,5 @@
+name = Demo
+description = Module written without TDD
+package = TDD Demo Modules
+version = VERSION
+core = 6.x

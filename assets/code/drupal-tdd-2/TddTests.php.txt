@@ -1,0 +1,40 @@
+<?php
+
+require_once './includes/bootstrap.inc';
+drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+
+class TddTests extends PHPUnit_Framework_TestCase
+{  
+  public function setup()
+  {
+    $login_form = array('name' => 'admin', 'pass' => 'adminpassword');
+    user_authenticate($login_form);
+
+    $this->node = new stdClass();
+    $this->node->title = 'This title contains the word FindSomethingElse';
+    $this->node->body = 'This is the body of the node';
+    node_save($this->node);    
+  }
+
+  public function teardown()
+  {
+    node_delete($this->node->nid);  
+  }
+
+  public function test_tdd_help()
+  {
+    $this->assertEquals(tdd_help('admin/content/tdd'), "<p>Help for TDD module.</p>");
+  }
+
+  public function test_search_for_titles()
+  {
+    $query = 'FindSomethingElse';
+    $titles = tdd_search_for_titles($query);
+    $this->assertEquals(count($titles), 1);
+    foreach ($titles as $title) {
+      $this->assertTrue(stripos($title, $query) > 0);
+    }
+  }
+
+}
+?>

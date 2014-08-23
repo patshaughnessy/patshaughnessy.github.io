@@ -1,0 +1,22 @@
+body {
+  background:#EEEEDD;
+}
+.slide {
+  display:none;
+}
+#slides .slide-header {
+  display: none
+}
+#slides .slide-footer {
+  margin:0;
+  width: 200px;
+}
+.slide-footer .previous {
+  width:75px;
+  float:left;
+}
+.slide-footer .next {
+  width:75px;
+  float:right;
+  text-align:right;
+}

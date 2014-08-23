@@ -1,0 +1,16 @@
+<?php
+function tdd_help($path, $arg) {
+  switch ($path) {
+    case 'admin/content/tdd':  
+      return '<p>Help for TDD module.</p>';
+  }
+}
+function tdd_search_for_titles($query) {
+  $titles = array();
+  $result = db_query("SELECT title FROM {node} WHERE title LIKE '%%%s%%'", $query);
+  while ($node = db_fetch_object($result)) {
+    $titles[] = $node->title;
+  }
+  return $titles;
+}
+?>

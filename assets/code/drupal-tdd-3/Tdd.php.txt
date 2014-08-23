@@ -1,0 +1,24 @@
+<?php
+function tdd_search_for_titles($query, $ascending, $from, $count) {
+  $titles = array();
+  if ($query != NULL) {
+    $sql = "SELECT title FROM {node} WHERE title LIKE '%%%s%%'";
+    if ($ascending) {
+      $sql .= ' ORDER BY title';
+    }
+    else {
+      $sql .= ' ORDER BY title DESC';
+    }
+    if ($from || $count) {
+      $result = db_query_range($sql, $query, $from, $count);
+    }
+    else {
+      $result = db_query($sql, $query);
+    }
+    while ($node = db_fetch_object($result)) {
+      $titles[] = $node->title;
+    }
+  }
+  return $titles;
+}
+?>

@@ -1,0 +1,81 @@
+<?php
+
+function demo_help($path, $arg) {
+  switch ($path) {
+    case 'admin/content/demo':  
+      return '<p>This module lists all of the pages that have a title containing a given pattern.</p>';
+  }
+}
+
+function demo_menu() {
+  $items['admin/content/demo'] = array(
+    'title' => 'Demo Page',
+    'description' => 'This is a demo page.',
+    'page callback' => 'demo_page_view',
+    'access arguments' => array('access content')
+  );
+  return $items;
+}
+
+function demo_page_view($keys = NULL)
+{
+  $header = array(
+    array('data' => t('Page Title'), 'field' => 'title', 'sort' => 'asc')
+  );
+
+  $sql = "SELECT * FROM {node} WHERE title LIKE '%%%s%%'";
+  $sql .= tablesort_sql($header);
+  $result = pager_query($sql, 50, 0 , NULL, $keys);
+  
+  $rows = array();
+  while ($data = db_fetch_object($result)) {
+    $rows[] = array(check_plain($data->title));
+  }
+
+  if (empty($rows)) {
+    $rows[] = array(array('data' => 'No pages match the given pattern.'));
+  }
+  
+  $output = drupal_get_form('demo_pattern_form', $keys);
+  $output .= "Pages matching this pattern:";
+  $output .= theme('table', $header, $rows);
+  $output .= theme('pager', NULL, 50, 0);
+
+  return $output;
+}
+
+function demo_pattern_form(&$form_state, $keys = '') {
+  $form['#attributes'] = array('class' => 'search-form');
+  $form['basic'] = array('#type' => 'fieldset',
+    '#title' => t('Search Query')
+  );
+  $form['basic']['inline'] = array('#prefix' => '<div class="container-inline">', '#suffix' => '</div>');
+  $form['basic']['inline']['filter'] = array(
+    '#type' => 'textfield',
+    '#title' => '',
+    '#default_value' => $keys,
+    '#maxlength' => 64,
+    '#size' => 25,
+  );
+  $form['basic']['inline']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+    '#submit' => array('demo_pattern_form_submit'),
+    );
+  if ($keys) {
+    $form['basic']['inline']['reset'] = array(
+      '#type' => 'submit',
+      '#value' => t('Reset'),
+      '#submit' => array('demo_pattern_form_reset'),
+    );
+  }
+  return $form;
+}
+
+function demo_pattern_form_submit($form, &$form_state) {
+  $form_state['redirect'] = 'admin/content/demo/'. trim($form_state['values']['filter']);
+}
+
+function demo_pattern_form_reset($form, &$form_state) {
+  $form_state['redirect'] = 'admin/content/demo';
+}

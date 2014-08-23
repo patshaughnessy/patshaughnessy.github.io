@@ -1,0 +1,183 @@
+<?php
+
+require_once './includes/bootstrap.inc';
+drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+
+class TddTests extends PHPUnit_Framework_TestCase
+{  
+  public function setup()
+  {
+    $login_form = array('name' => 'admin', 'pass' => 'adminpassword');
+    user_authenticate($login_form);
+
+    for ($i = 0; $i < 15; $i++) {
+      $this->nodes[] = new stdClass();
+      $this->nodes[$i]->title = "This title contains the word FindSomethingElse page $i";
+      $this->nodes[$i]->body = "This is the body of the node";
+      node_save($this->nodes[$i]);
+    }
+
+    $this->nodes[] = new stdClass();
+    $this->nodes[15]->title = "AAA This is the first title containing the word FindSomethingElse";
+    $this->nodes[15]->body = "This is the body of the node";
+    node_save($this->nodes[15]);
+
+    $this->nodes[] = new stdClass();
+    $this->nodes[16]->title = "ZZZ This is the last title containing the word FindSomethingElse";
+    $this->nodes[16]->body = "This is the body of the node";
+    node_save($this->nodes[16]);
+  }
+
+  public function teardown()
+  {
+    foreach ($this->nodes as $node) {
+      node_delete($node->nid);  
+    }
+  }
+
+  public function test_tdd_help()
+  {
+    $this->assertEquals("<p>Help for TDD module.</p>", tdd_help('admin/content/tdd'));
+  }
+
+  public function test_search_for_titles()
+  {
+    $query = 'FindSomethingElse';
+    $titles = tdd_search_for_titles($query);
+    $this->assertEquals(17, count($titles));
+    $this->assert_titles_contain_query($titles, $query);
+  }
+  
+  public function test_wrong_titles_are_not_returned()
+  {
+    $titles = tdd_search_for_titles('CantFindThis');
+    $this->assertEquals(0, count($titles));
+  }
+  
+  public function test_empty_list_for_empty_query()
+  {
+    $titles = tdd_search_for_titles(NULL);
+    $this->assertEquals(0, count($titles));
+
+    $titles = tdd_search_for_titles('');
+    $this->assertEquals(0, count($titles));
+  }
+
+  public function test_titles_sort_ascending()
+  {
+    $query = 'FindSomethingElse';
+    $titles = tdd_search_for_titles($query, true);
+    $this->assertEquals(17, count($titles));
+    $this->assert_titles_contain_query($titles, $query);
+    $this->assertEquals("AAA This is the first title containing the word FindSomethingElse", $titles[0]);
+    $this->assertEquals("ZZZ This is the last title containing the word FindSomethingElse", $titles[16]);
+  }
+
+  public function test_titles_sort_descending()
+  {
+    $query = 'FindSomethingElse';
+    $titles = tdd_search_for_titles($query, false);
+    $this->assertEquals(17, count($titles));
+    $this->assert_titles_contain_query($titles, $query);
+    $this->assertEquals("ZZZ This is the last title containing the word FindSomethingElse", $titles[0]);
+    $this->assertEquals("AAA This is the first title containing the word FindSomethingElse", $titles[16]);
+  }
+
+  public function test_titles_page_query_first_three_ascending()
+  {
+    $query = 'FindSomethingElse';
+    $limit = 3;
+    $titles = tdd_search_for_titles($query, true, 0, 3);
+    $this->assertEquals(3, count($titles));
+    $this->assert_titles_contain_query($titles, $query);
+    $this->assertEquals("AAA This is the first title containing the word FindSomethingElse", $titles[0]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 0", $titles[1]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 1", $titles[2]);
+  }
+
+  public function test_titles_page_query_first_three_descending()
+  {
+    $query = 'FindSomethingElse';
+    $titles = tdd_search_for_titles($query, false, 0, 3);
+    $this->assertEquals(3, count($titles));
+    $this->assert_titles_contain_query($titles, $query);
+    $this->assertEquals("ZZZ This is the last title containing the word FindSomethingElse", $titles[0]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 9", $titles[1]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 8", $titles[2]);
+  }
+  
+  public function test_titles_first_page_ascending()
+  {
+    $query = 'FindSomethingElse';
+    $titles = tdd_search_for_titles($query, true, 0, 10);
+    $this->assertEquals(10, count($titles));
+    $this->assert_titles_contain_query($titles, $query);
+    $this->assertEquals("AAA This is the first title containing the word FindSomethingElse", $titles[0]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 0", $titles[1]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 1", $titles[2]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 10", $titles[3]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 11", $titles[4]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 12", $titles[5]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 13", $titles[6]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 14", $titles[7]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 2", $titles[8]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 3", $titles[9]);
+  }
+      
+  public function test_titles_first_page_descending()
+  {
+    $query = 'FindSomethingElse';
+    $titles = tdd_search_for_titles($query, false, 0, 10);
+    $this->assertEquals(10, count($titles));
+    $this->assert_titles_contain_query($titles, $query);
+    $this->assertEquals("ZZZ This is the last title containing the word FindSomethingElse", $titles[0]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 9", $titles[1]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 8", $titles[2]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 7", $titles[3]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 6", $titles[4]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 5", $titles[5]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 4", $titles[6]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 3", $titles[7]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 2", $titles[8]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 14", $titles[9]);
+  }
+
+  public function test_titles_second_page_ascending()
+  {
+    $query = 'FindSomethingElse';
+    $titles = tdd_search_for_titles($query, true, 10, 10);
+    $this->assertEquals(7, count($titles));
+    $this->assert_titles_contain_query($titles, $query);
+    $this->assertEquals("This title contains the word FindSomethingElse page 4", $titles[0]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 5", $titles[1]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 6", $titles[2]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 7", $titles[3]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 8", $titles[4]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 9", $titles[5]);
+    $this->assertEquals("ZZZ This is the last title containing the word FindSomethingElse", $titles[6]);
+  }
+
+  public function test_titles_second_page_descending()
+  {
+    $query = 'FindSomethingElse';
+    $titles = tdd_search_for_titles($query, false, 10, 10);
+    $this->assertEquals(7, count($titles));
+    $this->assert_titles_contain_query($titles, $query);
+    $this->assertEquals("This title contains the word FindSomethingElse page 13", $titles[0]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 12", $titles[1]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 11", $titles[2]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 10", $titles[3]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 1", $titles[4]);
+    $this->assertEquals("This title contains the word FindSomethingElse page 0", $titles[5]);
+    $this->assertEquals("AAA This is the first title containing the word FindSomethingElse", $titles[6]);
+  }
+
+  public function assert_titles_contain_query($titles, $query)
+  {
+    foreach ($titles as $title) {
+      $this->assertTrue(stripos($title, $query) > 0);
+    }
+  }
+
+}
+?>

@@ -1,0 +1,87 @@
+<?php
+
+require_once 'Tdd.php';
+
+function tdd_menu() {
+  $items['admin/content/tdd'] = array(
+    'title' => 'TDD Demo Page',
+    'description' => 'This is a tdd demo page.',
+    'page callback' => 'tdd_page_view',
+    'access arguments' => array('access content')
+  );
+  return $items;
+}
+
+function tdd_page_view($keys = NULL)
+{
+  $header = array(
+    array('data' => t('Page Title'), 'field' => 'title', 'sort' => 'asc')
+  );
+
+  $sortAscending = true;
+  if (isset($_GET['sort']) && $_GET['sort'] == 'desc') {
+    $sortAscending = false;
+  }
+
+  $titles = tdd_search_for_titles($keys, $sortAscending, 0, 10);
+  
+  $rows = array();
+  foreach ($titles as $title) {
+    $rows[] = array($title);
+  }
+  
+  if (empty($rows)) {
+    $rows[] = array(array('data' => 'No pages match the given pattern.'));
+  }
+  
+  $output = drupal_get_form('tdd_pattern_form', $keys);
+  $output .= "Pages matching this pattern:";
+  $output .= theme('table', $header, $rows);
+  $output .= theme('pager', NULL, 50, 0);
+
+  return $output;
+}
+function tdd_help($path, $arg) {
+  switch ($path) {
+    case 'admin/content/tdd':  
+      return '<p>Help for TDD module.</p>';
+  }
+}
+
+
+function tdd_pattern_form(&$form_state, $keys = '') {
+  $form['#attributes'] = array('class' => 'search-form');
+  $form['basic'] = array('#type' => 'fieldset',
+    '#title' => t('Search Query')
+  );
+  $form['basic']['inline'] = array('#prefix' => '<div class="container-inline">', '#suffix' => '</div>');
+  $form['basic']['inline']['filter'] = array(
+    '#type' => 'textfield',
+    '#title' => '',
+    '#default_value' => $keys,
+    '#maxlength' => 64,
+    '#size' => 25,
+  );
+  $form['basic']['inline']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+    '#submit' => array('tdd_pattern_form_submit'),
+    );
+  if ($keys) {
+    $form['basic']['inline']['reset'] = array(
+      '#type' => 'submit',
+      '#value' => t('Reset'),
+      '#submit' => array('tdd_pattern_form_reset'),
+    );
+  }
+  return $form;
+}
+
+function tdd_pattern_form_submit($form, &$form_state) {
+  $form_state['redirect'] = 'admin/content/tdd/'. trim($form_state['values']['filter']);
+}
+
+function tdd_pattern_form_reset($form, &$form_state) {
+  $form_state['redirect'] = 'admin/content/tdd';
+}
+?>
