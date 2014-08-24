@@ -1,0 +1,494 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Finding your soulmate: autocomplete with Redis in Rails 3.1 - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Finding your soulmate: autocomplete with Redis in Rails 3.1 - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Finding your soulmate: autocomplete with Redis in Rails 3.1</h1>
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 7px 30px 10px 0px">
+<table cellpadding="0" cellspacing="0" border="0">
+  <tr><td><img src="http://patshaughnessy.net/assets/2011/11/23/romantic-couple.jpg"></td></tr>
+  <tr><td align="center"><small><i>Fast autocomplete with Soulmate can help<br/>users fall in love with your Rails app</i></small></td></tr>
+</table>
+</div>
+
+
+<p>Back in February the <a href="http://seatgeek.com/">SeatGeek</a> team open sourced a gem they call <a href="https://github.com/seatgeek/soulmate">Soulmate</a> that implements autocomplete using a <a href="http://redis.io/">Redis</a> back end. “Soulmate finishes your sentences” as they say on their Github readme page. You can see it in action on <a href="http://seatgeek.com/">SeatGeek.com</a>. Soulmate is very useful: many of us need type ahead search behavior and using Redis is a great way to make it fast and snappy. But more importantly, Soulmate is a great example of how to create an index in Redis ahead of time, allowing for very fast lookups later. Take a few minutes to learn how Soulmate works; chances are you’ll be able to use the same approach in your own app with a completely different data set.</p>
+
+<br/>
+
+
+<p>I&rsquo;ll get started today by showing you step by step how to setup a new Rails 3.1 app with Soulmate and Redis, using the jQuery UI autocomplete widget. <a href="http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index">Next week I’ll follow this up with a second article</a> on the details of exactly how Soulmate’s Redis caching algorithm works. But before we start building the sample app, let’s learn something about the Soulmate gem&hellip;.</p>
+
+<h2>How Soulmate was intended to work</h2>
+
+<p>Here’s a conceptual diagram showing how you would normally use Soulmate:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2011/11/23/soulmate-as-intended.png" alt="How Soulmate was intended to work" /></p>
+
+<p>The Soulmate gem contains two components that you interact with directly:</p>
+
+<ul>
+  <li>A loader script (“soulmate load”) that reads a data text file containing all of the words or phrases that your end users will search for and saves them into Redis, and:</li>
+  <li>A Sinatra app that will perform searches against these words and return the matching results via HTTP directly to the user’s browser.</li>
+</ul>
+
+
+<p>Check out Soulmate’s <a href="https://github.com/seatgeek/soulmate">github readme page</a> for more details on exactly how to use the load script, and also on how to send search requests to the Sinatra app. SeatGeek also explain how to mount their Sinatra app inside your Rails 3 app, so you can take advantage of Soulmate without having to setup a separate server, etc.</p>
+
+<h2>Calling Soulmate directly from a Rails 3 app</h2>
+
+<p>Using Sinatra is a great way to get started with Soulmate quickly; however, I decided to set up the gem inside my Rails 3.1 app today in a slightly different way. Instead of interacting with Soulmate via the load script and Sinatra, I called the <span class="code">Soulmate::Loader</span> and <span class="code">Soulmate::Matcher</span> Ruby classes found inside the Soulmate gem directly from an ActiveRecord model. Here’s a diagram showing my setup:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2011/11/23/calling-soulmate-from-rails.png" alt="Calling Soulmate from Rails" /></p>
+
+<p>My ActiveRecord model&rsquo;s database table contains the words my users will search for using autocomplete, and uses an <span class="code">after_save</span> callback to save them in Soulmate by calling the same code that Soulmate’s loader script does: the <span class="code">Soulmate::Loader</span> class. This allows me to keep my SQL database in sync with my Redis autocomplete cache. Later when my users perform a search from an autocomplete text field, my app will call the same code that Soulmate’s Sinatra app did: the <span class="code">Soulmate::Matcher</span> class, without the need for a separate Rack app to service these results.</p>
+
+<p>This was actually all very easy to do! Soulmate’s code was quite easy to follow and everything just worked for me. To prove it, let’s spend 10 or 20 minutes together and setup a new sample Rails 3.1 app right now that will use Soulmate and Redis for autocomplete.</p>
+
+<h2>Step 1: Installing Redis and creating a new Rails 3.1 app</h2>
+
+<p>I’ll assume most of you have already installed and used Redis by now; if not then I hope reading this article will encourage you to take the time to download and become familiar with it. If you have <a href="https://github.com/mxcl/homebrew">Homebrew</a>, then it’s just a matter of running:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ brew install redis  
+==&gt; Downloading http://redis.googlecode.com/files/redis-2.2.14.tar.gz
+etc...
+</pre></div>
+</div>
+
+
+
+<p>If not, then you easily built it from source; see: <a href="http://redis.io/download">http://redis.io/download</a> for details.</p>
+
+<p>Now that we have Redis, let’s create a new example Rails 3.1 app that we can try out Soulmate with:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rails -v 
+Rails 3.1.3
+$ rails new soulmate_example
+{^s: create^}
+{^s: create^}  README
+{^s: create^}  Rakefile
+{^s: create^}  config.ru
+{^s: create^}  .gitignore
+{^s: create^}  Gemfile
+
+etc...
+
+Using sass-rails (3.1.5) 
+Using sqlite3 (1.3.4) 
+Using uglifier (1.1.0) 
+{^s: Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.^}
+</pre></div>
+</div>
+
+
+
+<p>And let’s add the Soulmate gem to the Gemfile, along with <a href="http://faker.rubyforge.org/rdoc/">Faker</a>, which will give us some silly names to test autocomplete with:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+source <span class="string"><span class="delimiter">'</span><span class="content">http://rubygems.org</span><span class="delimiter">'</span></span>
+
+gem <span class="string"><span class="delimiter">'</span><span class="content">rails</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">3.1.3</span><span class="delimiter">'</span></span>
+gem <span class="string"><span class="delimiter">'</span><span class="content">soulmate</span><span class="delimiter">'</span></span>
+gem <span class="string"><span class="delimiter">'</span><span class="content">faker</span><span class="delimiter">'</span></span>
+
+etc...
+</pre></div>
+</div>
+
+
+
+<p>Now we need to run <span class="code">bundle update</span> to install Soulmate and Faker, since Rails already ran <span class="code">bundle install</span> for us when we created the new app:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ bundle update
+</pre></div>
+</div>
+
+
+
+<h2>Step 2: Creating a model and some test data</h2>
+
+<p>Now let’s create a new ActiveRecord model called “Person” with a single string attribute called “name:”</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rails g model person name:string
+</pre></div>
+</div>
+
+
+
+<p>And next let’s write some code to create 1000 test person records using the Faker gem we added above. Editing db/seeds.rb:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="integer">1000</span>.times <span class="keyword">do</span>
+  <span class="constant">Person</span>.create <span class="symbol">:name</span> =&gt; <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span><span class="constant">Faker</span>::<span class="constant">Name</span>.first_name<span class="inline-delimiter">}</span></span><span class="content"> </span><span class="inline"><span class="inline-delimiter">#{</span><span class="constant">Faker</span>::<span class="constant">Name</span>.last_name<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>Finally we can create our database along with 1000 silly names:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rake db:migrate
+$ rake db:seed
+</pre></div>
+</div>
+
+
+
+<h2>Step 3: Adding the after_save callback, and loading the data into Redis</h2>
+
+<p>As I discussed above, today I’m going to call the Soulmate code directly to load the Redis cache with data, instead of using the load script. To do that, all we need to do is add an <span class="code">after_save</span> callback to our Person model:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="keyword">class</span> <span class="class">Person</span> &lt; <span class="constant">ActiveRecord</span>::<span class="constant">Base</span>
+  after_save <span class="symbol">:load_into_soulmate</span>
+
+  <span class="keyword">def</span> <span class="function">load_into_soulmate</span>
+    loader = <span class="constant">Soulmate</span>::<span class="constant">Loader</span>.new(<span class="string"><span class="delimiter">&quot;</span><span class="content">person</span><span class="delimiter">&quot;</span></span>)
+    loader.add(<span class="string"><span class="delimiter">&quot;</span><span class="content">term</span><span class="delimiter">&quot;</span></span> =&gt; name, <span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span> =&gt; id)
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>My Person model can access the <span class="code">Soulmate::Loader</span> class since I included the Soulmate gem in my bundle when I created the app. Now if I drop and recreate my database, all of the 1000 names will be loaded right into Redis via Soulmate, since the after_save callback will be called 1000 times when the “db:seed” rake task is called by “db:reset:”</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rake db:reset
+-- create_table(&quot;people&quot;, {:force=&gt;true})
+   -&gt; 0.0027s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0027s
+-- assume_migrated_upto_version(20111122161511, [&quot;/path/to/db/migrate&quot;])
+   -&gt; 0.0013s
+rake aborted!
+Connection refused - Unable to connect to Redis on 127.0.0.1:6379
+</pre></div>
+</div>
+
+
+
+<p>Oops &ndash; I forgot to start my redis server; let’s do that in a separate terminal window:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ redis-server 
+[1467] 22 Nov 11:20:12 # Warning: no config file specified, using the default config...
+[1467] 22 Nov 11:20:12 * Server started, Redis version 2.2.14
+[1467] 22 Nov 11:20:12 * DB loaded from disk: 0 seconds
+[1467] 22 Nov 11:20:12 * The server is now ready to accept connections on port 6379
+[1467] 22 Nov 11:20:13 - DB 0: 35 keys (0 volatile) in 96 slots HT.
+[1467] 22 Nov 11:20:13 - 0 clients connected (0 slaves), 957552 bytes in use
+</pre></div>
+</div>
+
+
+
+<p>And back in my first terminal window I’ll try again:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rake db:reset
+-- create_table(&quot;people&quot;, {:force=&gt;true})
+   -&gt; 0.0041s
+-- initialize_schema_migrations_table()
+   -&gt; 0.0027s
+-- assume_migrated_upto_version(20111122161511, [&quot;/path/to/db/migrate&quot;])
+   -&gt; 0.0015s
+</pre></div>
+</div>
+
+
+
+<h2>A window into your soul: taking a quick peek at the Redis data set</h2>
+
+<p>Let’s take a look at the special sauce that makes Soulmate interesting, how it saves the autocomplete data inside of Redis. To get sense of how this works, I’ll open the Redis command line interface:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ redis-cli
+redis 127.0.0.1:6379&gt; 
+</pre></div>
+</div>
+
+
+
+<p>Next week I’ll cover this in a lot more detail, but for now let’s take a quick look at how the autocomplete data are saved in Redis. First, I’ll take a look at a few entries in the “soulmate-data:person” hash:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+redis 127.0.0.1:6379&gt; hget soulmate-data:person 1
+&quot;{\&quot;term\&quot;:\&quot;Eda Lueilwitz\&quot;,\&quot;id\&quot;:1}&quot;
+redis 127.0.0.1:6379&gt; hget soulmate-data:person 2
+&quot;{\&quot;term\&quot;:\&quot;Abbey Lindgren\&quot;,\&quot;id\&quot;:2}&quot;
+redis 127.0.0.1:6379&gt; hget soulmate-data:person 3
+&quot;{\&quot;term\&quot;:\&quot;Brooklyn Mayer\&quot;,\&quot;id\&quot;:3}&quot;
+</pre></div>
+</div>
+
+
+
+<p>These wonderful names were generated by the call to <span class="code">Faker::Name.first_name</span> and <span class="code">Faker::Name.last_name</span> above in seeds.rb. The Redis key names use the pattern “soulmate-data:person” because I passed “person” into the constructor for the <span class="code">Soulmate::Loader</span> class above. You can see the Soulmate saves each name as a separate element in this Redis hash object.</p>
+
+<p>The real magic happens next: Soulmate also calculates a series of substrings for each phrase, or name in my example, and saves them separately into a search index, using a Redis sorted set object. For example, the name “Laurel” would be split into these possible substrings:</p>
+
+<p>La<br/>
+Lau<br/>
+Laur<br/>
+Laure<br/>
+Laurel<br/></p>
+
+<p>We can also see these values, along with a few other &ldquo;Lau&rdquo; substrings from other names, using the Redis command line:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+redis 127.0.0.1:6379&gt; keys soulmate-index:person:lau*
+1) &quot;soulmate-index:person:laur&quot;
+2) &quot;soulmate-index:person:laurel&quot;
+3) &quot;soulmate-index:person:laurie&quot;
+4) &quot;soulmate-index:person:laure&quot;
+5) &quot;soulmate-index:person:lauri&quot;
+6) &quot;soulmate-index:person:laury&quot;
+7) &quot;soulmate-index:person:lau&quot;
+</pre></div>
+</div>
+
+
+
+<p>If you try this yourself, you’ll get different values since the Faker gem creates random names. You might have to try different combinations of two or more letters to see the data.</p>
+
+<p>What we see here is really a search index: Soulmate has expanded all the possible combinations of matching letters your users might type as keys in this sorted set. The values corresponding to these keys are the id’s found above in the Redis hash &ndash; also the id’s of my ActiveRecord model objects! When a user types “lau” for example, Soulmate can issue a Redis query to figure out very quickly which person objects match&hellip; all without ever calling ActiveRecord to issue a single SQL query!</p>
+
+<p>There are a lot of interesting details here; stay tuned for a <a href="http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index">follow up post next week</a> on how this algorithm actually works, and the computer science theory behind it.</p>
+
+<h2>Step 4: Putting it all together with JQuery in Rails 3.1</h2>
+
+<p>Ok, let’s finish up our Rails 3.1 app and see Soulmate in action! I decided not to use a Rails autocomplete gem, such as the excellent <a href="https://github.com/crowdint/rails3-jquery-autocomplete">rails3-jquery-autocomplete</a>, since I don’t need any help with my server code; Soulmate is doing it all for me. Instead, I’ll just write the view code manually using the jQuery UI autocomplete widget. First I’ll head over to jquery-ui.org:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2011/11/23/jquery-ui.png" alt="jqueryui.com" /></p>
+
+<p>&hellip; and then deselect everything and then check off just the autocomplete widget:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2011/11/23/select-autocomplete.png" alt="select autocomplete widget" /></p>
+
+<p>Finally I’ll select the jQuery UI theme I want &ndash; hmm&hellip;. “Swanky Purse” sounds interesting:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2011/11/23/select-swanky-purse.png" alt="select swanky purse" /></p>
+
+<p>And I’ll download the tar ball to my laptop. Now I just need to copy the “Swanky Purse” jQuery UI files into my Rails 3.1 asset folder like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ cd ~/Downloads/jquery-ui-1
+$ cp js/* /path/to/app/assets/javascripts/.
+$ cp -r css/swanky-purse /path/to/app/assets/stylesheets/.
+</pre></div>
+</div>
+
+
+
+<p>This gives me both the Javascript I need to perform the autocomplete, and also the styling required to make it look “swanky!” Now I’ll generate a controller and view codes files for my sample web site like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rails g controller people index autocomplete_person_name
+</pre></div>
+</div>
+
+
+
+<p>This will create an index action, and also a second action to handle the AJAX requests generated by the autocomplete widget. Next I’ll enable the default root in routes.rb:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="comment"># You can have the root of your site routed with &quot;root&quot;</span>
+<span class="comment"># just remember to delete public/index.html.</span>
+root <span class="symbol">:to</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">people#index</span><span class="delimiter">'</span></span>
+</pre></div>
+</div>
+
+
+
+<p>&hellip; and delete the default Rails index page:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rm public/index.html
+</pre></div>
+</div>
+
+
+
+<p>And finally my view will consist of a single text field; editing app/views/people/index.html.erb:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+Please enter the name of a person:
+<span class="inline"><span class="inline-delimiter">&lt;%=</span> text_field_tag <span class="string"><span class="delimiter">'</span><span class="content">person_name</span><span class="delimiter">'</span></span> <span class="inline-delimiter">%&gt;</span></span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="inline"><span class="predefined">$</span>(<span class="keyword">function</span>() {
+  <span class="predefined">$</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">#person_name</span><span class="delimiter">&quot;</span></span> ).autocomplete({
+    <span class="key">source</span>: <span class="string"><span class="delimiter">&quot;</span></span></span><span class="inline"><span class="inline-delimiter">&lt;%=</span> people_autocomplete_person_name_path <span class="inline-delimiter">%&gt;</span></span>&quot;
+  });
+})
+<span class="tag">&lt;/script&gt;</span>
+</pre></div>
+</div>
+
+
+
+<p>Here I call the jQuery UI autocomplete widget on page load, and set it up against my single text field. I’ve set the source attribute to be the path of the “autocomplete_person_name” action, which I included in the people controller generate command above. Using unobtrusive Javascript would be much better, but for today this keeps things simple. If I have time, I’ll try to add Soulmate support to an existing Rails autocomplete gem, such as rails3-jquery-autocomplete.</p>
+
+<h2>Step 5: Calling Soulmate for autocomplete searches</h2>
+
+<p>The last thing we need to do to finish our Soulmate sample app is to actually call Soulmate when users start typing. To do this, all we need to do is implement the <span class="code">autocomplete_person_name</span> action in the <span class="code">PeopleController</span>:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="keyword">class</span> <span class="class">PeopleController</span> &lt; <span class="constant">ApplicationController</span>
+  <span class="keyword">def</span> <span class="function">index</span>
+  <span class="keyword">end</span>
+
+  <span class="keyword">def</span> <span class="function">autocomplete_person_name</span>
+    render <span class="symbol">:json</span> =&gt; <span class="constant">Person</span>.search(params[<span class="string"><span class="delimiter">'</span><span class="content">term</span><span class="delimiter">'</span></span>])
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>This just passes the “term” parameter, sent by JQuery, to the Person model’s search method and then renders the return value, the matching names, as JSON. And now let’s write that <span class="code">Person.search</span> method like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="keyword">class</span> <span class="class">Person</span> &lt; <span class="constant">ActiveRecord</span>::<span class="constant">Base</span>
+
+  <span class="keyword">def</span> <span class="predefined-constant">self</span>.<span class="function">search</span>(term)
+    matches = <span class="constant">Soulmate</span>::<span class="constant">Matcher</span>.new(<span class="string"><span class="delimiter">'</span><span class="content">person</span><span class="delimiter">'</span></span>).matches_for_term(term)
+    matches.collect {|match| {<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span> =&gt; match[<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>], <span class="string"><span class="delimiter">&quot;</span><span class="content">label</span><span class="delimiter">&quot;</span></span> =&gt; match[<span class="string"><span class="delimiter">&quot;</span><span class="content">term</span><span class="delimiter">&quot;</span></span>], <span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span> =&gt; match[<span class="string"><span class="delimiter">&quot;</span><span class="content">term</span><span class="delimiter">&quot;</span></span>] } }
+  <span class="keyword">end</span>
+
+etc...
+</pre></div>
+</div>
+
+
+
+<p>Just like I did earlier in the after_save callback, here i’m calling the Soulmate gem directly, this time using the <span class="code">Soulmate::Matcher</span> class. I pass the same “person” string into the constructor, and then just call the same method the Soulmate Sinatra app does: <span class="code">matches_for_term</span>, which calls Redis to perform the search! Once I have the matches, all I need to do is convert them into the format that the jQuery UI widget expects: an array of hashes containing the id, label and value for each name.</p>
+
+<p>Now running my Rails server and trying it out, I can see that “Swanky Purse” style:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2011/11/23/working-autocomplete.png" alt="working autocomplete" /></p>
+
+<h2>Stay tuned for more&hellip;</h2>
+
+<p>Whether or not you ever need to use autocomplete in your Rails 3 app, I hope this article will inspire you to consider using Redis the next time you have a large data set that you need to access quickly. Redis is an amazing tool, and when your data set is appropriate it can provide you with lightning fast query results. Next week I’ll continue my discussion of Soulmate, taking a closer look at the details of the autocomplete caching algorithm. There are a lot of interesting details there and a lot to learn from about how to use Redis.</p>
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

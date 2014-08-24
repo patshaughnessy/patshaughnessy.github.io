@@ -1,0 +1,224 @@
+title: "ruby187gc.patch"
+date: 2010/09/28
+
+<p>I just ported the RailsBench <a href="http://rubyforge.org/tracker/download.php/1814/7062/17676/3291/ruby186gc.patch">ruby186gc.patch</a> over to Ruby 1.8.7 - you can use this to measure garbage collection statistics for a Rails 3 app. I posted a <a href="http://github.com/patshaughnessy/ruby187gc">new ruby187gc.patch file</a> on github.</p>
+<h2>Why do you need this?</h2>
+<p>In <a href="http://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">my last post</a>, I ran some Rails profile performance tests and found the process time taken to execute ActiveRecord queries using find and select_all. However, I got &ldquo;unsupported&rdquo; for the amount of memory and number of Ruby objects created:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rake test:profile
+(in /Users/pat/rails-apps/perf_test)
+Loaded suite /Users/pat/.rvm/gems/ruby-1.8.7...
+Started
+LoadUsersTest#test_find (54 ms warmup)
+        process_time: 398 ms
+<div class='container'>              memory: unsupported
+             objects: unsupported<span class='overlay'></span></div>
+</pre></div>
+</div><br>
+<p>To get these values you need to use a patched Ruby interpreter that supports measuring memory allocations, object creations, etc. In addition, if you want to run these tests on a Rails 3 app, you&rsquo;ll need to use Ruby 1.8.7 or higher.</p>
+<p>If you don&rsquo;t mind reinstalling Ruby, Rails and all of the gems your app uses, then the best way to do this might be to install <a href="http://www.rubyenterpriseedition.com/">Ruby Enterprise Edition</a>, based on Ruby 1.8.7. This version of Ruby contains the GC statistics code changes along with a variety of other code changes and improvements.</p>
+<p>But I had a lot of gems already installed, and I also already had a copy of standard Ruby 1.8.7 built from source by RVM, so I decided to just port over the GC patch code changes myself. It was a lot of fun, and for a while I&rsquo;ve been looking for a good excuse to take a look under the hood at how Ruby actually works internally.</p>
+<p>Here&rsquo;s how to install the patch in your copy of the Ruby 1.8.7 source; replace the .rvm/src path with the actual path of the Ruby source code on your machine:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ cd ~/.rvm/src/ruby-1.8.7-p302
+$ git clone http://github.com/patshaughnessy/ruby187gc.git
+$ cat ruby187gc/ruby187gc.patch | patch -p0
+patching file gc.c
+patching file intern.h</pre></div>
+</div><br>
+<p>Now you can recompile Ruby and reinstall the ruby, irb, etc., executables:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ make
+$ make install</pre></div>
+</div><br>
+<h2>Using the GC patch with Rails 3 performance tests</h2>
+<p>As explained in the <a href="http://guides.rubyonrails.org/performance_testing.html">Performance Testing Rails Applications Rails Guide</a>, if you&rsquo;re using Rails you can take advantage of this patch using the ruby-prof gem and then running Rails performance tests using rake test:profile. Until now the problem was the standard GC patch only applied to Ruby 1.8.6, which is not supported by Rails 3.</p>
+<p>One important detail here: if you&rsquo;ve already got the ruby-prof gem, be sure to uninstall it and reinstall it again after patching Ruby before trying to use it. This is necessary since the gem builds native extensions when it&rsquo;s installed that need to pick up the GC patch changes in the Ruby interpreter.</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ gem uninstall ruby-prof
+Remove executables:
+        ruby-prof
+
+in addition to the gem? [Yn]  Y
+Removing ruby-prof
+Successfully uninstalled ruby-prof-0.9.2</pre></div>
+</div><br>
+<p>Now go ahead and reinstall it (or install it for the first time):</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ gem install ruby-prof
+Building native extensions.  This could take a while...
+Successfully installed ruby-prof-0.9.2
+1 gem installed
+Installing ri documentation for ruby-prof-0.9.2...
+Installing RDoc documentation for ruby-prof-0.9.2...</pre></div>
+</div><br>
+<p>Repeating the select_all vs. find example from <a href="http://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">my last post</a>:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rake test:profile
+  (in /Users/pat/perf_test)
+  Loaded suite /Users/pat/.rvm/gems/ruby-1.8.7-p302/gems/rake-0.8.7/...
+  Started
+  LoadUsersTest#test_find (55 ms warmup)
+          process_time: 398 ms
+<div class='container'>                memory: 1327.91 KB
+               objects: 118715<span class='overlay'></span></div>
+  .
+  LoadUsersTest#test_select_all (35 ms warmup)
+          process_time: 242 ms
+<div class='container'>                memory: 925.35 KB
+               objects: 106562<span class='overlay'></span></div>
+  .
+  Finished in 1.580706 seconds.
+
+  6 tests, 0 assertions, 0 failures, 0 errors</pre></div>
+</div><br>
+<p>Now you can see in addition to the process_time value, I also get values for the amount of memory allocated in each test, and also the number of Ruby objects created.</p>
+<h2>Enabling detailed GC statistics</h2>
+<p>Another neat trick you can try after installing the GC patch is to set an environment variable causing the patched Ruby interpreter to display detailed statistics each time it runs a garbage collection:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ export RUBY_GC_STATS=1</pre></div>
+</div><br>
+<p>And now repeating the profile test:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rake test:profile
+  (in /Users/pat/perf_test)
+  Loaded suite /Users/pat/.rvm/gems/ruby-1.8.7-p302/gems/rake-0.8.7/...
+  Started
+  LoadUsersTest#test_find (56 ms warmup)
+          process_time: 399 ms
+  Garbage collection started
+  objects processed: 0140928
+  live objects	: 0000000
+  freelist objects : 0000000
+  freed objects	: 0140928
+  kept 0001390 / freed 0001385 objects of type OBJECT
+  kept 0000644 / freed 0008742 objects of type FLOAT
+  kept 0034120 / freed 0061905 objects of type STRING
+  kept 0002805 / freed 0053757 objects of type ARRAY
+  kept 0002140 / freed 0005240 objects of type HASH
+  kept 0000013 / freed 0000001 objects of type BIGNUM
+  kept 0000005 / freed 0000930 objects of type MATCH
+  kept 0000291 / freed 0001156 objects of type VARMAP
+  kept 0000250 / freed 0000131 objects of type SCOPE
+  kept 0312179 / freed 0007469 objects of type NODE
+  GC time: 44 msec
+                memory: 1327.91 KB
+  Garbage collection started
+  objects processed: 0148944
+  live objects	: 0000000
+  freelist objects : 0027118
+  freed objects	: 0121826
+  kept 0001391 / freed 0001590 objects of type OBJECT
+  kept 0000793 / freed 0012976 objects of type FLOAT
+  kept 0027154 / freed 0070691 objects of type STRING
+  kept 0002833 / freed 0017263 objects of type ARRAY
+  kept 0000564 / freed 0005472 objects of type HASH
+  kept 0000013 / freed 0000002 objects of type BIGNUM
+  kept 0000006 / freed 0001767 objects of type MATCH
+  kept 0000295 / freed 0002076 objects of type VARMAP
+  kept 0000258 / freed 0000121 objects of type SCOPE
+  kept 0312510 / freed 0008908 objects of type NODE
+  GC time: 43 msec
+               objects: 118715
+  .
+  LoadUsersTest#test_select_all (35 ms warmup)
+          process_time: 243 ms
+                memory: 925.35 KB
+               objects: 106562
+  .
+  Finished in 1.672623 seconds.
+
+  6 tests, 0 assertions, 0 failures, 0 errors</pre></div>
+</div><br>
+<p>Here we can see Ruby ran the garbage collection code twice during my performance test - not coincidentally both times occurred during my &ldquo;LoadUsersTest#test_find&rdquo; test, and neither occurred during the &ldquo;LoadUsersTest#test_select_all&rdquo; test. This is because ActiveRecord::Base.find is creating a lot more objects and using more memory than ActiveRecord::Base.connection.select_all is. See my last post for more details.</p>
+<p>I can also see that the GC executions took 44ms and 43ms, and also details such as what types of Ruby objects were freed. With RUBY_GC_STATS=1 you could run your Rails server process and get this output each time your server had to stop and perform garbage collection - this could be a good way to see if garbage collection was in fact causing performance problems for your app.</p>
+<h2>C programming details</h2>
+<p>The GC patch code is actually quite simple. Among other things, a couple global variables are added to gc.c to track how many times Ruby allocates memory, and how much it allocates:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="pt">long</span> gc_allocated_size = <span class="i">0</span>;
+<span class="pt">long</span> gc_num_allocations = <span class="i">0</span>;</pre></div>
+</div><br>
+<p>Next, whenever Ruby needs to allocate memory for a new object, it calls this function:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="pt">void</span> *
+ruby_xmalloc(size)
+    <span class="pt">long</span> size;
+{
+    <span class="pt">void</span> *mem;
+
+    <span class="r">if</span> (size &lt; <span class="i">0</span>) {
+        rb_raise(rb_eNoMemError, <span class="s"><span class="dl">&quot;</span><span class="k">negative allocation size (or too big)</span><span class="dl">&quot;</span></span>);
+    }
+    <span class="r">if</span> (size == <span class="i">0</span>) size = <span class="i">1</span>;
+
+    <span class="r">if</span> (ruby_gc_stress || (malloc_increase+size) &gt; malloc_limit) {
+        garbage_collect();
+    }
+    RUBY_CRITICAL(mem = malloc(size));
+    <span class="r">if</span> (!mem) {
+        garbage_collect();
+        RUBY_CRITICAL(mem = malloc(size));
+        <span class="r">if</span> (!mem) {
+            rb_memerror();
+        }
+    }
+    malloc_increase += size;
+
+<div class='container'>    <span class="r">if</span> (gc_statistics) {
+      gc_allocated_size += size;
+      gc_num_allocations += <span class="i">1</span>;
+    }<span class='overlay'></span></div>
+
+    <span class="r">return</span> mem;
+}</pre></div>
+</div><br>
+<p>Here you can see Ruby&rsquo;s basic logic around allocating memory.
+<ul><li>malloc_increase tracks the current heap size</li>
+<li>malloc_limit is the maximum size each heap is allowed to be</li>
+<li>If the amount of requested memory causes the heap to pass the limit, garbage_collect() is called... this means your Ruby application stops completely while unused objects are freed.</li>
+<li>If ruby_gc_stress == 1 then Ruby will call garbage_collect for each and every allocation... you can set this using the Ruby call &ldquo;GC.stress = 1&rdquo;  ... of course, this is only useful for someone debugging the interpreter code.</li>
+<li>Then Ruby calls malloc to get the new memory from the operating system, and calls garbage_collect again in case that fails.</li>
+<li>Next Ruby calculates the new heap size: malloc_increase += size</li>
+<li>Finally, the highlighted lines at the bottom keep track of the total amount of memory allocated (gc_allocated_size) and the total number of allocations (gc_num_allocations). These lines were added by the GC patch.</li>
+</ul></p>
+<p>Keep in mind this is such a low level function in the C interpreter code that this will be called many thousands of times for every Ruby application!</p>
+<p>Later the gc_num_allocations and gc_allocated_size values are made available to Ruby programs using the &ldquo;GC&rdquo; object, like this:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="c">/*
+*  call-seq:
+*     GC.allocated_size    =&gt; Integer
+*
+*  Returns the size of memory (in bytes) allocated since GC statistics collection
+*  was enabled.
+*
+*     GC.allocated_size    #=&gt; 35
+*
+*/</span>
+
+VALUE
+rb_gc_allocated_size()
+{
+    <span class="r">return</span> INT2NUM(gc_allocated_size);
+}</pre></div>
+</div><br>
+<p>To use the GC patch in one of your Ruby programs, you call GC.enable_stats, and then you use the GC object to display various statistics such as the number of objects allocated, the amount of memory used, etc. For example:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ irb
+ruby-1.8.7-p302 > GC.enable_stats
+ => false 
+ruby-1.8.7-p302 > GC.allocated_size
+ => 3348 
+ruby-1.8.7-p302 > GC.num_allocations
+ => 326 
+ruby-1.8.7-p302 > GC.collections
+ => 0 
+ruby-1.8.7-p302 > GC.time
+ => 0 
+ruby-1.8.7-p302 > GC.clear_stats
+ => nil 
+ruby-1.8.7-p302 > ObjectSpace.allocated_objects
+ => 37390 
+</pre></div>
+</div><br>
+<p>GC.collections return the number of times garbage_collect() was called, and GC.time returns the total time spent performing garbage collection. Finally, ObjectSpace.allocated_objects returns the total number of objects created.</p>
+<p>When you run a Rails profile performance test with the ruby-prof gem, it calls these new methods added by the GC patch to display the &ldquo;memory&rdquo; and &ldquo;objects&rdquo; values.</p>

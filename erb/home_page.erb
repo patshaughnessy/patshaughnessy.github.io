@@ -1,0 +1,54 @@
+<div id="about1" class="about">
+  <div id="about_photo">
+    <img src="/assets/images/pat2.jpg"/>
+  </div>
+  <p><b>Blogger</b> I love diving into the details of a technology, learning how it works, and then explaining it in simple terms that everyone can understand.</p>
+  <p><b>Rubyist</b> I’ve written a few gems that you can find <a href="https://github.com/patshaughnessy">on my github profile</a>. You can also find me occasionally at meetings of the <a href="http://bostonrb.org/">Boston.rb</a> group.</p>
+  <p><b>Aspiring Author</b> I just self-published an eBook called <a href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a Microscope</a>.
+</div>
+
+<div id="about2" class="about">
+  <p><b>SitePoint</b> <a href="http://www.sitepoint.com/author/pshaughnessy/">I also write for SitePoint.com</a>; recently I've been having fun interviewing famous Rubyists and open source developers.</p>
+
+  <div id="about2-subscribe">
+
+    <div class="header"><b>Subscribe</b>&nbsp;<a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16.png"/></a></div>
+    <div class="links">
+      <ul>
+        <li>
+          <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><br/>
+          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+          <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="about2-book">
+    <div class="header"><b>Buy my book:</b></div>
+    <div id="about2-book-icon">
+      <a href="http://patshaughnessy.net/ruby-under-a-microscope"><img src="http://patshaughnessy.net/assets/images/book-cover.png"></a><br/>
+    </div>
+    <div class="header"><b><a href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a Microscope</a></b></div>
+  </div>
+</div>
+
+<div style="clear: left"></div>
+
+<div id="all-articles">
+  <h2>All Articles</h2>
+</div>
+
+<table id="archive-table"><% last_month = nil %>
+
+  <% posts.zip(month_strings).each do |post, month_string| %>
+    <tr>
+      <td align="right">
+          <%= month_string %>
+      </td>
+      <td>
+        <a href="<%= post.url %>"><%= post.title %></a>
+      </td>
+    </tr>
+  <% end %>
+</table>

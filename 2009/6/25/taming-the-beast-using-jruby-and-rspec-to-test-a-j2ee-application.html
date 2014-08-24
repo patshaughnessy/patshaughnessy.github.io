@@ -1,0 +1,323 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Taming the beast: Using JRuby and RSpec to test a J2EE application - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Taming the beast: Using JRuby and RSpec to test a J2EE application - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Taming the beast: Using JRuby and RSpec to test a J2EE application</h1>
+  </header>
+
+  <section class="content">
+    <p>Working with J2EE applications is something like wandering in a jungle: you never quite know what wild animal you&rsquo;ll find around the next corner&hellip; it might be an ORM tool like Hibernate; it could be an application framework like Spring or Struts with lots of confusing XML files, or it might just be a long list of obscure JAR files that you need to find and download&hellip; whatever it is, you&rsquo;re guaranteed to spend countless hours wasting time learning things you really didn&rsquo;t want to know. This article will show how you can get your J2EE application under control by using JRuby and RSpec&hellip; but first, let&rsquo;s take a quick look at what RSpec is and how it&rsquo;s normally used with Ruby.</p>
+
+
+<p/>
+<p><b>Using RSpec with Ruby</b></p>
+<p>If you are a Ruby developer, you would probably write code similar to this to add up an array of numbers:</p>
+<pre>class Calculator
+  def self.sum numbers
+    numbers.inject do |sum, x|
+      sum+x
+    end
+  end
+end</pre>
+<p>This is simple enough to run:</p>
+<pre>$ irb
+irb(main):001:0&gt; require &#x27;calculator.rb&#x27;
+=&gt; true
+irb(main):002:0&gt; Calculator.sum [2, 3]
+=&gt; 5</pre>
+<p>One of the best things about Ruby are all of the different testing tools available to you &ndash; for example, you could write a test for this method using RSpec like this:</p>
+<pre>require &#x27;calculator.rb&#x27;
+describe &quot;Calculator&quot; do
+  it &quot;should add numbers correctly&quot; do
+    Calculator.sum([1, 2]).should == 3
+    Calculator.sum([2, 2]).should == 4
+    Calculator.sum([2, 3, 4]).should == 9
+  end
+end</pre>
+<p>And then run the spec as follows:</p>
+<pre>$ spec calculator_spec.rb 
+.
+Finished in 0.001703 seconds
+1 example, 0 failures</pre>
+<p>RSpec allows you to write test code that is readable, and also behavior-oriented; that is, the tests reflect the way an end user might actually behave. In fact, RSpec is really just the first step towards behavior-driven-development. The Ruby community also benefits from other tools such as WebRat, Cucumber, etc., that can make testing very easy and effective.</p>
+<p/>
+<p><b>A J2EE sample app</b></p>
+<p>Let&rsquo;s rewrite the &ldquo;sum&rdquo; Ruby method above using Java. To make this feel more like an actual J2EE application, we&rsquo;ll use a service class that will perform the actual sum operation for us, and set it up with the Spring framework. We can start by writing an XML file called &ldquo;ApplicationContext.xml&rdquo; for Spring to use, and declare a bean called &ldquo;calculatorService:&rdquo;</pre>
+<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE beans PUBLIC &quot;-//SPRING//DTD BEAN//EN&quot;
+  &quot;http://www.springframework.org/dtd/spring-beans.dtd&quot;&gt;
+&lt;beans&gt;
+  &lt;bean id=&quot;calculatorService&quot;
+    class=&quot;calculator.CalculatorServiceImpl&quot;&gt;
+  &lt;/bean&gt;
+&lt;/beans&gt;</pre>
+<p>In a real J2EE app, we would probably have an interface called &ldquo;CalculatorService&rdquo; like this:</p>
+<pre>package calculator;
+public interface CalculatorService {
+  public int sum(int[] array);
+}</pre>
+<p>And then we&rsquo;d implement it using a concrete class, like this:</p>
+<pre>package calculator;
+public class CalculatorServiceImpl implements CalculatorService {
+  public int sum(int[] array)
+  {
+    int sum = 0;
+    for (int number: array)
+    {
+      sum += number;
+    }
+    return sum;
+  }
+}</pre>
+<p>And finally, let&rsquo;s write a simple Java command line client for this so we can test running it from the command line:</p>
+<pre>package calculator;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+public class CalculatorApp {
+  public static void main(String[] args) throws Exception {
+    int[] array = { 2, 3 };
+    ClassPathXmlApplicationContext application_context =
+      new ClassPathXmlApplicationContext(&quot;ApplicationContext.xml&quot;);
+    CalculatorService calculator =
+      (CalculatorService)application_context.getBean(&quot;calculatorService&quot;);
+    System.out.println(&quot;2 + 3 is: &quot; + Integer.toString(calculator.sum(array)));
+  }
+}</pre>
+<p>This will also help us figure out how to write the ruby spec later. If you run this from Eclipse or your favorite Java IDE, you&rsquo;ll get:</p>
+<pre>Jun 25, 2009 12:21:58 PM org.springframework.context.support.AbstractApplicationContext prepareRefresh
+INFO: Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@3479e304: display name [org.springframework.context.support.ClassPathXmlApplicationContext@3479e304]; startup date [Thu Jun 25 12:21:58 EDT 2009]; root of context hierarchy
+Jun 25, 2009 12:21:58 PM org.springframework.beans.factory.xml.XmlBeanDefinitionReader loadBeanDefinitions
+INFO: Loading XML bean definitions from class path resource [ApplicationContext.xml]
+Jun 25, 2009 12:21:58 PM org.springframework.context.support.AbstractApplicationContext obtainFreshBeanFactory
+INFO: Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@3479e304]: org.springframework.beans.factory.support.DefaultListableBeanFactory@604788d5
+Jun 25, 2009 12:21:58 PM org.springframework.beans.factory.support.DefaultListableBeanFactory preInstantiateSingletons
+INFO: Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@604788d5: defining beans [calculatorService]; root of factory hierarchy
+2 + 3 is: 5</pre>
+<p>This is starting to feel like an actual &ldquo;Enterprise&rdquo; J2EE application now that we have an XML config file and lots of confusing information being logged!</p>
+<p/>
+<p><b>Running RSpec with JRuby</b></p>
+<p>Now that we have a J2EE application to test, let&rsquo;s get started with JRuby. First, you will need to <a href="http://jruby.codehaus.org/Getting+Started">download and install JRuby</a>. This is really just a matter of downloading the TAR file and then placing the JRuby bin folder on your path. Test that you have it setup properly by running this command:</p>
+<pre>$ jruby --version
+jruby 1.1.5 (ruby 1.8.6 patchlevel 114) (2008-11-03 rev 7996) [x86_64-java]</pre>
+<p>Now let&rsquo;s update our Ruby spec from above and get it to work with Java. Here&rsquo;s what we had for Ruby:</p>
+<pre>require &#x27;calculator.rb&#x27;
+describe &quot;Calculator&quot; do
+  it &quot;should add numbers correctly&quot; do
+    Calculator.add([1, 2]).should == 3
+    Calculator.add([2, 2]).should == 4
+    Calculator.add([2, 3, 4]).should == 9
+  end
+end</pre>
+<p>The key to using JRuby to test Java is to add this line at the top of the spec:</p>
+<pre>require 'java'</pre>
+<p>This tells JRuby that we want to allow the Ruby code to call Java directly. But what code should we try to call? The nice thing about the Spring framework is that is makes a series of &ldquo;beans,&rdquo; i.e. Java objects, available to us. The reason I went to the trouble of adding the Spring framework to this sample app is that for a real J2EE application using Spring to create and load a Java object will be the simplest path towards testing your target application. What I did while testing a real J2EE application was to:</p>
+<ul>
+  <li>Identify what business logic I wanted to test</li>
+  <li>Look for the Java object that was the top-level, simplest interface to that business logic under the user interface layer</li>
+  <li>Find a bean in the ApplicationContext.xml file that corresponded to that Java object. In my case, there actually was no such bean, and I had to slightly modify the application I was testing by adding a new &lt;bean&gt; tag to one of the Spring XML files.</li>
+</ul>
+<p>If your application is not using Spring, you might simply be able to create a Java object directly from your Ruby code, or in the worst case scenario you might have to make Java code changes to the target J2EE app to break dependencies that the object you&rsquo;d like to test has on other objects, interfaces, services, etc., allowing you to create it in isolation. Michael Feathers has written an entire <a href="http://amzn.com/0131177052">book on dependency breaking techniques</a>.</p>
+<p>Back to this sample app: here in our Ruby spec we can follow the same pattern that I used above in the command line Java client: calling &ldquo;ClassPathXmlApplicationContext&rdquo; to get the application context, and then creating a bean with getBean. The other thing we need to add are &ldquo;include_class&rdquo; directives that indicate to JRuby which Java classes should be loaded from the classpath and made available to the Ruby script. Here&rsquo;s the spec code with the new JRuby code changes in bold:</p>
+<pre><b>require &#x27;java&#x27;
+include_class &#x27;org.springframework.context.ApplicationContext&#x27;
+include_class
+  &#x27;org.springframework.context.support.ClassPathXmlApplicationContext&#x27;</b>
+describe &quot;Calculator&quot; do
+  it &quot;should add numbers correctly&quot; do
+    <b>application_context =
+      ClassPathXmlApplicationContext.new &quot;ApplicationContext.xml&quot;
+    calculator =  application_context.getBean &quot;calculatorService&quot;</b>
+    calculator.sum([1, 2]).should == 3
+    calculator.sum([2, 2]).should == 4
+    calculator.sum([2, 3, 4]).should == 9
+  end
+end</pre>
+<p>Now let&rsquo;s try to run it using JRuby. Another trick with JRuby is knowing how to use the &ldquo;-S&rdquo; option &ndash; this allows you to run a Ruby command like &ldquo;gem&rdquo; or &ldquo;spec,&rdquo; but inside a JRuby session. So here&rsquo;s how to run our new spec using JRuby:</p>
+<pre>$ jruby -S spec calculator_spec.rb 
+(eval):1:in `include_class&#x27;: cannot load Java class
+  org.springframework.context.ApplicationContext (NameError)
+  from /Users/pat/src/jruby-1.1.5/lib/ruby/site_ruby/1.8/builtin/javasupport/core_ext/object.rb:38:in `eval&#x27;
+  from /Users/pat/src/jruby-1.1.5/lib/ruby/site_ruby/1.8/builtin/javasupport/core_ext/object.rb:67:in `include_class&#x27;
+  from /Users/pat/src/jruby-1.1.5/lib/ruby/site_ruby/1.8/builtin/javasupport/core_ext/object.rb:38:in `each&#x27;
+  from /Users/pat/src/jruby-1.1.5/lib/ruby/site_ruby/1.8/builtin/javasupport/core_ext/object.rb:38:in `include_class&#x27;
+  from calculator_spec.rb:2</pre>
+<p>So what is the error message all about? This just means that JRuby wasn&rsquo;t able to find the ApplicationContext class from Spring on the classpath. But what is the classpath anyway? It would be nice to be able to simply specify the classpath using a command line option, the way you do with a java command line using &ldquo;-cp&rdquo; for example. But for JRuby you need to specify the classpath as an environment setting. To make this easier, I wrote a simple shell script for running a JRuby spec:</p>
+<pre>BASE=`pwd`
+CLASSPATH=$BASE/lib/spring-2.5.1.jar
+export CLASSPATH
+jruby -S spec $1</pre>
+<p>This just gets the current working directory and constructs the classpath setting, indicating where to find the Spring JAR file. Finally we export the classpath value and call JRuby. This will work on the Mac and Linux; for Windows you would need something slightly different. Anyway, now I can run my specs like this:</p>
+<pre>$ ./jruby-spec.sh calculator_spec.rb 
+F
+1)
+NativeException in &#x27;Calculator should add numbers correctly&#x27;
+java.lang.NoClassDefFoundError: org/apache/commons/logging/LogFactory
+org/springframework/util/ClassUtils.java:73:in `&lt;clinit&gt;&#x27;
+org/springframework/core/io/DefaultResourceLoader.java:52:in `&lt;init&gt;&#x27;
+org/springframework/context/support/AbstractApplicationContext.java:198:in `&lt;init&gt;&#x27;
+org/springframework/context/support/AbstractRefreshableApplicationContext.java:80:in `&lt;init&gt;&#x27;
+org/springframework/context/support/AbstractXmlApplicationContext.java:58:in `&lt;init&gt;&#x27;
+org/springframework/context/support/ClassPathXmlApplicationContext.java:119:in `&lt;init&gt;&#x27;
+org/springframework/context/support/ClassPathXmlApplicationContext.java:66:in `&lt;init&gt;&#x27;
+sun/reflect/NativeConstructorAccessorImpl.java:-2:in `newInstance0&#x27;
+sun/reflect/NativeConstructorAccessorImpl.java:39:in `newInstance&#x27;
+sun/reflect/DelegatingConstructorAccessorImpl.java:27:in `newInstance&#x27;
+java/lang/reflect/Constructor.java:513:in `newInstance&#x27;
+org/jruby/javasupport/JavaConstructor.java:226:in `new_instance&#x27;
+org/jruby/java/invokers/ConstructorInvoker.java:100:in `call&#x27;
+org/jruby/java/invokers/ConstructorInvoker.java:180:in `call&#x27;
+etc...</pre>
+<p>Oops &ndash; it turns out that Spring actually requires the Apache Commons logging JAR file to be on the classpath also. This sample app is definitely reminding me of a complex J2EE app running on WebSphere or WebLogic! Let&rsquo;s add commons-logging-1.0.4.jar to the classpath in my shell script and try again:</p>
+<pre>$ ./jruby-spec.sh calculator_spec.rb 
+Jun 25, 2009 1:58:15 PM org.springframework.context.support.AbstractApplicationContext prepareRefresh
+INFO: Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@4c6c3e: display name [org.springframework.context.support.ClassPathXmlApplicationContext@4c6c3e]; startup date [Thu Jun 25 13:58:15 EDT 2009]; root of context hierarchy
+Jun 25, 2009 1:58:15 PM org.springframework.beans.factory.xml.XmlBeanDefinitionReader loadBeanDefinitions
+INFO: Loading XML bean definitions from class path resource [ApplicationContext.xml]
+F
+1)
+NativeException in &#x27;Calculator should add numbers correctly&#x27;
+org.springframework.beans.factory.BeanDefinitionStoreException:
+  IOException parsing XML document from class path resource
+  [ApplicationContext.xml]; nested exception is java.io.FileNotFoundException:
+  class path resource [ApplicationContext.xml] cannot be opened because
+  it does not exist
+org/springframework/beans/factory/xml/XmlBeanDefinitionReader.java:334:in `loadBeanDefinitions&#x27;
+org/springframework/beans/factory/xml/XmlBeanDefinitionReader.java:295:in `loadBeanDefinitions&#x27;</pre>
+<p>Once again, I&rsquo;ve forgotten something in my class path: this time it&rsquo;s the ApplicationContext.xml file which I passed into ClassPathXmlApplicationContext in the spec. As the name implies, I need to put the XML file on the classpath in order for Spring to be able to find it. Let&rsquo;s cut to the chase and put everything I need onto the classpath&hellip; here&rsquo;s the final version of jruby-spec.sh (the classpath line split into two for readability):</p>
+<pre>BASE=`pwd`
+CLASSPATH=$BASE/bin:$BASE/resources:$BASE/lib/spring-2.5.1.jar:
+  $BASE/lib/commons-logging-1.0.4.jar
+export CLASSPATH
+jruby -S spec $1</pre>
+<p>Now JRuby will be able to find everything that it needs: Spring, Apache Common Logging, the ApplicationContext.xml file, and also the application&rsquo;s class files saved under &ldquo;bin&rdquo; by Eclipse. Now if I run the spec once more it should all work:</p>
+<pre>$ ./jruby-spec.sh calculator_spec.rb 
+Jun 25, 2009 2:02:22 PM org.springframework.context.support.AbstractApplicationContext prepareRefresh
+INFO: Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@1717d968: display name [org.springframework.context.support.ClassPathXmlApplicationContext@1717d968]; startup date [Thu Jun 25 14:02:22 EDT 2009]; root of context hierarchy
+Jun 25, 2009 2:02:22 PM org.springframework.beans.factory.xml.XmlBeanDefinitionReader loadBeanDefinitions
+INFO: Loading XML bean definitions from class path resource [ApplicationContext.xml]
+Jun 25, 2009 2:02:22 PM org.springframework.context.support.AbstractApplicationContext obtainFreshBeanFactory
+INFO: Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@1717d968]: org.springframework.beans.factory.support.DefaultListableBeanFactory@5a21fdc8
+Jun 25, 2009 2:02:22 PM org.springframework.beans.factory.support.DefaultListableBeanFactory preInstantiateSingletons
+INFO: Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@5a21fdc8: defining beans [calculatorService]; root of factory hierarchy
+F
+1)
+TypeError in &#x27;Calculator should add numbers correctly&#x27;
+for method sum expected [[I]; got: [org.jruby.RubyArray];
+  error: argument type mismatch calculator_spec.rb:8:
+Finished in 0.70559 seconds
+1 example, 1 failure</pre>
+<p>What&rsquo;s this error all about? I do have the correct classpath now, but what does &ldquo;RubyArray&rdquo; mean? I thought I passed an array of integers into the calculator service:</p>
+<pre>calculator.sum([1, 2]).should == 3</pre>
+<p>Well it turns out that Ruby and JRuby aren&rsquo;t quite the same thing. Since JRuby is actually a Java application itself, it implements each Ruby class with a corresponding Java class. For the Ruby Array class, JRuby has created a class called &ldquo;org.jruby.RubyArray.&rdquo; When you call Java code and pass in Ruby objects, JRuby actually provides the Java equivalent of these Ruby objects to the Java code. That&rsquo;s why we get an error here; our calculator service doesn&rsquo;t expect a RubyArray &ndash; it expects int[] instead.</p>
+<p>To avoid this error, we need to convert the RubyArray into a normal Java array, using a JRuby method called &ldquo;to_java()&rdquo;, like this:</p>
+<pre>calculator.sum([1, 2].to_java(:int)).should == 3</pre>
+<p>To_java takes a symbol as a parameter, which indicates what type each element of the Ruby array should be converted into. Now our spec will pass!</p>
+<pre>$ ./jruby-spec.sh calculator_spec.rb 
+Jun 25, 2009 2:15:37 PM org.springframework.context.support.AbstractApplicationContext prepareRefresh
+INFO: Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@1717d968: display name [org.springframework.context.support.ClassPathXmlApplicationContext@1717d968]; startup date [Thu Jun 25 14:15:37 EDT 2009]; root of context hierarchy
+Jun 25, 2009 2:15:37 PM org.springframework.beans.factory.xml.XmlBeanDefinitionReader loadBeanDefinitions
+INFO: Loading XML bean definitions from class path resource [ApplicationContext.xml]
+Jun 25, 2009 2:15:37 PM org.springframework.context.support.AbstractApplicationContext obtainFreshBeanFactory
+INFO: Bean factory for application context [org.springframework.context.support.ClassPathXmlApplicationContext@1717d968]: org.springframework.beans.factory.support.DefaultListableBeanFactory@5a21fdc8
+Jun 25, 2009 2:15:37 PM org.springframework.beans.factory.support.DefaultListableBeanFactory preInstantiateSingletons
+INFO: Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@5a21fdc8: defining beans [calculatorService]; root of factory hierarchy
+.
+Finished in 0.28237 seconds
+1 example, 0 failures</pre>
+<p>Taking a step back, I think what we&rsquo;ve done is quite interesting; we have:
+  <ul>
+    <li>Pulled a J2EE application out of Eclipse, IntelliJ or whatever IDE you project uses, and started to run it from the command line instead. For me, avoiding a confusing and complex IDE makes the application easier to work with&hellip; more like a Rails app.</li>
+    <li>Documented what the classpath needs to be and what JAR files the application requires in an understandable text file format, rather than having it hidden away in a confusing Eclipse dialog box.</li>
+    <li>Exposed the J2EE application&rsquo;s business logic to testing below the user interface layer &ndash; nothing here involves a web browser or user interface testing tool like Selenium.</li>
+    <li>Started to apply behavior driven development to a J2EE application, using the best tools available, which happen to be written in Ruby.</li>
+  </ul>
+  In a future post, I&rsquo;ll try to take the next step of using Cucumber features to test this same J2EE sample app. It will be interesting to find out if Cucumber works will with JRuby.</p>
+
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

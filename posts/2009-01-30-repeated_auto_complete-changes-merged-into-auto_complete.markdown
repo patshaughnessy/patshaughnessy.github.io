@@ -1,0 +1,104 @@
+title: Repeated_auto_complete changes merged into auto_complete
+date: 2009/01/30
+tag: the auto_complete plugin
+
+<p>Update June 2009: I just added support to my version of auto_complete to support Rails 2.3 nested attributes; for more details see: <a href="http://patshaughnessy.net/repeated_auto_complete">http://patshaughnessy.net/repeated_auto_complete</a>. The basic ideas below still apply, but my implementation of auto_complete has changed, and <a href="http://patshaughnessy.net/2009/6/15/repeated-auto-complete-plugin-usage-change">I&rsquo;ve also simplified the usage.</a></p>
+<p>&nbsp;</p>
+<p>In October <a href="http://patshaughnessy.net/2008/10/21/autocomplete-plugin-doesn-t-work-for-repeated-fields">I described how the auto_complete plugin doesn&rsquo;t work when text fields are repeated</a> more than once on a complex form. <a href="http://patshaughnessy.net/2008/10/31/modifying-the-autocomplete-plugin-to-allow-repeated-fields">I went on to write a plugin called &ldquo;repeated_auto_complete&rdquo</a>; which modified the way the standard auto_complete plugin works and fixed this problem by adding random numbers to &lt;input id=&quot;&quot;&gt; attributes among other changes.</p>
+<p>Since it&rsquo;s much cleaner to have a single auto_complete plugin rather than two separate plugins, I&rsquo;ve merged my changes to auto_complete into the original version, and pushed them to github as a new fork: <a href="http://github.com/patshaughnessy/auto_complete">http://github.com/patshaughnessy/auto_complete</a></p>
+<p>To install and use my modified version of auto_complete first remove the standard auto_complete plugin from your app if necessary, and install with:</p>
+<pre>script/plugin install git://github.com/patshaughnessy/auto_complete.git</pre>
+<p>To use auto complete in a complex form, you write &ldquo;auto_complete_fields_for&rdquo; or &ldquo;auto_complete_form_for&rdquo; in your view, and then call text_field_with_auto_complete on the form builder object, as follows:</p>
+<pre>&lt;% for person in @group.people %&gt;
+  &lt;% <b>auto_complete_fields_for</b> &quot;group[person_attributes][]&quot;, person do |form| %&gt;
+    Person &lt;%= person_form.label :name %&gt;&lt;br /&gt;
+    &lt;%= <b>form</b>.text_field_with_auto_complete :person, :name, {},
+                                           {:method =&gt; :get}  %&gt;
+  &lt;% end %&gt;
+&lt;% end %&gt;</pre>
+<p>To understand my changes to the plugin, let&rsquo;s first look at how the original auto_complete works. If you add this line to your view:</p>
+<pre>&lt;%= text_field_with_auto_complete :project, :name, {}, {:method =&gt; :get } %&gt;</pre>
+<p>&hellip;then you get HTML and script that looks like this (style sheet omitted):</p>
+<pre>&lt;input id=&quot;project_name&quot; name=&quot;project[name]&quot; size=&quot;30&quot; type=&quot;text&quot; /&gt;
+&lt;div class=&quot;auto_complete&quot; id=&quot;project_name_auto_complete&quot;&gt;&lt;/div&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+//&lt;![CDATA[
+var project_name_auto_completer = new Ajax.Autocompleter(&#x27;project_name&#x27;,
+&#x27;project_name_auto_complete&#x27;, &#x27;/projects/auto_complete_for_project_name&#x27;,
+{method:&#x27;get&#x27;})
+//]]&gt;
+&lt;/script&gt;</pre>
+<p>The original text_field_with_auto_complete method looked like this:</p>
+<pre>def text_field_with_auto_complete(object, method, tag_options = {},
+                                  completion_options = {})
+    (completion_options[:skip_style] ? &quot;&quot; : auto_complete_stylesheet) +
+    text_field(object, method, tag_options) +
+    content_tag(&quot;div&quot;, &quot;&quot;, :id =&gt; &quot;#{object}_#{method}_auto_complete&quot;,
+                :class =&gt; &quot;auto_complete&quot;) +
+    auto_complete_field(
+        &quot;#{object}_#{method}&quot;,
+        { 
+          :url =&gt; { :action =&gt; &quot;auto_complete_for_#{object}_#{method}&quot; }
+        }.update(completion_options))
+  end</pre>
+<p>You can see that it calls &ldquo;text_field&rdquo; in ActionView::Helpers::FormHelper to generate the actual &lt;input&gt; tag for the form, in addition to generating the HTML and script needed for the auto completion behavior.</p>
+<p>What I wanted to achieve in the modified plugin was to allow the view to contain code like this:</p>
+<pre>&lt;% auto_complete_fields_for task do |f| %&gt;
+  &lt;%= f.label :name, &quot;Task:&quot; %&gt;
+  &lt;%= f.text_field_with_auto_complete :task, :name, {}, {:method =&gt; :get } %&gt;
+&lt;% end %&gt;</pre>
+<p>To make this work, we need a new version of text_field_with_auto_complete that calls text_field from ActionView::Helpers::FormBuilder, and not ActionView::Helpers::FormHelper, generating an &lt;input&gt; tag similar to what this call would generate:</p>
+<pre>&lt;% fields_for task do |f| %&gt;
+  &lt;%= f.text_field :name %&gt;
+&lt;% end %&gt;</pre>
+<p>To do this, I first refactored the original text_field_with_auto_complete in auto_complete_macros_helper.rb:</p>
+<pre>def text_field_with_auto_complete(object, method, tag_options = {},
+                                  completion_options = {})
+  auto_complete_field_with_style_and_script(object, method, tag_options,
+                                            completion_options) do
+    text_field(object, method, tag_options)
+  end
+end
+
+def auto_complete_field_with_style_and_script(object, method,
+                                              tag_options = {},
+                                              completion_options = {})
+  (completion_options[:skip_style] ? &quot;&quot; : auto_complete_stylesheet) +
+  yield +
+  content_tag(&quot;div&quot;, &quot;&quot;, :id =&gt; &quot;#{object}_#{method}_auto_complete&quot;,
+              :class =&gt; &quot;auto_complete&quot;) +
+  auto_complete_field(
+    &quot;#{object}_#{method}&quot;,
+    {
+      :url =&gt; { :action =&gt; &quot;auto_complete_for_#{object}_#{method}&quot; } 
+    }.update(completion_options))
+end</pre>
+<p>Here I&rsquo;ve introduced a new utility function called &ldquo;auto_complete_field_with_style_and_script&rdquo; that generates the same Javascript and style sheet for the view as before, but instead calls a block to generate the actual text field. Then I changed text_field_with_auto_complete to call this, providing a block to make the call to &ldquo;text_field&rdquo; in ActionView::Helpers::FormHelper with the proper names and options.</p>
+<p>Now my new form builder class in auto_complete_form_helper.rb contains a version of text_field_with_auto_complete that looks like this:</p>
+<pre>def text_field_with_auto_complete(object,
+                                  method,
+                                  tag_options = {},
+                                  completion_options = {})
+  unique_object_name = &quot;#{object}_#{Object.new.object_id.abs}&quot;
+  completion_options_for_original_name =
+    {
+      :url =&gt; { :action =&gt; &quot;auto_complete_for_#{object}_#{method}&quot;},
+      :param_name =&gt; &quot;#{object}[#{method}]&quot;
+    }.update(completion_options)
+  @template.auto_complete_field_with_style_and_script(
+        unique_object_name,
+        method,
+        tag_options,
+        completion_options_for_original_name
+  ) do
+    text_field(method,
+               {
+                 :id =&gt; &quot;#{unique_object_name}_#{method}&quot;
+               }.update(tag_options))
+  end
+end</pre>
+<p>Here the call to auto_complete_field_with_style_and_script passes a block that calls the other text_field from ActionView::Helpers::FormBuilder (note the &ldquo;object&rdquo; parameter is not present as above).</p>
+<p>To allow the text field to be repeated on a complex form, I insure the object&rsquo;s name is unique by adding a random number to it (&ldquo;unique_object_name&rdquo;). This unique name is then passed into both auto_complete_field_with_style_and_script and text_field, insuring that the &lt;input&gt; and related Javascript all work without problems, even if the text field is repeated more than once on the same form.</p>
+<p>The last important detail here is that the completion options passed into auto_complete_field_with_style_and_script are generated using the original, unchanged (non-unque) object name, so that the Ajax calls to the server are made using the original name. This means no changes are required on the server side, and the same single line of code in your controller still works as usual:</p>
+<pre>auto_complete_for :task, :name</pre>
+<p>Next time I&rsquo;ll post a sample application that uses this new plugin, and explain what changes you will need to make to your own application for auto_complete in a complex form.</p>

@@ -1,0 +1,280 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Auto complete for complex forms using nested attributes in Rails 2.3 - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Auto complete for complex forms using nested attributes in Rails 2.3 - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Auto complete for complex forms using nested attributes in Rails 2.3</h1>
+  </header>
+
+  <section class="content">
+    <p>I just updated <a href="http://github.com/patshaughnessy/auto_complete">my fork of the auto_complete plugin</a> to support Rails 2.3 nested attributes. Thanks to Anthony Frustagli for the code and ideas that I used as the basis for this fix.</p>
+
+
+<p><u>Basic usage:</u></p>
+
+
+<p>To use auto_complete on a complex form with nested attributes, just call &ldquo;text_field_for_auto_complete&rdquo; right on the form builder object yielded by form_for or fields_for, like in this example:</p>
+
+
+<pre>&lt;% parent_form.fields_for :children do |child_form| %&gt;
+  &lt;%= child_form.text_field_with_auto_complete :name, {},
+        { :method =&gt; :get, :skip_style =&gt; true } %&gt;
+&lt;% end %&gt;</pre>
+
+
+<p>If you have Rails 2.3, this code will iterate over each child object and display a text field with auto complete support. My plugin will generate HTML and Javascript that works even when repeated in a loop like this. Also note that I&rsquo;ve left off the object name parameter from text_field_with_auto_complete. It&rsquo;s not needed now, since the object is indicated by the surrounding call to fields_for. The other parameters are optional and are taken unchanged from the original auto_complete plugin:
+  <ul>
+    <li>&ldquo;:method =&gt; :get&rdquo; indicates GET requests should be used by the AJAX calls to load the pick list values, avoiding problems with CSRF protection.</li>
+    <li>And &ldquo;:skip =&gt; :true&rdquo; indicates that the inline CSS stylesheet used by the auto complete drop down Prototype code should be skipped. Since we&rsquo;re iterating over child objects we don&rsquo;t want the same CSS code repeated once for each; instead include it once in a parent object&rsquo;s call to text_field_for_auto_complete or else just include it manually somewhere.</li>
+  </ul>
+</p>
+
+
+<p>That&rsquo;s it &ndash; it should just work. If you&rsquo;re interested in learning more about how to use nested attributes and what my plugin is actually doing, read on&hellip;</p>
+
+
+<p><u>Details:</u></p>
+
+
+<p>To learn more, let&rsquo;s take a look at a simple nested attribute example, using the Projects/Tasks models from <a href="http://railscasts.com/episodes/73-complex-forms-part-1">Ryan Bates' complex forms screen cast</a>:</p>
+
+
+<pre>class Project &lt; ActiveRecord::Base
+  has_many :tasks
+  accepts_nested_attributes_for :tasks, :allow_destroy =&gt; true
+end
+class Task &lt; ActiveRecord::Base
+  belongs_to :project
+end</pre>
+
+
+<p>A project has many tasks, and each task belongs to a project. Here I&rsquo;ve also declared that each project &ldquo;accepts nested attributes for&rdquo; tasks. This is a new method added to ActiveRecord in Rails 2.3&hellip; for lots of examples and explanation just take a look directly at the <a href="http://github.com/rails/rails/blob/d32965399ccfa2052a4d52b70db1bae0ca16830b/activerecord/lib/active_record/nested_attributes.rb">new nested_attributes.rb code file in Rails 2.3</a>. In a nutshell, &ldquo;accepts_nested_attributes_for&rdquo; tells ActiveRecord that the project model should be able to save the attributes of the associated task model objects when a project is saved. This means that when I submit my project form, it can also contain a series of task fields as well. For example, my view code might look something like this:</p>
+
+
+<pre>&lt;% form_for @project do |project_form| %&gt;
+  &lt;p&gt;
+    &lt;%= project_form.label :name, &quot;Project:&quot; %&gt;
+    &lt;%= project_form.text_field :name %&gt;
+  &lt;/p&gt;
+  &lt;% project_form.fields_for :tasks do |task_form| %&gt;
+    &lt;%= task_form.label :name, &quot;Task:&quot; %&gt;
+    &lt;%= task_form.text_field :name %&gt;
+  &lt;% end %&gt;
+&lt;% end %&gt;</pre>
+
+
+<p>This displays a name text field for the project, and then calls &ldquo;fields_for&rdquo; again right on the form builder yielded by form_for. This is new for Rails 2.3. In earlier versions of Rails you had to explicitly iterate over the child objects and call fields_for for each one. Now in Rails 2.3, you can call fields_for as a method of the parent form and it will automatically iterate over all of the child objects and call fields_for. If we take a look at the HTML generated by this example form, we&rsquo;ll find something like:</p>
+
+
+<pre>&lt;input id=&quot;project_name&quot; name=&quot;project[name]&quot;
+  size=&quot;30&quot; type=&quot;text&quot; value=&quot;Some project&quot; /&gt;
+&lt;input id=&quot;project_tasks_attributes_0_id&quot;
+  name=&quot;project[tasks_attributes][0][id]&quot; type=&quot;hidden&quot; value=&quot;1&quot; /&gt;
+&lt;input id=&quot;project_tasks_attributes_0_name&quot;
+  name=&quot;project[tasks_attributes][0][name]&quot; type=&quot;text&quot; value=&quot;Task one&quot; /&gt;
+&lt;input id=&quot;project_tasks_attributes_1_id&quot;
+  name=&quot;project[tasks_attributes][1][id]&quot; type=&quot;hidden&quot; value=&quot;2&quot; /&gt;
+&lt;input id=&quot;project_tasks_attributes_1_name&quot;
+  name=&quot;project[tasks_attributes][1][name]&quot; type=&quot;text&quot; value=&quot;Task two&quot; /&gt;</pre>
+
+
+<p>I&rsquo;ve simplified this to make it more readable. You can see the iteration by project_form.fields_for :tasks, and that for each task there&rsquo;s an &lt;input&gt; tag for the &ldquo;name&rdquo; field, along with another hidden &lt;input&gt; tag containing the task&rsquo;s &ldquo;id&rdquo; attribute. The most important detail here is the name given to each of these tags: &ldquo;project[tasks_attributes][0][name]&rdquo; for example. Since the tasks are nested attributes of the project, they are displayed using the PARENT_OBJECT[CHILD_OBJECTS_attributes][INDEX][FIELD] pattern, while for the project we get the simple OBJECT[FIELD] pattern. This is the key to making nested attributes work. In our project model, when we called &ldquo;has_many :tasks&rdquo;, Rails defined some new methods for us on the Project class to handle tasks: tasks, tasks=, task_ids, task_ids= and a couple of others as well. Now with Rails 2.3, when we call &ldquo;accepts_nested_attributes_for :tasks&rdquo; Rails defines another new method for Project called tasks_attributes= in order to process all of the new nested parameters for tasks when the complex project form is submitted. This is the reason for the &ldquo;_attributes&rdquo; in the naming pattern used in the form.</p>
+
+
+<p>Now&hellip; how do we get auto complete to work for this form? The problem with auto complete on a complex form has always been that the Javascript and HMTL used by the Prototype library assumes that the &lt;input&gt; tag, &lt;div&gt; tag and related Javascript code would be unique on the HTML page. If you just call the text_field_with_auto_complete macro from the standard auto_complete plugin like this&hellip;</p>
+
+
+<pre>&lt;% project_form.fields_for :tasks do |task_form| %&gt;
+  &lt;%= text_field_with_auto_complete :task, :name, {},
+        { :method =&gt; :get, :skip_style =&gt; true } %&gt;
+&lt;% end %&gt;</pre>
+
+
+<p>&hellip; it will not work. The first problem is that text_field_with_auto_complete does not know that fields_for is iterating over the child tasks, or which task is currently being processed in the iteration. But even if you were able to identify the current task object somehow, you would still get HTML like this:</p>
+
+
+<pre>&lt;input id=&quot;task_name&quot; name=&quot;task[name]&quot; size=&quot;30&quot; type=&quot;text&quot; /&gt;
+&lt;div class=&quot;auto_complete&quot; id=&quot;task_name_auto_complete&quot;&gt;&lt;/div&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+//&lt;![CDATA[
+var task_name_auto_completer = new Ajax.Autocompleter(&#x27;task_name&#x27;,
+  &#x27;task_name_auto_complete&#x27;, &#x27;/projects/auto_complete_for_task_name&#x27;,
+  {method:&#x27;get&#x27;})
+//]]&gt;
+&lt;/script&gt;
+
+&hellip;
+
+&lt;input id=&quot;task_name&quot; name=&quot;task[name]&quot; size=&quot;30&quot; type=&quot;text&quot; /&gt;
+&lt;div class=&quot;auto_complete&quot; id=&quot;task_name_auto_complete&quot;&gt;&lt;/div&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+//&lt;![CDATA[
+var task_name_auto_completer = new Ajax.Autocompleter(&#x27;task_name&#x27;,
+  &#x27;task_name_auto_complete&#x27;, &#x27;/projects/auto_complete_for_task_name&#x27;,
+  {method:&#x27;get&#x27;})
+//]]&gt;
+&lt;/script&gt;</pre>
+
+
+<p>Now the &lt;input id=&ldquo;task_name&rdquo;&gt; tag is repeated on the same page, and the Javascript call to Ajax.Autocompleter(&#x27;task_name&#x27;, &hellip; ) will not work since the browser will not be able to identify which &lt;input&gt; tag to use.</p>
+
+
+<p>If you use my plugin instead of the original auto_complete plugin&hellip;</p>
+
+
+<pre>$ rm -rf vendor/plugins/auto_complete
+$ ./script/plugin install git://github.com/patshaughnessy/auto_complete.git
+Initialized empty Git repository in /Users/pat/rails-app/vendor/plugins/auto_complete/.git/
+remote: Counting objects: 20, done.
+remote: Compressing objects: 100% (19/19), done.
+remote: Total 20 (delta 5), reused 0 (delta 0)
+Unpacking objects: 100% (20/20), done.
+From git://github.com/patshaughnessy/auto_complete
+ * branch            HEAD       -&gt; FETCH_HEAD
+</pre>
+
+
+<p>&hellip; and restart your Rails app, then you can change your view to call text_field_with_auto_complete as a method of the form builder, like this:</p>
+
+
+<pre>&lt;% project_form.fields_for :tasks do |task_form| %&gt;
+  &lt;%= <b>task_form.</b>text_field_with_auto_complete :name, {},
+  { :method =&gt; :get, :skip_style =&gt; true } %&gt;
+&lt;% end %&gt;</pre>
+
+
+<p>Note that I&rsquo;ve also dropped :task as a parameter since that&rsquo;s implicit in the call to fields_for. In fact, since text_field_with_auto_complete is now a method of the FormBuilder object (&ldquo;task_form&rdquo;), it has access to the task object currently being processed in the iteration. Now if you refresh the same form you&rsquo;ll instead get this HTML instead:</p>
+
+
+<pre>&lt;input id=&quot;project_tasks_attributes_0_name&quot;
+  name=&quot;project[tasks_attributes][0][name]&quot;
+  size=&quot;30&quot; type=&quot;text&quot; value=&quot;Task one&quot; /&gt;
+&lt;div class=&quot;auto_complete&quot; id=&quot;project_tasks_attributes_0_name_auto_complete&quot;&gt;
+&lt;/div&gt;&lt;script type=&quot;text/javascript&quot;&gt;
+//&lt;![CDATA[
+var project_tasks_attributes_0_name_auto_completer =
+  new Ajax.Autocompleter(&#x27;project_tasks_attributes_0_name&#x27;,
+  &#x27;project_tasks_attributes_0_name_auto_complete&#x27;,
+  &#x27;/projects/auto_complete_for_task_name&#x27;,
+  {method:&#x27;get&#x27;, paramName:&#x27;task[name]&#x27;})
+//]]&gt;
+&lt;/script&gt;
+
+&hellip;
+
+&lt;input id=&quot;project_tasks_attributes_1_name&quot;
+  name=&quot;project[tasks_attributes][1][name]&quot;
+  size=&quot;30&quot; type=&quot;text&quot; value=&quot;Task two&quot; /&gt;
+&lt;div class=&quot;auto_complete&quot; id=&quot;project_tasks_attributes_1_name_auto_complete&quot;&gt;
+&lt;/div&gt;&lt;script type=&quot;text/javascript&quot;&gt;
+//&lt;![CDATA[
+var project_tasks_attributes_1_name_auto_completer =
+  new Ajax.Autocompleter(&#x27;project_tasks_attributes_1_name&#x27;,
+  &#x27;project_tasks_attributes_1_name_auto_complete&#x27;,
+  &#x27;/projects/auto_complete_for_task_name&#x27;,
+  {method:&#x27;get&#x27;, paramName:&#x27;task[name]&#x27;})
+//]]&gt;
+&lt;/script&gt;</pre>
+
+
+<p>This looks much better, and will actually work for the following reasons:
+  <ul>
+    <li>The &lt;input&gt; tags have the correct names, using the PARENT_OBJECT[CHILD_OBJECTS_attributes][INDEX][FIELD] pattern from fields_for. This means that the field values will be processed properly by ActiveRecord when the form is submitted.</li>
+    <li>My changes to the auto_complete plugin have picked up the child object index, 0 and 1 in this example, and included it in the &lt;input&gt; tag&rsquo;s id, the &lt;div&gt; tag id and well as the associated Javascript code that calls Ajax.Autocompleter. Since all of the tag id&rsquo;s are unique, the auto complete behavior works properly again for each text field.</li>
+    <li>The original &ldquo;task&rdquo; class name and &ldquo;name&rdquo; field name are passed unchanged into the Ajax calls to the server. This means that in your controller you can continue to use &ldquo;auto_complete_for :task, :name&rdquo; as usual, without worrying about the complex form and the fact that the task fields are repeated multiple times, etc.:
+<pre>Ajax.Autocompleter(&#x27;project_tasks_attributes_1_name&#x27;,     
+  &#x27;project_tasks_attributes_1_name_auto_complete&#x27;,
+  &#x27;/projects/auto_complete_for_task_name&#x27;,
+  {method:&#x27;get&#x27;, paramName:&#x27;task[name]&#x27;})</pre>
+  Here the third parameter to Ajax.Autocompleter, "/projects/auto_complete_for_task_name", is the AJAX URL which you need to account for in routes.rb, and paramName:'task[name]' tells the auto_complete_for handler in your controller to get the task names as usual, and protects the server side code from all of the complexity around the tag id, names, child object index, etc.
+  </ul>
+</p>
+
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,165 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Example Drupal module to use for TDD demonstration - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Example Drupal module to use for TDD demonstration - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Example Drupal module to use for TDD demonstration</h1>
+  </header>
+
+  <section class="content">
+    <p>To illustrate how to use Test Driven Development while developing a Drupal module, we first need an example module to write: Let's assume we want a page in our Drupal admin console that lists all of nodes in the database, similar to the Administer-&gt;Content Management-&gt;Content page. It will also filter and sort the list, but instead of filtering on the status and type of nodes, it will filter on words contained in the node title.</p>
+
+
+<p>The first thing I did was to write the module as quickly as possible as I normally would have without using TDD. Here&rsquo;s the completed module: <a href="http://patshaughnessy.net/code/demo.module">demo.module</a>, and <a href="http://patshaughnessy.net/code/demo.info">demo.info</a>. If you want to follow along this demonstration just install a fresh copy of the latest version of Drupal 6.x (Drupal 6.6 when I wrote this); be sure to create and use a new MySQL database to use in these examples so your existing work won&rsquo;t get in the way. Then download the demo.module and demo.info files into a new "demo" module folder and enable the demo module in your admin console (Administer-&gt;Site building-&gt;Modules). It will be called &quot;Demo&quot; and will appear at the bottom of the list of modules in a section called &quot;TDD Demo Modules.&quot;</p>
+
+
+<p>Once the Demo module is enabled, look for a new page in your admin console at Administer-&gt;Content management-&gt;Demo Page. It will initially display a list of all the nodes in your database, and also allow you to enter a keyword to show only the nodes whose title contains the given word.</p>
+
+
+<p>If you are using a new empty database, create a couple of pages (Create Content->Page) to have some data to display here. I created two pages with these titles (body text doesn't matter):
+<ul>
+  <li>This is my first page</li>
+  <li>My second page!</li>
+</ul>
+</p>
+
+
+<p>A quick review of the module code will reveal nothing special. Demo.module is very simple&hellip; it has some boilerplate code (demo_help and demo_menu), and then displays the new &ldquo;Demo Page&rdquo; with the demo_page_view function:</p>
+
+
+<pre>function demo_page_view($keys = NULL)
+{
+  $header = array(
+    array('data' => t('Page Title'), 'field' => 'title', 'sort' => 'asc')
+  );
+  $sql = "SELECT * FROM {node} WHERE title LIKE '%%%s%%'";
+  $sql .= tablesort_sql($header);
+  $result = pager_query($sql, 50, 0 , NULL, $keys);
+  $rows = array();
+  while ($data = db_fetch_object($result)) {
+    $rows[] = array(check_plain($data->title));
+  }
+  if (empty($rows)) {
+    $rows[] = array(array('data' => 'No pages match the given pattern.'));
+  }
+  $output = drupal_get_form('demo_pattern_form', $keys);
+  $output .= "Pages matching this pattern:";
+  $output .= theme('table', $header, $rows);
+  $output .= theme('pager', NULL, 50, 0);
+  return $output;
+}</pre>
+
+
+<p>This is really all there is to demo.module &ndash; this function generates a SQL statement using tablesort_sql, then selects all the matching nodes from the database using pager_query and builds an array containing the matches. Then it returns the HTML for a table containing the matching records using the currently selected theme. Later in the module file there are more functions that handle navigation and processing for the &ldquo;demo_pattern_form.&rdquo;</p>
+
+
+<p>This code is so simple it&rsquo;s hard to imagine that anything could be wrong with it: in just a few lines it gets the data we need and also displays it. It&rsquo;s also very typical Drupal module code. If you look around the Drupal code base or at code from 3rd party modules you will see a lot of code that looks just like this. It uses common Drupal functions like &ldquo;theme,&rdquo; &ldquo;pager_query&rdquo; and &ldquo;db_fetch_object.&rdquo;</p>
+
+
+<p>But in my opinion there are a two things wrong with this example module:
+<ul>
+  <li>There are no tests &ndash; if I needed to change something about the behavior of demo.module I would have no way to know whether or not I broke something after making a code change, other than by opening a browser and testing manually.</li>
+<li>It&rsquo;s very hard to separate the actual business logic or custom behavior that demo.module provides from the boilerplate code required to run inside of Drupal.</li>
+</ul></p>
+
+
+<p>A veteran Drupal developer would disagree with the second point, of course: obviously the SQL statement used in demo_page_view really is the only custom behavior here, and all of the other calls to Drupal functions like drupal_get_form, table_sort_sql, etc., are used to help display our data in a Drupal page.
+But imagine a PHP developer who wasn&rsquo;t yet very familiar with Drupal looking at this module file for the first time: how would she or he have any idea what this module did? Or where to begin to change it&rsquo;s behavior if necessary? This is another important use of tests: as living documentation for what code does and how it should work.</p>
+
+
+<p>This is a silly example, but imagine if this module did something sophisticated and important to your business. Then imagine if your business decided to upgrade from one version of Drupal to another &ndash; or imagine that your business decided to use DJango, Joomla or some other CMS system&hellip; or to implement it using custom Java or Ruby code. Then the question would become: what part of the module&rsquo;s code is ours that we want to keep? And what part of the module is simply needed to coexist with Drupal? Right now it&rsquo;s not so easy to tell.</p>
+
+
+<p>I believe that using TDD while writing a Drupal module will not only provide the normal benefits of testing: emergent design, living documentation and simply more robust code, but will also lead to isolating your business&rsquo;s code from the framework in a natural way. By writing unit tests first, you will have to think about what you are trying to test: your business logic only and not the Drupal framework itself.</p>
+
+
+<p>In my next post we&rsquo;ll get started by installing PHPUnit and writing our first PHPUnit unit test with Drupal.</p>
+
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

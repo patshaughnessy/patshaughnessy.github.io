@@ -1,0 +1,270 @@
+title: How to install Paperclip in a Rails 3 app
+date: 2010/05/23
+tag: Paperclip
+
+<p><u>Update June 2010:</u> I just heard from Jon Yurek in the comments below that he has, in fact, finished up the Rails 3 changes for Paperclip. This means that you can now just install Paperclip as usual in a Rails 3 app as a plugin:</p>
+<div class="CodeRay">   <div class="code"><pre>$ rails plugin install git://github.com/thoughtbot/paperclip.git</pre></div></div><br>
+<p>... or as a gem by adding it to your Gemfile if you&rsquo;ve already installed it with &ldquo;gem install paperclip:&rdquo;</p>
+<div class="CodeRay">
+  <div class="code"><pre>source <span class="s"><span class="dl">'</span><span class="k">http://rubygems.org</span><span class="dl">'</span></span>
+
+gem <span class="s"><span class="dl">'</span><span class="k">rails</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">3.0.0.beta3</span><span class="dl">'</span></span>
+
+<span class="c"># Bundle edge Rails instead:</span>
+<span class="c"># gem 'rails', :git =&gt; 'git://github.com/rails/rails.git'</span>
+
+<div class='container'>gem <span class="s"><span class="dl">'</span><span class="k">paperclip</span><span class="dl">'</span></span><span class='overlay'></span></div>
+</pre></div></div><br>
+<p>I&rsquo;ll leave my original article here as a reference &ndash; it was a fun learning experience trying out Paperclip with Rails 3, and the same ideas around Bundler, generators, etc., might still be helpful while using other gems or plugins with Rails 3.</p><br>
+<p>&nbsp;</p>
+<p>To get Paperclip to work in a Rails 3 application, use this in your Gemfile:</p>
+<div class="CodeRay">
+  <div class="code"><pre>gem <span class="s"><span class="dl">'</span><span class="k">paperclip</span><span class="dl">'</span></span>, <span class="sy">:git</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">git://github.com/thoughtbot/paperclip.git</span><span class="dl">'</span></span>,
+                 <span class="sy">:branch</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">rails3</span><span class="dl">'</span></span></pre></div>
+</div><br>
+<p>&hellip; and this in application.rb:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">module</span> <span class="cl">YourPaperclipApp</span>
+  <span class="r">class</span> <span class="cl">Application</span> &lt; <span class="co">Rails</span>::<span class="co">Application</span>
+
+<div class='container'>    <span class="co">Paperclip</span>::<span class="co">Railtie</span>.insert<span class='overlay'></span></div>
+etc...
+
+  <span class="r">end</span>
+<span class="r">end</span></pre></div>
+</div><br>
+<p>Right now it looks like Thoughtbot is finishing Rails 3 related changes in a &ldquo;rails3&rdquo; branch in their Paperclip github repository. The best thing to do if you have a Paperclip app you want to migrate to Rails 3 is simply to wait a bit longer for them to finish that work, test it and merge it back into the master branch.</p>
+<p>The rest of this article is really not about Paperclip at all, but about Rails 3. Here’s what I learned about Rails 3 while troubleshooting Paperclip:
+<ol>
+  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact1">The command line has changed</a></li>
+  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact2">Plugin generators have moved</a></li>
+  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact3">Rails 2.x generators don&rsquo;t work at all</a></li>
+  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact4">You use Bundler and a &ldquo;Gemfile&rdquo; to declare gems</a></li>
+  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact5">You can install a gem from a specific git repository branch</a></li>
+  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact6">Rails 3 frameworks are now based on Rails::Railtie</a></li>
+  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact7">Bundler does not call rails/init.rb in each gem</a></li>
+</ol>
+Let&rsquo;s go ahead and troubleshoot Paperclip together in a new Rails 3 app. First I&rsquo;ll begin by verifying the versions of Ruby and Rails I&rsquo;m using now:</p>
+<p/>
+<div class="CodeRay">
+  <div class="code"><pre>$ ruby -v
+ruby 1.8.7 (2010-01-10 patchlevel 249) [i686-darwin9.8.0]
+$ rails -v
+Rails 3.0.0.beta3</pre></div>
+</div><br>
+<p>And next I&rsquo;ll create a sample app to use with Paperclip:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rails new paperclip-sample-app
+      <span class="s">create</span>  
+      <span class="s">create</span>  README
+      <span class="s">create</span>  .gitignore
+      <span class="s">create</span>  Rakefile
+      <span class="s">create</span>  config.ru
+      <span class="s">create</span>  Gemfile
+      <span class="s">create</span>  app
+      <span class="s">create</span>  app/controllers/application_controller.rb
+etc…</pre></div>
+</div><br>
+<p>Now we&rsquo;re ready to install Paperclip into my new app. But what should I do exactly? Should I use Paperclip as a plugin or a gem? I wasn&rsquo;t sure what to do, so I simply tried both.</p>
+<p><a name="fact1"></a><b>Fact 1: the command line has changed</b></p>
+<p>First let&rsquo;s install it as a plugin, since that&rsquo;s the most straightforward. In Rails 3 the plugin install command has changed a bit vs. Rails 2.x:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ cd paperclip-sample-app
+$ rails plugin install git://github.com/thoughtbot/paperclip.git
+Initialized empty Git repository in .../vendor/plugins/paperclip/.git/
+remote: Counting objects: 77, done.
+remote: Compressing objects: 100% (68/68), done.
+remote: Total 77 (delta 12), reused 20 (delta 0)
+Unpacking objects: 100% (77/77), done.
+From git://github.com/thoughtbot/paperclip
+ * branch            HEAD       -> FETCH_HEAD</pre></div>
+ </div><br>
+<p>Next let&rsquo;s use scaffolding to create a &ldquo;User&rdquo; model with a couple of attributes:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rails generate scaffold user name:string email:string
+      invoke  active_record
+      <span class="s">create</span>    db/migrate/20100521034815_create_users.rb
+      <span class="s">create</span>    app/models/user.rb
+      invoke    test_unit
+      <span class="s">create</span>      test/unit/user_test.rb
+      <span class="s">create</span>      test/fixtures/users.yml
+       <span class="s">route</span>  resources :users
+      invoke  scaffold_controller
+      <span class="s">create</span>    app/controllers/users_controller.rb
+      invoke    erb
+      <span class="s">create</span>      app/views/users
+      <span class="s">create</span>      app/views/users/index.html.erb
+etc…
+$ rake db:migrate</pre></div>
+ </div><br>
+<p><a name="fact2"></a><b>Fact 2: plugin generators have moved</b></p>
+<p>The next step is to create a second migration for the additional database columns required by Paperclip. To make this easy, Paperclip provides a &ldquo;paperclip&rdquo; generator; let&rsquo;s try that and specify that we want an &ldquo;avatar&rdquo; file attachment saved on the user model:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rails generate paperclip user avatar
+Could not find generator paperclip.</pre></div>
+   </div><br>
+<p>Uhh&hellip; not what I expected. It looks like something has changed about Rails 3 generators that has broken the Paperclip generator. For now, let&rsquo;s take a look at the Paperclip code to see if we can find the generator:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ find vendor/plugins/paperclip -name *generator*
+vendor/plugins/paperclip/generators
+vendor/plugins/paperclip/generators/paperclip/paperclip_generator.rb</pre></div>
+   </div><br>
+<p>There it is&hellip; After some research, I found out that for Rails 3, plugin/gem generators need to be located inside a folder called &ldquo;BASE_DIR/lib/generators&rdquo; &ndash; we can see here that the Paperclip generator needs to be moved in order to comply with this new standard.</p>
+<p><a name="fact3"></a><b>Fact 3: Rails 2.x generators don&rsquo;t work at all</b></p>
+<p>So let&rsquo;s try just moving it and see what happens:</p>
+<div class="CodeRay">
+  <div class="code"><pre>mv vendor/plugins/paperclip/generators vendor/plugins/paperclip/lib/.
+$ rails generate paperclip user avatar
+[WARNING] Could not load generator "generators/paperclip/paperclip_generator"
+because it's a Rails 2.x generator, which is not supported anymore.
+Error: uninitialized constant Rails::Generator.
+</pre></div>
+   </div><br>
+<p>Things are looking worse and worse! It turns out that the generators architecture for Rails 3 has been completely rewritten, and that generators written for Rails 2.x will simply not work at all in Rails 3. What to do now? Of course, I could simply hand code the migration for adding the avatar columns to the users table, and continue to work on my sample application. Instead, I decided to give up on the plugin entirely and to try using Paperclip as a gem.</p>
+<p><a name="fact4"></a><b>Fact 4: You use Bundler and a &ldquo;Gemfile&rdquo; to declare gems</b></p>
+Let&rsquo;s take a look at how gems are installed for a Rails 3 app. Rails 3 uses a new file called the &ldquo;Gemfile,&rdquo; which specifies which gems should be included in your application. This file is read and used by Bundler, which manages gems and their dependencies. We can specify that our application uses the Paperclip gem by adding a single line to the Gemfile like this:</p>
+<p/>
+<div class="CodeRay">
+  <div class="code"><pre>source <span class="s"><span class="dl">'</span><span class="k">http://rubygems.org</span><span class="dl">'</span></span>
+gem <span class="s"><span class="dl">'</span><span class="k">rails</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">3.0.0.beta3</span><span class="dl">'</span></span>
+
+<span class="c"># Bundle edge Rails instead:</span>
+<span class="c"># gem 'rails', :git =&gt; 'git://github.com/rails/rails.git'</span>
+
+<div class='container'>gem <span class="s"><span class="dl">'</span><span class="k">paperclip</span><span class="dl">'</span></span><span class='overlay'></span></div>
+etc…
+</pre></div>
+</div><br>
+<p>This simply tells Bundler to install Paperclip from your default gem source: probably rubygems.org. Now I&rsquo;ll delete the plugin I installed earlier and install the gem, using the &ldquo;bundle install&rdquo; command to install all of the gems in my Gemfile:</p>
+<div class="CodeRay">
+     <div class="code"><pre>$ rm -rf vendor/plugins/paperclip/
+$ bundle install
+Fetching source index from http://rubygems.org/
+Using rake (0.8.7) from system gems 
+Using abstract (1.0.0) from bundler gems 
+
+etc…
+
+Installing paperclip (2.3.1.1) from rubygems repository at http://rubygems.org/ 
+
+etc…</pre></div>
+</div><br>
+<p>Bundler indicated that it found the official version of Paperclip on rubygems.org, downloaded and installed it. It also told us we have version 2.3.1.1. Let&rsquo;s use the bundle show command and take a look at where Paperclip was installed to:</p>
+<div class="CodeRay">
+   <div class="code"><pre>$ bundle show paperclip
+  /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/paperclip-2.3.1.1</pre></div>
+    </div><br>
+<p>Bundler simply installed the gem in the standard location where all my other gems are located for my RVM version of Ruby 1.8.7, just as if I had run a gem install command manually. Now let&rsquo;s try that generate command again and see if it works any better:</p>
+<div class="CodeRay">
+   <div class="code"><pre>$ rails generate paperclip user avatar
+DEPRECATION WARNING: RAILS_ROOT is deprecated! Use Rails.root instead. (called from expand_path at /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/paperclip-2.3.1.1/lib/paperclip.rb:39)
+/Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/paperclip-2.3.1.1/lib/paperclip.rb:39:in `expand_path': can't convert #<Class:0x16a87d0> into String (TypeError)
+	from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/paperclip-2.3.1.1/lib/paperclip.rb:39
+	from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/bundler-0.9.25/lib/bundler/runtime.rb:46:in `require'
+	from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/bundler-0.9.25/lib/bundler/runtime.rb:46:in `require'
+	from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/bundler-0.9.25/lib/bundler/runtime.rb:41:in `each'</pre></div>
+    </div><br>
+<p>Still broken! It looks like I&rsquo;m just not running code that was intended to be used with Rails 3.</p>
+<p><a name="fact5"></a><b>Fact 5: You can install a gem from a specific git repository branch</b></p>
+<p>After more investigation, I noticed that there had been a lot of recent changes to the Paperclip github repository. At the time I wrote this, Thoughtbot was actively developing on a branch called &ldquo;rails3.&rdquo; I decided the best thing to do would be to try the code from the rails3 branch, hoping it might work better for me. Bundler makes this easy, since you can just specify git as a source for downloading a gem using a &ldquo;git&rdquo; option, as well as optionally a specific branch using a &ldquo;branch&rdquo; option, like this:</p>
+<div class="CodeRay">
+  <div class="code"><pre>source <span class="s"><span class="dl">'</span><span class="k">http://rubygems.org</span><span class="dl">'</span></span>
+
+gem <span class="s"><span class="dl">'</span><span class="k">rails</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">3.0.0.beta3</span><span class="dl">'</span></span>
+
+<span class="c"># Bundle edge Rails instead:</span>
+<span class="c"># gem 'rails', :git =&gt; 'git://github.com/rails/rails.git'</span>
+
+<div class='container'>gem <span class="s"><span class="dl">'</span><span class="k">paperclip</span><span class="dl">'</span></span>, <span class="sy">:git</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">git://github.com/thoughtbot/paperclip.git</span><span class="dl">'</span></span>,
+                 <span class="sy">:branch</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">rails3</span><span class="dl">'</span></span><span class='overlay'></span></div>
+etc <span class="er">…</span></pre></div>
+  </div><br>
+<p>After saving this change to Gemfile, let&rsquo;s re-run the bundle install command:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ bundle install
+Updating git://github.com/thoughtbot/paperclip.git
+Fetching source index from http://rubygems.org/
+Updating git://github.com/thoughtbot/paperclip.git
+Using rake (0.8.7) from system gems 
+Using abstract (1.0.0) from bundler gems 
+
+…etc…
+
+Using paperclip (2.3.2.beta1)
+  from git://github.com/thoughtbot/paperclip.git (at rails3)
+</pre></div>
+</div><br>
+<p>Hmm&hellip; interesting. Bundler is showing that it&rsquo;s downloaded Paperclip from the github repository, and that it got the code at the head of the rails3 branch. Another interesting detail here is that I apparently now have version &ldquo;2.3.2 beta1&rdquo; of Paperclip. This is a good sign, since I have a more recent version than 2.3.1.1 (the rubygems.org version) and also it seems that Thoughtbot is actively working on it since it&rsquo;s labeled &ldquo;beta1.&rdquo;</p>
+<p>If we run bundle show again, we can see that Bundler has saved a special copy of Paperclip downloaded from github, along with the git commit id and branch of the version I have:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ bundle show paperclip
+      /Users/pat/.rvm/gems/ruby-1.8.7-p249/bundler/gems/paperclip-61f74de14812cabc026967a2b2c3ca8cbd2eed69-rails3</pre></div>
+</div><br>
+<p>Now let&rsquo;s try that generator once more:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rails generate paperclip user avatar
+            <span class="s">create</span>  db/migrate/20100521003113_add_attachment_avatar_to_user.rb</pre></div>
+</div><br>
+<p>Yes! It&rsquo;s working now!</p>
+<p><a name="fact6"></a><b>Fact 6: Rails 3 frameworks are now based on Rails::Railtie</b></p>
+<p>Let&rsquo;s continue to put together my sample application by running the migration:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rake db:migrate</pre></div>
+</div><br>
+<p>&hellip; and by editing my User model to call &ldquo;has_attached_file:&rdquo;</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">User</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  has_attached_file <span class="sy">:avatar</span>
+<span class="r">end</span></pre></div>
+</div><br>
+<p>Before I start editing my views and adding the code to upload and display the avatar attachment, let&rsquo;s start the server and see if Paperclip is working. Opening the users index page I get&hellip;</p>
+<p><img src="http://patshaughnessy.net/assets/2010/5/22/paperclip_error.png"></p>
+<p>&hellip; more trouble! I&rsquo;m definitely having a bad day&hellip; what now? Well it seems that Paperclip is just not being loaded at all, or is being initialized improperly for some reason. At this point I started to poke around the Paperclip source code a bit, and found that the code that includes the Paperclip module into ActiveRecord::Base was moved and is no longer being called. Since Paperclip is not included in my User/ActiveRecord class I get the error has_attached_file not defined, since that&rsquo;s defined by Paperclip.</p>
+<p>I found the include code in a file called &ldquo;lib/paperclip/railtie.rb:&rdquo;</p>
+<div class="CodeRay">
+  <div class="code"><pre>require <span class="s"><span class="dl">'</span><span class="k">paperclip</span><span class="dl">'</span></span>
+
+<span class="r">module</span> <span class="cl">Paperclip</span>
+  <span class="r">if</span> <span class="r">defined?</span> <span class="co">Rails</span>::<span class="co">Railtie</span>
+    require <span class="s"><span class="dl">'</span><span class="k">rails</span><span class="dl">'</span></span>
+    <span class="r">class</span> <span class="cl">Railtie</span> &lt; <span class="co">Rails</span>::<span class="co">Railtie</span>
+      config.after_initialize <span class="r">do</span>
+        <span class="co">Paperclip</span>::<span class="co">Railtie</span>.insert
+      <span class="r">end</span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+
+  <span class="r">class</span> <span class="cl">Railtie</span>
+    <span class="r">def</span> <span class="pc">self</span>.insert
+<span class='container'>      <span class="co">ActiveRecord</span>::<span class="co">Base</span>.send(<span class="sy">:include</span>, <span class="co">Paperclip</span>)<span class='overlay'></span></span>
+<span class='container'>      <span class="co">File</span>.send(<span class="sy">:include</span>, <span class="co">Paperclip</span>::<span class="co">Upfile</span>)<span class='overlay'></span></span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+<span class="r">end</span>
+</pre></div>
+</div><br>
+<p>I&rsquo;m not quite sure what Thoughtbot&rsquo;s plans are for Paperclip, but if you take some time to read through Yehuda Katz&rsquo;s write up <a href="http://www.engineyard.com/blog/2010/rails-and-merb-merge-rails-core-part-4-of-6/">Rails and Merb Merge: Rails Core (Part 4 of 6)</a>, you&rsquo;ll learn about how Rails frameworks like ActiveRecord and ActiveController have been recast as instances of this &ldquo;Rails::Railtie&rdquo; class. Possibly Paperclip will become one of these. Rails 3 has a new API for declaring how Railties are loaded and initialized, but it looks like this version of Paperclip and this version of Rails aren&rsquo;t quite working correctly now.</p>
+<p><a name="fact7"></a><b>Fact 7: Bundler does not call rails/init.rb in each gem</b></p>
+<p>For now, the problem I&rsquo;m having in my sample application is that the Paperclip::Railtie.insert method is not being called &ndash; the two lines I highlighted above need to be executed in order to enable &ldquo;has_attached_file&rdquo; to be present as a class method for ActiveRecord models. To make things more interesting, Thoughtbot did include a call to insert inside rails/init.rb, like this:</p>
+<div class="CodeRay">
+  <div class="code"><pre>require <span class="s"><span class="dl">'</span><span class="k">paperclip/railtie</span><span class="dl">'</span></span>
+<span class="co">Paperclip</span>::<span class="co">Railtie</span>.insert</pre></div>
+</div><br>
+<p>&hellip; but for Rails 3, it turns out that <a href="https://rails.lighthouseapp.com/projects/8994/tickets/3745-railsinitrb-is-not-being-called-anymore">Bundler no longer calls rails/init.rb</a>.</p>
+<p>Moving this line instead to config/application.rb will solve the problem:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">module</span> <span class="cl">PaperclipSampleApp</span>
+  <span class="r">class</span> <span class="cl">Application</span> &lt; <span class="co">Rails</span>::<span class="co">Application</span>
+
+<span class='container'>    <span class="co">Paperclip</span>::<span class="co">Railtie</span>.insert<span class='overlay'></span></span>
+
+    etc…
+    
+  <span class="r">end</span>
+<span class="r">end</span></pre></div>
+</div><br>
+<p>Alternatively, you could just create a file called &ldquo;config/initializers/paperclip.rb&rdquo; and put the call to insert there.</p>
+<p>Now reloading the users index page we finally get Paperclip to work:</p>
+<p><img src="http://patshaughnessy.net/assets/2010/5/22/index_view.png"></p>
+<p>Instead of proceeding with my sample app now, I&rsquo;m going to wait a few weeks while Thoughtbot finishes off the Rails 3 changes for Paperclip.</p>
+<p> I don&rsquo;t think troubleshooting these problems was a waste of time at all; in fact, it was a good excuse to get my hands dirty with Rails 3 and Bundler. Once Thoughtbot has finished their changes in the rails3 branch and merged them into the master I&rsquo;ll update <a href="http://patshaughnessy.net/2009/4/30/paperclip-sample-app">my tutorial from last year</a>, and also update <a href="http://github.com/patshaughnessy/paperclip">my Paperclip fork</a> to support database BLOB storage for Rails 3.</p>

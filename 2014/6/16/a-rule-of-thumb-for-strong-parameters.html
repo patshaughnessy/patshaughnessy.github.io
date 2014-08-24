@@ -1,0 +1,308 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="A Rule of Thumb for Strong Parameters - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>A Rule of Thumb for Strong Parameters - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>A Rule of Thumb for Strong Parameters</h1>
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
+  <img src="http://patshaughnessy.net/assets/2014/6/16/security.jpg"><br/>
+  <i>It can be hard to open the Strong Parameters<br/>door and let permitted values into your Rails 4 app.</i>
+</div>
+
+
+<p>Last week I banged my head against the wall for a few hours trying to figure
+out how to whitelist input values for my Rails 4 app using the <a href="http://edgeguides.rubyonrails.org/action_controller_overview.html#strong-parameters">Strong
+Parameters</a>
+feature. Calling <span class="code">permit</span> when you have a simple
+attributes hash for a single new object is straightforward, but figuring out
+how to call <span class="code">permit</span> for a complex, nested set of attributes can be nearly
+impossible.</p>
+
+<p><b>TL;DR:</b> Use this rule of thumb when trying to figure out how to whitelist nested attributes:</p>
+
+<blockquote>To Permit a Hash, Pass an Array<br/>
+  To Permit an Array, Pass a Hash</blockquote>
+
+
+<p>After studying the problem for a while, I noticed this curious pattern: To whitelist a simple hash of attributes, you pass
+<span class="code">permit</span> an array. To whitelist an array of nested objects, you pass it a hash,
+including that hash in the surrounding array.</p>
+
+<p>Not familiar with Strong Parameters yet? What do I mean by “whitelist?” Why do
+you need this rule of thumb? My post today will explain.</p>
+
+<h2>To Permit a Hash, Pass an Array</h2>
+
+<p>Rails 4 requires you to whitelist or authorize input values for your app. This
+important new feature, known as Strong Parameters, adds an extra layer of
+security that prevents attackers from posting harmful or garbage information to
+your site.</p>
+
+<p>Here’s how it works: Suppose you have a <span class="code">Post</span> model
+with title and body columns. Using Rails 4, you would write a create controller
+action like this:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/simple_controller.png"><br/></p>
+
+<p>Here you first tell Rails which attributes are allowed for new post objects &ndash;
+title and body in this example &ndash; and then you create the new post. This is
+simple enough and quite readable. You are telling Rails: “data for a post is
+required and it’s attributes may only include title and body attributes.”</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/diagram1.png"><br/></p>
+
+<p>In the diagram above you can see the post attribute hash on the left, and the
+arguments for <span class="code">permit</span> on the right. Notice the arguments are actually a
+single array (internally Rails processes the arguments as an array). Each key/value pair on the left maps to an array element on the
+right. You permit a hash by passing an array.</p>
+
+<h2>Strong Parameters Confusion</h2>
+
+<p>However, now suppose you add a second model to your app, <span
+  class="code">Comment</span>. Let’s suppose a post has many comments, and each
+comment has a single text attribute.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/has-many.png"><br/></p>
+
+<p>Because your app is a REST-ful JSON service (what else do people use Rails for
+these days?) you have a requirement to create a post and its comments from a
+single JSON string:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/json.png"><br/></p>
+
+<p>Because the comment array is named “comments” you assume ActiveRecord will
+create the associated comment models along with the new post. That is,
+ActiveRecord should call <span class="code">comments=</span> on the new post
+and pass in the comment attributes. But it doesn’t work. Instead, using the
+code from earlier you get:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/warning.png"><br/></p>
+
+<p>Ah &ndash; you forgot to whitelist the comments attribute. You try adjusting the call
+to <span class="code">permit</span>:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/permit-comments.png"><br/></p>
+
+<p>It still doesn’t work. You get the same warning:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/warning.png"><br/></p>
+
+<p>Clearly Rails isn’t listening! You just told it comments is permitted &ndash; why
+does Rails give you the same warning again? Maybe you need to create the
+comment objects yourself, as a separate step:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/create-comments.png"><br/></p>
+
+<p>Now things are even worse: Rails raises an exception!</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/exception.png"><br/></p>
+
+<p>The problem here is that the <span class="code">Comment</span> model is
+complaining that you haven’t whitelisted its attributes. Somehow each
+ActiveRecord model has knowledge about which attributes were whitelisted and
+which weren’t!</p>
+
+<p>If you happened to know that Rails 4 saves the parameters inside an <span
+  class="code">ActionController::Parameters</span> object, you could try
+creating a separate instance of this class for each comment, and whitelist it&rsquo;s text attribute directly:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/permit-comments2.png"><br/></p>
+
+<p>But you’ll still get the same “Unpermitted parameters” warning when you try to
+create the post next &ndash; not to mention that your code has become incredibly
+confusing and verbose. What’s going on here? There must be some way of creating
+nested objects without warnings or exceptions.</p>
+
+<h2>To Permit an Array, Pass a Hash</h2>
+
+<p>The solution is to permit all the post and comment attributes with a single
+call to <span class="code">ActionController::Parameters#permit</span>, like
+this:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/nested-solution.png"><br/></p>
+
+<p>What? What does the complex argument list to <span class="code">permit</span> mean? How in the world
+would anyone know to pass that in?</p>
+
+<p>My rule of thumb can help. In this example, you are permitting an array of
+comments by passing a hash. Imagine if your app received a post with two
+comments, like this:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/diagram2.png"><br/></p>
+
+<p>On the left you see the nested attributes for the post and its comments. Rails
+has parsed this for you from a JSON string. On the right are the arguments you
+pass to <span class="code">permit</span>. Notice how the hash of post
+attributes contains an array for the comments &ndash; in the call to <span class="code">permit</span> you
+replace this array with a hash! To permit an array, pass a hash.</p>
+
+<p>This hash, in turn, contains an array listing the attributes of each comment
+object (just <span class="code">[:text]</span> here).</p>
+
+<h2>Whitelisting Rails Nested Attributes</h2>
+
+<p>Note: if your Rails app was in fact a web site, you might use the Rails nested
+attributes feature with a complex HTML form. In this case, you would declare
+that posts accept nested attributes for comments, directing ActiveRecord to
+automatically create the comment objects for you:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/accepts-nested.png"><br/></p>
+
+<p>To make this work you will need to adjust your call to <span
+class="code">permit</span> slightly:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/nested-attribs-permit.png"><br/></p>
+
+<p>With <span class="code">accepts_nested_attribute_for</span>, Rails expects the
+comments to be saved as <span class="code">comments_attributes</span>. Also,
+each comment must have an <span class="code">id</span> attribute in order for
+the web forms to update existing comments properly. (Also, Rails represents the
+comment array as a hash, with the id as the key for each comment.)</p>
+
+<p>But the syntax is almost the same, and the same rule applies: to permit an
+array of comments you call <span class="code">permit</span> with a hash.</p>
+
+<h2>Under the Hood</h2>
+
+<p>Internally, Rails uses a trick to tell ActiveRecord which attributes were
+permitted and which weren’t. Here’s how it works:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/hashes.png"><br/></p>
+
+<p>On the left is a normal hash &ndash; you can create an ActiveRecord model using this
+hash without worrying about whitelisting parameters. On the right is an <span
+class="code">ActionController::Parameters</span> object; notice it looks almost
+the same.  <span class="code">ActionController::Parameters</span> is actually a
+subclass of <span class="code">Hash</span> (via <span
+class="code">ActiveSupport::HashWithIndifferentAccess</span>).</p>
+
+<p>But on the right notice that the <span
+  class="code">ActionController::Parameters</span> object contains a <span class="code">permitted?</span>
+method. This tells ActiveRecord whether the attributes in that hash were
+whitelisted or not.</p>
+
+<p>When you create a new post or any <span class="code">ActiveRecord::Base</span>
+object, code inside of Rails checks whether the attributes hash implements the
+<span class="code">permitted?</span> method or not:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/internals1.png"><br/></p>
+
+<p>Because a normal hash doesn’t respond to <span class="code">permitted?</span>,
+ActiveRecord creates the new post without complaining.</p>
+
+<p>However, if you try to create a post from an <span
+  class="code">ActionController::Parameters</span> object, Rails finds the
+<span class="code">permitted?</span> method:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/internals2.png"><br/></p>
+
+<p>If you didn’t whitelist this hash using a call to <span class="code">permit</span>, <span class="code">permitted?</span> will
+return <span class="code">false</span> and Rails will raise the <span class="code">ActiveModel::ForbiddenAttributesError</span>
+exception.</p>
+
+<h2>Still Confused? Just Use a Normal Hash</h2>
+
+<p>If all of this is still confusing you &ndash; if you’re still having trouble figuring
+out the call to <span class="code">permit</span> properly for your complex JSON input &ndash; then remember you
+can always just use normal hashes instead of <span class="code">ActionController::Parameters</span>
+objects.</p>
+
+<p>For example:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/6/16/normal-hashes.png"><br/></p>
+
+<p>Here you are whitelisting or permitting each attribute manually by copying them
+into normal hashes. Since <span class="code">Hash</span> doesn&rsquo;t implement <span
+class="code">permitted?</span>, ActiveRecord won’t raise a <span
+class="code">ActiveModel::ForbiddenAttributesError</span> exception.</p>
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

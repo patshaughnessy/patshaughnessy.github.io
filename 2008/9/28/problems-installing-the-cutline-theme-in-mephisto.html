@@ -1,0 +1,181 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Problems Installing the Cutline Theme in Mephisto - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Problems Installing the Cutline Theme in Mephisto - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Problems Installing the Cutline Theme in Mephisto</h1>
+  </header>
+
+  <section class="content">
+    <p>My next step was to switch away from the standard “simpla” theme to another more interesting one. Once again I expected this to be a very easy task but ended up spending hours debugging and troubleshooting Mephisto and my blog setup on HostingRails.com.</p>
+
+<p>I started by downloading the theme onto my server:</p>
+
+<pre>cd themes/site-1/
+mkdir cutline
+curl http://mephisto-themes.nanorails.com/download?theme
+    =cutline.mephisto-themes.nanorails.com > cutline/cutline.zip
+cd cutline
+unzip cutline.zip</pre>
+
+
+<p>Now when I logged into the Mephisto console and viewed Design->Manage Themes I saw the new theme. The first problem occurred when I clicked on the new theme and selected “Use Theme.&ldquo; I expected to see the new theme or a message in the admin console, but instead got a page full of text:</p>
+
+<pre>$("dialog-box").update("\u003Cdiv id=\"theme-info\" class=\"clearfix\"\u003E\n  \u003Ch3\u003E\n    Cutline (rhtml) (v1.1)by \u003Ca
+href=\"http://cutline.tubetorial.com/\"\u003EPearsonified\u003C/a\u003E\n    \u003Ca href=\"#\" id=\"close-dialog\" onclick=\"Dialog.close();
+return false;\"\u003Eclose\u003C/a\u003E\n  \u003C/h3\u003E\n  \u003Cdiv id=\"screenshot\"\u003E\n    \u003Cimg
+src=\"/admin/themes/preview_for/cutline\" alt=\"Theme preview\" title=\"Cutline (rhtml) (v1.1)\" /\u003E\n    \u003Cp\u003EToday, you can put
+an end to boring default styling and step into a world where your posts will become more artistic, more engaging, and more
+compelling!\u003C/p\u003E\n  \u003C/div\u003E\n  \u003Cdiv id=\"theme-options\"\u003E\n    \u003Cul\u003E\n          \u003Cli\u003E\u003Ca
+href=\"/admin/themes/change_to/cutline\"\u003EUse theme\u003C/a\u003E\u003C/li\u003E\n      \u003Cli\u003E\u003Ca
+href=\"/admin/design?theme=cutline\"\u003EEdit theme\u003C/a\u003E\u003C/li\u003E\n          \u003Cli\u003E\u003Ca
+href=\"/admin/themes/export/cutline\"\u003EDownload theme\u003C/a\u003E\u003C/li\u003E\n          \u003Cli\u003E\u003Ca href=\"#\"
+onclick=\"if (confirm('Are you sure you wish to delete this theme stored at \\'themes/site-1/cutline\\'?')) { new
+Ajax.Request('/admin/themes/destroy/cutline', {asynchronous:true, evalScripts:true, method:'delete'}); }; return false;\"\u003EDelete
+theme\u003C/a\u003E\u003C/li\u003E\n        \u003C/ul\u003E\n  \u003C/div\u003E\n\u003C/div\u003E");
+Dialog.current.layout();</pre>
+
+
+<p>It looks like the parent window from the admin console was redirected to “/admin/themes/show/cutline” and the meta data/contents of the theme dialog box intended for some javascript was displayed as plain text to me. After staring at this for a while I started looking for help on the Internet and eventually found an article explaining that I needed to make a code change to app/controllers/admin/themes_controller.rb near line 5:</p>
+
+<pre>before_filter :protect_action, :only => [:export, :change_to, :rollback,
+ :import]</pre>
+
+
+<p>&hellip;should be changed to:</p>
+
+<pre>before_filter :protect_action, :only => [:export, :rollback]</pre>
+
+
+
+
+<p>One to do item here is to check whether the latest, edge version of Mephisto contains this fix already or not. I’m sure it does. Even after making the change on hostingrails.com I struggled for some more time before realizing that I had to kill any dispatch.fcgi processes running on the server before a code change would take effect. This wasn’t a problem in my local, development setup. Passenger must load and cache Ruby code after the first request. This would be interesting to explore further.</p>
+
+
+
+
+<p>I tried again and this time: success! Finally I was able to switch to the new theme. Excited, I quickly took a look at my new site and saw... nothing! More troubleshooting revealed this error in my production.log file:</p>
+
+
+
+
+<pre>SystemExit (Define INLINEDIR or HOME in your environment and try again):
+...ruby/gems/1.8/gems/RubyInline-3.7.0/lib/inline.rb:93:in 'abort'
+...ruby/gems/1.8/gems/RubyInline-3.7.0/lib/inline.rb:93:in 'rootdir'
+...ruby/gems/1.8/gems/RubyInline-3.7.0/lib/inline.rb:107:in 'directory'
+...ruby/gems/1.8/gems/RubyInline-3.7.0/lib/inline.rb:277:in 'so_name'
+...ruby/gems/1.8/gems/RubyInline-3.7.0/lib/inline.rb:317:in 'load_cache'
+...ruby/gems/1.8/gems/RubyInline-3.7.0/lib/inline.rb:653:in 'inline'
+...ruby/gems/1.8/gems/image_science-1.1.3/lib/image_science.rb:84
+...ruby/site_ruby/1.8/rubygems/custom_require.rb:32:in 'gem_original_require'
+...ruby/site_ruby/1.8/rubygems/custom_require.rb:32:in 'require'
+...rails/activesupport/lib/active_support/dependencies.rb:496:in 'require'
+...rails/activesupport/lib/active_support/dependencies.rb:342:in 'new_constants_in'
+...rails/activesupport/lib/active_support/dependencies.rb:496:in 'require'
+...plugins/attachment_fu/lib/technoweenie/attachment_fu/processors/image_science_processor.rb:1
+...ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in 'gem_original_require'
+etc...</pre>
+
+
+<p>Some further searching on the Internet revealed that the problem here was that an image library called <a href="http://seattlerb.rubyforge.org/ImageScience.html">ImageScience</a> requires something called <a href="http://rubyforge.org/projects/rubyinline">RubyInline</a>. Looking at the stack trace, it seems that the “attachment_fu” plugin uses the ImageScience library. Probably this is used by Mephisto to produce the thumbnail preview images in the Admin->Assets page. The solution in this case is to create a folder on the server for RubyInline, and to set this value near the top of Mephisto’s environment.rb file. Along with my change from last week to force the production environment, the top of config/environment.rb looks like this:</p>
+
+<pre># Uncomment below to force Rails into production mode when
+# you don't control web/app server and can't set it the proper way
+ENV['RAILS_ENV'] ||= 'production'
+ENV['INLINEDIR'] ||= 'inline'</pre>
+
+
+<p>I tried again to see my site, and this time still saw a blank page. View->Source revealed that the Ruby code in the view was not being executed. Finally I installed the “mephisto_erb_templates” plugin as instructed by <a href="http://mephisto-themes.nanorails.com/2007/3/21/cutline-theme">http://mephisto-themes.nanorails.com/2007/3/21/cutline-theme</a>.</p>
+
+<pre>script/plugin install http://svn.nanorails.com/plugins/mephisto_erb_templates/</pre>
+
+
+<p>Now the theme worked properly. I made a few cosmetic CSS tweaks, picked my own image and ended up with this page.</p>
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

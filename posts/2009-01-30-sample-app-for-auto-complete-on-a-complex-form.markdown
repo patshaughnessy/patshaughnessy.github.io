@@ -1,0 +1,97 @@
+title: Sample app for auto complete on a complex form
+date: 2009/01/30
+tag: the auto_complete plugin
+
+<p>Update November 2009: My <a href ="http://patshaughnessy.net/view_mapper">View Mapper gem</a> now supports generating scaffolding code for a complex form with auto_complete behavior like the one I describe below right inside your application, using your models and attributes. For more info see: <a href ="http://patshaughnessy.net/2009/11/25/scaffolding-for-auto-complete-on-a-complex-nested-form">http://patshaughnessy.net/2009/11/25/scaffolding-for-auto-complete-on-a-complex-nested-form</a>.
+You can read more about my fork of the auto_complete plugin here: <a href ="http://patshaughnessy.net/repeated_auto_complete">http://patshaughnessy.net/repeated_auto_complete</a>.</p>
+<p>&nbsp;</p>
+<p>In his &ldquo;Complex Forms&rdquo; series (<a href="http://railscasts.com/episodes/73">part 1</a>, <a href="http://railscasts.com/episodes/74">part 2</a> and <a href="http://railscasts.com/episodes/75">part 3</a>) Ryan Bates does a fantastic job explaining how to create a complex form containing a series of parent/child text fields while still using simple, clean code. Ryan also pushed the sample application from the screen cast onto github, here: <a href="http://github.com/ryanb/complex-form-examples">http://github.com/ryanb/complex-form-examples</a></p>
+<p>Here&rsquo;s what Ryan&rsquo;s sample complex form looks like:</p>
+<p><img src="http://patshaughnessy.net/assets/2009/1/30/sample.png"></p>
+<p>One problem I ran into while using Ryan&rsquo;s suggestions on a complex form I was writing was how to get auto complete behavior to work properly using the auto_complete plugin for fields that are repeated, like the &ldquo;task&rdquo; field here. <a href="http://patshaughnessy.net/2008/10/21/autocomplete-plugin-doesn-t-work-for-repeated-fields">As I explained in a previous blog post</a>, this causes a lot of problems for the auto_complete plugin since the &lt;input id=&rdquo;&rdquo;&gt; attributes are no longer unique, breaking the javascript used for auto complete. <a href="http://patshaughnessy.net/2009/1/30/repeated_auto_complete-changes-merged-into-auto_complete">I was able to solve the problem by modifying the auto_complete plugin</a> to generate unique &lt;input id=&rdquo;&rdquo;&gt; attributes, among other things.</p>
+<p>Here I want to take some time to show how to use my modified auto_complete plugin, using the same sample application from Ryan&rsquo;s screencast. To get started, let&rsquo;s clone the git repository for the sample app - this command refers to my fork of Ryan's complex-form-examples repository: <a href="http://github.com/patshaughnessy/complex-form-examples">http://github.com/patshaughnessy/complex-form-examples</a></p>
+<pre>$ git clone git://github.com/patshaughnessy/complex-form-examples.git
+Initialized empty Git repository in /Users/pat/rails-apps/complex-form-examples/.git/
+remote: Counting objects: 192, done.
+remote: Compressing objects: 100% (122/122), done.
+remote: Total 192 (delta 71), reused 159 (delta 58)
+Receiving objects: 100% (192/192), 86.19 KiB | 68 KiB/s, done.
+Resolving deltas: 100% (71/71), done.</pre>
+<p>Ryan had saved various versions of the sample app in different git branches, so to avoid confusion I&rsquo;ve saved my auto complete related changes in a branch called &ldquo;auto_complete.&rdquo; So next you should switch to that branch:</p>
+<pre>$ cd complex-form-examples
+$ git checkout origin/auto_complete
+Note: moving to &quot;origin/auto_complete&quot; which isn&#x27;t a local branch
+If you want to create a new branch from this checkout, you may do so
+(now or later) by using -b with the checkout command again. Example:
+  git checkout -b &lt;new_branch_name&gt;
+HEAD is now at 4f3e908... Sample app code changes for auto_complete</pre>
+<p>Now you will see my changes in Ryans&rsquo; code, except for one more detail: I saved my version of the auto_complete plugin in this git repository as a submodule. To get the plugin&rsquo;s code for this sample app you need to run these commands:</p>
+<pre>$ git submodule init
+Submodule &#x27;vendor/plugins/auto_complete&#x27; (git://github.com/patshaughnessy/auto_complete.git) registered for path &#x27;vendor/plugins/auto_complete&#x27;
+$ git submodule update
+Initialized empty Git repository in /Users/pat/rails-apps/complex-form-examples/vendor/plugins/auto_complete/.git/
+remote: Counting objects: 22, done.
+remote: Compressing objects: 100% (21/21), done.
+remote: Total 22 (delta 5), reused 0 (delta 0)
+Receiving objects: 100% (22/22), 7.65 KiB, done.
+Resolving deltas: 100% (5/5), done.
+Submodule path &#x27;vendor/plugins/auto_complete&#x27;: checked out &#x27;0814a25a754a235c5cf6f7a258fa405059a5ca6f&#x27;</pre>
+<p>(Note that normally to install the plugin in your app you would just run “script/plugin install git://github.com/patshaughnessy/auto_complete.git” – the submodule is only present in this sample app.) Now to setup and run the application you just need to:
+  <ol>
+    <li>Enter your MySQL details in config/database.yml</li>
+    <li>Run rake db:migrate</li>
+    <li>Run script/server to launch the app</li>
+  </ol>
+</p>  
+<p>If you enter a few records you should be able to see the auto complete drop down, even for the repeated field:</p>
+<p><img src="http://patshaughnessy.net/assets/2009/1/30/sample_auto_complete.png"></p>
+<p>Let&rsquo;s review the changes I&rsquo;ve made to Ryan&rsquo;s code aside from adding my modified version of auto_complete to vendor/plugins. First, I added the standard auto_complete handlers to projects_controller.rb for both the project and task fields:</p>
+<pre>class ProjectsController &lt; ApplicationController
+  auto_complete_for :project, :name
+  auto_complete_for :task, :name
+&hellip;</pre>
+<p>Next I modified the project text field to use auto complete (in views/projects/_form.html.erb):</p>
+<pre>&lt;p&gt;
+  &lt;%= f.label :name, &quot;Project:&quot; %&gt;
+  &lt;%= text_field_with_auto_complete :project, :name, {}, {:method =&gt; :get } %&gt;
+&lt;/p&gt;</pre>
+<p>These two changes enable auto complete for the single project text field, just the same way you would with any text field and the standard auto_complete plugin. However, to get auto complete to work with the repeated tasks field, we need to use changes I&rsquo;ve made to auto_complete. First, in helpers/projects_helper.rb change the &ldquo;fields_for_task&rdquo; method to use my new auto_complete_fields_for method, like this:</p>
+<pre>def fields_for_task(task, &amp;block)
+  new_or_existing = task.new_record? ? &#x27;new&#x27; : &#x27;existing&#x27;
+  prefix = &quot;project[#{new_or_existing}_task_attributes][]&quot;
+  <b>auto_complete_</b>fields_for(prefix, task, &amp;block)
+end</pre>
+<p>This causes my code in auto_complete to provide a custom form builder object, which we can use in the view as follows (views/projects/_task.html.erb):</p>
+<pre>&lt;% fields_for_task task do |f| -%&gt;
+  &lt;%= error_messages_for :task, :object =&gt; task %&gt;
+  &lt;%= f.label :name, &quot;Task:&quot; %&gt;
+  <b>&lt;%= f.text_field_with_auto_complete :task, :name, {}, {:method =&gt; :get } %&gt;</b>
+  &lt;%= link_to_function &quot;remove&quot;, &quot;$(this).up(&#x27;.task&#x27;).remove()&quot; %&gt;
+&lt;% end -%&gt;</pre>
+<p>Here I&rsquo;ve called &ldquo;text_field_with_auto_complete&rdquo; as a method on the &ldquo;f&rdquo; form builder object yielded by fields_for_task. This will cause the auto complete script and HTML to be generated with unique &lt;input id=&rdquo;&rdquo;&gt; attributes, allowing the auto complete behavior to work properly.</p>
+<p>One other change I made was also to helpers/projects_helper.rb:</p>
+<pre>def add_task_link(name)
+  link_to_remote &quot;Add a task&quot;, :url =&gt; {
+                                 :controller =&gt; &quot;projects&quot;,
+                                 :action =&gt; &quot;add_task_script&quot;
+                               }
+end</pre>
+<p>Here I&rsquo;ve changed Ryan&rsquo;s &ldquo;link_to_function&rdquo; call to &ldquo;link_to_remote.&rdquo; As Ryan explains in <a href="http://railscasts.com/episodes/74">part 2</a> of his complex forms screen cast, link_to_function avoids an AJAX call to the server to obtain the HTML for each new task &lt;input&gt; tag, avoiding unnecessary load on the server since all of the task fields are the same. However, with my changes to auto_complete the HTML generated for the task field contains random numbers which are different for each copy of the field&hellip; meaning that we do need a separate call to the server to obtain the task field HTML and script. To handle the call from link_to_remote, I&rsquo;ve added a new file, views/projects/add_task_script.rjs:</p>
+<pre>page.insert_html :bottom, :tasks, :partial =&gt; &#x27;task&#x27;, :object =&gt; Task.new</pre>
+<p>&hellip; which works essentially the same way as described by Ryan, but is called each time the user clicks &ldquo;Add a task.&rdquo;</p>
+<p>The last change I made to the sample app is in routes.rb; these changes are required to allow the controller to map the Ajax requests, and to insure that these requests use GET, and not POST HTTP requests:</p>
+<pre>map.connect 'projects/auto_complete_for_project_name',
+            :controller => 'projects',
+            :action => 'auto_complete_for_project_name'
+map.connect 'projects/auto_complete_for_task_name',
+            :controller => 'projects',
+            :action => 'auto_complete_for_task_name'
+map.connect 'projects/add_task_script',
+            :controller => 'projects',
+            :action => 'add_task_script'
+map.resources :projects,
+              :collection => {
+                :auto_complete_for_project_name => :get,
+                :auto_complete_for_task_name => :get
+              }</pre>
+<p>This certainly seems very ugly, and probably could be simplified! But for now, we need this code to avoid problems with CRSF protection; see <a href="http://www.ruby-forum.com/topic/128970">http://www.ruby-forum.com/topic/128970</a>.</p>

@@ -1,0 +1,516 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</h1>
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 7px 30px 10px 0px">
+<table cellpadding="0" cellspacing="0" border="0">
+  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/29/fortran.png"></td></tr>
+  <tr><td align="center"><small><i>Part of a Fortran IV program (source: <a href="http://en.wikibooks.org/wiki/Fortran/Fortran_examples">WikiBooks</a>)</i></small></td></tr>
+</table>
+</div>
+
+
+<p>The <span class="code">goto</span> statement is one of the most infamous and troublesome features of old, archaic languages like Fortran. It allowed programmers to quickly create spaghetti code that was confusing and impossible to understand. Thankfully when structured programming came into use in the late 1960s and 1970s with Algol, Pascal and later C, <span class="code">goto</span> was no longer necessary.</p>
+
+<p>This is all ancient history: why am I bringing it up? Well, I just discovered this week that Ruby, one of the most beautiful and expressive languages in use today, includes support for the <span class="code">goto</span> statement!</p>
+
+<div style="clear: left"/></div>
+
+
+<p>Here’s how it works:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+__label__(<span class="symbol">:loop</span>)
+
+puts <span class="string"><span class="delimiter">&quot;</span><span class="content">The Ruby core team is playing a joke on us!</span><span class="delimiter">&quot;</span></span>
+
+__goto__(<span class="symbol">:loop</span>)
+
+puts <span class="string"><span class="delimiter">&quot;</span><span class="content">This line of code is never reached.</span><span class="delimiter">&quot;</span></span>
+</pre></div>
+</div>
+
+
+
+
+
+<div style="float: right; padding: 15px 0px 10px 30px">
+<table cellpadding="0" cellspacing="0" border="0">
+  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/29/legacy-data.jpg"></td></tr>
+</table>
+</div>
+
+
+<p>The <span class="code">__goto__</span> statement will cause the MRI Ruby 1.9 interpreter to jump up to the <span class="code">__label__</span> statement on the first line, since they both refer to the same symbol <span class="code">:loop</span>. The last line of code will never be executed at all. Brilliant, isn’t it? We’ve managed to degrade and reduce Ruby to the level of Fortran.</p>
+
+<p>However, there’s a catch. Ruby 1.9 doesn’t support <span class="code">goto</span> by default. You need to enable it by setting an optional virtual machine setting called <span class="code">SUPPORT_JOKE</span> and then recompiling Ruby from source. That’s right: the Ruby core team has included optional support for the <span class="code">goto</span> statement in Ruby 1.9 as a joke! But it’s no joke: the <span class="code">__goto__</span> and <span class="code">__label__</span> methods actually do work if you enable <span class="code">SUPPORT_JOKE</span>. Today I’ll show you exactly how to do this, and also explain how the Ruby 1.9 byte code compiler and virtual machine (called <a href="http://www.atdot.net/yarv/">YARV</a>) implement <span class="code">goto</span>.</p>
+
+<p>In case you get bored by all of the technical details, be sure to skip down to the bottom of the article, where I reveal a couple of other jokes included in Ruby 1.9 by the Ruby core team!</p>
+
+<h2>Enabling goto support in your Ruby 1.9 installation</h2>
+
+<p>First, let’s try running the code above directly using a normal Ruby 1.9.3 MRI interpreter. I’ll paste the code above into a file called “joke.rb” and then run it like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rvm 1.9.3
+$ ruby joke.rb 
+joke.rb:1:in `&lt;main&gt;': undefined method `__label__' for main:Object (NoMethodError)
+</pre></div>
+</div>
+
+
+
+<p>No surprise: since I haven’t yet enabled <span class="code">goto</span> statement support, I get an error from Ruby stating that the <span class="code">__label__</span> method is not defined on line 1. Until you enable the <span class="code">SUPPORT_JOKE</span> setting, the <span class="code">__goto__</span> and <span class="code">__label__</span> methods aren’t defined.</p>
+
+<p>Here’s how to enable the <span class="code">goto</span> statement support. First, find the source code for your Ruby 1.9 installation, and open the “vm_opts.h” header file in an editor. Here’s how I would do that on my Mac laptop using RVM:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ cd ~/.rvm/src/ruby-1.9.3-preview1
+$ mvim vm_opts.h
+</pre></div>
+</div>
+
+
+
+<p>Depending on exactly which version of Ruby 1.9 you have installed and how you obtained it, you might have to look in a different path for the Ruby C source code. Anyway, once you find the vm_opts.h file, you’ll see a series of settings for the Ruby 1.9 virtual machine:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="comment">/**********************************************************************
+
+  vm_opts.h - VM optimize option
+
+  $Author: akr $
+
+  Copyright (C) 2004-2007 Koichi Sasada
+
+**********************************************************************/</span>
+
+
+<span class="preprocessor">#ifndef</span> RUBY_VM_OPTS_H
+<span class="preprocessor">#define</span> RUBY_VM_OPTS_H
+
+<span class="comment">/* Compile options.
+ * You can change these options at runtime by VM::CompileOption.
+ * Following definitions are default values.
+ */</span>
+
+<span class="preprocessor">#define</span> OPT_TRACE_INSTRUCTION        <span class="integer">1</span>
+<span class="preprocessor">#define</span> OPT_TAILCALL_OPTIMIZATION    <span class="integer">0</span>
+<span class="preprocessor">#define</span> OPT_PEEPHOLE_OPTIMIZATION    <span class="integer">1</span>
+<span class="preprocessor">#define</span> OPT_SPECIALISED_INSTRUCTION  <span class="integer">1</span>
+
+... etc ...
+</pre></div>
+</div>
+
+
+
+<p>This is actually interesting; from the comments it looks like using the <span class="code">VM::CompileOption</span> Ruby object you can enable or disable different YARV optimizations at runtime. Someday I might take a look into what these mean and write up a blog post on YARV internals. But for today, let’s continue to scroll down and take a look at the bottom of the vm_opts.h file:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="comment">/* Build Options.
+ * You can't change these options at runtime.
+ */</span>
+
+<span class="comment">/* C compiler depend */</span>
+<span class="preprocessor">#define</span> OPT_DIRECT_THREADED_CODE     <span class="integer">1</span>
+<span class="preprocessor">#define</span> OPT_TOKEN_THREADED_CODE      <span class="integer">0</span>
+<span class="preprocessor">#define</span> OPT_CALL_THREADED_CODE       <span class="integer">0</span>
+
+... etc ...
+
+<span class="comment">/* misc */</span>
+<span class="preprocessor">#define</span> SUPPORT_JOKE                 <span class="integer">0</span>
+
+<span class="preprocessor">#endif</span> <span class="comment">/* RUBY_VM_OPTS_H */</span>
+</pre></div>
+</div>
+
+
+
+<p>And there it is: at the very bottom of the file we see a value called <span class="code">SUPPORT_JOKE</span> which is set to 0. Strangely, there’s no documentation or explanation as to what the joke might be, or what might happen if you changed the value to 1. As I explain below in the rest of this article, what happens is that changing this value to 1 will enable Ruby’s <span class="code">goto</span> statement support&hellip; along with two other jokes!</p>
+
+<p>Let’s try it out &ndash; I’ll change the value to 1 like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+ <span class="comment">/* misc */</span>
+<span class="preprocessor">#define</span> SUPPORT_JOKE                 <span class="integer">1</span>
+</pre></div>
+</div>
+
+
+
+<p>&hellip; and save the modified vm_opts.h file. Now I need to recompile Ruby, using the “make” command like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ make
+    CC = /usr/bin/gcc-4.2
+    LD = ld
+    LDSHARED = /usr/bin/gcc-4.2 -dynamiclib
+
+... etc ...
+
+compiling miniprelude.c
+compiling class.c
+compiling enum.c
+compiling error.c
+compiling eval.c
+
+... etc ...
+
+installing default zlib libraries
+linking ruby
+</pre></div>
+</div>
+
+
+
+<p>You can see most of the C source code files depend on vm_opts.h and will be recompiled with the new setting. Now I just need to install the new Ruby executable file like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ make install
+./miniruby -I./lib -I. -I.ext/common  ./tool/rbinstall.rb --make=&quot;make&quot; ...
+installing binary commands:   /Users/pat/.rvm/rubies/ruby-1.9.3-preview1/bin
+installing base libraries:    /Users/pat/.rvm/rubies
+
+... etc ...
+</pre></div>
+</div>
+
+
+
+<p>And I’m done &ndash; my special, customized Ruby 1.9 executable is now ready. Let’s give it a try and see what happens:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ ruby joke.rb
+The Ruby core team is playing a joke on us!
+The Ruby core team is playing a joke on us!
+The Ruby core team is playing a joke on us!
+The Ruby core team is playing a joke on us!
+The Ruby core team is playing a joke on us!
+The Ruby core team is playing a joke on us!
+
+...etc...
+</pre></div>
+</div>
+
+
+
+<h2>Understanding how Ruby supports goto</h2>
+
+<p>While this might be worth a few laughs, I view it as a learning opportunity as well. The rest of this article will show you what happens inside Ruby when you set <span class="code">SUPPORT_JOKE=1</span>, and how the <span class="code">goto</span> statement actually works. Before we get to the C language details of the Ruby byte code compiler and the <span class="code">SUPPORT_JOKE</span> setting, let’s start with a brief overview of the Ruby 1.9 parse and compile process. Here’s a high level picture of what happens when you run a Ruby 1.9 program:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/2/29/high-level.png" alt="high level view" /></p>
+
+<p>Going from left to right, whenever you run a Ruby program it:</p>
+
+<ul>
+  <li>First tokenizes your Ruby source code into a series of tokens</li>
+  <li>Parses the stream of tokens using an open source parsing engine called <a href="http://www.gnu.org/software/bison/">Bison</a>, creating a tree structure called an <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree</a>, or AST.</li>
+  <li>Compiles that AST into byte code</li>
+  <li>Finally, the Ruby virtual machine (YARV) interprets these byte code instructions and executes your program.</li>
+</ul>
+
+
+<h2>Parsing</h2>
+
+<p>Now let’s take a look at how the “joke.rb” program above is parsed by Ruby. The best way to get a sense of how Ruby does this is by using the <a href="http://www.ruby-doc.org/stdlib-1.9.3/libdoc/ripper/rdoc/Ripper.html">Ripper</a> library, like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+require <span class="string"><span class="delimiter">'</span><span class="content">ripper</span><span class="delimiter">'</span></span>
+require <span class="string"><span class="delimiter">'</span><span class="content">pp</span><span class="delimiter">'</span></span>
+
+joke_code = <span class="string"><span class="delimiter">&lt;&lt;SRC</span></span><span class="string"><span class="content">
+__label__(:loop)
+puts &quot;The Ruby core team is playing a joke on us!&quot;
+__goto__(:loop)
+puts &quot;This line of code is never reached!&quot;</span><span class="delimiter">
+SRC</span></span>
+
+pp <span class="constant">Ripper</span>.sexp(joke_code)
+</pre></div>
+</div>
+
+
+
+<p>I first learned about Ripper watching Peter Cooper’s excellent <a href="http://rubyreloaded.com/trickshots/">RubyTrickShots</a> screen cast. Also, I&rsquo;ve skipped over the tokenize/lex step here today, but adding a call to <span class="code">Ripper.lex</span> would display the output of the Ruby tokenizer. Running this, <span class="code">Ripper.sexp</span> will display the AST produced by the Bison parser inside of Ruby:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+[:program,
+ [[:method_add_arg,
+   [:fcall, [:@ident, &quot;__label__&quot;, [1, 0]]],
+   [:arg_paren,
+    [:args_add_block,
+     [[:symbol_literal, [:symbol, [:@ident, &quot;loop&quot;, [1, 11]]]]],
+     false]]],
+  [:command,
+   [:@ident, &quot;puts&quot;, [2, 0]],
+   [:args_add_block,
+    [[:string_literal,
+      [:string_content,
+       [:@tstring_content,
+        &quot;The Ruby core team is playing a joke on us!&quot;,
+        [2, 6]]]]],
+
+... etc ...
+</pre></div>
+</div>
+
+
+
+<p>To make this easier to understand, here’s a graphical representation of the syntax tree for part of the joke.rb script:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/2/29/ast.png" alt="Abstract Syntax Tree" /></p>
+
+<p>This is just part of the syntax tree for my joke.rb file. Notice that in the node on the left, representing the call to <span class="code">__label__(:loop)</span>, I’ve included the constant <span class="code">NODE_FCALL</span> used internally by the Ruby C source code to identify function calls in the syntax tree. We’ll see this used in a moment.</p>
+
+<h2>Compiling</h2>
+
+<p>After tokenizing and parsing your script, the next thing Ruby does is to compile the AST node tree into byte code that the YARV engine can later execute. As <a href="http://www.rohitarondekar.com/">Rohit Arondekar</a> pointed out in a comment on <a href="http://patshaughnessy.net/2012/2/15/is-ruby-interpreted-or-compiled">my last post</a> the easiest way to see the output of the Ruby 1.9 compiler is to use the <span class="code">RubyVM</span> object like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+code = <span class="string"><span class="delimiter">&lt;&lt;SRC</span></span><span class="string"><span class="content">
+__label__(:loop)
+puts &quot;The Ruby core team is playing a joke on us!&quot;
+__goto__(:loop)
+puts &quot;This line of code is never reached!&quot;</span><span class="delimiter">
+SRC</span></span>
+
+bytecode = <span class="constant">RubyVM</span>::<span class="constant">InstructionSequence</span>.compile(code)
+puts bytecode.disasm
+</pre></div>
+</div>
+
+
+
+<p>Running this, I get:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ ruby byte_code.rb 
+== disasm: &lt;RubyVM::InstructionSequence:&lt;compiled&gt;@&lt;compiled&gt;&gt;==========
+0000 trace            1                                               (   1)
+0002 trace            1                                               (   2)
+0004 putnil           
+0005 putstring        &quot;The Ruby core team is playing a joke on us!&quot;
+0007 send             :puts, 1, nil, 8, &lt;ic:0&gt;
+0013 pop              
+0014 trace            1                                               (   3)
+0016 jump             2
+0018 trace            1                                               (   4)
+0020 putnil           
+0021 putstring        &quot;This line of code is never reached!&quot;
+0023 send             :puts, 1, nil, 8, &lt;ic:1&gt;
+0029 leave            
+</pre></div>
+</div>
+
+
+
+<p>This is actually easy to understand, since the byte code instructions are quite high level and intuitive. You can see how the <span class="code">__goto__</span> and <span class="code">__label__</span> statements work: on line 16 there’s a <span class="code">jump</span> instruction which sends the YARV engine back up to line 2 in an endless loop.</p>
+
+<h2>Finding where SUPPORT_JOKE is used in the Ruby C source code</h2>
+
+<p>Now that we have a high level understanding of how my simple joke.rb Ruby script works, let’s return to the <span class="code">SUPPORT_JOKE</span> setting and take a look at exactly what happens when you enable it. <span class="code">SUPPORT_JOKE</span> appears in a few places in the Ruby 1.9 source code, but primarily it’s used in the compile.c file, which implements the Ruby AST to byte code compiler. If you open compile.c and search for <span class="code">SUPPORT_JOKE</span>, you’ll find this C code:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="preprocessor">#if</span> SUPPORT_JOKE
+
+... etc ...
+
+<span class="comment">/* only joke */</span>
+{
+   ID goto_id;
+   ID label_id;
+
+   CONST_ID(goto_id, <span class="string"><span class="delimiter">&quot;</span><span class="content">__goto__</span><span class="delimiter">&quot;</span></span>);
+   CONST_ID(label_id, <span class="string"><span class="delimiter">&quot;</span><span class="content">__label__</span><span class="delimiter">&quot;</span></span>);
+
+   <span class="keyword">if</span> (nd_type(node) == NODE_FCALL &amp;&amp;
+       (mid == goto_id || mid == label_id)) {
+
+... etc ...
+
+     <span class="keyword">if</span> (mid == goto_id) {
+       ADD_INSNL(ret, nd_line(node), jump, label);
+     }
+     <span class="keyword">else</span> {
+       ADD_LABEL(ret, label);
+     }
+
+... etc ...
+</pre></div>
+</div>
+
+
+
+<p>For the sake of simplicity, I’ve omitted some of the C code you would see in compile.c. But I have shown enough code to get the basic idea across. Let’s take it one step at a time&hellip;.</p>
+
+<p>First, you should notice the two calls to <span class="code">CONST_ID</span> &ndash; these define two identifiers called <span class="code">__goto__</span>and <span class="code">__label__</span>. This is actually a very unusual, odd way of defining Ruby keywords! In the Ruby parser and compiler, most reserved words and other hard coded constants of the language are defined in a variety of standard ways. But what we see here is that, only in the case when <span class="code">SUPPORT_JOKE=1</span>, the Ruby compiler explicitly defines these two special identifiers inline right in the ruby byte code compiler C code. Very strange!</p>
+
+<p>Next, if you read the following <span class="code">if</span> statement, you see that Ruby is checking whether the current <span class="code">node</span> object is of type <span class="code">NODE_FCALL</span>. Here <span class="code">node</span> refers to one of the nodes in the AST tree we saw above. <span class="code">NODE_FCALL</span> corresponds to the <span class="code">:fcall</span> symbol we saw in the Ripper output. What’s happening in this part of the compile.c file is that Ruby is stepping around the AST tree above, and converting each tree element into byte code. Translating this <span class="code">if</span> statement into English we get: “If the current node is a function call and the function being called is either <span class="code">__goto__</span>or <span class="code">__label__</span>&hellip;.”</p>
+
+<p>Finally, if the statement is true and after executing some other C code I’ve omitted here, Ruby will call either <span class="code">ADD_INSNL</span> or <span class="code">ADD_LABEL</span> to output new byte code. In this case we can see <span class="code">ADD_INSNL</span> adds a <span class="code">jump</span> byte code command to the specified label:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+ADD_INSNL(ret, nd_line(node), jump, label);
+</pre></div>
+</div>
+
+
+
+<p>All of this code is only included in Ruby if <span class="code">SUPPORT_JOKE</span> is true; if you haven’t enabled <span class="code">SUPPORT_JOKE</span> then none of this C code will even be compiled, because of the <span class="code">#if SUPPORT_JOKE</span> statement at the top.</p>
+
+<h2>Other jokes</h2>
+
+<p>It turns out there are two other jokes the Ruby core team has included in the compiler:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="comment">// (from id.c)</span>
+<span class="preprocessor">#if</span> SUPPORT_JOKE
+    REGISTER_SYMID(idBitblt, <span class="string"><span class="delimiter">&quot;</span><span class="content">bitblt</span><span class="delimiter">&quot;</span></span>);
+    REGISTER_SYMID(idAnswer, <span class="string"><span class="delimiter">&quot;</span><span class="content">the_answer_to_life_the_universe_and_everything</span><span class="delimiter">&quot;</span></span>);
+<span class="preprocessor">#endif</span>
+
+<span class="comment">// (from compile.c near the snippet I showed above)</span>
+<span class="preprocessor">#if</span> SUPPORT_JOKE
+<span class="keyword">if</span> (nd_type(node) == NODE_VCALL) {
+  <span class="keyword">if</span> (mid == idBitblt) {
+    ADD_INSN(ret, nd_line(node), bitblt);
+    <span class="keyword">break</span>;
+  }
+  <span class="keyword">else</span> <span class="keyword">if</span> (mid == idAnswer) {
+    ADD_INSN(ret, nd_line(node), answer);
+    <span class="keyword">break</span>;
+  }
+}
+
+... etc ...
+</pre></div>
+</div>
+
+
+
+<p>Once you’ve enabled <span class="code">SUPPORT_JOKE</span> and recompiled, you’ll be able to run these two other special, hard coded methods:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ irb
+ruby-1.9.3-preview1 :001 &gt; bitblt
+ =&gt; &quot;a bit of bacon, lettuce and tomato&quot; 
+ruby-1.9.3-preview1 :002 &gt; the_answer_to_life_the_universe_and_everything
+ =&gt; 42 
+</pre></div>
+</div>
+
+
+
+
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

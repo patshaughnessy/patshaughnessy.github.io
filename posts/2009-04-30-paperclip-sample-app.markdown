@@ -1,0 +1,198 @@
+title: Paperclip sample app
+date: 2009/04/30
+tag: Paperclip
+
+<p>(Update October 2009)<br/>I just updated a gem I wrote called <a href="http://patshaughnessy.net/view_mapper">View Mapper</a> that will generate all of the code I describe below&hellip; you can use View Mapper to generate working scaffolding code that uploads/downloads files using Paperclip, or only view scaffolding code that works with an existing model in your app; for more details see: <a href="http://patshaughnessy.net/2009/10/16/paperclip-scaffolding">http://patshaughnessy.net/2009/10/16/paperclip-scaffolding</a></p>
+<p>&nbsp;</p>
+<p>I love scaffolding. Many experienced Rails developers scoff at the idea of using scaffolding to generate Rails code: it&rsquo;s ugly; it probably means you don&rsquo;t understand how to write the code yourself; it generates a lot more code than you need, etc., etc. However, for a beginning Rails developer working on her/his own like me who isn&rsquo;t surrounded by a team of Ruby experts, scaffolding is an essential tool and can help to get started in the right direction. Also, even for experienced Rubyists scaffolding can be a great way to quickly (minutes, not hours or days) get a simple app up and running to use for demos, UI wireframes, spiking some technical issue, etc.</p>
+<p>This post will demonstrate how to use scaffolding to create a new Rails app from scratch that uses the Paperclip plugin to upload and display an image file. Feel free to copy/paste pieces of code from the narrative below and use them in your app, or you can just skip to the chase and <a href="http://github.com/patshaughnessy/paperclip-sample-app">get the finished version from github</a> and run that on your machine.</p>
+<p>There are a lot of other good tutorials out there about this; see:
+  <ul>
+    <li><a href="http://burm.net/2008/10/07/the-ruby-on-rails-paperclip-plugin-tutorial-easy-image-attachments">http://burm.net/2008/10/07/the-ruby-on-rails-paperclip-plugin-tutorial-easy-image-attachments</a>, or</li>
+    <li><a href="http://jimneath.org/2008/04/17/paperclip-attaching-files-in-rails">http://jimneath.org/2008/04/17/paperclip-attaching-files-in-rails</a></li>
+    <li>and of course Ryan Bates has a <a href="http://railscasts.com/episodes/134-paperclip">screen cast on this topic also</a>.</li>
+  </ul>
+</p>
+<p>I&rsquo;ll take on the risk of repeating material that&rsquo;s already out there in order to show how easy it is to get a working Paperclip application up and running using scaffolding. The fact that just a few commands and lines of code are required illustrates just how simple and powerful Paperclip&rsquo;s design is. In my next post, I&rsquo;ll proceed to change this sample app to demonstrate how to save the uploaded files in a database column instead of on the web server&rsquo;s file system, using <a href="http://github.com/patshaughnessy/paperclip">my modified version of Paperclip</a>.</p>
+<p>FYI At the time I wrote this, Rails was at version 2.3.2:</p>
+<pre>$ rails --version
+Rails 2.3.2</pre>
+<p>Let&rsquo;s get started by creating a new Rails application:</p>
+<pre>$ rails paperclip-sample-app
+      create  
+      create  app/controllers
+      create  app/helpers
+      create  app/models
+      create  app/views/layouts
+      create  config/environments
+      create  config/initializers
+      create  config/locales
+      create  db
+      create  doc
+      create  lib
+      create  lib/tasks
+      create  log
+      etc...</pre>
+<p>Before we go any farther, let&rsquo;s setup our database.yml file and create a new MySQL database to use with the sample app. Replace the contents of config/database.yml with this:</p>
+<pre>development:
+    adapter: mysql
+    database: paperclip_sample_app_development
+    username: root
+    password: 
+    host: localhost</pre>
+<p>Enter the proper username and password for MySQL if they are not &ldquo;root&rdquo; and null. And then run this from the command line:</p>
+<pre>$ cd paperclip-sample-app
+$ rake db:create
+(in /Users/pat/rails-apps/paperclip-sample-app)</pre>
+<p>Ok, now we have a MySQL database to work with. Next, let&rsquo;s go ahead and install the Paperclip plugin. The best thing to do is just to get the latest version from github; Thoughtbot frequently updates it with bug fixes, enhancements, etc.:</p>
+<pre>$ ./script/plugin install git://github.com/thoughtbot/paperclip.git
+Initialized empty Git repository in /Users/pat/rails-apps/paperclip-sample-app/vendor/plugins/paperclip/.git/
+remote: Counting objects: 62, done.
+remote: Compressing objects: 100% (50/50), done.
+remote: Total 62 (delta 6), reused 39 (delta 4)
+Unpacking objects: 100% (62/62), done.
+From git://github.com/thoughtbot/paperclip
+ * branch            HEAD       -&gt; FETCH_HEAD</pre>
+<p>Now that we have an empty, shell application created and the Paperclip plugin installed, we can use scaffolding to add some working code to it. Let&rsquo;s use the same &ldquo;user&rdquo; and &ldquo;avatar&rdquo; example Thoughtbot does on the <a href="http://thoughtbot.com/projects/paperclip">Paperclip project page</a>. The idea is that the sample will contain a table of users, and each user will have an avatar image displayed in the web site. So to get started, I&rsquo;ll just create a new &ldquo;user&rdquo; model with string columns for the name and email address:</p>
+<pre>$ ./script/generate scaffold user name:string email:string
+      exists  app/models/
+      exists  app/controllers/
+      exists  app/helpers/
+      create  app/views/users
+      exists  app/views/layouts/
+      exists  test/functional/
+      exists  test/unit/
+      create  test/unit/helpers/
+      exists  public/stylesheets/
+      create  app/views/users/index.html.erb
+      create  app/views/users/show.html.erb
+      etc...</pre>
+<p>Now we need to generate the database columns necessary for Paperclip on our new model object using script/generate:</p>
+<pre>$ ./script/generate paperclip user avatar
+      exists  db/migrate
+      create  db/migrate/20090430084151_add_attachments_avatar_to_user.rb</pre>
+<p>And let&rsquo;s go ahead and create the users table using db:migrate:</p>
+<pre>$ rake db:migrate
+(in /Users/pat/rails-apps/paperclip-sample-app)
+==  CreateUsers: migrating ====================================================
+-- create_table(:users)
+   -&gt; 0.0031s
+==  CreateUsers: migrated (0.0032s) ===========================================
+
+==  AddAttachmentsAvatarToUser: migrating =====================================
+-- add_column(:users, :avatar_file_name, :string)
+   -&gt; 0.0063s
+-- add_column(:users, :avatar_content_type, :string)
+   -&gt; 0.0069s
+-- add_column(:users, :avatar_file_size, :integer)
+   -&gt; 0.0085s
+-- add_column(:users, :avatar_updated_at, :datetime)
+   -&gt; 0.0081s
+==  AddAttachmentsAvatarToUser: migrated (0.0311s) ============================</pre>
+<p>You can see that the Paperclip generator created columns in the users table called &ldquo;avatar_file_name,&rdquo; &ldquo;avatar_content_type,&rdquo; &ldquo;avatar_file_size&rdquo; and &ldquo;avatar_updated_at.&rdquo; Now we have our database schema setup. The next step is to just modify the code that was generated for us by the scaffolding and make the changes necessary for Paperclip. The first thing to do is to add a line to the user model and indicate that it has a file attachment called &ldquo;avatar.&rdquo; To do this, open app/models/user.rb and just add this one line:</p>
+<pre>class User &lt; ActiveRecord::Base
+  has_attached_file :avatar
+end</pre>
+<p>And then edit the new user form (app/views/users/new.html.erb) and add a file field to use to upload files. There are actually two code changes you need to make: first you need to set the HTML form to encode the uploaded file data (and other fields) using MIME multiple part syntax, and then second you need to actually add the file upload field. Here&rsquo;s the finished new.html.erb file with these two changes in bold:</p>
+<pre>&lt;h1&gt;New user&lt;/h1&gt;
+
+&lt;% form_for(@user<b>, :html =&gt; { :multipart =&gt; true }</b>) do |f| %&gt;
+  &lt;%= f.error_messages %&gt;
+
+  &lt;p&gt;
+    &lt;%= f.label :name %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :name %&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+    &lt;%= f.label :email %&gt;&lt;br /&gt;
+    &lt;%= f.text_field :email %&gt;
+  &lt;/p&gt;
+  <b>&lt;p&gt;
+    &lt;%= f.label :avatar %&gt;&lt;br /&gt;
+    &lt;%= f.file_field :avatar %&gt;
+  &lt;/p&gt;</b>
+  &lt;p&gt;
+    &lt;%= f.submit &#x27;Create&#x27; %&gt;
+  &lt;/p&gt;
+&lt;% end %&gt;
+
+&lt;%= link_to &#x27;Back&#x27;, users_path %&gt;</pre>
+<p>Also make the same changes to the edit form that was generated by the scaffolding: app/views/users/edit.html.erb. The best thing to do would be to include the same ERB file (maybe called &ldquo;_form.html.erb&rdquo;) in both the new and edit form files. Ideally the scaffolding generator would have done this for us&hellip;</p>
+<p>Now if we run our application we can upload an image file and attach it to a user:<br/>
+<img src="http://patshaughnessy.net/assets/2009/4/30/mickey-new.png"/></p>
+<p>If you submit this form, the image file will be uploaded to the server and saved on the file system. By default, Paperclip saves files inside a &ldquo;system&rdquo; folder it creates in your Rails app&rsquo;s public folder. Let&rsquo;s take a look at my public folder and see where the file went:</p>
+<pre>$ find public/system
+public/system
+public/system/avatars
+public/system/avatars/1
+public/system/avatars/1/original
+public/system/avatars/1/original/mickey-mouse.jpg</pre>
+<p>This is one of the nice things about Paperclip: it just works. I don&rsquo;t have to think about or worry about where the files are going to go; Thoughtbot has chosen simple default values that make sense. Here we can see that there are a series of folders created that correspond to the attachment name, model primary key and also the &ldquo;style&rdquo; of the attachment (more on that below).</p>
+<p>If you want to or need to save the files in some other place on your server&rsquo;s file system you can specify different options to has_attached_file in your model; see this write up for an example: <a href="http://travisonrails.com/2009/01/11/Changing-Paperclip-File-Storage-Location">http://travisonrails.com/2009/01/11/Changing-Paperclip-File-Storage-Location</a>. Paperclip also supports saving the files in Amazon&rsquo;s S3 storage service, and in my next post I&rsquo;ll demonstrate how to save the file data inside the database itself, right in the users table in this example.</p>
+<p>I&rsquo;m almost done; now I just need to display the uploaded image somewhere; the simplest thing to do is just to add an image tag to the users show page. Again, my changes to the standard scaffolding code are in bold:</p>
+<pre>&lt;p&gt;
+  &lt;b&gt;Name:&lt;/b&gt;
+  &lt;%=h @user.name %&gt;
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;b&gt;Email:&lt;/b&gt;
+  &lt;%=h @user.email %&gt;
+&lt;/p&gt;
+
+<b>&lt;p&gt;
+  &lt;b&gt;Avatar:&lt;/b&gt;
+  &lt;%= image_tag @user.avatar.url %&gt;
+&lt;/p&gt;</b>
+
+&lt;%= link_to &#x27;Edit&#x27;, edit_user_path(@user) %&gt; |
+&lt;%= link_to &#x27;Back&#x27;, users_path %&gt;</pre>
+<p>Now we can see the image for our new user:<br/>
+<img src="http://patshaughnessy.net/assets/2009/4/30/mickey-large.png"></p>
+<p>Since this image is bigger that what I would like, I can take advantage of Paperclip &ldquo;styles&rdquo; feature to generate a smaller version of it. To do that you will need to be sure you have ImageMagick installed on your server, which is what Paperclip uses behind the scenes to modify image files. Then all you need to do is just add two &ldquo;styles&rdquo; to your model, like this:</p>
+<pre>class User &lt; ActiveRecord::Base
+  has_attached_file :avatar,
+                    :styles =&gt; {
+                      :thumb =&gt; &quot;75x75&gt;&quot;,
+                      :small =&gt; &quot;150x150&gt;&quot;
+                    }
+end</pre>
+<p>The strings we pass in are actually options for ImageMagick's "convert" command; see <a href="http://www.imagemagick.org/script/convert.php">it&rsquo;s documentation</a> for more details. And now in the show ERB we can just specify the &ldquo;small&rdquo; style in the image tag instead:</p>
+<pre>&lt;%= image_tag @user.avatar.url(:small) %&gt;</pre>
+<p>To see it, first I need to re-edit and re-upload the image (remember to add the file field code to edit.html.erb just like for new.html.erb):<br/>
+<img src="http://patshaughnessy.net/assets/2009/4/30/mickey-edit.png"></p>
+<p>Now when this form is submitted we will see the smaller image:<br/>
+  <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-small.png"></p>
+And let&rsquo;s take another look at the public/system folder and see what Paperclip and ImageMagick have done for us:</p>
+<pre>$ find public/system
+public/system
+public/system/avatars
+public/system/avatars/1
+public/system/avatars/1/original
+public/system/avatars/1/original/mickey-mouse.jpg
+public/system/avatars/1/small
+public/system/avatars/1/small/mickey-mouse.jpg
+public/system/avatars/1/thumb
+public/system/avatars/1/thumb/mickey-mouse.jpg</pre>
+<p>Again, this is very simple and just works! As a last step, let&rsquo;s add the thumbnail image to the users index page so we can see Mickey without even clicking on that user record. This is as simple as editing app/views/users/index.html.erb and adding a new table column:</p>
+<pre>&lt;table&gt;
+  &lt;tr&gt;
+    <b>&lt;th&gt;Photo&lt;/th&gt;</b>
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Email&lt;/th&gt;
+  &lt;/tr&gt;
+
+&lt;% @users.each do |user| %&gt;
+  &lt;tr&gt;
+    <b>&lt;td&gt;&lt;%= image_tag user.avatar.url(:thumb) %&gt;&lt;/td&gt;</b>
+    &lt;td&gt;&lt;%=h user.name %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%=h user.email %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to &#x27;Show&#x27;, user %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to &#x27;Edit&#x27;, edit_user_path(user) %&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;%= link_to &#x27;Destroy&#x27;, user, :confirm =&gt; &#x27;Are you sure?&#x27;, :method =&gt; :delete %&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
+&lt;/table&gt;</pre>
+<p>And now we just need to refresh the index page since the thumb image file was already generated:<br/>
+  <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-index.png"></p>
+<p>And there you have it: a working file upload web site written in minutes. This was made possible by Rails scaffolding, and Paperclip's simple, elegant design.</p>

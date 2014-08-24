@@ -1,0 +1,7 @@
+title: OSCON
+date: 2010/07/19
+
+<p>Update: OSCON was a lot of fun... if anyone is interested in seeing the slides Alex and I wrote they&rsquo;re up on <a href="http://www.slideshare.net/alexrothenberg/rails-in-the-enterprise">slide share</a>.</p>
+<p>&nbsp;</p>
+<p>I just arrived in Portland for OSCON; my friend <a href="http://www.alexrothenberg.com">Alex Rothenberg</a> and I are going to talk here about on Thursday about <a href="http://www.oscon.com/oscon2010/public/schedule/detail/13664">using Rails in the Enterprise</a>&hellip; about some of the things he and I do at our day job while working with Rails and legacy technologies. We&#x27;ll post the slides online later this week.</p>
+<p>I won&rsquo;t be blogging here, but if you&rsquo;re interested in what&rsquo;s going on at OSCON follow me on Twitter <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>, or the official tag is <a href="http://twitter.com/#search?q=%23OSCON">#OSCON</a>. If you are in Portland definitely drop by and say hello!</p>

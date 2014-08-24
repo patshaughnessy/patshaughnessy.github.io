@@ -1,0 +1,186 @@
+title: "Creating associations to existing data part 2: belongs_to with auto_complete"
+date: 2010/02/13
+tag: View Mapper
+
+<p><a href="http://patshaughnessy.net/2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding">In my last post</a> I started a series on how to write Rails forms that associate a new record with existing data. This sort of requirement comes up for me over and over again at my day job, and so I decided to support scaffolding for these forms in <a href="http://patshaughnessy.net/view_mapper">View Mapper</a>.</p>
+<p>Today I&rsquo;ll continue by showing how to use the auto_complete plugin to select an existing record &ndash; exactly what Ryan Bates discussed in his screen cast <a href="http://railscasts.com/episodes/102-auto-complete-association">Auto-Complete Association</a>. Using the same Category/Product example, this form would allow the user to create a new product record, and associate it with an existing category tag:<br/><br/>
+<img src="http://patshaughnessy.net/assets/2010/2/12/new_product.png"/>
+<p>To create scaffolding like this in your app with View Mapper, just run this command:</p>
+<div class="CodeRay">
+  <div class="code"><pre>script/generate scaffold_for_view product name:string bar_code:integer
+                --view belongs_to_auto_complete:category</pre></div>
+</div>
+<p>View Mapper will validate you have a line &ldquo;has_many :products&rdquo; in your category model, that you have a category model to begin with, and also that the auto_complete plugin is installed before proceeding to generate this form. Also, View Mapper assumes the parent model, &ldquo;Category&rdquo; in this example, has a &ldquo;name&rdquo; column and will use that value to identify each category in the auto complete list. You can indicate to use a different parent model field instead with this syntax:</p>
+<div class="CodeRay">
+  <div class="code"><pre>script/generate scaffold_for_view product name:string bar_code:integer
+                --view belongs_to_auto_complete:category[display_name]</pre></div>
+</div>
+<p>For more details on View Mapper, see the example below where I create a sample app from scratch.</p>
+<p><b>Code review: model</b></p>
+<p>Since Ryan explains auto complete association so well in his screen cast, I won&rsquo;t repeat all of that information here. Instead, let&rsquo;s take a look at the code View Mapper generates and compare it to what Ryan showed. First, in the product model Ryan has a &ldquo;category_name&rdquo; virtual attribute:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">def</span> <span class="fu">category_name</span>
+  category.name <span class="r">if</span> category
+<span class="r">end</span>
+<span class="r">def</span> <span class="fu">category_name=</span>(name)
+  <span class="pc">self</span>.category = <span class="co">Category</span>.find_or_create_by_name(name) <span class="r">unless</span> name.blank?
+<span class="r">end</span></pre></div>
+</div>
+<p>This allows the view to display the category for each product easily, and also supports creating new categories on the fly when you submit a new product. The View Mapper scaffolding is a bit simpler and uses &ldquo;find_by_name&rdquo; instead of &ldquo;find_or_create_by_name&rdquo; since it assumes the category records already exist. Also, Ryan&rsquo;s code uses &ldquo;unless name.blank?&rdquo; to avoid creating empty categories, while the View Mapper scaffolding assumes a blank category name indicates a product without a category, and allows the user to clear the category when editing an existing product. Either approach can make sense depending on the business requirements of your application. Here&rsquo;s the View Mapper model code:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Product</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  belongs_to <span class="sy">:category</span>
+  <span class="r">def</span> <span class="fu">category_name</span>
+    category.name <span class="r">if</span> category
+  <span class="r">end</span>
+  <span class="r">def</span> <span class="fu">category_name=</span>(name)
+    <span class="pc">self</span>.category = <span class="co">Category</span>.find_by_name(name)
+  <span class="r">end</span>
+<span class="r">end</span></pre></div>
+</div></p>
+<p><b>Code review: controller</b></p>
+<p>In the controller code, the View Mapper scaffolding differs from Ryan&rsquo;s solution more dramatically. To return the list of matching categories to the auto_complete plugin, Ryan adds this code to the categories controller to query the category records that have a name field that match a given search parameter:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">def</span> <span class="fu">index</span>
+  <span class="iv">@categories</span> =
+    <span class="co">Category</span>.find(<span class="sy">:all</span>, <span class="sy">:conditions</span> =&gt; [<span class="s"><span class="dl">'</span><span class="k">name LIKE ?</span><span class="dl">'</span></span>, <span class="s"><span class="dl">&quot;</span><span class="k">%</span><span class="il"><span class="idl">#{</span>params[<span class="sy">:search</span>]<span class="idl">}</span></span><span class="k">%</span><span class="dl">&quot;</span></span>])
+<span class="r">end</span></pre></div>
+</div>
+<p>This makes a lot of sense: the categories controller should be used to generate a list of categories. However, for View Mapper I chose to use the products controller instead since the scaffolding generator already generates that code file, and to avoid the need for creating or modifying the categories controller also. View Mapper just adds this one line to the products controller to return the list of category names:</p>
+<div class="CodeRay">
+  <div class="code"><pre>auto_complete_for <span class="sy">:category</span>, <span class="sy">:name</span></pre></div>
+</div>
+<p>This simple call actually achieves exactly the same thing as the Category.find call above. In my next post, I&rsquo;ll take a look at the Ruby metaprogramming used by auto_complete_for and show how it automatically generates a method that executes the same SQL query.</p>
+<p><b>Code review: view</b></p>
+<p>Finally in the view we see a call to &ldquo;text_field_with_auto_complete&rdquo; to use the Prototype javascript library&rsquo;s auto_complete feature. Here&rsquo;s Ryan&rsquo;s view code from the screen cast:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="il"><span class="idl">&lt;%=</span> text_field_with_auto_complete <span class="sy">:product</span>,
+                                  <span class="sy">:category_name</span>,
+                                  { <span class="sy">:size</span> =&gt; <span class="i">15</span> },
+                                  { <span class="sy">:url</span> =&gt; formatted_categories_path(<span class="sy">:js</span>),
+                                    <span class="sy">:method</span> =&gt; <span class="sy">:get</span>,
+                                    <span class="sy">:param_name</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">search</span><span class="dl">'</span></span> }
+<span class="idl">%&gt;</span></span></pre></div>
+</div>
+<p>&ldquo;:url =&gt; formatted_categories_path(:js)&rdquo; calls the categories controller code above when the user starts to type in the text field, and the &ldquo;:param_name =&gt;&lsquo;search&rsquo;&rdquo; option passes the user&rsquo;s text in as the search parameter. Ryan&rsquo;s solution also uses a view file called &ldquo;index.js.erb&rdquo; to return the list of completion options in the proper format &ndash; this is called by the index action when the categories controller receives the &ldquo;/categories.js&rdquo; request:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="il"><span class="idl">&lt;%=</span> auto_complete_result <span class="iv">@categories</span>, <span class="sy">:name</span> <span class="idl">%&gt;</span></span></pre></div>
+</div>
+<p>By contrast, View Mapper&rsquo;s call to text_field_with_auto_complete looks like this:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="il"><span class="idl">&lt;%=</span> text_field_with_auto_complete <span class="sy">:product</span>,
+                                  <span class="sy">:category_name</span>,
+                                  {},
+                                  { <span class="sy">:method</span> =&gt; <span class="sy">:get</span>,
+                                    <span class="sy">:url</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">/auto_complete_for_category_name</span><span class="dl">'</span></span>,
+                                    <span class="sy">:param_name</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">category[name]</span><span class="dl">'</span></span> }
+<span class="idl">%&gt;</span></span></pre></div>
+</div>
+<p>This is very similar, but uses &ldquo;category[name]&rdquo; as the search parameter and sets the AJAX url to &ldquo;auto_complete_for_office_code&rdquo;, since this is what &ldquo;auto_complete_for&rdquo; expects.</p>
+<p>Ryan&rsquo;s approach is more elegant since it follows the REST model for the Ajax URL and controller code: the categories controller is used to handle category related requests, and its index action is used to return the list of category values. The scaffolding code View Mapper generates uses the auto_complete plugin the way it was originally intended with the &ldquo;auto_complete_for&rdquo; function, but is a bit ugly in that the products controller returns the category values, and uses a custom action method name instead of the normal &ldquo;index&rdquo; action. There&rsquo;s no need for the index.js.erb file since auto_complete_for renders the response inline.</p>
+<p>The advantage of the View Mapper approach is that there&rsquo;s no need for the categories controller at all, and also you don&rsquo;t need to code the &ldquo;index&rdquo; action or the index.js.erb view file yourself. If you plan to have a categories controller in your application anyway, you might want to change the text_field_with_auto_complete call to use that controller instead.</p>
+<p><b>Detailed example</b></p>
+<p>To make sure you can get a working example on your computer, let&rsquo;s run through a step by step example:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rails sample_app
+      create  
+      create  app/controllers
+      create  app/helpers
+      create  app/models
+      create  app/views/layouts
+etc...</pre></div>
+</div>
+<p>First, let&rsquo;s create a model to represent our existing data called &ldquo;Office&rdquo; that will have two attributes: &ldquo;display_name&rdquo; and &ldquo;code:&rdquo;</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ cd sample_app/
+$ ./script/generate model office code:string display_name:string
+      exists  app/models/
+      exists  test/unit/
+      exists  test/fixtures/
+      create  app/models/office.rb
+      create  test/unit/office_test.rb
+      create  test/fixtures/offices.yml
+      create  db/migrate
+      create  db/migrate/20100212193446_create_offices.rb
+$ rake db:migrate
+(in /Users/pat/rails-apps/sample_app)
+==  CreateOffices: migrating ==================================================
+-- create_table(:offices)
+   -&gt; 0.0031s
+==  CreateOffices: migrated (0.0034s) =========================================</pre></div>
+</div>
+<p>And now let&rsquo;s create a few sample office records:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ ./script/console 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; Office.create :display_name =&gt; 'Boston', :code =&gt; 'BOS'
+&gt;&gt; Office.create :display_name =&gt; 'Boise', :code =&gt; 'BOI'
+&gt;&gt; Office.create :display_name =&gt; 'Barcelona', :code =&gt; 'BAR'
+&gt;&gt; exit</pre></div>
+</div>
+<p>Now you can install View Mapper &ndash; you&rsquo;ll need version 0.3.3 for the &ldquo;belongs_to_auto_complete&rdquo; view:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ gem sources -a http://gemcutter.org
+http://gemcutter.org added to sources
+$ sudo gem install view_mapper
+Successfully installed view_mapper-0.3.3
+1 gem installed
+Installing ri documentation for view_mapper-0.3.3...
+Installing RDoc documentation for view_mapper-0.3.3...</pre></div>
+</div>
+<p>And now we can just run View Mapper&rsquo;s &ldquo;scaffold_for_view&rdquo; generator to create the scaffolding code. Let&rsquo;s try creating a new model called &ldquo;Employee&rdquo; that will belong to one of the existing offices:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ ./script/generate scaffold_for_view employee name:string
+                    --view belongs_to_auto_complete:office
+       error  The auto_complete plugin does not appear to be installed.
+$ ./script/plugin install git://github.com/rails/auto_complete.git
+Initialized empty Git repository in /Users/pat/rails-apps/sample_app/vendor/plugins/auto_complete/.git/
+remote: Counting objects: 13, done.
+remote: Compressing objects: 100% (12/12), done.
+remote: Total 13 (delta 2), reused 0 (delta 0)
+Unpacking objects: 100% (13/13), done.
+From git://github.com/rails/auto_complete
+ * branch            HEAD       -&gt; FETCH_HEAD</pre></div>
+</div>
+<p>Trying again:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ ./script/generate scaffold_for_view employee name:string
+                    --view belongs_to_auto_complete:office
+     warning  Model Office does not contain a has_many association for Employee.</pre></div>
+</div>
+<p>Editing app/models/office.rb:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="no">1</span> <span class="r">class</span> <span class="cl">Office</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+<span class="no">2</span>   has_many <span class="sy">:employees</span>
+<span class="no">3</span> <span class="r">end</span></pre></div>
+</div>
+<p>Trying a third time:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ ./script/generate scaffold_for_view employee name:string
+                    --view belongs_to_auto_complete:office
+     warning  Model Office does not have a name attribute.
+</pre></div>
+</div>
+<p>This time we get a warning that our existing model doesn&rsquo;t have a &ldquo;name&rdquo; attribute (we chose &ldquo;display_name&rdquo; instead). To make this a bit more interesting, let&rsquo;s use the &ldquo;code&rdquo; attribute for the auto_complete options. You can specify this to View Mapper with this syntax:</p>
+<div class="CodeRay">
+  <div class="code"><pre>
+$ ./script/generate scaffold_for_view employee name:string
+                    --view belongs_to_auto_complete:office[code]
+      exists  app/models/
+      exists  app/controllers/
+      exists  app/helpers/
+      create  app/views/employees
+      exists  app/views/layouts/
+      exists  test/functional
+etc...</pre></div>
+</div>
+<p>Now we just run rake db:migrate again, start our server and we&rsquo;re done!</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rake db:migrate
+(in /Users/pat/rails-apps/sample_app)
+==  CreateEmployees: migrating ================================================
+-- create_table(:employees)
+   -&gt; 0.0034s
+==  CreateEmployees: migrated (0.0036s) =======================================</pre></div>
+</div><br/>
+<img src="http://patshaughnessy.net/assets/2010/2/12/new_employee.png"/>

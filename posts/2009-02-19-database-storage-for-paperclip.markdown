@@ -1,0 +1,52 @@
+title: Database storage for Paperclip
+date: 2009/02/19
+tag: Paperclip
+
+<p>Update April 2009:<br>I just rewrote this to use the same database table as the target model to save the file data, and not a separate database table. The &ldquo;create_table&rdquo; migration I describe here below will no longer work; instead you should create one or more columns in the same table as the target model to hold the file data. <a href="http://patshaughnessy.net/2009/4/14/database-storage-for-paperclip-rewritten-to-use-a-single-table">Please read this update for more details.</a></p>
+<p></p>
+<p><a href="http://thoughtbot.com/projects/paperclip/">Paperclip from Thoughtbot</a> is a fantastic bit of code that allows you to easily upload files to your Rails app and later manage them as just another attribute on your model object. If you&rsquo;re not familiar with Paperclip you should start by reading <a href="http://thoughtbot.com/projects/paperclip/">Thoughtbot&rsquo;s Paperclip intro page</a>; Ryan Bates also did a <a href="http://railscasts.com/episodes/134-paperclip">screen cast on Paperclip usage</a>. By default it supports saving the file attachments on the server file system, and also there&rsquo;s an option for saving the files in <a href="http://aws.amazon.com/s3/">Amazon&rsquo;s S3 service</a>. One reason I decided to use Paperclip in a recent project was that the implementation and usage were both much simpler and cleaner than attachment_fu, the other popular Rails plugin for file upload and management.</p>
+<p>One thing that Thoughtbot decided not to implement was the ability to store files in a database table, rather than on the file system. It doesn&rsquo;t make a lot of sense to do this for most normal web application deployments, since serving files via Apache directly from the file system is obviously much faster and avoids the need to call your Rails stack at all for download requests. However, I work in an Enterprise IT environment that has a lot of experience with Oracle, and finds it easier to manage file attachments with a database table. I also have requirements around file encryption, security, etc.</p>
+<p>Since Paperclip doesn&rsquo;t include a database storage option, I decided to write one. Here&rsquo;s what I came up with: <a href="http://github.com/patshaughnessy/paperclip">http://github.com/patshaughnessy/paperclip</a></p>
+<p>I added a new storage module called Paperclip::Storage::Database. See <a href="http://github.com/patshaughnessy/paperclip/blob/ee96901d349598f04a65347e4568e46b9fe0583b/lib/paperclip/storage.rb">lib/paperclip/storage.rb</a> for details; Paperclip::Storage::Database is at the bottom of the file. I&rsquo;d love any feedback or suggestions about the usage/design of how the database storage option would work with your application, or on the implementation itself.</p>
+<p>I&rsquo;ll be blogging here in the coming weeks with a detailed explanation of how Paperclip database storage works, and a working sample application that illustrates how to use it.</p>
+<p>For now, here&rsquo;s the usage description from <a href="http://github.com/patshaughnessy/paperclip/blob/ee96901d349598f04a65347e4568e46b9fe0583b/lib/paperclip/storage.rb">lib/paperclip/storage.rb</a> for specifying database storage for your Paperclip app. You need to follow these steps in addition to the <a href="http://thoughtbot.com/projects/paperclip">standard Paperclip setup steps from Thoughtbot</a>.</p>
+<ol>
+  <li>In your model specify the &quot;database&quot; storage option; for example:
+<pre>  has_attached_file :avatar, :storage =&gt; :database</pre>
+The files will be stored in a new database table named with the plural attachment name
+by default, &quot;avatars&quot; in this example.</li>
+<li><p>You need to create this new storage table with at least these columns:<br>
+  - file_contents<br>
+  - style<br>
+  - the primary key for the parent model (e.g. user_id)<br></p>
+<p>Note the &quot;binary&quot; migration will not work for the LONGBLOG type in MySQL for the
+file_contents column. You may need to craft a SQL statement for your migration,
+depending on which database server you are using. Here&#x27;s an example migration for MySQL:</p>
+<pre>create_table :avatars do |t|
+  t.string :style
+  t.integer :user_id
+  t.timestamps
+end
+execute &#x27;ALTER TABLE avatars ADD COLUMN file_contents LONGBLOB&#x27;</pre>
+You can optionally specify any storage table name you want as follows:
+<pre>  has_attached_file :avatar, :storage =&gt; :database,
+                    :database_table =&gt; &#x27;avatar_files&#x27;</pre></li>
+<li>By default, URLs will be set to this pattern:
+<pre>  /:relative_root/:class/:attachment/:id?style=:style</pre>
+Example:
+<pre>  /app-root-url/users/avatars/23?style=original</pre>
+The idea here is that to retrieve a file from the database storage, you will need some
+controller's code to be executed. Once you pick a controller to use for downloading, you can add this line
+to generate the download action for the default URL/action (the plural attachment name),
+&quot;avatars&quot; in this example:</p>
+<pre>  downloads_files_for :user, :avatar</pre>
+Or you can write a download method manually if there are security, logging or other
+requirements. If you prefer a different URL for downloading files you can specify that in the model; e.g.:
+<pre>  has_attached_file :avatar, :storage =&gt; :database,
+                    :url =&gt; &#x27;/users/show_avatar/:id/:style&#x27;</pre></li>
+<li>Add a route for the download to the controller which will handle downloads, if necessary.
+
+The default URL (/:relative_root/:class/:attachment/:id?style=:style) will be matched by
+the default route:
+<pre>map.connect ':controller/:action/:id'</pre></li>
+</ol>

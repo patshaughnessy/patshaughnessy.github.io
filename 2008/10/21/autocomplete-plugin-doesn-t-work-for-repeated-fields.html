@@ -1,0 +1,164 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Autocomplete plugin doesn’t work for repeated fields - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Autocomplete plugin doesn’t work for repeated fields - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Autocomplete plugin doesn’t work for repeated fields</h1>
+  </header>
+
+  <section class="content">
+    <p>Recently I tried using the <a href="http://svn.rubyonrails.org/rails/plugins/auto_complete">autocomplete plugin</a> from Rails for the first time. It was a great way to quickly implement type-ahead Ajax behavior by writing little or no code. By simply adding two lines – one to my controller:</p>
+
+<pre>auto_complete_for :group, :name</pre>
+
+
+<p>and another to my form:</p>
+
+<pre>&lt;%= text_field_with_auto_complete :group, :name, {}, {:method => :get} %&gt;</pre>
+
+
+<p>users of my form were able to easily pick from a long list of group names simply by typing the first few letters. What I love about Rails is not only was I able to implement this complex feature with only 2 lines, but those 2 lines were very easy to read:  my controller has to handle “autocompletion for group names” and my form should contain a “text field with auto complete behavior for group names”. It’s very natural and intuitive.</p>
+
+<p/>
+<p>The only ugly detail here is that the “{:method => :get}” hash is required to avoid errors related to form security… without it I get an error like this:</p>
+<pre>ActionController::InvalidAuthenticityToken (ActionController::InvalidAuthenticityToken):
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.1/lib/action_controller/request_forgery_protection.rb:86:in 'verify_authenticity_token'</pre>
+
+<a href="http://groups.google.com/group/rubyonrails-spinoffs/browse_thread/thread/7ed6dbb6bdcabf40/287a90ed28bba7da">This discussion explains</a> that we can avoid the security exception by forcing the autocomplete request to use GET instead of POST. Note that you also need to change config/routes.rb to map the GET request for the completion values to the autocomplete action in your controller. This is a bit ugly, but not a big deal.
+
+<p/>
+<p>However, once I tried adding additional fields to the form I ran into some real trouble. I enhanced my form by adding multiple child model objects; in this case I associated a series of people for each group. That is:</p>
+<pre>class Person < ActiveRecord::Base`
+ belongs_to :group</pre>
+
+and:
+<pre>class Group < ActiveRecord::Base
+ has_many :people</pre>
+
+Following <a href="http://railscasts.com/episodes/73">Ryan Bates’ great explanation on railcasts</a> about how to implement a form for both parent and child records at the same time, I ended up with a form that looked like this:
+<pre>&lt;p&gt;
+  Group &lt;%= f.label :name %&gt;&lt;br /&gt;
+  &lt;%= text_field_with_auto_complete :group, :name, {}, {:method =&gt; :get} %&gt;
+&lt;/p&gt;
+&lt;% for person in @group.people %&gt;
+  &lt;% fields_for "group[person_attributes][]", person do |person_form| %&gt;
+    &lt;p&gt;
+      Person &lt;%= person_form.label :name %&gt;&lt;br /&gt;
+     &lt;%= text_field_with_auto_complete :person, :name, {:index =&gt; nil}, {:method =&gt; :get}  %&gt;&lt;/p&gt;
+    &lt;% unless person.new_record? %&gt;
+      &lt;%= person_form.hidden_field :id, :index =&gt; nil %&gt;
+    &lt;% end %&gt;
+  &lt;% end %&gt;
+&lt;% end %&gt;</pre>
+
+This looks a lot more complicated, but except for the “index => nil” hack (see <a href="http://railscasts.com/episodes/75">part 3 of Ryan’s screen cast</a> for an explanation) the code is very clean and straightforward to understand. We display the group name autocomplete text field as before, and then iterate over the people contained in this group, displaying a new autocomplete text field for each one.
+
+<p/><p>Too bad it doesn’t work! Even worse, this code actually has 3 separate problems:
+
+First, the &lt;input&gt; tag generated by text_field_with_auto_complete is not what we want for the child objects. Without autocomplete, we would use:
+<pre>&lt;%= person_form.text_field :name %&gt;</pre>
+
+referring to the “fields_for” method just above and get this HTML:
+<pre>&lt;input id="group_person_attributes__name" name="group[person_attributes][][name]" size="30" type="text" /&gt;</pre>
+
+But text_field_with_auto_complete :person, :name, …  yields this instead:
+<pre>&lt;input id="person__name" name="person[][name]" size="30" type="text" /&gt;</pre>
+
+along with CSS and Javascript for the auto complete behavior.
+
+<p/><p>Second, the server side code added to my controller also doesn’t know where to look for the person name value in the actual parameter hash; instead it assumes it will receive the parameter as specified in the &lt;input&gt; above: params[“person”][“name”]. See vendor/plugins/autocomplete/lib/auto_complete.rb for details.</p>
+
+<p/><p>And the last and worst problem of all is that the DHTML/Javascript code inside of controls.js from script.aculo.us assumes that the &lt;input&gt; tag id passed in will be unique on the page. But since we will have many person fields for each group field, the script.aculo.us code will fail trying to location the &lt;input&gt; and &lt;div&gt; tags specified by text_field_with_auto_complete.</p>
+
+<p/><p>So what to do? The first time I solved this problem, I simply copied and hard coded the HTML and Javascript produced by the autocomplete plugin into my form erb file. Then I changed it to make it work. I also manually added a function to my controller on the server side to get it to find and process the parameter hash properly. If I were still writing PHP code, then I would probably assume this was sufficient and call it a day. If I happened to be using J2EE for this project, I’d probably look at creating a subclass of the autocomplete plugin somehow and extending/modifying the behavior as necessary. Then I would have yet another class and another JAR file to maintain and worry about – not quite as messy, but still ugly or at best complicated.</p>
+
+<p/><p>There must be a better way! Since I’m using Ruby I don’t need to settle for overly complicated code or ugly code. Instead I’ll try to develop a solution using what seems to me the Ruby philosophy: write the cleanest, tightest code you can that makes sense and then find a way to make it work. In my next post I’ll tell you what happened.</p>
+
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

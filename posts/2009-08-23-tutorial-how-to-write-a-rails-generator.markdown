@@ -1,0 +1,121 @@
+title: "Tutorial: How to write a Rails generator"
+date: 2009/08/23
+tag: Rails Generators
+
+<p>I&rsquo;ve been working on a generator called <a href="http://patshaughnessy.net/2009/7/24/generating-view-scaffolding-code-for-existing-models">ViewMapper</a> recently that allows you to create view scaffolding from an existing model. I found writing a Rails generator to be somewhat confusing and hard to do: Where do I need to put my generator class? What does it need to be called? How does it work? This article will show step by step how to write your own Rails generator from scratch &ndash; hopefully it will save you some time if you ever need to write your own.</p>
+<p>First let&#x27;s think of some sample Rails code that I might want to generate as an example. This is admittedly contrived, but it&rsquo;s short and simple enough to show here while still interesting enough to illustrate how a generator would work. Let&rsquo;s suppose my Capistrano deployment scripts wrote the last commit information from Git into a file called &ldquo;version.txt&rdquo; in a folder RAILS_ROOT/../build-info:</p>
+<pre>commit 217d9bd1d1d508a0f7f1e7afa2b489b130196e33
+Author: Pat Shaughnessy &lt;pat@patshaughnessy.net&gt;
+Date:   Wed Aug 5 07:45:01 2009 -0400</pre>
+<p>Now with a controller like this I could display the info, helping me keep track of what version is running on a given development development, QA or production server:</p>
+<pre>class VersionController &lt; ApplicationController
+  VERSION_FILE = &#x27;../build-info/version.txt&#x27;
+  def display_version
+    path = File.join(RAILS_ROOT, VERSION_FILE)
+    render path
+  end
+end</pre>
+<p>If I add a route to this action like this in config/routes.rb:</p>
+<pre>map.version 'version', :controller => 'version', :action => 'display_version'</pre>
+<p>&hellip;then I&rsquo;ll get the Git last commit info by just opening http://servername/version in my browser. Obviously it would be simpler to just put the version.txt file under the public folder&hellip; but let&rsquo;s continue with this contrived example for now. Now let&rsquo;s say I have 5 or 10 different Rails apps, and that I&rsquo;d like to add the same controller and route to each one. Let&rsquo;s write a simple Rails generator that would make this easy to do, called the &ldquo;version&rdquo; generator. Here&rsquo;s how to do it&hellip;</p>
+<p><u>Step 1: A skeleton Rails generator</u></p>
+<p>All Rails generators are derived from a class called &ldquo;Rails::Generator::Base.&rdquo; You can find the source code for this file in <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/base.rb">vendor/rails/railties/lib/rails_generator/base.rb</a> (link is to the Rails 2.3.3 version). Definately read the source code; there is helpful documentation in the comments and understanding the base class code is indispensible if you plan to use it for your generator.</p>
+<p>Here&rsquo;s an empty, skeleton Rails generator that we can use as a starting point:</p>
+<pre>class VersionGenerator &lt; Rails::Generator::Base
+  def manifest
+    record do |m|
+      # Do something
+    end
+  end
+end</pre>
+<p>The name of the class is important: since we want a &ldquo;version&rdquo; generator we need to create a class called &ldquo;VersionGenerator.&rdquo; The other important detail here is where this class is located: we need to put it in lib/generators/version/version_generator.rb. The reason for all of this is that the code called by script/generate takes the generator name and looks for the corresponding generator class in this location. We can check that our class is being found by just running script/generate with no parameters, like this:</p>
+<pre>$ ./script/generate 
+Usage: ./script/generate generator [options] [args]
+&hellip;etc&hellip;
+Installed Generators
+  <b>Lib: version</b>
+  Rubygems: cucumber, feature, install_rubigen_scripts, integration_spec, rspec, rspec_controller, rspec_model, rspec_scaffold, session
+  Builtin: controller, helper, integration_test, mailer, metal, migration, model, observer, performance_test, plugin, resource, scaffold, session_migration</pre>
+<p>Note that our new &ldquo;version&rdquo; generator is listed as &ldquo;Lib: version,&rdquo; in bold above. The other generators found on my system were either part of Rails or else part of a gem or plugin. If you don&rsquo;t see your generator in this list, or if it has the wrong name then double check your folder name: it should be lib/generators/XYZ or lib/generators/version in this example. After you finish developing your generator you'll want to move it into a plugin or gem so it can be reused in different apps on your machine; then "version" would appear in the "Rubygems" list for example.</p>
+<p>If we try running our empty generator, we&rsquo;ll get no output or changes; not a surprise:</p>
+<pre>$ ./script/generate version</pre>
+<p>If you see an error like this:</p>
+<pre>$ ./script/generate version
+/usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:31:
+in `gem_original_require&#x27;: no such file to load --
+/path/to/myapp/lib/generators/version/version_generator.rb (MissingSourceFile)</pre>
+<p>Then you have the wrong file name&hellip; it needs to be XYZ_generator.rb, or version_generator.rb in this example. Or if you see:</p>
+<pre>Missing VersionGenerator class in
+  /path/to/myapp/lib/generators/version/version_generator.rb</pre>
+<p>&hellip; then you have the wrong class name inside this file. It needs to be XYZGenerator, or VersionGenerator in this example.</p>
+<p><u>Step 2: Creating code using an ERB template</u></p>
+<p>The way Rails generators work is by creating code using ERB, in just the same way that view code generates HTML for a Rails web site. To see how this works and to take the next step towards writing our version generator, let&rsquo;s create a new template file for our version controller. Create a new text file called &ldquo;controller.rb&rdquo; and put it into this folder: lib/generators/version/templates/controller.rb; in other words, into a new subfolder under version called &ldquo;templates.&rdquo; Next, paste in the controller code from above:<p>
+<pre>class VersionController &lt; ApplicationController
+  VERSION_FILE = &#x27;../build-info/version.txt&#x27;
+  def display_version
+    path = File.join(RAILS_ROOT, VERSION_FILE)
+    render path
+  end
+end</pre>
+<p>Now if we add this line to our manifest method back in the VersionGenerator class:</p>
+<pre>def manifest
+  record do |m|
+    <b>m.template(&#x27;controller.rb&#x27;, &#x27;app/controllers/version_controller.rb&#x27;)</b>
+  end
+end</pre>
+<p>&hellip; a new code file called version_controller.rb will be generated inside of the app/controllers folder in our app when we run the generator:</p>
+<pre>$ ./script/generate version
+    create  app/controllers/version_controller.rb</pre>
+<p>If you take a look at this new version_controller.rb file, you&rsquo;ll just see the code we pasted into the controller.rb template file. Here&rsquo;s what happened when we ran script/generate version:</p>
+<p>
+  <ul>
+    <li>The Rails code called by script/generate looked for the &ldquo;version&rdquo; generator, by looking for a class called &ldquo;VersionGenerator&rdquo; in the lib/generators/version folder, among other places.</li>
+    <li>It called the &ldquo;manifest&rdquo; method in VersionGenerator. Using the &ldquo;record&rdquo; utility method, a series of actions are recorded that the Rails generator base classes will execute later. In our case, there&rsquo;s only one action: &ldquo;template.&rdquo;</li>
+    <li>The template action indicates that the Rails generator code should run an ERB transformation to generate new code, using the &ldquo;controller.rb&rdquo; file. The generated code will then be copied to the app/controllers/version_controller.rb file.</li></ul></p>
+<p>To make our generator interesting, let&rsquo;s provide a parameter to it that indicates the path of the file containing the version information, instead of hard coding &ldquo;version.txt.&rdquo; To do that we can take advantage of another Rails built in class called &ldquo;Rails::Generator::NamedBase&rdquo;. If we derive our VersionGenerator class from NamedBase instead of Base, then we&rsquo;ll get the ability to take a name parameter from the script/generate command line for free. Let start by changing our base class in version_generator.rb:</p>
+<pre>class VersionGenerator &lt; Rails::Generator::<b>NamedBase</b></pre>
+<p>Now if you run the generator, you&rsquo;ll get some helpful usage information:</p>
+<pre>$ ./script/generate version
+Usage: ./script/generate version VersionName [options]
+Etc&hellip;</pre>
+<p>Here the NamedBase class has written the usage info, explaining that an additional parameter is now expected. If we re-run the generator and add the version file name as a parameter, here&rsquo;s what we&rsquo;ll get:</p>
+<pre>$ ./script/generate version ../build-info/version.txt
+   identical  app/controllers/version_controller.rb</pre>
+<p>This shows a helpful feature of Rails generators: they check if you&rsquo;re about to overwrite some existing code with the new, generated code. In this case, since we already had a controller called &ldquo;version_controller.rb&rdquo; the Rails generator code displayed the &ldquo;identical&rdquo; message. Our new generated controller is identical to the previous one since we haven&rsquo;t used the version name parameter yet. To take advantage of the version file name parameter and our new NamedBase base class, we need to add some new code to VersionGenerator, in bold:</p>
+<pre>class VersionGenerator &lt; Rails::Generator::NamedBase
+  <b>attr_reader :version_path
+  def initialize(runtime_args, runtime_options = {})
+    super
+    @version_path = File.join(RAILS_ROOT, name)
+  end</b>
+  def manifest
+    record do |m|
+      m.template(&#x27;controller.rb&#x27;, &#x27;app/controllers/version_controller.rb&#x27;)
+    end
+  end
+end</pre>
+<p>The way this works is:
+  <ul>
+    <li>The NamedBase base class parses the script/generate command line, expecting an additional parameter which indicates the name of some object.</li>
+    <li>This name is provided in "name," an instance variable/attribute of the NamedBase class.</li>
+    <li>The VersionGenerator class assumes "name" indicates the relative path of a version file, determines the full path of the file and then saves the full path in the @version_path attribute.</li></ul></p>
+<p>I mentioned above that Rails generators work by running an ERB transformation; to try using ERB in this example, we just need to refer to the new &ldquo;version_path&rdquo; attribute inside the controller.rb template file, like this:</p>
+<pre>class VersionController &lt; ApplicationController
+  VERSION_PATH = &#x27;&lt;%= version_path %&gt;&#x27;
+  def display_version
+    render VERSION_PATH
+   end
+end</pre>
+<p>The &ldquo;version_path&rdquo; variable in this template refers to the version_path attribute of the VersionGenerator class above. I&rsquo;ve also removed the File.join line from here since we now handle that in the generator itself. If we run the generate command and provide the name of the version file, we&rsquo;ll get this result:</p>
+<pre>$ ./script/generate version ../build-info/version.txt
+overwrite app/controllers/version_controller.rb? (enter &quot;h&quot; for help) [Ynaqdh] Y
+       force  app/controllers/version_controller.rb</pre>
+<p>As I mentioned above, Rails checks whether you&rsquo;re about to overwrite some existing code file. Since in this case our controller code file is now different that what we had before (VERSION_PATH and not VERSION_FILE; no File.join, etc.) we get an overwrite warning. I just entered &ldquo;Y&rdquo; to overwrite the old file.</p>
+<p>If we look at our new controller, app/controllers/version_controller.rb, we now have:</p>
+<pre>class VersionController &lt; ApplicationController
+  VERSION_PATH = &#x27;/path/to/myapp/../build-info/version.txt&#x27;
+  def display_version
+    render VERSION_PATH
+   end
+end</pre>
+<p>We&rsquo;ve successfully generated a new VersionController class, based on a parameter passed to our &ldquo;version&rdquo; generator. While this is a good start, to be able to use this action in our app we still need to add a route to config/routes.rb. It turns out this is a lot harder to do with a generator, since we will need to insert a new line of code in an existing file, and not just generate a new routes.rb file. We will also need to worry about how to remove the route line when script/destroy is run. It&rsquo;s possible to do all of this with a Rails generator, but will require a more thorough understanding of how Rails generators actually work. I&rsquo;ll explain all of that in my next post&hellip;</p>

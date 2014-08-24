@@ -1,0 +1,258 @@
+title: Using method_missing to customize SearchLogic
+date: 2010/06/12
+tag: SearchLogic
+
+<p>The Ruby interpreter calls method_missing on a Ruby object whenever it receives a message (method call) that it cannot handle. One of the best examples of using method_missing that I&rsquo;ve come across is in the SearchLogic plugin, which allows you to dynamically create named scopes. Today I&rsquo;m going to take some time to explain how method_missing works, show how it&rsquo;s used by SearchLogic, and finally show how you can use method_missing yourself to customize SearchLogic&rsquo;s behavior.</p>
+<p><b>Simple sorting with SearchLogic</b></p>
+<p>Suppose I have an ActiveRecord model called &ldquo;book&rdquo; with a &ldquo;title&rdquo; attribute:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ rails books
+$ cd books
+$ script/generate model book title:string
+$ rake db:migrate
+$ script/console
+&gt;&gt; [&quot;one&quot;, &quot;two&quot;, &quot;three&quot;].each { |title| Book.create :title =&gt; title }</pre></div>
+</div><br>
+<p>The best way in Rails to display the books sorted by title would be to use a named scope like this in my model:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  named_scope <span class="sy">:sorted_by_title</span>, { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">title</span><span class="dl">'</span></span> }
+<span class="r">end</span></pre></div>
+</div><br>
+<p>If I use <a href="http://niranjansarade.blogspot.com/2009/12/display-sql-queries-in-ruby.html">a trick my colleague Niranjan Sarade</a> showed me, we can see the SQL produced by ActiveRecord for the named scope in the console, like this:
+<div class="CodeRay">
+  <div class="code"><pre>$ script/console
+&gt;&gt; ActiveRecord::Base.logger = Logger.new(STDOUT)
+&gt;&gt; Book.sorted_by_title.collect { |book| book.title }
+  Book Load (1.6ms)   SELECT * FROM &quot;books&quot; ORDER BY title
+=&gt; [&quot;one&quot;, &quot;three&quot;, &quot;two&quot;]</pre></div>
+</div><br>
+<p>This is a good example of why I&rsquo;m a Rails developer: with just a single line of code in my model I can sort the values in a database column! But it gets even easier if I install SearchLogic:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ script/plugin install git://github.com/binarylogic/searchlogic.git</pre></div>
+</div><br>
+<p>Now I get a <a href="http://github.com/binarylogic/searchlogic">whole series of named scopes</a> created for me automatically! For example, I can now just call the &ldquo;ascend_by_title&rdquo; and &ldquo;descend_by_title&rdquo; named scopes as if I had written them myself:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ script/console
+&gt;&gt; Book.ascend_by_title.collect { |book| book.title }
+  Book Load (1.3ms)   SELECT * FROM &quot;books&quot; ORDER BY books.title ASC
+=&gt; [&quot;one&quot;, &quot;three&quot;, &quot;two&quot;]
+&gt;&gt; Book.descend_by_title.collect { |book| book.title }
+  Book Load (2.0ms)   SELECT * FROM &quot;books&quot; ORDER BY books.title DESC
+=&gt; [&quot;two&quot;, &quot;three&quot;, &quot;one&quot;]</pre></div>
+</div><br>
+<p>Brilliant! Using SearchLogic I can filter/sort on any attribute of any model in my application without writing a single line of code. I can even sort and filter on attributes of associated models, e.g. if I had &ldquo;Book has_many :authors,&rdquo; I could sort books by their author&rsquo;s names, or sort the authors for each book, etc., all without writing any SQL or even Ruby code.</p>
+<p><b>Sorting with NULL values last</b></p>
+<p>Recently at my day job I came across a business requirement to sort a list of values, always displaying the NULL or empty values at the end of the list. In our example, this would mean that there might be some books with missing titles:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ script/console
+&gt;&gt; 2.times { Book.create :title =&gt; nil }
+</pre></div>
+</div><br>
+<p>Here&rsquo;s the behavior I get from the ascend_by_title and descend_by_title named scopes with NULL values:</p>
+<div class="CodeRay">
+  <div class="code"><pre>&gt;&gt; Book.ascend_by_title.collect { |book| book.title }
+  Book Load (2.5ms)   SELECT * FROM &quot;books&quot; ORDER BY books.title ASC
+=&gt; [nil, nil, &quot;one&quot;, &quot;three&quot;, &quot;two&quot;]
+&gt;&gt; Book.descend_by_title.collect { |book| book.title }
+  Book Load (2.7ms)   SELECT * FROM &quot;books&quot; ORDER BY books.title DESC
+=&gt; [&quot;two&quot;, &quot;three&quot;, &quot;one&quot;, nil, nil]</pre></div>
+</div><br>
+<p>In other words, the NULL values are considered to be less than the other values by the database server, and are sorted accordingly. To get the behavior I want, I need to use a slightly more complex sorting pattern in a named scope, like this:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  named_scope <span class="sy">:sorted_by_title_nulls_last</span>,
+              { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">title IS NULL, title</span><span class="dl">'</span></span> }
+  named_scope <span class="sy">:sorted_by_title_nulls_last_desc</span>,
+              { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">title IS NULL, title DESC</span><span class="dl">'</span></span> } 
+<span class="r">end</span>
+</pre></div>
+</div><br>
+<p>Trying it out in the console:</p>
+<div class="CodeRay">
+  <div class="code"><pre>$ script/console
+&gt;&gt; Book.sorted_by_title_nulls_last.collect { |book| book.title }
+  Book Load (2.6ms)   SELECT * FROM &quot;books&quot; ORDER BY title IS NULL, title
+=&gt; [&quot;one&quot;, &quot;three&quot;, &quot;two&quot;, nil, nil]
+&gt;&gt; Book.sorted_by_title_nulls_last_desc.collect { |book| book.title }
+  Book Load (2.5ms)   SELECT * FROM &quot;books&quot; ORDER BY title IS NULL, title DESC
+=&gt; [&quot;two&quot;, &quot;three&quot;, &quot;one&quot;, nil, nil]</pre></div>
+</div><br>
+<p>These named scopes first sort on &ldquo;title IS NULL&rdquo; and then on the actual title value, causing the NULL values to appear at the end. This code is fairly clean and would work fine &ndash; the problem I had at my day job, however, was that I needed this sorting behavior for about six different columns in various database tables. To make this work, I would need to repeat these two named scopes in each model for each attribute that I wanted to sort on. If only SearchLogic had supported this sorting behavior, I wouldn&rsquo;t need to copy and paste all of the named scopes.</p>
+<p><b>Using method_missing</b></p>
+<p>Specifically, here&rsquo;s the method that I wished SearchLogic had implemented for me:</p>
+<div class="CodeRay">
+  <div class="code"><pre>>> Book.ascend_by_title_nulls_last
+undefined method `ascend_by_title_nulls_last' for #&lt;Class:0x2234978&gt;
+</pre></div>
+</div><br>
+<p>As you can see it doesn&rsquo;t. But I mentioned above that SearchLogic works by using method_missing; let&rsquo;s see if I can use method_missing myself and implement the NULLs last behavior&hellip; in other words, let&rsquo;s see if I can use metaprogramming to implement the &ldquo;nulls last&rdquo; named scopes on all of my model classes all at once!</p>
+<p>I&rsquo;ll start by using the simplest possible implementation of method_missing:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  <span class="r">class</span> &lt;&lt; <span class="cl">self</span>
+    <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+      puts <span class="s"><span class="dl">&quot;</span><span class="k">This method is missing: </span><span class="il"><span class="idl">#{</span></span></span>name<span class="s"><span class="il"><span class="idl">}</span></span><span class="dl">&quot;</span></span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+<span class="r">end</span>
+</pre></div>
+</div><br>
+<p>Here &ldquo;class &lt;&lt; self&rdquo; indicates that method_missing will be a class method on my Book class; Ruby calls method_missing on the class that is missing the method. The code here simply writes out a message when an unknown method is called:</p>
+<div class="CodeRay">
+  <div class="code"><pre>&gt;&gt; Book.ascend_by_title_nulls_last
+This method is missing: ascend_by_title_nulls_last
+=&gt; nil
+</pre></div>
+</div><br>
+<p>Now I&rsquo;m ready to think about how to implement the nulls last sorting. But not so fast: it turns out that I have just broken my model class! Aside from SearchLogic, ActiveRecord itself also uses method_missing extensively. The simplest examples of this are the &ldquo;find_by_...&rdquo; methods. For example, calling find_by_title should return the book record with the given title:</p>
+<div class="CodeRay">
+  <div class="code"><pre>&gt;&gt; Book.find_by_title 'one'
+This method is missing: find_by_title 
+</pre></div>
+</div><br>
+<p>But now instead of Book &ldquo;one&rdquo; I just get the debug message from method_missing. The correct solution here is to pass along the method_missing call to the super class, like this:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  <span class="r">class</span> &lt;&lt; <span class="cl">self</span>
+    <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+      <span class="r">if</span> name == <span class="sy">:ascend_by_title_nulls_last</span>
+        puts <span class="s"><span class="dl">&quot;</span><span class="k">This method is missing: </span><span class="il"><span class="idl">#{</span></span></span>name<span class="s"><span class="il"><span class="idl">}</span></span><span class="dl">&quot;</span></span>
+      <span class="r">else</span>
+        <span class="r">super</span>
+      <span class="r">end</span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+<span class="r">end</span></pre></div>
+</div><br>
+<p>Let&rsquo;s try find_by_title again in the console:</p>
+<div class="CodeRay">
+  <div class="code"><pre>&gt;&gt; Book.find_by_title 'one'
+  Book Load (0.5ms)
+  SELECT * FROM &quot;books&quot; WHERE (&quot;books&quot;.&quot;title&quot; = 'one') LIMIT 1
+=&gt; #&lt;Book id: 1, title: &quot;one&quot;, created_at: &quot;2010-06-11 18:39:26&quot;, etc...
+&gt;&gt; Book.ascend_by_title_nulls_last
+This method is missing: ascend_by_title_nulls_last
+=&gt; nil</pre></div>
+</div><br>
+<p>Sigh of relief &ndash; it works again! Looking at the if statement above, you can see that I check if the missing method is called &ldquo;ascend_by_title_nulls_last,&rdquo; in which case I write the debug message; if any other missing method is called I pass the call along to the super class. In this case, the super class is actually the SearchLogic module; it uses method_missing with super in exactly the same way that I do here. If the missing method is not recognized by SearchLogic, super is called again and finally ActiveRecord receives the method_missing call, which eventually evaluates find_by_title.</p>
+<p><b>How does SearchLogic work?</b></p>
+<p>SearchLogic uses method_missing as follows, the first time a missing method is called on an ActiveRecord model:
+<ul><li>Check if the unknown method matches a certain pattern, e.g. &ldquo;ascend_by_XYZ.&rdquo;</li>
+<li>Call &ldquo;named_scope&rdquo; if so, to create the corresponding named scope.</li>
+<li>Run the new named scope, to return the desired query results.</li>
+</ul></p>
+<p>If the same missing method is called again, it will no longer be missing since the corresponding named scope will now exist. ActiveRecord caches a list of scopes that are created by calls to named_scope for each model class.</p><p>Ok &ndash; let&rsquo;s try this idea on my Book model:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  <span class="r">class</span> &lt;&lt; <span class="cl">self</span>
+    <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+      <span class="r">if</span> name == <span class="sy">:ascend_by_title_nulls_last</span>
+        named_scope <span class="sy">:ascend_by_title_nulls_last</span>,
+                    { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">title IS NULL, title</span><span class="dl">'</span></span> }
+        ascend_by_title_nulls_last
+      <span class="r">else</span>
+        <span class="r">super</span>
+      <span class="r">end</span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+<span class="r">end</span>
+</pre></div>
+</div><br>
+<p>In the console again:</p>
+<div class="CodeRay">
+  <div class="code"><pre>&gt;&gt; Book.ascend_by_title_nulls_last.collect { |book| book.title }
+  Book Load (1.9ms)   SELECT * FROM &quot;books&quot; ORDER BY title IS NULL, title
+=&gt; [&quot;one&quot;, &quot;three&quot;, &quot;two&quot;, nil, nil] 
+</pre></div>
+</div><br>
+<p>It works! The code above implements SearchLogic&rsquo;s algorithm: if someone tries to use a named scope called &ldquo;ascend_by_title_nulls_last&rdquo; then actually create the scope at that moment with the proper sorting behavior.</p>
+<p><b>Adding custom sorting to SearchLogic</b></p>
+<p>Now I&rsquo;m ready to generalize this for any model and attribute. First, I&rsquo;ll look for any missing method name that matches a certain regex pattern (&ldquo;ascend_by_XYZ_nulls_last&rdquo;):</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  <span class="r">class</span> &lt;&lt; <span class="cl">self</span>
+    <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+      <span class='container'><span class="r">if</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^ascend_by_(</span><span class="ch">\w</span><span class="k">+)_nulls_last$</span><span class="dl">/</span></span><span class='overlay'></span></span>
+        named_scope <span class="sy">:ascend_by_title_nulls_last</span>,
+                    { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">title IS NULL, title</span><span class="dl">'</span></span> }
+        ascend_by_title_nulls_last
+      <span class="r">else</span>
+        <span class="r">super</span>
+      <span class="r">end</span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+<span class="r">end</span>
+</pre></div>
+</div><br>
+<p>The line highlighted above first converts the method name from a symbol to a string, and then matches it against the &ldquo;nulls_last&rdquo; syntax I&rsquo;m looking for. Next, I&rsquo;m still hard coding &ldquo;title&rdquo; in the named_scope call; let&rsquo;s replace that with the proper value, and also use the name passed into method_missing instead of the hard coded symbol for the scope name:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  <span class="r">class</span> &lt;&lt; <span class="cl">self</span>
+    <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+      <span class="r">if</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^ascend_by_(</span><span class="ch">\w</span><span class="k">+)_nulls_last$</span><span class="dl">/</span></span>
+        named_scope name, { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class='container'><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span><span class='overlay'></span></span></span><span class="k"> IS NULL, </span><span class="il"><span class='container'><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span><span class='overlay'></span></span></span><span class="dl">&quot;</span></span> }
+        ascend_by_title_nulls_last
+      <span class="r">else</span>
+        <span class="r">super</span>
+      <span class="r">end</span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+<span class="r">end</span>
+</pre></div>
+</div><br>
+<p>&ldquo;$1&rdquo; returns the string that matched the first expression contained in parentheses in the regex pattern above, &ldquo;(\w+)&rdquo; in this case. This will be the name of the attribute between ascend_by&hellip; and &hellip;nulls_last, taken from the missing method&rsquo;s name. Now the proper named scope is created using this attribute name in the SQL fragment. So for example, if I call &ldquo;Book.ascend_by_author_name_nulls_last&rdquo; a named scope called &ldquo;ascend_by_author_name_nulls_last&rdquo; will be created, using :order =&gt; &ldquo;author_name IS NULL, author_name.&rdquo;</p>
+<p>One last hard coded value to remove: the call to &ldquo;ascend_by_title_nulls_last&rdquo; still refers to title directly. To fix this, I just need to use &ldquo;send(name)&rdquo; &ndash; this calls the method whose name is in the &ldquo;name&rdquo; string, which is the named scope we just created. Here&rsquo;s how that looks:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  <span class="r">class</span> &lt;&lt; <span class="cl">self</span>
+    <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+      <span class="r">if</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^ascend_by_(</span><span class="ch">\w</span><span class="k">+)_nulls_last$</span><span class="dl">/</span></span>
+        named_scope name, { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="k"> IS NULL, </span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="dl">&quot;</span></span> }
+        <span class='container'>send(name)<span class='overlay'></span></span>
+      <span class="r">else</span>
+        <span class="r">super</span>
+      <span class="r">end</span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+<span class="r">end</span>
+</pre></div>
+</div><br>
+<p>Now I can add in the case for the descending sort as well:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
+  <span class="r">class</span> &lt;&lt; <span class="cl">self</span>
+    <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+      <span class="r">if</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^ascend_by_(</span><span class="ch">\w</span><span class="k">+)_nulls_last$</span><span class="dl">/</span></span>
+        named_scope name, { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="k"> IS NULL, </span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="dl">&quot;</span></span> }
+        send(name)
+      <span class="r">elsif</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^descend_by_(</span><span class="ch">\w</span><span class="k">+)_nulls_last$</span><span class="dl">/</span></span>
+        named_scope name, { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="k"> IS NULL, </span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="k"> DESC</span><span class="dl">&quot;</span></span> }
+        send(name)
+      <span class="r">else</span>
+        <span class="r">super</span>
+      <span class="r">end</span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+<span class="r">end</span></pre></div>
+</div><br>
+<p>The last thing I&rsquo;ll do today is generalize this for any model in my application by moving the method_missing code into a module that I&rsquo;ll call &ldquo;SearchLogicExtensions,&rdquo; and then extending ActiveRecord::Base with that:</p>
+<div class="CodeRay">
+  <div class="code"><pre><span class="r">module</span> <span class="cl">SearchLogicExtensions</span>
+  <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+    <span class="r">if</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^ascend_by_(</span><span class="ch">\w</span><span class="k">+)_nulls_last$</span><span class="dl">/</span></span>
+      named_scope name, { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="k"> IS NULL, </span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="dl">&quot;</span></span> }
+      send(name)
+    <span class="r">elsif</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^descend_by_(</span><span class="ch">\w</span><span class="k">+)_nulls_last$</span><span class="dl">/</span></span>
+      named_scope name, { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="k"> IS NULL, </span><span class="il"><span class="idl">#{</span><span class="gv">$1</span><span class="idl">}</span></span><span class="k"> DESC</span><span class="dl">&quot;</span></span> }
+      send(name)
+    <span class="r">else</span>
+      <span class="r">super</span>
+    <span class="r">end</span>
+  <span class="r">end</span>
+<span class="r">end</span>
+<span class="co">ActiveRecord</span>::<span class="co">Base</span>.extend(<span class="co">SearchLogicExtensions</span>)</pre></div>
+</div>
+<br>
+<p>Note that I need to use ActiveRecord::Base.extend and not ActiveRecord::Base.include here, since my method_missing code calls &ldquo;super&rdquo; if the missing method does not match the pattern. &ldquo;Extend&rdquo; means that the methods of ActiveRecord::Base, including method_missing, will be overridden by the methods of the SearchLogicExtensions module, but will still be present and available via a call to &ldquo;super.&rdquo; Another important detail here is that I removed the &ldquo;class &lt;&lt; self&rdquo; syntax. Since this is a module and not a class like Book was, I just define method_missing directly. My method_missing will be added as a class method to Book and all of my other models by the last line, when we extend ActiveRecord::Base. In my application I put this code into a file called &ldquo;config/initializers/search_logic_extensions.rb,&rdquo; which caused it to be loaded during the Rails initialization process. I could have also packaged the code up as a separate plugin.</p>
+<p>That&rsquo;s it for today; next time I&rsquo;ll continue this discussion of metaprogramming with SearchLogic by showing how to sort with NULL values in an associated database table, using a LEFT OUTER JOIN query.</p>

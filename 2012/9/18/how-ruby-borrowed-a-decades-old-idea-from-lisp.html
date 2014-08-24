@@ -1,0 +1,329 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="How Ruby Borrowed a Decades Old Idea From Lisp - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>How Ruby Borrowed a Decades Old Idea From Lisp - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>How Ruby Borrowed a Decades Old Idea From Lisp</h1>
+  </header>
+
+  <section class="content">
+    <p><b>This is the last of a series of free excerpts from an eBook I’m writing called <a href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a Microscope</a>. I plan to finish the book and make it available for purchase and download from this web site before <a href="http://rubyconf.org">RubyConf 2012</a> on Nov. 1. You can still <a href="http://patshaughnessy.net/ruby-under-a-microscope">sign up here</a>, if you haven’t already, to receive an email when the book is finished. I plan send that one, single email message out to everyone before November!</b></p>
+
+<div style="float: left; padding: 17px 30px 10px 0px">
+  <table cellpadding="0" cellspacing="0" border="0">
+    <tr><td><img src="http://patshaughnessy.net/assets/2012/9/18/ibm-704.jpg"></td></tr>
+    <tr><td align="center"><i>The IBM 704, above, was the first computer<br/>to run Lisp in the early 1960s.</i></td></tr>
+  </table>
+</div>
+
+
+<p>Blocks are one of the most commonly used and powerful features of Ruby. As you probably know, they allow you to pass a code snippet to iterators such as <span class="code">each</span>, <span class="code">detect</span> or <span class="code">inject</span>. You can also write your own functions that call blocks for other reasons using the <span class="code">yield</span> keyword. Ruby code containing blocks is often more succinct, elegant and expressive than the equivalent code would appear in older languages such as C.</p>
+
+<p>However, don’t jump to the conclusion that blocks are a new idea! In fact, blocks are not new to Ruby at all; the computer science concept behind blocks, called “closures,” <a href="http://en.wikipedia.org/wiki/Closure_(computer_science)#History_and_etymology">was first invented by Peter J. Landin</a> in 1964, a few years after the original version of <a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a> was created by <a href="http://en.wikipedia.org/wiki/John_McCarthy_(computer_scientist)">John McCarthy</a> in 1958. Closures were later adopted by Lisp &ndash; or more precisely a dialect of Lisp called <a href="http://en.wikipedia.org/wiki/Scheme_(programming_language)">Scheme</a>, invented by <a href="http://en.wikipedia.org/wiki/Gerald_Jay_Sussman">Gerald Sussman</a> and <a href="http://en.wikipedia.org/wiki/Guy_L._Steele,_Jr.">Guy Steele</a> in 1975. Sussman and Steele’s use of closures in Scheme brought the idea to many programmers for the first time starting in the 1970s.</p>
+
+<p>But what does “closure” actually mean? In other words, exactly what are Ruby blocks? Are they as simple as they appear? Are they just the snippet of Ruby code that appears between the <span class="code">do</span> and <span class="code">end</span> keywords? Or is there more to Ruby blocks than meets the eye? In this chapter I’ll review how Ruby implements blocks internally, and show how they meet the definition of “closure” used by Sussman and Steele back in 1975. I’ll also show how blocks, lambdas, procs and bindings are all different ways of looking at closures, and how these objects are related to Ruby’s metaprogramming API.</p>
+
+<div style="float: right; padding: 25px 0px 20px 40px">
+<table cellpadding="0" cellspacing="0" border="0">
+  <tr><td><img src="http://patshaughnessy.net/assets/2012/9/18/sussman-steele-paper.jpg"></td></tr>
+  <tr><td align="center"><i>Sussman and Steele gave a useful definition of the term “closure”<br/>in <a href="http://en.wikisource.org/wiki/Scheme:_An_Interpreter_for_Extended_Lambda_Calculus">this 1975 academic paper</a>, one of the so-called “<a href="http://en.wikipedia.org/wiki/Lambda_Papers#The_Lambda_Papers">Lambda Papers</a>.”</i></td></tr>
+</table>
+</div>
+
+
+<h2>What exactly is a block?</h2>
+
+<p>Internally Ruby represents each block using a C structure called <span class="code">rb_block_t</span>:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/9/18/empty-block.png"/></p>
+
+<p>One way to define what a block is would be to take a look at the values Ruby stores inside this structure. Just as we did in Chapter 3 with the <span class="code">RClass</span> structure, let’s deduce what the contents of the <span class="code">rb_block_t</span> structure must be based on what we know blocks can do in our Ruby code.</p>
+
+<p>Starting with the most obvious attribute of blocks, we know each block must consist of a piece of Ruby code, or internally a set of compiled YARV byte code instructions. For example, if I call a method and pass a block as a parameter:</p>
+
+<br/>
+
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="integer">10</span>.times <span class="keyword">do</span>
+  str = <span class="string"><span class="delimiter">&quot;</span><span class="content">The quick brown fox jumps over the lazy dog.</span><span class="delimiter">&quot;</span></span>
+  puts str
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>&hellip;it’s clear that when executing the <span class="code">10.times</span> call Ruby needs to know what code to iterate over. Therefore, we know the <span class="code">rb_block_t</span> structure must contain a pointer to that code:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/9/18/block-and-code.png"/></p>
+
+<p>In this diagram you can see a value called <span class="code">iseq</span> which is a pointer to the YARV instructions compiled from the Ruby code in my block.</p>
+
+<p>Another obvious but often overlooked behavior of blocks is that they can access variables in the surrounding or parent Ruby scope. For example:</p>
+
+<br/>
+
+
+<div class="CodeRay">
+  <div class="code"><pre>
+str = <span class="string"><span class="delimiter">&quot;</span><span class="content">The quick brown fox</span><span class="delimiter">&quot;</span></span>
+<span class="integer">10</span>.times <span class="keyword">do</span>
+  str2 = <span class="string"><span class="delimiter">&quot;</span><span class="content">jumps over the lazy dog.</span><span class="delimiter">&quot;</span></span>
+  puts <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>str<span class="inline-delimiter">}</span></span><span class="content"> </span><span class="inline"><span class="inline-delimiter">#{</span>str2<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>Here the <span class="code">puts</span> function call refers equally well to the <span class="code">str2</span> variable located inside the block and the <span class="code">str</span> variable from the surrounding code. We often take this for granted &ndash; obviously blocks can access values from the code surrounding them. This ability is one of the things that makes blocks useful. But if you think about this for a moment, you’ll realize blocks have in some sense a dual personality. On the one hand they behave like separate functions: you can call them and pass them arguments just as you would with any function. But on the other hand they are part of the surrounding function or method. As I wrote the sample code above I didn’t think of the block as a separate function &ndash; I thought of the block’s code as just part of the simple, top level script that printed a string 10 times.</p>
+
+<p>How does this work internally? Does Ruby internally implement blocks as separate functions? Or as part of the surrounding function? Let’s step through the example above, slowly, and see what happens inside of Ruby when you call a block.</p>
+
+<p>In this example when Ruby executes the first line of code, as I explained in Chapter 2, YARV will store the local variable <span class="code">str</span> on it’s internal stack, and save it’s location in the DFP pointer located in the current <span class="code">rb_control_frame_t</span> structure*. (*footnote: If the outer code was located inside a function or method then the DFP would point to the stack frame as shown, but if the outer code was located in the top level scope of your Ruby program, then Ruby would use dynamic access to save the variable in the TOPLEVEL_BINDING environment instead &ndash; more on this in section 4.3. Regardless the DFP will always indicate the location of the <span class="code">str</span> variable.)</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/9/18/save-local-variable.png"/></p>
+
+<p>Next Ruby will come to the <span class="code">10.times do</span> call. Before executing the actual iteration &ndash; before calling the <span class="code">times</span> method &ndash; Ruby will first create and initialize a new <span class="code">rb_block_t</span> structure to represent the block. Ruby needs to create the block structure now, since the block is really just another argument to the <span class="code">times</span> method:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/9/18/new-block.png"/></p>
+
+<p>To do this, Ruby copies the current value of the DFP, the dynamic frame pointer, into the new block. In other words, Ruby saves away the location of the current stack frame in the new block.</p>
+
+<p>Next Ruby will proceed to call the <span class="code">times</span> method on the object <span class="code">10</span>, an instance of the <span class="code">Fixnum</span> class. While doing this, YARV will create a new frame on its internal stack. Now we have two stack frames: on the top is the new stack frame for the <span class="code">Fixnum.times</span> method, and below is the original stack frame used by the top level function:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/9/18/fixnum-stack.png"/></p>
+
+<p>Ruby implements the <span class="code">times</span> method internally using its own C code &ndash; it’s a built in method &ndash; but Ruby implements it the same way you probably would in Ruby. Ruby starts to iterate over the numbers 0, 1, 2, etc., up to 9, and calls <span class="code">yield</span> once for each of these integers. Finally, the code that implements <span class="code">yield</span> internally actually calls the block each time through the loop, pushing a third* frame onto the top of the stack for the code inside the block to use: (*footnote: Ruby actually pushes an extra, internal stack frame whenever you call yield before actually calling the block, so strictly speaking there should be four stack frames in this diagram. I only show three for the sake of clarity.)</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/9/18/executing-block.png"/></p>
+
+<p>Here on the left we now have three stack frames:</p>
+
+<ul>
+<li>On the top is the new stack frame for the block, containing the <span class="code">str2</span> variable.</li>
+<li>In the middle is the stack frame used by the internal C code that implements the <span class="code">Fixnum.times</span> method.</li>
+<li>And at the bottom is the original function’s stack frame, containing the <span class="code">str</span> variable from the outer scope.</li>
+</ul>
+
+
+<p>While creating the new stack frame at the top, Ruby’s internal <span class="code">yield</span> code copies the DFP from the block into the new stack frame. Now the code inside the block can access both it’s own local variables, via the <span class="code">rb_control_frame</span> structure as usual, and indirectly the variables from the parent scope, via the DFP pointer using dynamic variable access, as I explained in Chapter 2. Specifically this allows the <span class="code">puts</span> statement to access the <span class="code">str</span> variable from the parent scope.</p>
+
+<p>To summarize, we have seen now that Ruby’s <span class="code">rb_block_t</span> structure contains two important values:
+a pointer to a snippet of YARV code instructions, and
+a pointer to a location on YARV’s internal stack, the location that was at the top of the stack when the block was created:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/></p>
+
+<p>At first glance this seems like a very technical, unimportant detail. This is obviously a behavior we expect Ruby blocks to exhibit, and the DFP seems to be just another minor, uninteresting part of Ruby’s internal implementation of blocks.</p>
+
+<p>Or is it? I believe the DFP is actually a profound, important part of Ruby internals. The DFP is the basis for Ruby’s implementation of “closures.” Here’s how Sussman and Steele defined the term “closure” in their 1975 paper <i><a href="http://en.wikisource.org/wiki/Scheme:_An_Interpreter_for_Extended_Lambda_Calculus">Scheme: An Interpreter for Extended Lambda Calculus</a></i>:</p>
+
+<br/>
+
+
+<blockquote>
+In order to solve this problem we introduce the notion of a closure [11, 14] which is a data structure containing a lambda expression, and an environment to be used when that lambda expression is applied to arguments.
+</blockquote>
+
+
+<p>Reading this again carefully, a closure is defined to be the combination of:</p>
+
+<ul>
+<li>A “lambda expression,” i.e. a function that takes a set of arguments, and</li>
+<li>An environment to be used when calling that lambda or function.</li>
+</ul>
+
+
+<p>I’ll have more context and information about “lambda expressions” and how Ruby’s borrowed the <span class="code">lambda</span> keyword from Lisp in section 4-2, but for now take another look at the internal <span class="code">rb_block_t</span> structure:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/></p>
+
+<p>Notice that this structure meets the definition of a closure Sussman and Steele wrote back in 1975:</p>
+
+<ul>
+<li><span class="code">iseq</span> is a pointer to a lambda expression, i.e. a function or code snippet, and</li>
+<li><span class="code">DFP</span> is a pointer to the environment to be used when calling that lambda or function, i.e. a pointer to the surrounding stack frame.</li>
+</ul>
+
+
+<p>Following this train of thought, we can see that blocks are Ruby’s implementation of closures. Ironically blocks, one of the features that in my opinion makes Ruby so elegant and natural to read &ndash; so modern and innovative &ndash; is based on research and work done at least 20 years before Ruby was ever invented!</p>
+
+<div class="yellow">
+
+<p><b>
+[ Note: In Ruby Under a Microscope I won't show or discuss any C code directly, except for optional sections that are called out with a different background color like this. ]
+</b></p>
+
+<br/>
+
+In Ruby 1.9 and later you can find the actual definition of the <span class="code">rb_block_t</span> structure in the vm_core.h file. Here it is:
+
+<br/>
+<br/>
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="keyword">typedef</span> <span class="keyword">struct</span> rb_block_struct {
+    VALUE self;         <span class="comment">/* share with method frame if it's only block */</span>
+    VALUE *lfp;         <span class="comment">/* share with method frame if it's only block */</span>
+    VALUE *dfp;         <span class="comment">/* share with method frame if it's only block */</span>
+    rb_iseq_t *iseq;
+    VALUE proc;
+} rb_block_t;
+</pre></div>
+</div>
+
+
+<br/>
+You can see the <span class="code">iseq</span> and <span class="code">DFP</span> values I described above, along with a few other values:
+<ul>
+<li><span class="code">self</span>: As we’ll see in the next sections when I cover lambdas, procs and bindings, the value the <span class="code">self</span> pointer had when the block was first referred to is also an important part of the closure’s environment. Ruby executes block code inside the same object context the code outside the block had.</li>
+<li><span class="code">lfp</span>: It turns out blocks also contain a local frame pointer, along with the dynamic frame pointer. However, Ruby doesn’t use local variable access inside of blocks; it doesn’t use the set/getlocal YARV instructions inside of blocks. Instead, Ruby uses this LFP for internal, technical reasons and not to access local variables.</li>
+<li><span class="code">proc</span>: Finally, Ruby uses this value when it creates a proc object from a block. As we’ll see in the next section, procs and blocks are closely related.</li>
+</ul>
+
+Right above the definition of <span class="code">rb_block_t</span> in vm_core.h you’ll see the <span class="code">rb_control_frame_t</span> structure defined:
+
+<br/>
+<br/>
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="keyword">typedef</span> <span class="keyword">struct</span> {
+    VALUE *pc;          <span class="comment">/* cfp[0] */</span>
+    VALUE *sp;          <span class="comment">/* cfp[1] */</span>
+    VALUE *bp;          <span class="comment">/* cfp[2] */</span>
+    rb_iseq_t *iseq;    <span class="comment">/* cfp[3] */</span>
+    VALUE flag;         <span class="comment">/* cfp[4] */</span>
+    VALUE self;         <span class="comment">/* cfp[5] / block[0] */</span>
+    VALUE *lfp;         <span class="comment">/* cfp[6] / block[1] */</span>
+    VALUE *dfp;         <span class="comment">/* cfp[7] / block[2] */</span>
+    rb_iseq_t *block_iseq;  <span class="comment">/* cfp[8] / block[3] */</span>
+    VALUE proc;         <span class="comment">/* cfp[9] / block[4] */</span>
+    <span class="directive">const</span> rb_method_entry_t *me;<span class="comment">/* cfp[10] */</span>
+} rb_control_frame_t;
+</pre></div>
+</div>
+
+<br/>
+
+Notice that this C structure also contains all of the same values the <span class="code">rb_block_t</span> structure did: everything from <span class="code">self</span> down to <span class="code">proc</span>. The fact these two structures share the same values is actually one of the interesting, but confusing, optimizations Ruby uses internally to speed things up a bit. Whenever you refer to a block for the first time by passing it into a method call, as I explained above Ruby creates a new <span class="code">rb_block_t</span> structure and copies values such as the LFP from the current <span class="code">rb_control_frame_t</span> structure into it. However, by making the members of these two structures similar &ndash; <span class="code">rb_block_t</span> is a subset of <span class="code">rb_control_frame_t</span> &ndash; Ruby is able to avoid creating a new <span class="code">rb_block_t</span> structure and instead sets the pointer to the new block to refer to the common portion of the <span class="code">rb_control_frame_t</span> structure. In other words, instead of allocating new memory to hold a new <span class="code">rb_block_t</span> structure, Ruby simple passes around a pointer to the middle of the <span class="code">rb_control_frame_t</span> structure. This is very confusing, but does avoid unnecessary calls to malloc, and speeds up the process of creating blocks.
+</div>
+
+
+<h2>Experiment 4-1: Which is faster: a while-loop or passing a block to each?</h2>
+
+<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+
+<h2>Lambdas and Procs: treating code as a first class citizen</h2>
+
+<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+
+<h2>Experiment 4-2: Lambda/Proc performance &ndash; how long does it take Ruby to copy a stack frame to the heap?</h2>
+
+<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+
+<h2>Bindings: A closure environment without a function</h2>
+
+<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+
+<h2>Experiment 4-3: Exploring the TOPLEVEL_BINDING object.</h2>
+
+<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+
+<h2>Closures in JRuby</h2>
+
+<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+
+<h2>Closures in Rubinius</h2>
+
+<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

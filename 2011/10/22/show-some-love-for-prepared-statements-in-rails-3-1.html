@@ -1,0 +1,255 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Show some love for prepared statements in Rails 3.1 - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Show some love for prepared statements in Rails 3.1 - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Show some love for prepared statements in Rails 3.1</h1>
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 7px 30px 10px 0px">
+<table cellpadding="0" cellspacing="0" border="0">
+  <tr><td><img src="http://patshaughnessy.net/assets/2011/10/22/heart.jpg"></td></tr>
+  <tr><td align="center"><small><i>@Tenderlove and the rest of the Rails core team<br/> deserve some love for speeding up your app!</i></small></td></tr>
+</table>
+</div>
+
+
+<p>We’ve heard a lot about many of the great new features in Rails 3.1: the asset pipeline, Coffee Script, HTTP streaming and on and on. But if you’re still using ActiveRecord with a traditional SQL database, like me, then you’re probably using one of Rails 3.1’s most powerful new features without even realizing it: Prepared Statements.</p>
+
+<p>Database servers such as Postgres and Oracle for years have allowed client applications to preprocess and cache specific SQL statement patterns ahead of time, later allowing the query results to be returned even faster. These “prepared statements” can be a great way to speed up frequently used SQL queries. However, until now the Rails framework never supported using them.</p>
+
+<p>With Rails 3.1, <a href="http://tenderlovemaking.com/">Aaron Patterson (@Tenderlove)</a> and the rest of the Rails core team managed to refactor ActiveRecord to create and cache prepared statements automatically without changing the existing ActiveRecord API. That’s a really amazing achievement, and means that many of us will get a significant performance boost just by upgrading to Rails 3.1&hellip; without writing even a single line of code!</p>
+
+<p>Today I’m going to take a look at how ActiveRecord 3.1 implements prepared statements, and write a simple Ruby script that will display a log message each time your application takes advantage of them &ndash; so you’ll know how much love you need to show @Tenderlove and the rest of the Rails core team!</p>
+
+<h2>Taking a closer look at a Rails 3.1 log file</h2>
+
+<p>If you’ve already upgraded your app to Rails 3.1, you might have noticed some subtle changes in the log file on the lines showing the SQL statements your app executes. For example, suppose I have a Rails 3.0 or Rails 2.x app with a “Person” model:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="keyword">class</span> <span class="class">Person</span> &lt; <span class="constant">ActiveRecord</span>::<span class="constant">Base</span>
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>If I open a console and set the ActiveRecord log output to STDOUT, then I can see the SQL statement ActiveRecord uses to load a single person record:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rails c
+Loading development environment (Rails 3.0.10)
+ruby-1.8.7-p352 :001 &gt; ActiveRecord::Base.logger = Logger.new(STDOUT)
+ruby-1.8.7-p352 :002 &gt; Person.find 1
+  Person Load (0.1ms)  SELECT &quot;people&quot;.* FROM &quot;people&quot; WHERE &quot;people&quot;.&quot;id&quot; = 1 LIMIT 1
+ =&gt; #&lt;Person id: 1, name: &quot;one&quot;, age: 23, created_at...
+</pre></div>
+</div>
+
+
+
+<p>No surprise here: ActiveRecord has constructed a simple SELECT statement that finds a record in the “people” table with the primary key “id” set to 1.</p>
+
+<p>Now after I upgrade my sample app to Rails 3.1 and try the same simple query in the console, I’ll get:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rails c
+Loading development environment (Rails 3.1.1)
+ruby-1.8.7-p352 :001 &gt; Person.find 1
+  Person Load (5.6ms)  SELECT &quot;people&quot;.* FROM &quot;people&quot; WHERE &quot;people&quot;.&quot;id&quot; = ? LIMIT 1  [[&quot;id&quot;, 1]]
+ =&gt; #&lt;Person id: 1, name: &quot;one&quot;, age: 23, created_at...
+</pre></div>
+</div>
+
+
+
+<p>Do you see the subtle difference? ActiveRecord 3.0 generated a select statement that contained a where clause: <span class="code">WHERE people.id = 1</span>, but ActiveRecord 3.1 generated a slightly different where clause: <span class="code">WHERE people.id = ?</span> followed by: <span class="code">[[&ldquo;id&rdquo;, 1]]</span>. Why is there a difference? What does the <span class="code">[[&ldquo;id&rdquo;, 1]]</span> notation mean? Why does any of this matter at all?</p>
+
+<p>Note you won&rsquo;t see this change in the log file if you&rsquo;re using MySQL; more on that later&hellip;</p>
+
+<h2>What are prepared statements?</h2>
+
+<p>I won’t take the time here today to thoroughly explain RDBMS prepared statements since there’s a wealth of information out there on the Internet. Prepared statements have been around for a long time, and actually the fact that until now Rails didn’t support them caused widespread complaints from developers coming from Java or .NET. It was just another excuse for considering Rails not “Enterprise ready.”</p>
+
+<p>If you’re not familiar at all with prepared statements, then a good way to start learning would be to take the time to watch <a href="http://www.youtube.com/watch?v=kWOAHIpmLAI">@Tenderlove’s keynote address at RailsConf 2011</a>. He does a great job explaining the fundamental idea behind prepared statements and how much of a performance improvement we can expect for each RDBMS server, Postgres, MySQL, SQLite, etc.</p>
+
+<p>For now, I’ll just show this simple diagram:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2011/10/22/prepared%20statement.png" alt="prepared statement" /></p>
+
+<p>The basic idea behind prepared statements and the log message above is that the SQL statement itself is compiled once and cached for future use. This is the left portion of the log message: <span class="code">SELECT &hellip;etc&hellip; LIMIT 1</span>. Notice that the actual value of the id column is replaced with “?”. By caching the SQL statement the DB server only needs to perform the work of compiling the SQL string and building up an execution plan once.</p>
+
+<p>Later when your application needs to use the prepared statement, it just needs to provide the actual, desired value for “id.” This is known as a “bind variable.” The value <span class="code">[[“id”, 1]]</span> at the end of the log message indicates that for this SQL call the application is passing the value 1 for the bind variable “id.”</p>
+
+<h2>How are prepared statements implemented in ActiveRecord 3.1?</h2>
+
+<p>It turns out that in Rails 3.1 prepared statement support is implemented in the ActiveRecord connection adapters, not in ActiveRecord itself. This is because each RDBMS server implements prepared statements differently, using a slightly different API. Let’s take a look at how ActiveRecord connects to SQLite, for example:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2011/10/22/sqlite3%20stack.png" alt="sqlite3 stack" /></p>
+
+<p>The magic for prepared statements happens inside the SQLiteAdapter class. The “StatementPool” inner class inside SQLiteAdapter is a simple hash-based cache implementation that holds on to all of the prepared statements returned by the SQLite database server. Each time your Rails 3.1 application executes a SQL statement the SQLiteAdapter class first checks whether there already is a prepared statement generated for that SQL statement and uses it if there is. If there isn’t a cached statement, it sends the SQL string along to SQLite to be processed and converted into a new prepared statement. Here’s the algorithm:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2011/10/22/flowchart.png" alt="flowchart" /></p>
+
+<h2>How much is your Rails 3.1 app taking advantage of prepared statements?</h2>
+
+<p>OK &ndash; now let’s find out how much love you need to send to the Ruby core team for all of this great work! We’ll do that by displaying a message in the Rails log file each time your application uses a cached prepared statement from the StatementPool class.</p>
+
+<p>First, add this code to one of your Rails 3.1 apps in a new file called config/initializers/love_meter.rb. This only works for the SQLiteAdapter so you&rsquo;ll have to reconfigure your developement environment to use SQLite for this test.</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="constant">ActiveSupport</span>.on_load <span class="symbol">:active_record</span> <span class="keyword">do</span>
+
+  <span class="keyword">class</span> <span class="class">ActiveRecord::ConnectionAdapters::SQLiteAdapter::StatementPool</span>
+    <span class="keyword">def</span> <span class="function">[]</span>(key)
+      info = cache[key]
+      <span class="keyword">unless</span> info.nil?
+        puts <span class="string"><span class="delimiter">&quot;</span><span class="content">SEND SOME LOVE TO THE RAILS CORE TEAM FOR SPEEDING UP YOUR APP!</span><span class="delimiter">&quot;</span></span>
+        puts <span class="string"><span class="delimiter">&quot;</span><span class="content">Using cached prepared statement for </span><span class="inline"><span class="inline-delimiter">#{</span>key<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
+      <span class="keyword">end</span>
+      info
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>What it does is monkey patch the StatementPool class to generate some additional log file output by overriding the <span class="code">def []</span> method. This is the method that the SQLiteAdapter uses to look for a prepared statement in StatementPool.</p>
+
+<p>The value of “key” here is the actual SQL string your application is about to execute; for example: <span class="code">SELECT &ldquo;people&rdquo;.* FROM &ldquo;people&rdquo; WHERE &ldquo;people&rdquo;.&ldquo;id&rdquo; = ? LIMIT 1</span>.</p>
+
+<p>The value of <span class="code">cache[key]</span> &ndash; what StatementPool saves in its hash &ndash; is an object representing the prepared statement object from the database.</p>
+
+<p>The code checks to see if the value of <span class="code">cache[key]</span> is not nil, and if so displays a message. Now if we repeat our console exercise from above:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+$ rails c
+Loading development environment (Rails 3.1.1)
+ruby-1.8.7-p352 :001 &gt; Person.find 3
+  Person Load (3.4ms)  SELECT &quot;people&quot;.* FROM &quot;people&quot; WHERE &quot;people&quot;.&quot;id&quot; = ? LIMIT 1  [[&quot;id&quot;, 3]]
+ =&gt; #&lt;Person id: 3, name: &quot;three&quot;, age: 43, created_at...
+</pre></div>
+</div>
+
+
+
+<p>The first time we execute a query for a person, the StatementPool class will have an empty cache, and the SQLiteAdapter class will have to send the SQL statement to the database to be compiled and processed &ndash; to be “prepared.” But during this call SQLiteAdapter saves the new prepared statement into the StatementPool cache.</p>
+
+<p>Now if we load another person record:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+ruby-1.8.7-p352 :002 &gt; Person.find 1
+SEND SOME LOVE TO THE RAILS CORE TEAM FOR SPEEDING UP YOUR APP!
+Using cached prepared statement for SELECT  &quot;people&quot;.* FROM &quot;people&quot;  WHERE &quot;people&quot;.&quot;id&quot; = ? LIMIT 1
+  Person Load (0.4ms)  SELECT &quot;people&quot;.* FROM &quot;people&quot; WHERE &quot;people&quot;.&quot;id&quot; = ? LIMIT 1  [[&quot;id&quot;, 1]]
+ =&gt; #&lt;Person id: 1, name: &quot;one&quot;, age: 23, created_at...
+</pre></div>
+</div>
+
+
+
+<p>&hellip; you can see that we now reuse the cached prepared statement from StatementPool and save some database execution time. Notice this was true even though I was loading a different person record, not id=3, but id=1. If you add this code to one of your Rails 3.1 apps and take a look at the log file, you’ll find out how much love you need to send to the Rails core team!</p>
+
+<p>If there&rsquo;s any interest I&rsquo;ll package up this test script as a gem and support Postgres, Oracle etc., as well as SQLite. Then if you drop the gem into any Rails app it could produce a more helpful and complete report on prepared statement usage.</p>
+
+<h2>No MySQL support</h2>
+
+<p>If you watch @Tenderlove’s presentation or if you just read the code inside the different ActiveRecord adapter classes, you’ll notice that for MySQL there’s no implementation of prepared statements in Rails (at least using the newer mysql2 gem and adapter). However, don’t blame the Rails team; the reason it’s not supported is that actually MySQL slows down when you start using prepared statements, and it turns out to be faster not to use them at all. So send that love to the Rails team anyway&hellip; they’re helping us out again by avoiding this performance bottleneck!</p>
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

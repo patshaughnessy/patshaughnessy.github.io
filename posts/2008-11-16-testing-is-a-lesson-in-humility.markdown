@@ -1,0 +1,78 @@
+title: Testing is a lesson in humility
+date: 2008/11/16
+
+<p>I was working on a web site a few weeks ago and found that the <a href="http://patshaughnessy.net/2008/10/21/autocomplete-plugin-doesn-t-work-for-repeated-fields">auto_complete plugin didn’t work well when text fields were repeated</a> on a form. Later I <a href="http://patshaughnessy.net/2008/10/31/modifying-the-autocomplete-plugin-to-allow-repeated-fields">modified auto_complete to handle the case where text fields are repeated</a>. I then refactored the code into a separate add-on plugin, but before I posted the code on github I decided to add a few tests just for the sake of completeness. I was confident that the text_field_with_auto_complete function I wrote last week was correct &ndash; after all, it was working inside my web site. I suppose you could call this method &ldquo;Development Driven Testing:&rdquo; write some code first, and then add a few tests after the fact to make yourself feel more confident that you have done your job correctly! Needless to say, I later realized this was a bad idea.</p>
+<p>I wrote some simple test code similar to what Rails uses to test the FormHelper module: <a href="http://dev.rubyonrails.org/browser/trunk/actionpack/test/template/form_helper_test.rb">vendor/rails/actionpack/test/template/form_helper_test.rb</a>. The idea behind my test was simple. As I explained last week, my code in text_field_with_auto_complete worked by insuring each generated &lt;input&gt; tag's id attribute was unique, and by using a name attribute taken from the surrounding call to fields_for, or form_for, instead of the standard name value &ldquo;object[method].&rdquo; (It also passes different values for the URL and &ldquo;param_name&rdquo; parameter into the Ajax code, but let&rsquo;s skip that for now.) In other words, my code simply called into the original auto_complete plugin with some modified parameters. So to test this, I would just call the original and modified versions of text_field_with_auto_complete and compare the HTML after a search/replace for the desired changes. Here&rsquo;s the test:</p>
+<pre>def test_auto_complete_fields_for_html
+  standard_auto_complete_html =
+    text_field_with_auto_complete :person,
+                                  :name,
+                                  {},
+                                  { :param_name =&gt; &#x27;person[name]&#x27; }
+  _erbout = &#x27;&#x27;
+  auto_complete_fields_for(&#x27;group[person_attributes][]&#x27;, @person) do |f|
+    _erbout.concat f.text_field_with_auto_complete(:person, :name)
+  end
+  assert_dom_equal standard_auto_complete_html,
+    _erbout.gsub(/group\[person_attributes\]\[\]/, &#x27;person&#x27;)
+           .gsub(/person_[0-9]+_name/, &#x27;person_name&#x27;)
+end</pre>
+<p>&ldquo;Standard_auto_complete_html&rdquo; contains the HTML the original auto_complete plugin generates. Then I call auto_complete_fields_for and my version of text_field_with_auto_complete, simulating a real ERB template, and write the HTML into _erbout. Finally we test that after search/replace on the expected changes the modified HTML is the same as the standard HTML. After the usual syntax errors and typos I ran the test again and completely expected it to work&hellip;</p>
+<p>Of course, it failed! I couldn’t even discover what the error was until I wrote the HTML out on the console and took a close look at what was generated. Here’s the &lt;input&gt; tag the original auto_complete plugin generates:</p>
+<pre>&lt;input id=&quot;person_name&quot;
+       name=&quot;person[name]&quot;
+       size=&quot;30&quot;
+       type=&quot;text&quot;
+       <b>value=&quot;Someone Important&quot; /&gt;</b></pre>
+<p>And here’s what my code generated before the search and replace:</p>
+<pre>&lt;input id=&quot;person_15961340_name&quot;
+       name=&quot;group[person_attributes][][name]&quot;
+       size=&quot;30&quot;
+       type=&quot;text&quot; /&gt;</pre>
+<p>Here we can see the expected changes to the id and name attributes, but the &ldquo;value&rdquo; attribute is missing from my HTML! I had no idea this was happening even when I used my plugin in a web site. I had noticed earlier that some values were missing in my site&rsquo;s text fields in the browser but I had assumed this was normal behavior from auto_complete and simply added the values explicitly in the ERB.</p>
+<p>Lesson learned: not only do tests insure your code works, but the process of writing the tests forces you to think much more deeply and carefully about what your code is really doing. Of course, once you start writing tests first the same thing applies to your design: you think much more carefully about what you are trying to do, and how to design a solution.</p>
+<p>I went on to quickly fix the text_field_with_auto_complete function by passing in the original object and method parameters, so that Rails would get the proper value for me, and explicitly setting the id attribute with a unique number as follows:</p>
+<pre>@template.text_field_with_auto_complete(
+      object,
+      method,
+      { :name =&gt; &quot;#{@object_name}[#{method}]&quot;,
+        :id =&gt; &quot;#{object}_#{Object.new.object_id}_#{method}&quot;
+etc&hellip;</pre>
+<p>This got my test to pass! Relieved, I went on to write another test. This second test insures that the id attributes generated by the plugin are all unique:</p>
+<pre>def test_two_auto_complete_fields_have_different_ids
+  id_attribute_pattern = /id=\&quot;[^\&quot;]*\&quot;/i
+  _erbout = &#x27;&#x27;
+  _erbout2 = &#x27;&#x27;
+  auto_complete_fields_for(&#x27;group[person_attributes][]&#x27;, @person) do |f|
+    _erbout.concat f.text_field_with_auto_complete(:person, :name)
+    _erbout2.concat f.text_field_with_auto_complete(:person, :name)
+  end
+  assert_equal
+    [],
+    _erbout.scan(id_attribute_pattern) &amp; _erbout2.scan(id_attribute_pattern)
+end</pre>
+<p>I call the text_field_with_auto_complete function twice and check that all of the &lt;input&gt; tags have unique id=&rdquo;&rdquo; attributes by scanning for the attributes and checking that the two arrays of matches have an empty intersection set. Sounds simple, right? Surely it will pass&hellip;</p>
+<p>Getting surprised and humiliated by one unit test was bad enough&hellip; but the second test surprised me yet again! What happened here was that all of the &lt;div&gt; tags, also generated by text_field_with_auto_complete, had the same id attributes! I had written the test above to look for &lt;input id=&rdquo;&rdquo;&gt; attributes but fortunately the code also matched &lt;div id=&rdquo;&rdquo;&gt;, like this:</p>
+<pre>&lt;div class=&quot;auto_complete&quot; id=&quot;person_name_auto_complete&quot;&gt;&lt;/div&gt;</pre>
+<p>Since these id's were not unique, my test failed:</p>
+<pre>&lt;[]&gt; expected but was
+&lt;[&quot;id=\&quot;person_name_auto_complete\&quot;&quot;]&gt;.
+2 tests, 2 assertions, 1 failures, 0 errors</pre>  
+<p>I finally solved the problem and got both of my tests to pass using this code:</p>
+<pre>def text_field_with_auto_complete(object, method,
+                                  tag_options = {}, completion_options = {})
+    object_value =
+      ActionView::Helpers::InstanceTag.value_before_type_cast(@object,
+                                                              method.to_s)
+    @template.text_field_with_auto_complete(
+      &quot;#{object}_#{Object.new.object_id}&quot;,
+      method,
+      { :name =&gt; &quot;#{@object_name}[#{method}]&quot;,
+        :value =&gt; object_value
+      }.update(tag_options),
+      { :param_name =&gt; &quot;#{object}[#{method}]&quot;,
+        :url =&gt; { :action =&gt; &quot;auto_complete_for_#{object}_#{method}&quot; }
+      }.update(completion_options)
+    )
+  end</pre>
+<p>To completely understand why the value attribute was missing and how to get it back I took a look at how the FormHelper module in Rails worked. A long story short: I get the object&rsquo;s value by carefully using the same code that the FormHelper module does by calling InstanceTag.value_before_type_cast, and then pass the value in as a parameter to text_field_with_auto_complete. I was sure to obtain the proper object&rsquo;s value by using &ldquo;@object&rdquo; from the FormBuilder base class. And now the &lt;div id=&quot;&quot;&gt;&#x27;s are unique since we pass in the modified object name into the original text_field_with_auto_complete.</p>

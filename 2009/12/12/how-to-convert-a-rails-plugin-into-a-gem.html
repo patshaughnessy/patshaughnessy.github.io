@@ -1,0 +1,391 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="How to convert a Rails plugin into a gem - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>How to convert a Rails plugin into a gem - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>How to convert a Rails plugin into a gem</h1>
+  </header>
+
+  <section class="content">
+    <p>Recently I decided to convert <a href="http://patshaughnessy.net/repeated_auto_complete">my fork of the auto_complete plugin</a> into a gem; I called it &ldquo;<a href="http://gemcutter.org/gems/repeated_auto_complete">repeated_auto_complete</a>.&rdquo; In the end it was very easy to convert a plugin into a gem; all I had to do was:</p>
+
+
+<ul><li>Make sure there was a code file in the lib folder with the same name as the gem, and</li>
+<li>Move or copy the init.rb into a subfolder called &ldquo;rails.&rdquo;</li></ul>
+
+
+<p></p></p>
+
+<p>This is simple enough, but why do I need to do this? These changes seem rather odd, and also it took me about 3-4 hours of debugging to figure out what I needed to do. The answer has to do with the way the Rails framework loads gems&hellip; this is more confusing and complicated than you might think! The rest of this article will show exactly how this works in detail, comparing how gems and plugins are loaded.</p>
+
+
+<p><b>The load path works the same way for plugins and gems</b></p>
+
+
+<p>Rails treats the load path in the same way for gems as it does for plugins. This is a relief, and also not a surprise since gems and plugins are very similar to each other. The best way to get a sense of how the load path works with plugins and gems is just to inspect it directly in the console. To do this, let&rsquo;s start by creating a new sample app:</p>
+
+
+<pre>$ rails sample
+      create  
+      create  app/controllers
+      create  app/helpers
+      create  app/models
+etc&hellip;</pre>
+
+
+<p>And now let&rsquo;s install the auto_complete plugin:</p>
+
+
+<pre>$ cd sample
+$ ./script/plugin install git://github.com/rails/auto_complete.git
+Initialized empty Git repository in .git/
+warning: no common commits
+remote: Counting objects: 13, done.
+remote: Compressing objects: 100% (12/12), done.
+remote: Total 13remote:  (delta 2), reused 0 (delta 0)
+Unpacking objects: 100% (13/13), done.</pre>
+
+
+<p>If we start a Rails console we can use the command in bold to just look at the load path:</p>
+
+
+<pre>$ ./script/console 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <b>$LOAD_PATH.each { |path| puts path }; nil</b>
+.../gems/activesupport-2.3.5/lib/active_support/vendor/i18n-0.1.3/lib
+.../gems/activesupport-2.3.5/lib/active_support/vendor/tzinfo-0.3.12
+.../gems/activesupport-2.3.5/lib/active_support/vendor/memcache-client-1.7.4
+/Users/pat/rails-apps/sample/app/controllers/
+/Users/pat/rails-apps/sample/app
+/Users/pat/rails-apps/sample/app/models
+/Users/pat/rails-apps/sample/app/controllers
+/Users/pat/rails-apps/sample/app/helpers
+/Users/pat/rails-apps/sample/lib
+<b>/Users/pat/rails-apps/sample/vendor/plugins/auto_complete/lib</b>
+/Users/pat/rails-apps/sample/vendor
+.../gems/rails-2.3.5/lib/../builtin/rails_info/
+.../gems/rails-2.3.5/lib
+etc&hellip;</pre>
+
+
+<p>Here we can see the various application paths for my new sample app, as well as the paths of a few of the gems found on my laptop. For clarity, I've shortened the path to my gems folder, and there are many more gems that I&rsquo;m not showing here. The line in bold indicates that the lib folder for the auto_complete plugin is included in the load paths array, allowing Rails to look inside the auto_complete plugin in order to find missing constants.</p>
+
+
+<p>Now if I remove the auto_complete plugin&hellip;</p>
+
+
+<pre>$ rm -rf vendor/plugins/auto_complete</pre>
+
+
+<p>&hellip; and install the repeated_auto_complete gem (from gemcutter):</p>
+
+<pre>$ gem sources -a http://gemcutter.org
+http://gemcutter.org added to sources
+$ sudo gem install repeated_auto_complete
+Password:
+Successfully installed repeated_auto_complete-0.1.0
+1 gem installed
+Installing ri documentation for repeated_auto_complete-0.1.0...
+Installing RDoc documentation for repeated_auto_complete-0.1.0...</pre>
+
+
+<p>&hellip; and add a call to config.gem in config/environment.rb:</p>
+
+
+<pre>Rails::Initializer.run do |config|
+&hellip;
+  <b>config.gem &quot;repeated_auto_complete&quot;</b>
+&hellip;
+end</pre>
+
+
+<p>&hellip; and view the load path again:</p>
+
+
+<pre>$ ./script/console 
+Loading development environment (Rails 2.3.5)
+&gt;&gt; <b>$LOAD_PATH.each { |path| puts path }; nil</b>
+.../gems/activesupport-2.3.5/lib/active_support/vendor/i18n-0.1.3/lib
+.../gems/activesupport-2.3.5/lib/active_support/vendor/tzinfo-0.3.12
+.../gems/activesupport-2.3.5/lib/active_support/vendor/memcache-client-1.7.4
+/Users/pat/rails-apps/sample/app/controllers/
+/Users/pat/rails-apps/sample/app
+/Users/pat/rails-apps/sample/app/models
+/Users/pat/rails-apps/sample/app/controllers
+/Users/pat/rails-apps/sample/app/helpers
+/Users/pat/rails-apps/sample/lib
+<b>.../gems/repeated_auto_complete-0.1.0/lib</b>
+/Users/pat/rails-apps/sample/vendor
+.../gems/rails-2.3.5/lib/../builtin/rails_info/
+.../gems/rails-2.3.5/lib
+etc&hellip;</pre>
+
+
+<p>In bold I can see the gem&rsquo;s lib folder appear just as the plugin&rsquo;s lib folder did earlier. In fact, it even appears at the same position in the array so classes should be loaded in exactly the same way for a gem as they were for a plugin.</p>
+
+
+<p><b>For a gem, you need to have the expected code file in your lib folder</b></p>
+
+
+<p>This next issue caused me some serious headaches&hellip; hopefully this explanation will save you some time. To explore how gems are loaded by Rails, let&rsquo;s unpack my &ldquo;repeated_auto_complete&rdquo; gem that I just installed above:</p>
+
+
+<pre>$ rake gems:unpack
+(in /Users/pat/rails-apps/sample)
+Unpacked gem: &#x27;/Users/pat/rails-apps/sample/vendor/gems/repeated_auto_complete-0.1.0&#x27;</pre>
+
+
+<p>Now I have a local copy of the gem&rsquo;s code in my vendor/gems directory. Next, let&rsquo;s see what happens when I delete the &ldquo;repeated_auto_complete.rb&rdquo; file from the lib folder &ndash; in other words, the code file with the same name as the gem:</p>
+
+
+<pre>$ rm vendor/gems/repeated_auto_complete-0.1.0/lib/repeated_auto_complete.rb 
+$ ./script/console 
+Loading development environment (Rails 2.3.5)
+no such file to load -- repeated_auto_complete
+/usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:36:in `gem_original_require&#x27;
+/usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:36:in `require&#x27;
+.../gems/activesupport-2.3.5/lib/active_support/dependencies.rb:156:in `require&#x27;
+.../gems/activesupport-2.3.5/lib/active_support/dependencies.rb:521:in `new_constants_in&#x27;
+.../gems/activesupport-2.3.5/lib/active_support/dependencies.rb:156:in `require&#x27;
+<b>.../gems/rails-2.3.5/lib/rails/gem_dependency.rb:208:in `load&#x27;
+.../gems/rails-2.3.5/lib/initializer.rb:307:in `load_gems&#x27;</b>
+.../gems/rails-2.3.5/lib/initializer.rb:307:in `each&#x27;
+.../gems/rails-2.3.5/lib/initializer.rb:307:in `load_gems&#x27;
+.../gems/rails-2.3.5/lib/initializer.rb:164:in `process&#x27;
+.../gems/rails-2.3.5/lib/initializer.rb:113:in `send&#x27;
+.../gems/rails-2.3.5/lib/initializer.rb:113:in `run&#x27;
+/Users/pat/rails-apps/sample/config/environment.rb:9
+etc&hellip;</pre>
+
+
+<p>Now we get an error trying to load the Rails environment! The reason why is simple: when Rails loads each gem specified in the environment.rb file with a call to config.gem, it tries to load a code file with exactly the same name. Let&rsquo;s take a look at <a href="http://github.com/rails/rails/blob/v2.3.5/railties/lib/initializer.rb#L307">line 307 of initializer.rb</a> which appears in the stack trace above:</p>
+
+
+<pre>def load_gems
+  unless $gems_rake_task
+    @configuration.gems.each { |gem| gem.load }
+  end
+end</pre>
+
+
+<p>What&rsquo;s going on here is:
+<ul><li>load_gems is a method of the Rails::Initializer object. This is the class that we refer to in environment.rb.
+<li>@configuration is the configuration object that was yielded to the initializer block in environment.rb&hellip; in order words the value of the &ldquo;config&rdquo; variable that we used in our call to &ldquo;config.gem&rdquo;</li>
+<li>@configuration.gems is an array of GemDependency objects; each one created by a config.gem call. If you&rsquo;re interested, you can see these are created at <a href="http://github.com/rails/rails/blob/v2.3.5/railties/lib/initializer.rb#L811">line 811 in initializer.rb</a>.</li>
+<li>For each GemDependency object Rails calls &ldquo;load.&rdquo;</li></ul></p>
+
+
+<p>Let&rsquo;s take a look at the GemDependency.load method: <a href="http://github.com/rails/rails/blob/v2.3.5/railties/lib/rails/gem_dependency.rb#L208">line 208 in gem_dependency.rb</a>, also in the stack trace above:</p>
+
+
+<pre>def load
+  return if @loaded || @load_paths_added == false
+  <b>require(@lib || name) unless @lib == false</b>
+  @loaded = true
+rescue LoadError
+  puts $!.to_s
+  $!.backtrace.each { |b| puts b }
+end</pre>
+
+
+<p>When the GemDependency object was created earlier, two of its attributes were loaded with values as follows:
+<ul><li>name: this is set to the name of the gem &ndash; &ldquo;repeated_auto_complete&rdquo; in my example</li>
+<li>@lib: this is set to the value of the &ldquo;:lib&rdquo; option provided to the config.gem call.</li></ul></p>
+
+
+<p>So if you read the code above, you&rsquo;ll see that Rails allows for three possible cases when loading a gem:
+<ol><li>config.gem &lsquo;repeated_auto_complete&rsquo; &ndash; in this case Rails will call require &ldquo;repeated_auto_complete&rdquo; and fail if a code file with that name is not present in the load path. This is what just happened to us above.</li>
+<li>config.gem &lsquo;repeated_auto_complete&rsquo;, :lib =&gt; &lsquo;something_else&rsquo;  &ndash; in this case Rails will call require &ldquo;something_else&rdquo; and fail if a code file with that name is not present in the load path.</li>
+<li>config.gem &lsquo;repeated_auto_complete&rsquo;, :lib =&gt; false  &ndash; in this case Rails will not call require at all for this gem.</li></ol></p>
+
+
+<p>Note that for plugins none of this is an issue: Rails simply adds the plugin's lib folder to the load path array and that's it. But when you convert a plugin into a gem, you need to decide which variation of config.gem your users will have to put in environment.rb.</p>
+
+
+<p><b>Init.rb has to move</b></p>
+
+
+<p>The next thing Rails does after loading each plugin or gem is to execute a file called init.rb. If you&rsquo;re the author of a gem or plugin this gives you a chance to initialize your code&hellip; for example to add certain modules you&rsquo;ve written to classes in the application, etc. But as I mentioned at the beginning, if you&rsquo;re writing a gem or converting a plugin into a gem, you need to be sure the init.rb file is located inside a folder called &ldquo;rails.&rdquo; Let&rsquo;s see if we can find out how Rails does this; first let&rsquo;s restore the original gem&rsquo;s code:</p>
+
+
+<pre>$ rm -rf vendor/gems/repeated_auto_complete-0.1.0
+$ rake gems:unpack
+(in /Users/pat/rails-apps/sample)
+Unpacked gem: &#x27;/Users/pat/rails-apps/sample/vendor/gems/repeated_auto_complete-0.1.0&#x27;</pre>
+
+
+<p>And now let&rsquo;s edit the init.rb file, located at vendor/gems/repeated_auto_complete-0.1.0/rails/init.rb:</p>
+
+
+<pre><b>puts caller</b>
+ActionController::Base.send :include, AutoComplete
+ActionController::Base.helper AutoCompleteMacrosHelper
+ActionView::Helpers::FormBuilder.send :include, AutoCompleteFormBuilderHelper</pre>
+
+
+<p>I added the first line in bold: &ldquo;puts caller.&rdquo; This will display a stack trace leading to this file when we startup the sample application:</p>
+
+
+<pre>$ ./script/console 
+Loading development environment (Rails 2.3.5)
+.../gems/rails-2.3.5/lib/rails/plugin.rb:158:in `evaluate_init_rb&#x27;
+.../gems/activesupport-2.3.5/lib/active_support/core_ext/kernel/reporting.rb:11:in `silence_warnings&#x27;
+<b>.../gems/rails-2.3.5/lib/rails/plugin.rb:154:in `evaluate_init_rb&#x27;</b>
+.../gems/rails-2.3.5/lib/rails/plugin.rb:48:in `load&#x27;
+.../gems/rails-2.3.5/lib/rails/plugin/loader.rb:38:in `load_plugins&#x27;
+.../gems/rails-2.3.5/lib/rails/plugin/loader.rb:37:in `each&#x27;
+.../gems/rails-2.3.5/lib/rails/plugin/loader.rb:37:in `load_plugins&#x27;
+.../gems/rails-2.3.5/lib/initializer.rb:369:in `load_plugins&#x27;
+.../gems/rails-2.3.5/lib/initializer.rb:165:in `process&#x27;
+.../gems/rails-2.3.5/lib/initializer.rb:113:in `send&#x27;
+.../gems/rails-2.3.5/lib/initializer.rb:113:in `run&#x27;
+/Users/pat/rails-apps/sample/config/environment.rb:9</pre>
+
+
+<p>This time I&rsquo;ve bolded the &ldquo;plugin.rb&rdquo; file; if you look at <a href="http://github.com/rails/rails/blob/v2.3.5/railties/lib/rails/plugin.rb#L152">line 152 in plugin.rb</a> you&rsquo;ll see this:</p>
+
+
+<pre>def evaluate_init_rb(initializer)
+  if has_init_file?
+    silence_warnings do
+      # Allow plugins to reference the current configuration object
+      config = initializer.configuration
+      eval(IO.read(init_path), binding, init_path)
+    end
+  end
+end</pre>
+
+
+<p>So this just calls &ldquo;eval()&rdquo; on the init.rb file, assuming that &ldquo;init_path&rdquo; indicates the path of this file, executing the plugin&rsquo;s or gem&rsquo;s initialization code. If you poke around a bit inside of <a href="http://github.com/rails/rails/blob/v2.3.5/railties/lib/rails/plugin.rb">plugin.rb</a>, you&rsquo;ll see this code for the Rails:Plugin class, which represents each plugin that Rails finds in your application:</p>
+
+
+<pre>def classic_init_path
+  File.join(directory, &#x27;init.rb&#x27;)
+end
+
+def gem_init_path
+  File.join(directory, &#x27;rails&#x27;, &#x27;init.rb&#x27;)
+end
+
+def init_path
+  File.file?(gem_init_path) ? gem_init_path : classic_init_path
+end</pre>
+
+
+<p>If we read the definition of init_path, we see that it uses either rails/init.rb  or init.rb, whichever it finds first. This seems to indicate that for a Rails plugin, you can place init.rb either in the &ldquo;rails&rdquo; subfolder, or in the main plugin folder, and that it will find and use the copy in the &ldquo;rails&rdquo; folder if you happen to have both.</p>
+
+
+<p>However, for a gem things don&rsquo;t work this way. You can see why if you look down towards the bottom of the <a href="http://github.com/rails/rails/blob/v2.3.5/railties/lib/rails/plugin.rb">plugin.rb</a> file:</p>
+
+
+<pre>class GemPlugin &lt; Plugin
+  # Initialize this plugin from a Gem::Specification.
+  def initialize(spec, gem)
+    directory = spec.full_gem_path
+    super(directory)
+    @name = spec.name
+  end
+  def init_path
+    File.join(directory, &#x27;rails&#x27;, &#x27;init.rb&#x27;)
+  end
+end</pre>
+
+
+<p>It turns out that Rails uses a different class to represent gems, called &ldquo;GemPlugin&rdquo;  (what a confusing name!). In this case we can see that init_path is defined to be the path rails/init.rb and nothing else. This means that gems intended to be used in a Rails application must put their init.rb file in the rails folder.</p>
+
+
+<p>To summarize this logic:
+<ul><li>Rails plugins can place init.rb either in the root plugin folder, or in a subfolder called &ldquo;rails.&rdquo; If they have both, the rails folder copy will be used.</li>
+<li>Rails gems must place their init.rb file in a &ldquo;rails&rdquo; subfolder.</li></ul></p>
+
+
+<p>The actual reason why Rails was implemented this way was that possibly a gem might be used by more than one Ruby framework (e.g. Merb, Sinatra, etc.) and might have different init.rb code for each framework. But a Rails plugin can only be used in a Rails application. Finally, Rails has allowed for plugins to work in the original manner with init.rb in the root folder, or for a plugin to be a gem at the same time, with init.rb in the rails folder.</p>
+
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,109 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Why to use TDD with Drupal - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Why to use TDD with Drupal - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Why to use TDD with Drupal</h1>
+  </header>
+
+  <section class="content">
+    <p><a href="http://drupal.org">Drupal</a> is a very popular Content Management System (CMS) developed using PHP. It’s a great way to get an interactive, community web site such as a blog or discussion forum up and running quickly without writing any code. But Drupal is a poor choice for general, complex web application development for a few simple reasons:
+1. It doesn’t use a standard, general software architecture such as Model-View-Controller (MVC) like Rails or Struts.
+2. Drupal doesn’t employ or support modern development best practices such as <a href="http://en.wikipedia.org/wiki/Test-driven_development">Test Driven Development (TDD)</a> or automated testing more generally. (Exception: the <a href="http://drupal.org/project/simpletest">SimpleTest</a> module can provide some automated integration testing using HTTP without opening a real browser.)
+3. While the module API does allow for some customization, it can be easy to get into trouble if your target application is outside of Drupal’s design center. Specifically, you may end up having to modify Drupal’s core code or database schema when Drupal doesn’t behave the way you would like.</p>
+
+<p>A better choice for more general or complex web development would be Ruby on Rails.</p>
+
+<p>If you do need to develop a custom web application using the Drupal framework, you can avoid problems #2 and #3 by using a test driven approach. Instead of simply implementing your custom logic by writing PHP code to the Drupal module API, try pulling your custom code out of Drupal entirely and running it independently of the framework. This will insure that your custom code could someday be run with another web framework and also help you avoid the temptation of modifying Drupal’s core code directly. Of course, you will also get all of the normal benefits of TDD: better design oriented around business requirements, live documentation through executable code, etc.</p>
+
+<p>How to do this? Write tests first using PHPUnit (which fail), then get your tests to pass by implementing the desired behavior using PHP 5 objected oriented code. Lastly, write a “shell” module that calls out to your test driven object oriented PHP code from Drupal. This means your code will be run twice: once from the command line by PHPUnit during development and from your CI process, and again from Drupal to process end user requests in production.</p>
+
+<p>In a series of future posts I&rsquo;ll write a Drupal module using TDD, using a few tips and tricks along the way to get PHPUnit and Drupal to play together nicely.</p>
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

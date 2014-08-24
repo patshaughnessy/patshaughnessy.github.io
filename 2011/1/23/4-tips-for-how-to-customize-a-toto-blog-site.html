@@ -1,0 +1,306 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="4 tips for how to customize a Toto blog site - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>4 tips for how to customize a Toto blog site - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>4 tips for how to customize a Toto blog site</h1>
+  </header>
+
+  <section class="content">
+    <p>During the week between Christmas and New Year’s I finally took the time to redesign and redeploy this site on Heroku using <a href="https://github.com/cloudhead/toto">Toto</a>, a very simple Rack blog engine. Sorry if I spammed your RSS inbox with duplicate articles.</p>
+
+<p>What makes Toto fantastic is that it includes just enough code to run a very simple blog site&hellip; and nothing else. <a href="https://github.com/cloudhead">Alexis Sellier’s</a> code is concise and elegant; you can see it all in a single Ruby file: <a href="https://github.com/cloudhead/toto/blob/master/lib/toto.rb">toto.rb</a>. It leaves you a clean, blank slate to add anything special or custom you might need. In fact, I chose to use Toto instead of <a href="https://github.com/mojombo/jekyll">Jekyll</a>, <a href="https://github.com/gma/nesta">Nesta</a> or other blog engine alternatives only because it looked like it would be fun to understand how it works and customize it.</p>
+
+<p>Here are 4 tips to keep in mind as you work with Toto, based on my experience building this site:</p>
+
+<ul>
+<li><a href="#tip1">Use bundler instead of a Heroku .gems file</a></li>
+<li><a href="#tip2">Run with Shotgun</a></li>
+<li><a href="#tip3">Use Rack::Rewrite for supporting shortened or obsolete URLs</a></li>
+<li><a href="#tip4">Take the time to learn and use Toto’s Riot/RR test suite</a></li>
+</ul>
+
+
+<h2><a id="tip1"></a>Use bundler instead of a Heroku .gems file</h2>
+
+<p>The best way to get started with Toto is to take a look at the <a href="https://github.com/cloudhead/toto#readme">GitHub readme page</a>. Basically what you do is clone the <a href="https://github.com/cloudhead/dorothy">example blog template</a> called “Dorothy” like this:</p>
+
+<div class="CodeRay"><pre>$ git clone git://github.com/cloudhead/dorothy.git myblog
+$ cd myblog</pre></div>
+
+
+<p>Now you have a super-simple Rack app called “myblog” that you could deploy to Heroku immediately if you wanted to. It comes with a rackup file (config.ru) and also a .gems file that tells Heroku which gems to install:</p>
+
+<div class="CodeRay"><pre>$ cat .gems
+builder
+rdiscount
+toto</pre></div>
+
+
+<p>You can see your new blog site will use builder (to generate the RSS XML feed), rdiscount (to parse the markdown content) and the toto gem, which is the blog engine itself. However, before proceeding I would take a few minutes to add bundler to your app and replace the .gems file with a Gemfile. Besides feeling a bit more modern and similar to Rails 3, using Bundler will make it easy to use a customized Toto gem from your hard drive or your github repo. Here’s how to do it&hellip;</p>
+
+<p>First, in the myblog folder edit config.ru and add the 2 lines at the top that I’ve highlighted:</p>
+
+<div class="CodeRay"><pre><div class='container'>require <span class="s"><span class="dl">'</span><span class="k">bundler</span><span class="dl">'</span></span> 
+<span class="co">Bundler</span>.setup<span class='overlay'></span></div>
+require <span class="s"><span class="dl">'</span><span class="k">toto</span><span class="dl">'</span></span> 
+ 
+<span class="c"># Rack config</span> 
+use <span class="co">Rack</span>::<span class="co">Static</span>, <span class="sy">:urls</span> =&gt; [<span class="s"><span class="dl">'</span><span class="k">/css</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/js</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/images</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/favicon.ico</span><span class="dl">'</span></span>], <span class="sy">:root</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">public</span><span class="dl">'</span></span> 
+use <span class="co">Rack</span>::<span class="co">CommonLogger</span> 
+ 
+etc...</pre></div>
+
+
+<p>And now replace the .gems file</p>
+
+<div class="CodeRay"><pre>$ rm .gems</pre></div>
+
+
+<p>&hellip;with a Gemfile:</p>
+
+<div class="CodeRay"><pre>source <span class="s"><span class="dl">&quot;</span><span class="k">http://rubygems.org</span><span class="dl">&quot;</span></span> 
+ 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">builder</span><span class="dl">&quot;</span></span> 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">rdiscount</span><span class="dl">&quot;</span></span> 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">toto</span><span class="dl">&quot;</span></span>, <span class="sy">:path</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">../customized_toto</span><span class="dl">'</span></span></pre></div>
+
+
+<p>Here along with the builder and rdiscount gems, I’ve indicated to bundler that it should use a copy of Toto on my local hard drive in a folder called “customized_toto.” At this point you should fork the Toto repo on GitHub and clone it on your machine into the “customized_toto” folder for example:</p>
+
+<div class="CodeRay"><pre>$ cd ..
+$ git clone git@github.com:yourname/toto.git customized_toto</pre></div>
+
+
+<p>And finally install the bundle for your blog app:</p>
+
+<div class="CodeRay"><pre>$ cd myblog
+$ bundle install
+Fetching source index for http://rubygems.org/
+Using builder (3.0.0) 
+Using rack (1.2.1) 
+Using rdiscount (1.6.5) 
+Using toto (0.4.9) from source at /Users/pat/apps/customized_toto 
+Using bundler (1.0.0) 
+<span class="s">Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.</span></pre></div>
+
+
+<p>When you’re ready to push your site to Heroku, you will just replace the “:path =>” location with your github repo URL, using the “:git” option. For example, here’s the Gemfile from this site’s Heroku app:</p>
+
+<div class="CodeRay"><pre>source <span class="s"><span class="dl">&quot;</span><span class="k">http://rubygems.org</span><span class="dl">&quot;</span></span> 
+ 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">builder</span><span class="dl">&quot;</span></span> 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">rdiscount</span><span class="dl">&quot;</span></span> 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">toto</span><span class="dl">&quot;</span></span>, <span class="sy">:git</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">https://github.com/patshaughnessy/toto.git</span><span class="dl">'</span></span></pre></div>
+
+
+<p>Heroku now supports bundler, and will automatically run bundle install on the server after you push your blog site there. Without bundler, using different versions of the Toto gem would be much more of a hassle.</p>
+
+<h2><a id="tip2"></a>Run with Shotgun</h2>
+
+<p>Normally you would startup your Toto blog site like any other rack app, with the “rackup” command:</p>
+
+<div class="CodeRay"><pre>$ cd myblog
+$ rackup</pre></div>
+
+
+<p>Rackup will look for config.ru in the current directory, and launch your application on port 9292. However, the problem with this is that the application code is cached between HTTP requests, similar to how a Rails application works in production. If you’re planning on modifying the Toto blog engine code and not just your blog’s content, then you would have to stop and restart the server each time you made a code change.</p>
+
+<p>For development, it’s much more convenient to use Shotgun instead. This is a version of the rackup command that will create an entirely new process for every HTTP request. What this means while you’re working with the Toto code is that you can make any sort of code change you’d like and just refresh your browser to see it work. You don’t need to worry about anything being cached.</p>
+
+<p>You just need to install it, and run “shotgun” instead of “rackup:”</p>
+
+<div class="CodeRay"><pre>$ gem install shotgun
+$ cd myblog
+$ shotgun</pre></div>
+
+
+<p>Now you’ll find your blog at <a href="http://locahost:9393">http://locahost:9393</a> instead of port 9292.</p>
+
+<h2><a id="tip3"></a>Use Rack::Rewrite for supporting shortened or obsolete URLs</h2>
+
+<p>As Dmitry Fadeyev pointed out in his helpful post <a href="http://fadeyev.net/2010/05/10/getting-started-with-toto/">Getting Started With Toto, a Tiny WordPress Killer</a>, if you’re migrating from a different blog engine the <a href="https://github.com/jtrupiano/rack-rewrite">Rack-Rewrite</a> gem by John Trupiano is a great way to redirect URL patterns from your old site into what Toto expects. You can also use it like me to shorten URLs for some posts. Rack-Rewrite is a helpful piece of rack middleware that applies Apache rewrite rules to HTTP requests coming through the Rack stack. This means it can be used to redirect or change URL patterns before they hit the Toto code, and avoid the need to change Toto at all for this purpose.</p>
+
+<p>With bundler it’s very easy to add Rack-Rewrite&hellip; all you need to do is add a line to your Gemfile like this:</p>
+
+<div class="CodeRay"><pre>source <span class="s"><span class="dl">&quot;</span><span class="k">http://rubygems.org</span><span class="dl">&quot;</span></span> 
+ 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">builder</span><span class="dl">&quot;</span></span> 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">rdiscount</span><span class="dl">&quot;</span></span> 
+<span class='container'>gem <span class="s"><span class="dl">&quot;</span><span class="k">rack-rewrite</span><span class="dl">&quot;</span></span><span class='overlay'></span></span>
+gem <span class="s"><span class="dl">&quot;</span><span class="k">toto</span><span class="dl">&quot;</span></span>, <span class="sy">:git</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">https://github.com/yourname/toto.git</span><span class="dl">'</span></span></pre></div>
+
+
+<p>&hellip; and then run bundle install again:</p>
+
+<div class="CodeRay"><pre>$ bundle install
+Using builder (3.0.0) 
+Using rack (1.2.1) 
+<span class='container'>Using rack-rewrite (1.0.2)<span class='overlay'></span></span>
+Using rdiscount (1.6.5) 
+Using toto (0.4.9) from https://github.com/yourname/toto.git (at master) 
+Using bundler (1.0.0) 
+<span class="s">Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.</span></pre></div>
+
+
+<p>You use a simple Ruby DSL in config.ru to specify the rewrite/redirect rules to Rack-Rewrite; here’s an example from my site:</p>
+
+<div class="CodeRay"><pre>
+require <span class="s"><span class="dl">'</span><span class="k">rack/rewrite</span><span class="dl">'</span></span> 
+use <span class="co">Rack</span>::<span class="co">Rewrite</span> <span class="r">do</span> 
+  r301 <span class="s"><span class="dl">'</span><span class="k">/code_buddy</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/2010/12/13/codebuddy-see-your-ruby-stack-come-alive</span><span class="dl">'</span></span> 
+<span class="r">end</span>
+</pre></div>
+
+
+<p>This redirects requests for the “/code_buddy” page to the actual article’s full path. With rack-rewrite I’m able to do this without writing a single line of code.</p>
+
+<h2><a id="tip4"></a>Take the time to learn and use Toto’s Riot/RR test suite</h2>
+
+<p>As I mentioned above, Toto’s source code is very concise and elegant&hellip; an entire blog application in just 200 or 300 lines of code. Toto’s test suite is equally concise and elegant. Alexis Sellier chose to use <a href="https://github.com/thumblemonks/riot">Riot</a>, an alternative to RSpec, and also <a href="https://github.com/btakita/rr">RR</a> for mocking and stubbing. The result is a super fast and effective test suite. To use it you’ll probably just need to install Riot, like this:</p>
+
+<div class="CodeRay"><pre>$ gem install riot
+Fetching: rr-1.0.2.gem (100%)
+Fetching: riot-0.12.1.gem (100%)
+Successfully installed rr-1.0.2
+Successfully installed riot-0.12.1
+2 gems installed</pre></div>
+
+
+<p>Now from your Toto folder (e.g. “customized_toto”) you can run the test suite just by running “rake:”</p>
+
+<div class="CodeRay"><pre>$ rake
+(in /Users/pat/apps/customized_toto)
+All dependencies seem to be installed.
+/Users/pat/.rvm/rubies/ruby-1.8.7-p302/bin/ruby -I"lib:lib:test" "/Users/pat/.rvm/gems/ruby-1.8.7-p302/gems...
+Toto GET /
+  + <span class="s">asserts returns a 200 is equal to 200</span>
+  + <span class="s">asserts body is not empty</span>
+ 
+etc...</pre></div>
+
+
+<p>However, I actually got this exception the first time I started working with the Toto Riot tests:</p>
+
+<div class="CodeRay"><pre>/test/../lib/toto.rb:174:in `to_xml': ./test/../lib/ext/ext.rb:43:in `utc': time out of range (ArgumentError)
+    from ./test/../lib/ext/ext.rb:43:in `iso8601'
+etc...</pre></div>
+
+
+<p>The problem here is that one of the test articles uses a date in the distant past (1900), which Ruby 1.8.7 chokes on&hellip; if you run Ruby 1.9 it will work fine. If you want to use Ruby 1.8.7, you just need to change the test article’s date to something more recent like 1990:</p>
+
+<div class="CodeRay"><pre>$ cd test/articles
+$ git mv 1900-05-17-the-wonderful-wizard-of-oz.txt <span class="container">1990<span class="overlay"></span></span>-05-17-the-wonderful-wizard-of-oz.txt</pre></div>
+
+
+<p>&hellip; and also type the corresponding article date inside the test article file like this:</p>
+
+<div class="CodeRay"><pre>title: The Wonderful Wizard of Oz
+date: 17/05/<span class="container">1990<span class="overlay"></span></span>
+
+_Once upon a time_...</pre></div>
+
+
+<p>&hellip; and you’ll need to update the corresponding test in test/toto_test.rb on line 58 to use the same date:</p>
+
+<div class="CodeRay"><pre>context <span class="s"><span class="dl">&quot;</span><span class="k">GET a single article</span><span class="dl">&quot;</span></span> <span class="r">do</span> 
+  setup { <span class="iv">@toto</span>.get(<span class="s"><span class="dl">&quot;</span><span class="k">/<span class="container">1990<span class="overlay"></span></span>/05/17/the-wonderful-wizard-of-oz</span><span class="dl">&quot;</span></span>) }
+  asserts(<span class="s"><span class="dl">&quot;</span><span class="k">returns a 200</span><span class="dl">&quot;</span></span>)                { topic.status }.equals <span class="i">200</span> 
+  asserts(<span class="s"><span class="dl">&quot;</span><span class="k">content type is set properly</span><span class="dl">&quot;</span></span>) { topic.content_type }.equals <span class="s"><span class="dl">&quot;</span><span class="k">text/html</span><span class="dl">&quot;</span></span> 
+  should(<span class="s"><span class="dl">&quot;</span><span class="k">contain the article</span><span class="dl">&quot;</span></span>)           { topic.body }.includes_html(<span class="s"><span class="dl">&quot;</span><span class="k">p</span><span class="dl">&quot;</span></span> =&gt; <span class="rx"><span class="dl">/</span><span class="k">&lt;em&gt;Once upon a time&lt;em&gt;</span><span class="dl">/</span></span>)
+<span class="r">end</span></pre></div>
+
+
+<p>&hellip; and now the tests should pass. For me I was able to run all 61 tests in 0.15 seconds. But even better is that the slow Rails startup time I’m used to is gone; after typing “rake” the tests run and are finished almost immediately&hellip; another advantage to working with a simple Rack app vs. something more complex such as Rails.</p>
+
+<h2>What next?</h2>
+
+<p>Now that you&rsquo;ve got Bundler setup with your version of Toto and the test suite working, you&rsquo;re ready to add something something new to Toto. Next week, I&rsquo;ll walk through how I added support for tagging/categories of articles, for example to get this page to work: <a href="http://patshaughnessy.net/tags/view-mapper">http://patshaughnessy.net/tags/view-mapper</a></p>
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

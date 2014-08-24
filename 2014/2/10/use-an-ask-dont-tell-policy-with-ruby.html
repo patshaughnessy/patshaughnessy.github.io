@@ -1,0 +1,328 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Use An Ask, Don’t Tell Policy With Ruby - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Use An Ask, Don’t Tell Policy With Ruby - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Use An Ask, Don’t Tell Policy With Ruby</h1>
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
+  <img src="http://patshaughnessy.net/assets/2014/2/10/innisfree.jpg"><br/>
+  <i>Innisfree is an actual island in Lough Gill, County Sligo, Ireland</i>
+</div>
+
+
+<p>The next time you need to develop a new algorithm, ask Ruby for what you want,
+don’t tell it what to do. Don’t think of your code as a series of instructions
+for the computer to follow. Instead, ask Ruby for what you need: Your code
+should state the solution to your problem, even if you’re not sure what that
+solution is yet! Then dive into more and more detail, filling in your
+solution’s gaps as you do. This can lead to a more expressive, functional
+solution that you might not find otherwise.</p>
+
+<p>Too often over the years I’ve written code that consists of instructions for
+the computer to follow. Do this, do that, and then finish by doing this third
+thing. As I write code I imagine I am the computer, in a way, asking myself:
+What do I need to do first to solve this problem? When I decide, this becomes
+the first line of code in my program. Then I continue, writing each line of
+code as another instruction for the computer to follow.</p>
+
+<p>But what does “Ask, Don’t Tell” mean exactly? And how could Ruby possibly know
+the answer when I ask it something? An example will help you understand what I
+mean.</p>
+
+<h2>Parsing a Yeats Poem</h2>
+
+<p>Last week I needed to parse a text file to obtain the lines of text that
+appeared after a certain word. My actual task was very boring (separating blog
+articles from their metadata), so instead let’s work with something more
+beautiful, <em>The Lake Isle Of Innisfree</em>:</p>
+
+<p></p>
+
+
+
+
+<blockquote>
+  I will arise and go now, and go to Innisfree,<br/>
+  And a small cabin build there, of clay and wattles made:<br/>
+  Nine bean-rows will I have there, a hive for the honeybee,<br/>
+  And live alone in the bee-loud glade.<br/>
+  <br/>
+  And I shall have some peace there, for peace comes dropping slow,<br/>
+  Dropping from the veils of the morning to where the cricket sings;<br/>
+  There midnight's all a glimmer, and noon a purple glow,<br/>
+  And evening full of the linnet's wings.<br/>
+  <br/>
+  I will arise and go now, for always night and day<br/>
+  I hear lake water lapping with low sounds by the shore;<br/>
+  While I stand on the roadway, or on the pavements grey,<br/>
+  I hear it in the deep heart's core.<br/>
+</blockquote>
+
+
+<p>My task is to write a Ruby script to return the line that contains a given
+word, along with the following lines:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/console.png"><br/></p>
+
+<h2>Telling Ruby What To Do</h2>
+
+<p>When I first wrote this script, I put myself in the computer’s shoes: What do I
+need to do to find the target word? I started writing instructions for Ruby to
+follow.</p>
+
+<p>First I need to open the file and read in the poem:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/one.png"><br/></p>
+
+<p>Here <span class="code">File#readlines</span> saves all the lines of text into an array, which the <span class="code">parse</span>
+method will process, returning the result in another array. Later I join the
+result lines together and print them out.</p>
+
+<p>How do I implement <span class="code">parse</span>? Again, I imagine that I am the computer, that I am
+Ruby. How do I find the lines that follow <em>glimmer</em>? Well, obviously I need to
+loop through the array looking for the target word.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/two.png"><br/></p>
+
+<p>Once I find the word, I’ll start saving the lines into a new array called
+<span class="code">result</span>. Since I want to save all the following lines and not just the matching
+line, I’ll also use a boolean flag to keep track of whether I’ve already seen
+the target.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/three.png"><br/></p>
+
+<p>What’s wrong with this code? Nothing really. It works just fine, and it’s
+even somewhat idiomatic Ruby. In the past, I would have probably considered
+this done and moved on.</p>
+
+<p>However, I can do better than this. I can ask Ruby for what I want, instead of
+telling Ruby what to do.</p>
+
+<h2>Ask Ruby For What You Want</h2>
+
+<p>Don’t imagine you are the computer. Don’t think about how to solve a problem by
+figuring out what Ruby should do and then writing down instructions for it to
+follow. Instead, start by asking Ruby for the answer.</p>
+
+<p>What should my method return? An array of the lines that appear after the
+target word. To reflect this, I’ll rename my method from <span class="code">parse</span> (telling Ruby
+what to do) to <span class="code">lines_after</span> (asking Ruby for what I want).</p>
+
+<p>This might seem like an unimportant detail, but naming methods is one of the
+most difficult and important things a programmer does. Picking a name for a
+method gives the reader a hint about what the method does, about what your
+intentions were when you wrote it. Think of writing code the same way you would
+think of writing an essay or story. You want your readers to understand what
+you are saying, and to be able to follow along. (You also want them to enjoy
+reading enough that they consider the code to be their own someday.)</p>
+
+<p>To get started I’ll write the new method to return an empty array.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/four.png"><br/></p>
+
+<p>Notice on the left I changed the label from “Instructions:” to “What do I
+want?” This reflects my new way of thinking about the problem.</p>
+
+<p>Now, what does “appear after the target word” mean exactly? It means the lines
+that appear in the array after (and including) the line containing the target.
+Ah… in other words, the <span class="code">lines_after</span> method should return a subset or slice of the
+array. Rewriting the problem in a different way lead me towards a solution I
+hadn&rsquo;t thought of before.</p>
+
+<p>Now I can rewrite the “What do I want?” text like this:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/five.png"><br/></p>
+
+<p>I rewrote what I want from Ruby to be more specific: I want a “portion of the
+array” and I want the portion “including and following the line containing the
+target.” I haven’t written much code yet, but I’ve taken a big step forward in
+how I think about the problem.</p>
+
+<p>On the right, I’ve written code to return a subset of the array,
+<span class="code">lines[target_index..-1]</span>. But my solution is still incomplete; what should
+<span class="code">target_index</span> be?</p>
+
+<p>Thinking about this a bit, it’s easy to see how to find the line containing the
+target string: I can use <span class="code">detect</span> to find the line that includes the target word.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/six.png"><br/></p>
+
+<p>But I’m still not done. I need the index of the line containing the target, not
+the line itself. How can I find <span class="code">target_index</span>? Again, I shouldn’t tell Ruby what
+to do (maybe create a local variable and loop through the lines checking each
+one). Instead, I should ask Ruby for what I need. What do I need? I need the
+index which corresponds to the line containing the target. In other words, I
+need to find (to detect) the target index, not the target line.</p>
+
+<p>Here’s how to do it:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/seven.png"><br/></p>
+
+<p>Here I use Ruby’s <span class="code">detect</span> method to search a range of index values, not lines.
+Inside the block I check whether the line corresponding to each index
+(<span class="code">lines[i]</span>) contains the target. At the bottom I return the correct slice of the
+array if I found the target, or an empty array if I didn’t.</p>
+
+<h2>Learning From Functional Languages</h2>
+
+<p>In my opinion this code is better than what I showed earlier. Why? They both
+work equally well. What’s the difference? Let&rsquo;s take a look at them side-by-side.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/compare.png"><br/></p>
+
+<p>First of all, I have simpler, more terse code. Less code is better. The <span class="code">lines_after</span>
+method contains just 4 lines of code while the <span class="code">parse</span> method
+contains 9. Of course, I could find ways to rewrite <span class="code">parse</span> to use
+fewer lines, but any way you look at it <span class="code">lines_after</span> is simpler than <span class="code">parse</span>.</p>
+
+<p>The <span class="code">parse</span> method contains two local variables which are changed, or <em>mutated</em>, by
+code inside the loop. This makes the method harder to understand. What is the
+value of <span class="code">flag</span>? What about <span class="code">result</span>? To really understand how <span class="code">parse</span> works you
+almost need to simulate the loop inside your head, thinking about how the flag
+and result values change over time.</p>
+
+<p>The <span class="code">lines_after</span> method also contains two local variables. However, they aren’t used
+in the same way &ndash; they aren’t changed as the program runs. The block
+parameter, <span class="code">i</span>, while different each time the block is called, doesn’t change
+inside the block. It’s meaning is clear and unambiguous while that block is
+running. Similarly, the <span class="code">target_index</span> variable is set once to an intermediate
+value, not changed once each time around a loop.</p>
+
+<p>Terse, simple code that doesn’t change values while it is running is the
+hallmark of functional programming languages like Haskell or Clojure. While
+these languages allow you to write concurrent code without using locks, their
+chief benefit is that they encourage (Clojure) or even force you (Haskell) to write simple, terse
+code. Code that asks the computer for what you need, not code that tells the
+computer what to do.</p>
+
+<p>But, as we’ve seen, you don’t need to abandon Ruby to write functional code.</p>
+
+<p><b>Update:</b> Simon Kröger and Josh Cheek both suggested using <span
+  class="code">drop_while</span>, which gives us an even more readable,
+functional solution:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2014/2/10/eight.png"><br/></p>
+
+<p>I also decided to rename the <span class="code">after</span> method to <span
+  class="code">lines_after</span>, based on the comments from TenderGlove and
+John Kary. I agree with them <span class="code">after</span> would make more sense if I
+called it as a method on an object containing the lines (e.g. <span class="code">lines.after</span>). But as a simple
+function like in this example <span class="code">lines_after</span> is more
+expressive.</p>
+
+<p>Thanks guys!</p>
+
+<h2>Learning From Sandi Metz</h2>
+
+<p>In her famous book, <a href="http://www.poodr.com">Practical Object-Oriented Design in Ruby</a>, Sandi Metz
+mentions the Ask, Don’t Tell policy also, but using slightly different words.
+With her brilliant bicycle examples, Sandy shows us in Chapter 4 of
+POODR why we should be <em>Asking for &ldquo;What&rdquo; Instead of Telling &ldquo;How&rdquo;</em>. When you
+send a message to an object, you should ask it for what you want, not tell it
+what to do or make assumptions about how it works internally. Sandi shows us
+how this policy &ndash; along with other important design principles &ndash; helps us write
+classes that are more independent and decoupled one from the other.</p>
+
+<p>The Ask, Don’t Tell policy applies equally well to functional programming and
+object oriented programming. At a lower level, it helps us write more terse,
+functional Ruby methods. Stepping back, it can also help us design object
+oriented applications that are easier to maintain and extend.</p>
+
+<p><b>Update #2:</b> Apparently I’ve (unknowingly) conflated “Ask, Don’t Tell” with the
+“Tell, Don’t Ask,” advice Dave Thomas has been giving us for years to make a
+different but related point about object oriented design.  Dave explains here:
+<a href="http://pragdave.me/blog/2014/02/11/telling-asking-and-the-power-of-jargon/">Telling, Asking, and the Power of
+Jargon</a>.
+He also disagrees with my opinion that the <span
+  class="code">parse_lines</span> example was written in a functional style.</p>
+
+  </section>
+
+</article>
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
+                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
+                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy &mdash; powered by <a href="http://cloudhead.io/toto">Toto</a> &mdash; comments powered by <a href="http://disqus.com">Disqus</a>
+    </div>
+  </div>
+</body>
+</html>
+

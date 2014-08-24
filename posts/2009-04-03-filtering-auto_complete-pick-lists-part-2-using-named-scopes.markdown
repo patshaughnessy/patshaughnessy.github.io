@@ -1,0 +1,146 @@
+title: "Filtering auto_complete pick lists – part 2: using named scopes"
+date: 2009/04/03
+tag: the auto_complete plugin
+
+<p>I just updated my customized version of the auto_complete plugin to allow you to provide a named scope to auto_complete_for, in order to filter the auto_complete pick list options differently than the plugin does by default. The updated code is now on github:</p>
+<p><a href="http://github.com/patshaughnessy/auto_complete">http://github.com/patshaughnessy/auto_complete</a></p>
+<p>This is based on the ideas from <a href="http://patshaughnessy.net/2009/3/14/filtering-auto_complete-pick-lists">my last post</a>, <a href="http://blog.andrewng.com/2008/09/08/autocomplete-with-multiple-related-form-fields-in-rails/">Andrew Ng&rsquo;s original post</a> and <a href="http://www.alexrothenberg.com/2009/03/using-scopes-in-autocomplete-plugin.html">my friend Alex&rsquo;s suggestion</a> to use named scopes instead of manually modifying the find options. Here&rsquo;s an example of how to use it taken from the <a href="http://patshaughnessy.net/2009/1/30/sample-app-for-auto-complete-on-a-complex-form">auto_complete sample app I posted in January</a>:</p>
+<p>
+  <ol>
+    <li>Add a named scope to your target model: For example suppose tasks belong to projects and have a named scope &ldquo;by_project&rdquo; which joins on the projects table and returns the tasks belonging to the project with the given name:<pre>class Task &lt; ActiveRecord::Base
+  belongs_to :project
+  named_scope :by_project,
+    lambda { |project_name| {
+      :include =&gt; :project,
+      :conditions =&gt; [ &quot;projects.name = ?&quot;, project_name ]
+    } }
+end</pre></li>
+    <li>In the controller, pass a block to auto_complete_for to specify that a named scope should be used to generate the competion options. Here the &ldquo;by_project&rdquo; named scope will be used to handle the task auto complete requests, using the &ldquo;project&rdquo; HTTP parameter:<pre>auto_complete_for :task, :name do | items, params |
+  items.by_project(params[&#x27;project&#x27;])
+end</pre></li>
+  <li>In the view, optionally specify additional parameters you might want to pass into your named scope: in my sample app I have a field called &ldquo;project_name&rdquo; elsewhere on my form:<pre>&lt;% fields_for_task task do |f| -%&gt;
+  &hellip;
+  &lt;%= f.text_field_with_auto_complete :task,
+        :name,
+        {},
+        {
+          :method =&gt; :get,
+          :with =&gt;&quot;value + &#x27;&amp;project=&#x27; + $F(&#x27;project_name&#x27;)&quot;
+        } %&gt;
+  &hellip;
+  &lt;% end -%&gt;</pre></li>
+  </ol>
+</p>
+<p>So how does this work? Let&rsquo;s take a look at my new implementation of auto_complete_for:</p>
+<pre>def auto_complete_for(object, method, options = {})
+  define_method(&quot;auto_complete_for_#{object}_#{method}&quot;) do
+    model = object.to_s.camelize.constantize
+    find_options = { 
+      :conditions =&gt; [ &quot;LOWER(#{model.quoted_table_name}.#{method}) LIKE ?&quot;,
+        &#x27;%&#x27; + params[object][method].downcase + &#x27;%&#x27; ], 
+      :order =&gt; &quot;#{model.quoted_table_name}.#{method} ASC&quot;,
+      :limit =&gt; 10 }.merge!(options)
+    <b>@items = model.scoped(find_options)
+    @items = yield(@items, params) if block_given?</b>
+    render :inline =&gt; &quot;&lt;%= auto_complete_result @items, &#x27;#{method}&#x27; %&gt;&quot;
+  end
+end</pre>
+<p>One minor change I made here was to call &ldquo;quoted_table_name&rdquo; on the given model to specify the table name in the SQL generated to retrieve the auto complete results later. This was needed in case, like in <a href="http://patshaughnessy.net/2009/1/30/sample-app-for-auto-complete-on-a-complex-form">my sample application</a>, the controller specifies a named scope that joins with another table containing columns with the same name as the target model. If this isn&rsquo;t the case, adding the table name to the SQL is harmless.</p>
+<p>However, the most important 2 lines here are in bold: first we call a function called &ldquo;scoped&rdquo; to create an anonymous named scope based on the default auto_complete options &ldquo;find_options:&rdquo;</p>
+<pre>@items = model.scoped(find_options)</pre>
+<p>The exciting thing about this line, which <a href="http://www.alexrothenberg.com/2009/03/using-scopes-in-autocomplete-plugin.html">Alex explained in his blog post</a>, is that the use of named scopes delays the corresponding SQL statement from being executed until later when we actually access the query results in auto_complete_result. What happens instead is that an ActiveRecord:: NamedScope::Scope object is created, containing a temporary cache of the find options.</p>
+<p>A good way to understand how this works is to try it in the Rails console:</p>
+<pre>complex-form-examples pat$ ./script/console 
+Loading development environment (Rails 2.1.0)
+&gt;&gt; find_options = { 
+?&gt;   :conditions =&gt; [ &quot;LOWER(`tasks`.name) LIKE ?&quot;, &#x27;%t%&#x27; ], 
+?&gt;   :order =&gt; &quot;`tasks`.name ASC&quot;,
+?&gt;   :limit =&gt; 10 }
+=&gt; {:order=&gt;&quot;name ASC&quot;, :conditions=&gt;[&quot;LOWER(name) LIKE ?&quot;, &quot;%t%&quot;], :limit=&gt;10}
+&gt;&gt; Task.scoped(find_options)
+=&gt; [#&lt;Task id: 4, project_id: 2, name: &quot;Task 2a&quot;, due_at: nil, created_at: &quot;2009-04-02 16:21:54&quot;,
+updated_at: &quot;2009-04-02 16:21:54&quot;&gt;, #&lt;Task id: 5, project_id: 2, name: &quot;Task 2b&quot;, due_at: nil,
+created_at: &quot;2009-04-02 16:21:54&quot;, updated_at: &quot;2009-04-02 16:21:54&quot;&gt;, #&lt;Task id: 6, project_id: 2,
+name: &quot;Task 2c&quot;, due_at: nil, created_at: &quot;2009-04-02 16:21:54&quot;, updated_at: &quot;2009-04-02
+16:21:54&quot;&gt;, #&lt;Task id: 1, project_id: 1, name: &quot;Task One&quot;, due_at: nil, created_at: &quot;2009-04-02
+16:21:30&quot;, updated_at: &quot;2009-04-02 16:21:30&quot;&gt;, #&lt;Task id: 3, project_id: 1, name: &quot;Task
+Three&quot;, due_at: nil, created_at: &quot;2009-04-02 16:21:30&quot;, updated_at: &quot;2009-04-02 16:21:30&quot;&gt;,
+#&lt;Task id: 2, project_id: 1, name: &quot;Task Two&quot;, due_at: nil, created_at: &quot;2009-04-02 16:21:30&quot;,
+updated_at: &quot;2009-04-02 16:21:30&quot;&gt;]</pre>
+<p>Wait a minute! I thought the actual SQL execution was delayed by named scopes until I needed to access the results? Here the console has already displayed the query results, so the SQL statement must have been executed already. How and why did this happen? In this case, when you enter an expression into the Rails console and press ENTER, the expression is evaluated and then the &ldquo;inspect&rdquo; method is called on it. The problem is that the named scopes implementation has delegated the &ldquo;inspect&rdquo; method to another method, which executes the SQL statement and loads the query results.</p>
+<p>We can use a trick in the console to open the ActiveRecord::NamedScope::Scope class and override the inspect method so the SQL is not executed, and prove to ourselves that &ldquo;scoped()&rdquo; actually does return a named scope object without executing the SQL statement:</p>
+<pre>&gt;&gt; module ActiveRecord
+&gt;&gt; module NamedScope
+&gt;&gt; class Scope
+&gt;&gt; def inspect
+&gt;&gt;   super # Avoids calling ActiveRecord::Base.find and calls Object.inspect
+&gt;&gt; end
+&gt;&gt; end
+&gt;&gt; end
+&gt;&gt; end
+=&gt; nil
+&gt;&gt; Task.scoped(find_options)
+=&gt; #&lt;ActiveRecord::NamedScope::Scope:0x21e65d4
+      @proxy_options={:conditions=&gt;[&quot;LOWER(`tasks`.name) LIKE ?&quot;, &quot;%t%&quot;],
+          :order=&gt;&quot;`tasks`.name ASC&quot;, :limit=&gt;10},
+      @proxy_scope=Task(id: integer, project_id: integer, name: string,
+          due_at: datetime, created_at: datetime, updated_at: datetime)&gt;</pre>
+<p>So here we can see that &ldquo;scoped&rdquo; returns an ActiveRecord::NamedScope::Scope object, and that it has two interesting instance variables: proxy_scope and proxy_options. The first of these, proxy_options, contains the find options that were passed into the scoped() function, or into the &ldquo;named_scope&rdquo; declaration in your model. The second value, proxy_scope, indicates the parent scope or context in which this named scope object&rsquo;s SQL statement should be run. In this example, that is the Task model itself. The named scope object is essentially a cache of the query options that will be user later when the query is executed.</p>
+<p>Let&rsquo;s see how this works in the auto_complete plugin. Back again to the new implementation of auto_complete_for, we have:</p>
+<pre>@items = model.scoped(find_options)
+@items = yield(@items, params) if block_given?</pre>
+<p>The first line generates a ActiveRecord::NamedScope::Scope object, which is then passed into the block provided by the controller code, if any. Let&rsquo;s take a look at my sample app&rsquo;s implementation of the controller:</p>
+<pre>auto_complete_for :task, :name do | items, params |
+  items.by_project(params[&#x27;project&#x27;])
+end</pre>
+<p>This is a good example of the second very cool feature of named scopes: that they are composable&hellip; in other words, that two or more named scopes can be combined together to form a single SQL statement that is executed only once! Let&rsquo;s return to the same Rails console session with our redefined &ldquo;inspect&rdquo; method and see if we can understand a bit more about this:</p>
+<pre>&gt;&gt; Task.scoped(find_options).by_project &#x27;Project One&#x27;
+=&gt; #&lt;ActiveRecord::NamedScope::Scope:0x21d1864
+  @proxy_options={
+    :conditions=&gt;[&quot;projects.name = ?&quot;, &quot;Project One&quot;],
+    :include=&gt;:project},
+  @proxy_scope=
+    #&lt;ActiveRecord::NamedScope::Scope:0x21d1a30
+      @proxy_options={
+        :conditions=&gt;[&quot;LOWER(`tasks`.name) LIKE ?&quot;, &quot;%t%&quot;],
+        :order=&gt;&quot;`tasks`.name ASC&quot;,
+        :limit=&gt;10},
+      @proxy_scope=Task(id: integer, project_id: integer, name: string, due_at: datetime, created_at: datetime, updated_at: datetime)
+    &gt;
+  &gt;</pre>
+<p>Now we can see that calling scoped(find_options).by_project just returns a chain of two named scopes: the first scope object with @proxy_scope set to the second one, and the second one with @proxy_scope set to the base model class. Later when this SQL query is executed, the code in NamedScope and ActiveRecord::Base will simply walk this chain of objects, accumulate the options into a single hash, convert the hash to SQL and execute it.</p>
+<p>In auto_complete_for after the controller&rsquo;s block returns, the &ldquo;@items&rdquo; value in auto_complete_for above is set to the parent/child named scope chain of objects, and then passed into auto_complete_result:</p>
+<pre>render :inline =&gt; &quot;&lt;%= auto_complete_result @items, &#x27;#{method}&#x27; %&gt;&quot;</pre>
+<p>Inside of auto_complete_result the @items value is used as if it were an array&hellip; like this:</p>
+<pre>def auto_complete_result(entries, field, phrase = nil)
+  return unless entries
+  items = entries.map { |entry|
+    content_tag(&quot;li&quot;,
+                phrase ? highlight(entry[field], phrase) : h(entry[field]))
+  }
+  content_tag(&quot;ul&quot;, items.uniq)
+end</pre>
+<p>&hellip; to generate the HTML needed for the Prototype library&rsquo;s implementation of the auto complete drop down box. The interesting thing here is that the SQL statement is executed as soon as the call to &ldquo;map&rdquo; is executed, accessing the elements of the &ldquo;@items&rdquo; array. This works because the ActiveRecord::NamedScope::Scope class redirects or delegates the [] and other array methods to ActiveRecord::Base.find. Here's the single SQL that is executed with the combined, accumulated query options:</p>
+<pre>SELECT `tasks`.`id` AS t0_r0, `tasks`.`project_id` AS t0_r1,
+  `tasks`.`name` AS t0_r2, `tasks`.`due_at` AS t0_r3,
+  `tasks`.`created_at` AS t0_r4, `tasks`.`updated_at` AS t0_r5,
+  `projects`.`id` AS t1_r0, `projects`.`name` AS t1_r1,
+  `projects`.`created_at` AS t1_r2, `projects`.`updated_at` AS t1_r3
+FROM `tasks`
+LEFT OUTER JOIN `projects` ON `projects`.id = `tasks`.project_id
+WHERE ((projects.name = 'Project One') AND
+  (LOWER(`tasks`.name) LIKE '%t%'))
+ORDER BY `tasks`.name ASC LIMIT 10</pre>
+<p>In fact, in the original version of the auto_complete plugin before my changes to it for named scopes, the value passed into auto_complete_result <i>was</i> a simple array. The fact that named scopes are used now is entirely hidden from this code!</p>
+<p>One last note here about named scope: as described in a comment in named_scope.rb from the Rails source code, the &ldquo;proxy_options&rdquo; method provides a convenient way to test the behavior of named scopes without actually checking the results of an actual SQL query. Here&rsquo;s one of the tests I wrote for my new version of auto_complete_for:</p>
+<pre>def test_default_auto_complete_for
+  get :auto_complete_for_some_model_some_field,
+      :some_model =&gt; { :some_field =&gt; &quot;some_value&quot; }
+  default_auto_complete_find_options = @controller.items.proxy_options
+  assert_equal &quot;`some_models`.some_field ASC&quot;, 
+               default_auto_complete_find_options[:order]
+  assert_equal 10, default_auto_complete_find_options[:limit]
+  assert_equal [&quot;LOWER(`some_models`.some_field) LIKE ?&quot;, &quot;%some_value%&quot;],
+               default_auto_complete_find_options[:conditions]
+end</pre>
+<p>Since I didn&rsquo;t want to go to the trouble of setting up an actual in-memory database using SQLite, or to introduce mocha or some other mocking framework to the auto_complete tests, all I had to do was just call @controller.items.proxy_options and check that the find options are as expected. (I also had to expose &ldquo;items&rdquo; in the mock controller using attr_reader.) I have another test that checks that the controller&rsquo;s block is called and it&rsquo;s named scope options are present as expected&hellip; this test uses the proxy_scope method to walk up the chain to the parent named scope and get it&rsquo;s proxy_options. See <a href="http://github.com/patshaughnessy/auto_complete/blob/f2703895ab7ae0748152557c3e5738a4e83ca9ee/test/auto_complete_test.rb">auto_complete_test.rb</a> for details.</p>
