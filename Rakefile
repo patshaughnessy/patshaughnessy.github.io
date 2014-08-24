@@ -1,4 +1,5 @@
 require './lib/post'
+require './lib/home_page'
 require './lib/layout'
 require 'rake/testtask'
 
@@ -19,7 +20,13 @@ html_files.zip(posts, markdown_files).each do |html, post, markdown|
 end
 
 task :posts => html_files
-task :home_page
+
+file 'index.html' => markdown_files do
+  home_page = HomePage.new(posts)
+  Layout.new(home_page).render_to('index.html')
+end
+task :home_page => 'index.html'
+
 task :feed
 
 task :default => [:posts, :home_page, :feed]

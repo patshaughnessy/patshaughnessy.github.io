@@ -3,10 +3,10 @@ require 'pathname'
 
 class Layout
 
-  attr_reader :post
+  attr_reader :page
 
-  def initialize(post)
-    @post = post
+  def initialize(page)
+    @page = page
   end
 
   def render_to(path)
@@ -18,12 +18,12 @@ class Layout
 
   def contents
     erb('layout') do
-      erb('article')
+      erb(page.class.to_s.downcase)
     end
   end
 
   def erb(template)
-    post.instance_eval { ERB.new(File.read("erb/#{template}.erb")).result(binding) }
+    page.instance_eval { ERB.new(File.read("erb/#{template}.erb")).result(binding) }
   end
 
 end

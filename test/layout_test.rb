@@ -11,7 +11,7 @@ class Layout
       template.must_equal 'layout'
       '[OUTER_HTML]' + yield
     else
-      template.must_equal 'article'
+      template.must_equal 'post'
       '[INNER_HTML]'
     end
   end
@@ -32,8 +32,8 @@ describe Layout do
   let(:layout) { Layout.new(post) }
   let(:output_file) { Pathname.new(__FILE__).dirname.join('support/erb_output_dir/erb_output.html') }
 
-  it 'has a post' do
-    layout.post.must_equal post
+  it 'has a page' do
+    layout.page.must_equal post
   end
 
   it 'creates the directory containing the output file' do
@@ -44,20 +44,20 @@ describe Layout do
     output_file.dirname.exist?.must_equal true
   end
 
-  it 'renders the layout and expects it to yield to render the article' do
+  it 'renders the layout and expects it to yield to render the post' do
     layout.contents.must_equal '[OUTER_HTML][INNER_HTML]'
   end
 
   it 'passes the contents of template to ERB and returns the result' do
     compiled_erb = mock
-    ERB.expects(:new).with(File.read('erb/article.erb')).returns(compiled_erb)
+    ERB.expects(:new).with(File.read('erb/post.erb')).returns(compiled_erb)
     compiled_erb.expects(:result).returns("HTML")
-    layout.erb_orig('article').must_equal "HTML"
+    layout.erb_orig('post').must_equal "HTML"
   end
 
   it 'passes the proper binding to ERB' do
     ERB.expects(:new).returns(CompiledErb.new)
-    layout.erb_orig('article')
+    layout.erb_orig('post')
   end
 
 end
