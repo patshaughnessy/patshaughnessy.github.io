@@ -2,7 +2,7 @@ title: "ReliefHub hackfest: helping orphanages in Haiti"
 date: 2010/11/1
 
 <p>Last month I had a very unique experience: I took a week off from my day job to work with a team of volunteers to build &ldquo;ReliefHub,&rdquo; an online charity site designed to help orphanages in Haiti. It&rsquo;s still unfinished, but here&rsquo;s what the site looks like right now:</p>
-<p><img src="/images/reliefhub1.png"></p>
+<p><img src="/assets/images/reliefhub1.png"></p>
 <p>After the terrible earthquake in January 2010, Rousseau Aurelien and James McElhiney started ReliefHub with this mission:</p>
 <blockquote>ReliefHub is dedicated to working with orphanages around the world to help perpetuate their effectiveness and provide a foundation for gathering the resources they require to continue to care for millions of orphans and abandoned children.</blockquote>
 <p>Initially the site will help orphanages in Haiti, but may expand it’s scope in the future. We’ve also put the <a href="http://github.com/ReliefHub/reliefhub">source code on github</a> and hope that someday it can become a general open source platform for online charities.</p>

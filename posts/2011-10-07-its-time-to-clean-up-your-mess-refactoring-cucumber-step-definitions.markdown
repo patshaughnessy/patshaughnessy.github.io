@@ -78,7 +78,7 @@ end
 
 To browse through all of the available Capybara Rspec matches, just take a look at [lib/capbyara/rspec/matchers.rb](https://github.com/jnicklas/capybara/blob/master/lib/capybara/rspec/matchers.rb). Here are some examples: have_checkbox, have_field, have_table, have_selector, etc.
 
-<span class="reminder"><img class="tip-image" src="/images/tip.png">Tip: remember to DRY up your step code</span>
+<span class="reminder"><img class="tip-image" src="/assets/images/tip.png">Tip: remember to DRY up your step code</span>
 
 Another good way to improve your step code is to move commonly used selectors into shared utility methods. That way you can DRY up the step code and reduce the number of place where you depend on CSS class names or other user interface details. In my example, I might want to refer to the “right click” button in a few different steps. In that case I could just write a new method like this:
 
@@ -124,7 +124,7 @@ end
 
 This allows you to scope your CSS or XPath selectors to a specified area of the HTML page you’re testing. It’s a great way to break up complex CSS selector strings like this.
 
-<span class="reminder"><img class="tip-image" src="/images/tip.png">Tip: remember to DRY up your step code</span>
+<span class="reminder"><img class="tip-image" src="/assets/images/tip.png">Tip: remember to DRY up your step code</span>
 
 We can DRY this up a bit more by writing a custom “within” method. If and when the HTML ID attribute changes, I’ll just need to update one line of code. It’s likely that I’m going to write a few different steps to test this content area in different ways, all in the same step file. For example, I could write a method called “within_the_file_container:”
 
