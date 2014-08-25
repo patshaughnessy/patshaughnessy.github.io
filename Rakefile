@@ -15,15 +15,14 @@ html_files = posts.map {|post| ".#{post.url}.html" }
 
 html_files.zip(posts, markdown_files).each do |html, post, markdown|
   file html => markdown do
-    Layout.new(post).render_to(html)
+    Layout.new(posts).render(post, html)
   end
 end
-
 task :posts => html_files
 
 file 'index.html' => markdown_files do
   home_page = HomePage.new(posts)
-  Layout.new(home_page).render_to('index.html')
+  Layout.new(posts).render(home_page, 'index.html')
 end
 task :home_page => 'index.html'
 

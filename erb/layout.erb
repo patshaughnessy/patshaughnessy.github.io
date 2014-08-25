@@ -72,10 +72,9 @@
             <div class="header">Recent</div>
             <div class="links">
               <ul>
-                <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
-                <li><a href="/2014/1/24/ruby-multiplies-like-a-fourth-grader">Ruby Multiplies Like a Fourth Grader</a></li>
-                <li><a href="/2014/1/9/how-big-is-a-bignum">How Big is a Bignum?</a></li>
-                <li><a href="/2013/12/4/three-rubyconf-surprises">Three RubyConf Surprises</a></li>
+                <% recent_posts.each do |recent| %>
+                  <li><a href="<%= recent.url %>"><%= recent.title %></a></li>
+                <% end %>
               </ul>
             </div>
             <div class="header"><a href="/">More...</a></div>

@@ -3,26 +3,27 @@ require 'pathname'
 
 class Layout
 
-  attr_reader :page
+  attr_reader :posts
 
-  def initialize(page)
-    @page = page
+  def initialize(posts)
+    @posts = posts
   end
 
-  def render_to(path)
+  def render(page, path)
     puts "Rendering: #{path}"
     output = Pathname.new(path)
     output.dirname.mkpath
-    output.write(contents)
+    output.write(contents(page))
   end
 
-  def contents
-    erb('layout') do
-      erb(page.class.to_s.downcase)
+  def contents(page)
+    erb('layout', page) do
+      erb(page.class.to_s.downcase, page)
     end
   end
 
-  def erb(template)
+  def erb(template, page)
+    recent_posts = posts.reverse[0..3]
     page.instance_eval { ERB.new(File.read("erb/#{template}.erb")).result(binding) }
   end
 
