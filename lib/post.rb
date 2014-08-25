@@ -27,6 +27,10 @@ class Post
     html.sub('DELIM', '')
   end
 
+  def summary
+    body_html[0..400]
+  end
+
   def headers
     header_lines.map {|line| line.split(':') }.reduce({}) do |headers, key_value|
       add_header(headers, key_value) if key_value.size > 1

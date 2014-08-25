@@ -147,4 +147,28 @@ interesting example and allows us to compare apples with apples.</p>
 HTML
   end
 
+  it 'returns the first 400 chars as the summary' do
+    summary = <<HTML
+<div style=\"float: left; padding: 7px 30px 10px 0px\">
+  <img src=\"http://patshaughnessy.net/assets/2013/6/3/python-cropped.png\">
+</div>
+
+
+
+
+<p>&nbsp;</p>
+
+
+<blockquote>
+  “Ruby is designed to make programmers happy.” - Yukihiro “Matz” Matsumoto
+</blockquote>
+
+
+<p>Not everyone might agree, but as a Rubyist I think Matz achieved his design
+goal. There’s something intangible about Ruby’s syntax that m
+HTML
+    post.summary.must_equal summary.chomp
+  end
+
+
 end

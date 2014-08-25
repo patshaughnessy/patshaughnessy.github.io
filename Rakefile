@@ -1,5 +1,6 @@
 require './lib/post'
 require './lib/home_page'
+require './lib/feed'
 require './lib/layout'
 require 'rake/testtask'
 
@@ -26,6 +27,9 @@ file 'index.html' => markdown_files do
 end
 task :home_page => 'index.html'
 
-task :feed
+file 'index.xml' => markdown_files do
+  Feed.new(posts).render('index.xml')
+end
+task :feed => 'index.xml'
 
 task :default => [:posts, :home_page, :feed]
