@@ -3,7 +3,7 @@
   <h1><%= title %></h1>
   <% unless ENV['DRAFT'] %>
     <div class="metadata">
-    <span class="date"><%= formatted_date %></span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net<%= url %>" class="date">&nbsp; Comments and &nbsp; Reactions</a><% if (tag = headers[:tag]) %>&nbsp;&mdash;&nbsp;<a href="/tags/<%= tag.slugize %>" class="tag">more on <%= tag %></a><% end %><br/>
+    <span class="date"><%= formatted_date %></span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net<%= url %>" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
     <% if date > Date.new(2010, 5, 1) || date == Date.new(2009, 6, 15) %>
       <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="<%= title.gsub(" - Pat Shaughnessy", '') %>">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
     <% end %>
