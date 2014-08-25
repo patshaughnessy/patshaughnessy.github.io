@@ -1,5 +1,6 @@
 title: "What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?"
 date: 2014/1/30
+url: /2014/1/30/what-does-f-x-f-x-a-a-b-b-mean
 
 This week I’ve been spending some free time between projects working on my
 function programming skills. I’m a Ruby developer but have always been

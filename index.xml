@@ -801,8 +801,8 @@ He also disagrees with my opinion that the &lt;span
   </entry>
   <entry>
     <title>What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</title>
-    <link href="http://patshaughnessy.net/2014/1/30/what-does--f----x---f-x--a---a--b---b-mean" rel="alternate"/>
-    <id>http://patshaughnessy.net/2014/1/30/what-does--f----x---f-x--a---a--b---b-mean</id>
+    <link href="http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean" rel="alternate"/>
+    <id>http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean</id>
     <published>2014-01-30T01:00:00Z</published>
     <updated>2014-01-30T01:00:00Z</updated>
     <category>ruby</category>
