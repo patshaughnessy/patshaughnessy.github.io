@@ -39,7 +39,7 @@
   </header>
 
   <section class="content">
-    <p>In <a href="http://patshaughnessy.net/2008/12/9/example-drupal-module-to-use-for-tdd-demonstration">my previous post</a> I wrote some typical Drupal code that lists nodes containing a given word in their title. In some upcoming posts I&rsquo;ll rewrite that module using Test Driven Development and see whether the module turns out differently. But to get started with TDD in Drupal we need to be able to write our first test. Before we can even do that we need to install <a href="http://www.phpunit.de">PHPUnit</a>. Once you have PHPUnit installed, test that it is working properly by writing a trivial test file called <a href="http://patshaughnessy.net/code/drupal-tdd-1/FirstTest.php.txt">FirstTest.php</a> somewhere on your hard drive:</p>
+    <p>In <a href="http://patshaughnessy.net/2008/12/9/example-drupal-module-to-use-for-tdd-demonstration">my previous post</a> I wrote some typical Drupal code that lists nodes containing a given word in their title. In some upcoming posts I&rsquo;ll rewrite that module using Test Driven Development and see whether the module turns out differently. But to get started with TDD in Drupal we need to be able to write our first test. Before we can even do that we need to install <a href="http://www.phpunit.de">PHPUnit</a>. Once you have PHPUnit installed, test that it is working properly by writing a trivial test file called <a href="http://patshaughnessy.net/assets/code/drupal-tdd-1/FirstTest.php.txt">FirstTest.php</a> somewhere on your hard drive:</p>
 
 
 <pre>&lt;?php
@@ -66,7 +66,7 @@ OK (1 test)</pre>
 <p>If you get errors running this command then review the <a href="http://www.phpunit.de/manual/3.3/en/installation.html">install instructions for PHPUnit</a> and install it again if necessary.</p>
 
 
-<p>Next: how do we apply PHPUnit to Drupal? Let&rsquo;s create a new module folder, and an &ldquo;info&rdquo; file in it so Drupal knows what our new module is called: &ldquo;tdd&rdquo; for example. So we create a folder drupal/modules/tdd and a <a href="http://patshaughnessy.net/code/drupal-tdd-1/tdd.info">tdd.info</a> file in this folder that contains:</p>
+<p>Next: how do we apply PHPUnit to Drupal? Let&rsquo;s create a new module folder, and an &ldquo;info&rdquo; file in it so Drupal knows what our new module is called: &ldquo;tdd&rdquo; for example. So we create a folder drupal/modules/tdd and a <a href="http://patshaughnessy.net/assets/code/drupal-tdd-1/tdd.info">tdd.info</a> file in this folder that contains:</p>
 
 
 <pre>name = tdd
@@ -76,7 +76,7 @@ version = VERSION
 core = 6.x</pre>
 
 
-<p>Now let&rsquo;s write our first test. PHPUnit convention is that if you have a PHP class called XYZ, you would write a test class for it called XYZTests, and by default place the test class in XYZTests.php in the same folder. Since we&rsquo;re using Drupal and don&rsquo;t have any object oriented code, let&rsquo;s just call our test class TddTests, named after our new module, and put it into a new file in the same folder called <a href="http://patshaughnessy.net/code/drupal-tdd-1/TddTests.php.1.txt">TddTests.php</a>. It needs to be a subclass of PHPUnit_Framework_TestCase like this:</p>
+<p>Now let&rsquo;s write our first test. PHPUnit convention is that if you have a PHP class called XYZ, you would write a test class for it called XYZTests, and by default place the test class in XYZTests.php in the same folder. Since we&rsquo;re using Drupal and don&rsquo;t have any object oriented code, let&rsquo;s just call our test class TddTests, named after our new module, and put it into a new file in the same folder called <a href="http://patshaughnessy.net/assets/code/drupal-tdd-1/TddTests.php.1.txt">TddTests.php</a>. It needs to be a subclass of PHPUnit_Framework_TestCase like this:</p>
 
 
 <pre>&lt;?php
@@ -101,7 +101,7 @@ Fatal error: Call to undefined function tdd_help() in
 /Users/pat/htdocs/drupal/modules/tdd/TddTests.php on line 6</pre>
 
 
-<p>Obviously the test fails because we haven&rsquo;t written our new module yet. This seems like a waste of time, but we've taken the first step in the TDD cycle: write a failing unit test. Now let's start writing <a href="http://patshaughnessy.net/code/drupal-tdd-1/tdd.module">tdd.module</a>:</p>
+<p>Obviously the test fails because we haven&rsquo;t written our new module yet. This seems like a waste of time, but we've taken the first step in the TDD cycle: write a failing unit test. Now let's start writing <a href="http://patshaughnessy.net/assets/code/drupal-tdd-1/tdd.module">tdd.module</a>:</p>
 
 
 <pre>&lt;?php
@@ -124,7 +124,7 @@ function tdd_help($path, $arg) {
 drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);</pre>
 
 
-<p>If we copy these 2 lines into <a href="http://patshaughnessy.net/code/drupal-tdd-1/TddTests.php.2.txt">TddTests.php</a> like this:</p>
+<p>If we copy these 2 lines into <a href="http://patshaughnessy.net/assets/code/drupal-tdd-1/TddTests.php.2.txt">TddTests.php</a> like this:</p>
 
 
 <pre>&lt;?php
@@ -223,7 +223,7 @@ OK (1 test)</pre>
                 
                   <li><a href="/2014/2/10/use-an-ask-dont-tell-policy-with-ruby">Use An Ask, Don’t Tell Policy With Ruby</a></li>
                 
-                  <li><a href="/2014/1/30/what-does--f----x---f-x--a---a--b---b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                  <li><a href="/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
                 
               </ul>
             </div>

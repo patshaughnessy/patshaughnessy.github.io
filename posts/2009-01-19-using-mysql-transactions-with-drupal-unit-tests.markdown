@@ -45,7 +45,7 @@ class TestDataExampleTest2 extends PHPUnit_Framework_TestCase
   }
 }
 ?&gt;</pre>
-<p>In this example, I use the <a href="http://patshaughnessy.net/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> file I wrote in my last post to clear out and setup a new Drupal schema each time I run the tests. Even though I have a clean test database each time I run PHPUnit, without using transactions one of these two unit tests will fail since each one creates its own test data, and assumes no other test data exist in the node table:</p>
+<p>In this example, I use the <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> file I wrote in my last post to clear out and setup a new Drupal schema each time I run the tests. Even though I have a clean test database each time I run PHPUnit, without using transactions one of these two unit tests will fail since each one creates its own test data, and assumes no other test data exist in the node table:</p>
 <pre>$ phpunit TestDataExampleTest2
           modules/test_data_module/TestDataExampleTest2.php 
 PHPUnit 3.2.21 by Sebastian Bergmann.
@@ -77,7 +77,7 @@ Tests: 2, Failures: 1.</pre>
 <p>Wait&hellip; what happened? It failed!</p>
 <p>The problem is that MySQL does not support transactions using the MyISAM database engine, which is what Drupal uses by default. What we need to do is to convert all of the Drupal MySQL tables to use the InnoDB database engine instead. Unfortunately, there are many implications to using InnoDB vs. MyISAM in Drupal or with any MySQL based application. See "<a href="http://2bits.com/articles/mysql-innodb-performance-gains-as-well-as-some-pitfalls.html">MySQL InnoDB: performance gains as well as some pitfalls</a>" to read more. Specifically, there can be performance issues and degradation when using InnoDB incorrectly, or depending on the type of application you have. Drupal was actually designed and developed with MyISAM in mind, and not InnoDB, although there is some chance this might change for Drupal 7 someday.</p>
 <p>Despite all of this, using InnoDB in a <b>test database</b> is a great idea since you will get all of the benefits of isolating tests from each other without having to worry about how InnoDB will effect your production site&rsquo;s performance. In fact, the performance of your tests will actually be dramatically improved, <a href="http://clarkware.com/cgi/blosxom/2005/10/24#Rails10FastTesting">as Mike Clark explained</a>.</p>
-<p>With all of this in mind, I wrote some code to convert the newly created Drupal tables in the test database from MyISAM to InnoDB right after we clear out and reload the test database. Here&rsquo;s how it works; this code is from <a href="http://patshaughnessy.net/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a>, which I included at the top of my PHPUnit test file:</p>
+<p>With all of this in mind, I wrote some code to convert the newly created Drupal tables in the test database from MyISAM to InnoDB right after we clear out and reload the test database. Here&rsquo;s how it works; this code is from <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a>, which I included at the top of my PHPUnit test file:</p>
 <pre>function enable_mysql_transactions()
 {
   convert_test_tables_to_innodb();
@@ -110,8 +110,8 @@ function convert_to_innodb($table)
 $db_url["test"] = 'mysql://user:password@localhost/drupal_test';</pre></li>
   <li><p>Create a new test database in MySQL:</p><pre>CREATE DATABASE drupal_test DEFAULT CHARACTER SET utf8
                             COLLATE utf8_unicode_ci;</pre></li>
-  <li>Download and save <a href="http://patshaughnessy.net/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> somewhere in your Drupal application; for example in the &ldquo;includes&rdquo; folder.</li>
-  <li>Include <a href="http://patshaughnessy.net/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> at the top of each of your PHPUnit test classes.</li>
+  <li>Download and save <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> somewhere in your Drupal application; for example in the &ldquo;includes&rdquo; folder.</li>
+  <li>Include <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> at the top of each of your PHPUnit test classes.</li>
   <li><p>Execute your PHPUnit test class from the root folder of your Drupal app:</p><pre>$ cd /path/to/your/drupal-site
 $ phpunit YourClass modules/your_module/YourClassFileName.php 
 PHPUnit 3.2.21 by Sebastian Bergmann.

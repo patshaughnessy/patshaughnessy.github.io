@@ -63,7 +63,7 @@ date: 2010/04/28
     <td><img src="http://patshaughnessy.net/assets/2010/4/28/mickey_es1.png"></td>
   </tr>
 </table>
-<p>With just a little bit of CSS love, the slideshow can look like this (click through the screen shot to see a <a href="http://patshaughnessy.net/mickey_slides_example/index.html">working example</a>):</p>
+<p>With just a little bit of CSS love, the slideshow can look like this (click through the screen shot to see a <a href="http://patshaughnessy.net/assets/mickey_slides_example/index.html">working example</a>):</p>
 <table>
   <tr>
     <td><div class="CodeRay">
@@ -92,7 +92,7 @@ date: 2010/04/28
 </div>
     </td>
     <td width="60">&nbsp;</td>
-    <td><a href="http://patshaughnessy.net/mickey_slides_example/index.html"><img src="http://patshaughnessy.net/assets/2010/4/28/mickey_es3.png"></a></td>
+    <td><a href="http://patshaughnessy.net/assets/mickey_slides_example/index.html"><img src="http://patshaughnessy.net/assets/2010/4/28/mickey_es3.png"></a></td>
   </tr>
 </table><br></p>
 <p>Now all the slides are displayed in a working slideshow inside my single web page! When I click on the previous or next links, I can watch Mickey move around without leaving the page. Let&rsquo;s take a look at how my ERB and CSS code works and what Electric Slide is doing:

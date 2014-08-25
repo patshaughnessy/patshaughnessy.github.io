@@ -18,8 +18,8 @@ tag: Drupal
 $db_url["test"] = 'mysql://user:password@localhost/drupal_test';</pre></li>
   <li><p>Create a new test database in MySQL:</p><pre>CREATE DATABASE drupal_test DEFAULT CHARACTER SET utf8
                             COLLATE utf8_unicode_ci;</pre></li>
-  <li>Download and save <a href="http://patshaughnessy.net/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> somewhere in your Drupal application; for example in the &ldquo;includes&rdquo; folder.</li>
-  <li>Include <a href="http://patshaughnessy.net/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> at the top of each of your PHPUnit test classes. See one of the two articles above for example PHPUnit tests.</li>
+  <li>Download and save <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> somewhere in your Drupal application; for example in the &ldquo;includes&rdquo; folder.</li>
+  <li>Include <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> at the top of each of your PHPUnit test classes. See one of the two articles above for example PHPUnit tests.</li>
   <li><p>Execute your PHPUnit test class from the root folder of your Drupal app:</p><pre>$ cd /path/to/your/drupal-site
 $ phpunit YourClass modules/your_module/YourClassFileName.php 
 PHPUnit 3.2.21 by Sebastian Bergmann.
