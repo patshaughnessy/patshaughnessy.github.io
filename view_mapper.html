@@ -1,17 +1,69 @@
-title: "View Mapper: Scaffolding for your models and plugins"
-date: 2009/10/01
-url: /view_mapper
-tag: View Mapper
 
-<p>View Mapper will generate scaffolding illustrating how to write view code using a specified plugin or feature with your existing models. It can also generate new models.</p>
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="View Mapper: Scaffolding for your models and plugins - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>View Mapper: Scaffolding for your models and plugins - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>View Mapper: Scaffolding for your models and plugins</h1>
+  
+  </header>
+
+  <section class="content">
+    <p>View Mapper will generate scaffolding illustrating how to write view code using a specified plugin or feature with your existing models. It can also generate new models.</p>
+
+
 <p>A couple simple examples:</p>
+
+
 <pre>script/generate view_for office --view auto_complete:address</pre>
+
+
 <p>&hellip; will generate Rails scaffolding code that displays a form for an existing &ldquo;office&rdquo; model, with auto complete on the &ldquo;address&rdquo; field.</p>
+
+
 <pre>script/generate scaffold_for_view office address:string code:string
                                   --view auto_complete:address</pre>
+
+
 <p>&hellip; will generate the same form, but also create the &ldquo;office&rdquo; model class file, a migration file containing the &ldquo;address&rdquo; and &ldquo;code&rdquo; columns, and other standard scaffolding files as well.</p>
+
+
 <p>The idea behind View Mapper is that it&rsquo;s easy to write simple, concise model classes representing your domain objects using ActiveRecord, but very hard to implement the corresponding views using a combination of HTML, Javascript Rails helper functions, routes, controllers, etc. If you&rsquo;re not very familiar with a certain plugin you want to use in your app, View Mapper can help you get started in the right direction by generating a working example with scaffolding code.</p>
+
+
 <p>If you&rsquo;re developing a Rails plugin or gem it&rsquo;s easy to write your own View Mapper module for your plugin&rsquo;s users to call with View Mapper.</p>
+
+
 <p/>
 <p/>
 <p><b>Code:</b>&nbsp;&nbsp;&nbsp;<a href="http://github.com/patshaughnessy/view_mapper">http://github.com/patshaughnessy/view_mapper</a></p>
@@ -45,3 +97,69 @@ tag: View Mapper
   <li>(Default) If no view is specified, then standard Rails scaffold code will be generated.</li>
 </ul>
 <p>I&rsquo;ll be implementing more views in the coming weeks and months. There is also an API for implementing your own View Mapper module, for example to generate code illustrating how to use a plugin or gem you are working on. In the future I&rsquo;ll document this as well.</p>
+
+
+  </section>
+
+  
+</article>
+
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                
+                  <li><a href="/2014/6/16/a-rule-of-thumb-for-strong-parameters">A Rule of Thumb for Strong Parameters</a></li>
+                
+                  <li><a href="/2014/4/8/using-a-ruby-class-to-write-functional-code">Using a Ruby Class To Write Functional Code</a></li>
+                
+                  <li><a href="/2014/2/10/use-an-ask-dont-tell-policy-with-ruby">Use An Ask, Don’t Tell Policy With Ruby</a></li>
+                
+                  <li><a href="/2014/1/30/what-does--f----x---f-x--a---a--b---b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy</a>
+    </div>
+  </div>
+
+</body>
+</html>
+

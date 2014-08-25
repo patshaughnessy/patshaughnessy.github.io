@@ -1,6 +1,7 @@
 title: "Database storage for Paperclip: rewritten to use a single table"
 date: 2009/04/14
 tag: Paperclip
+url: /paperclip-database-storage
 
 <p>Back in February I wrote an <a href="http://patshaughnessy.net/2009/2/19/database-storage-for-paperclip">implementation of a new storage module for Paperclip</a> that supports saving file attachments in a database table. My original implementation saved the file attachments in a separate database table, which was internally managed using a &ldquo;has_many&rdquo; relationship from the target model.</p>
 <p>This month I decided to rewrite the code to use a simpler, single table approach. Instead of saving the files in a separate table, each file is saved in a BLOB column in the same table as the target model. This makes the database storage module easier and more intuitive to use, and moves it closer to the original intent of the Paperclip design.</p>

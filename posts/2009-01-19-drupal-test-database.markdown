@@ -1,6 +1,6 @@
 title: Using transactions in a separate database with Drupal PHPUnit tests
 date: 2009/01/19
-url: /2009/1/19/drupal-test-database
+url: /drupal-test-database
 tag: Drupal
 
 <p>

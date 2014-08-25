@@ -1,6 +1,6 @@
 title: The auto_complete plugin refactored to support repeated fields and named scopes
 date: 2008/11/18
-url: /2008/11/18/posted-auto-complete-code-to-github
+url: /repeated_auto_complete
 tag: the auto_complete plugin
 
 <p>(Updated June 2009)</p>

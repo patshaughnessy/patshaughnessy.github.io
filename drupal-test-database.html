@@ -1,0 +1,142 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Using transactions in a separate database with Drupal PHPUnit tests - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Using transactions in a separate database with Drupal PHPUnit tests - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Using transactions in a separate database with Drupal PHPUnit tests</h1>
+  
+  </header>
+
+  <section class="content">
+    <p>
+  Update April 2009:<br/>
+  I&rsquo;ve started working with <a href="http://markbennett.ca">Mark Bennett</a> on phpunit_setup.inc and moved it up to a <a href="http://github.com/patshaughnessy/drupal_tdd">github repository</a>. Mark has adapted it to work with Drupal 5, and we&rsquo;re working on a number of other related ideas as well. I&rsquo;ll post updates here about our progress.</p>
+
+
+<p>This month I&rsquo;ve been experimenting with using testing ideas from Ruby on Rails while developing a Drupal module. To read more, see:</p>
+
+
+<ul>
+  <li><a href="http://patshaughnessy.net/2009/1/19/using-mysql-transactions-with-drupal-unit-tests">Using MySQL transactions with Drupal unit tests</a></li>
+  <li><a href="http://patshaughnessy.net/2009/1/16/using-a-test-database-with-drupal-unit-tests">Using a test database with Drupal unit tests</a></li>
+</ul>
+
+
+<p>If you want to try this out yourself, follow these instructions:</p>
+
+
+<ol>
+  <li><p>Edit settings.php and use an array of two values for $db_url:</p>
+    <pre>$db_url["default"] = 'mysql://user:password@localhost/drupal;
+$db_url["test"] = 'mysql://user:password@localhost/drupal_test';</pre></li>
+  <li><p>Create a new test database in MySQL:</p><pre>CREATE DATABASE drupal_test DEFAULT CHARACTER SET utf8
+                            COLLATE utf8_unicode_ci;</pre></li>
+  <li>Download and save <a href="http://patshaughnessy.net/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> somewhere in your Drupal application; for example in the &ldquo;includes&rdquo; folder.</li>
+  <li>Include <a href="http://patshaughnessy.net/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> at the top of each of your PHPUnit test classes. See one of the two articles above for example PHPUnit tests.</li>
+  <li><p>Execute your PHPUnit test class from the root folder of your Drupal app:</p><pre>$ cd /path/to/your/drupal-site
+$ phpunit YourClass modules/your_module/YourClassFileName.php 
+PHPUnit 3.2.21 by Sebastian Bergmann.
+..
+Time: 0 seconds
+OK (2 tests)</pre></li>
+</ol>
+
+
+<p>For more information about how to run PHPUnit with Drupal, see: <a href="http://patshaughnessy.net/2008/12/12/writing-your-first-phpunit-test-in-drupal">Writing your first PHPUnit test in Drupal</a>.</p>
+
+
+  </section>
+
+  
+</article>
+
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                
+                  <li><a href="/2014/6/16/a-rule-of-thumb-for-strong-parameters">A Rule of Thumb for Strong Parameters</a></li>
+                
+                  <li><a href="/2014/4/8/using-a-ruby-class-to-write-functional-code">Using a Ruby Class To Write Functional Code</a></li>
+                
+                  <li><a href="/2014/2/10/use-an-ask-dont-tell-policy-with-ruby">Use An Ask, Don’t Tell Policy With Ruby</a></li>
+                
+                  <li><a href="/2014/1/30/what-does--f----x---f-x--a---a--b---b-mean">What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</a></li>
+                
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy</a>
+    </div>
+  </div>
+
+</body>
+</html>
+
