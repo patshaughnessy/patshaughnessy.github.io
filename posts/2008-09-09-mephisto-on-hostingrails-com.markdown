@@ -54,5 +54,3 @@ Finally I was able to run rake db:bootstrap successfully! The last bit of config
 ENV['RAILS_ENV'] ||= 'production'</pre>
 
 After creating a symlink and doing some other [standard configuration for hostingrails.com](http://www.hostingrails.com/forums/wiki_thread/1), I was finally able to get my site up and running. It was a lot harder than configuring a PHP site and ruined a whole evening, but in the end wasn’t all that bad.
-
-TEST!
