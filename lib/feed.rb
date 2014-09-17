@@ -1,4 +1,5 @@
 require 'builder'
+require 'time'
 
 class Feed
 
