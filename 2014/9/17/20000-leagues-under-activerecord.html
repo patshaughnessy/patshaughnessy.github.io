@@ -48,7 +48,7 @@
   <section class="content">
     <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"><br/>
-  <i>First published in 1870, <a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea">20,000 Leagues Under the Sea</a><br/>describes an underwater adventure that takes place<br/>on board an a submarine called the “Nautilus.”</i>
+  <i>First published in 1870, <a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea">20,000 Leagues Under the Sea</a><br/>describes an underwater adventure that takes place<br/>onboard a submarine called the “Nautilus.”</i>
 </div>
 
 
@@ -82,10 +82,10 @@ returns it to us as a Ruby object.</p>
 you understand exactly what this line of code does. You didn’t need to come to
 Barcelona to learn how to use ActiveRecord.</p>
 
-<p>The reason why I want to discuss ActiveRecord today is that it was what hooked
-me, what first got me excited about using Rails. I came across Rails back in 2008,
-about six years ago now. And I can still remember the moment when I first typed
-a line of code similar to this one into the Rails console or into a Rails app
+<p>The reason why I want to discuss this is that ActiveRecord hooked me; it
+first got me excited about using Rails. I came across Rails back in 2008, about
+six years ago now. And I can still remember the moment when I first typed a
+line of code similar to this one into the Rails console or into a Rails app
 somewhere. It was amazing!  Before that I was using PHP or Java &ndash; I’ve since
 blocked out all memory of that so I’m not quite sure which it was :) &ndash; and when
 I saw how easy it was to use Rails to query a database I was very impressed.</p>
@@ -110,7 +110,7 @@ scenes that makes ActiveRecord queries possible.</p>
 I’d like to take you on an adventure inside of ActiveRecord to find out how it
 works, how ActiveRecord generates and executes SQL statements.</p>
 
-<p>And why stop there? …later we’ll dive underneath ActiveRecord and inside an
+<p>And why stop there? Later we’ll dive underneath ActiveRecord and inside an
 actual database server to find out how it works too. How does it understand the SQL
 statements we give it? How does it find the data we ask for and return it to
 us? Let’s find out!</p>
@@ -190,7 +190,7 @@ class='code'>ActiveRecord::Relation</span>
 
 <p><img src="http://patshaughnessy.net/assets/2014/9/17/first1.png"/></p>
 
-<p>Here you can see because we didn’t pass in a value for limit, ActiveRecord
+<p>Here you can see because we didn’t pass in a value for <span class='code'>limit</span>, ActiveRecord
 calls <span class='code'>find_nth</span> and passes in a value of 0,
 indicating we want the first record from the query result set. The second
 argument, <span class='code'>offset_index</span>, turns out to have a value of

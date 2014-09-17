@@ -18,11 +18,14 @@
     </author>
     <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
   &lt;img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;on board an a submarine called the “Nautilus.”&lt;/i&gt;
-&lt;/div</summary>
+  &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;onboard a submarine called the “Nautilus.”&lt;/i&gt;
+&lt;/div&gt;
+
+
+</summary>
     <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
   &lt;img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;on board an a submarine called the “Nautilus.”&lt;/i&gt;
+  &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;onboard a submarine called the “Nautilus.”&lt;/i&gt;
 &lt;/div&gt;
 
 
@@ -56,10 +59,10 @@ returns it to us as a Ruby object.&lt;/p&gt;
 you understand exactly what this line of code does. You didn’t need to come to
 Barcelona to learn how to use ActiveRecord.&lt;/p&gt;
 
-&lt;p&gt;The reason why I want to discuss ActiveRecord today is that it was what hooked
-me, what first got me excited about using Rails. I came across Rails back in 2008,
-about six years ago now. And I can still remember the moment when I first typed
-a line of code similar to this one into the Rails console or into a Rails app
+&lt;p&gt;The reason why I want to discuss this is that ActiveRecord hooked me; it
+first got me excited about using Rails. I came across Rails back in 2008, about
+six years ago now. And I can still remember the moment when I first typed a
+line of code similar to this one into the Rails console or into a Rails app
 somewhere. It was amazing!  Before that I was using PHP or Java &amp;ndash; I’ve since
 blocked out all memory of that so I’m not quite sure which it was :) &amp;ndash; and when
 I saw how easy it was to use Rails to query a database I was very impressed.&lt;/p&gt;
@@ -84,7 +87,7 @@ scenes that makes ActiveRecord queries possible.&lt;/p&gt;
 I’d like to take you on an adventure inside of ActiveRecord to find out how it
 works, how ActiveRecord generates and executes SQL statements.&lt;/p&gt;
 
-&lt;p&gt;And why stop there? …later we’ll dive underneath ActiveRecord and inside an
+&lt;p&gt;And why stop there? Later we’ll dive underneath ActiveRecord and inside an
 actual database server to find out how it works too. How does it understand the SQL
 statements we give it? How does it find the data we ask for and return it to
 us? Let’s find out!&lt;/p&gt;
@@ -164,7 +167,7 @@ class='code'&gt;ActiveRecord::Relation&lt;/span&gt;
 
 &lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/first1.png"/&gt;&lt;/p&gt;
 
-&lt;p&gt;Here you can see because we didn’t pass in a value for limit, ActiveRecord
+&lt;p&gt;Here you can see because we didn’t pass in a value for &lt;span class='code'&gt;limit&lt;/span&gt;, ActiveRecord
 calls &lt;span class='code'&gt;find_nth&lt;/span&gt; and passes in a value of 0,
 indicating we want the first record from the query result set. The second
 argument, &lt;span class='code'&gt;offset_index&lt;/span&gt;, turns out to have a value of
