@@ -7,6 +7,262 @@
     <name></name>
   </author>
   <entry>
+    <title>20,000 Leagues Under ActiveRecord</title>
+    <link href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord" rel="alternate"/>
+    <id>http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord</id>
+    <published>2014-09-17T00:00:00Z</published>
+    <updated>2014-09-17T00:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;on board an a submarine called the “Nautilus.”&lt;/i&gt;
+&lt;/div</summary>
+    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;on board an a submarine called the “Nautilus.”&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;&lt;b&gt;
+This is the first in a series of posts based on a presentation I just did
+last Friday at the &lt;a href="http://www.baruco.org"&gt;Barcelona Ruby Conference&lt;/a&gt;. I’ll
+also post a link to the video recording when the Baruco team has time to edit
+and post it online.  &lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;Let me start with a question: How many of you have actually read 20,000 Leagues
+Under the Sea, either in the original French or in some translation? [ A few
+people raised their hands, but most people in the audience did not. ] Yes, I’m
+not surprised. 20,000 Leagues is one of those classic novels we have all heard
+of, but few of us take the time to read.&lt;/p&gt;
+
+&lt;p&gt;While thinking about this presentation over the Summer, I decided to actually
+read the novel &amp;ndash; and I’m glad that I did! It blew my mind on a number of
+different levels. Today I’m going to take the time to tell you a bit about the
+novel itself as we go.&lt;/p&gt;
+
+&lt;p&gt;However, actually I’m here today to talk about ActiveRecord. I’d like to explore
+how ActiveRecord works internally; how it finds the information we ask for and
+returns it to us as a Ruby object.&lt;/p&gt;
+
+&lt;div style="clear: left"/&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;But why talk about ActiveRecord? We all know how to use ActiveRecord; most of
+you understand exactly what this line of code does. You didn’t need to come to
+Barcelona to learn how to use ActiveRecord.&lt;/p&gt;
+
+&lt;p&gt;The reason why I want to discuss ActiveRecord today is that it was what hooked
+me, what first got me excited about using Rails. I came across Rails back in 2008,
+about six years ago now. And I can still remember the moment when I first typed
+a line of code similar to this one into the Rails console or into a Rails app
+somewhere. It was amazing!  Before that I was using PHP or Java &amp;ndash; I’ve since
+blocked out all memory of that so I’m not quite sure which it was :) &amp;ndash; and when
+I saw how easy it was to use Rails to query a database I was very impressed.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/irb.png"/&gt;&lt;/p&gt;
+
+&lt;div style="float: right; padding: 7px 0px 0px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/underwater-walk.png"&gt;&lt;br/&gt;
+  &lt;i&gt;Captain Nemo takes Professor Arronax, Conseil and Ned Land&lt;br/&gt;on a hike through an underwater “forest.” Verne’s novel has&lt;br/&gt;many beautiful, detailed descriptions of underwater worlds&lt;br/&gt;he had never actually seen, and could only imagine.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Somehow Rails could take a simple, beautiful and readable line of Ruby code and
+convert it into a SQL statement like this. How could this possibly work? It
+seemed like magic!&lt;/p&gt;
+
+&lt;p&gt;But it’s not magic. There are thousands of lines of code and years of computer
+science research behind this simple line of code, the hard work behind the
+scenes that makes ActiveRecord queries possible.&lt;/p&gt;
+
+&lt;p&gt;Just as Professor Arronax went on an underwater adventure with Captain Nemo,
+I’d like to take you on an adventure inside of ActiveRecord to find out how it
+works, how ActiveRecord generates and executes SQL statements.&lt;/p&gt;
+
+&lt;p&gt;And why stop there? …later we’ll dive underneath ActiveRecord and inside an
+actual database server to find out how it works too. How does it understand the SQL
+statements we give it? How does it find the data we ask for and return it to
+us? Let’s find out!&lt;/p&gt;
+
+&lt;h2&gt;Agenda&lt;/h2&gt;
+
+&lt;p&gt;Here’s our plan: First we’ll start with a look at &lt;span
+class='code'&gt;ActiveRecord::Relation&lt;/span&gt;, the top, public API for
+ActiveRecord many of you use everyday. Then, we’ll look deeper inside of
+ActiveRecord to find out how it converts our Ruby queries into SQL statements.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/agenda.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Later, in the second half of the presentation we’ll dive even deeper and
+directly into an actual relational database server (RDBMS); today I’ll use
+PostgreSQL as an example. How does Postgres understand the SQL statement that
+ActiveRecord sent it? How does it find the data we want? Finally, if we have
+time we’ll look at the B-Tree Algorithm, which is part of the real magic that
+allows database servers to work.&lt;/p&gt;
+
+&lt;h2&gt;ActiveRecord::Relation&lt;/h2&gt;
+
+&lt;p&gt;Let’s use my line of code from earlier as an example &amp;ndash; today we’ll be searching
+for Captain Nemo together. Therefore, we’ll start with a &lt;span
+class='code'&gt;User&lt;/span&gt; class, a subclass of &lt;span
+class='code'&gt;ActiveRecord::Base&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-base.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;When I call &lt;span class='code'&gt;where&lt;/span&gt; what happens? It turns out the
+&lt;span class='code'&gt;where&lt;/span&gt; method is defined in the &lt;span
+class='code'&gt;ActiveRecord::Querying&lt;/span&gt; module:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-querying.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;But as you can see, ActiveRecord delegates the &lt;span class='code'&gt;where&lt;/span&gt;
+method over to another method called &lt;span class='code'&gt;all&lt;/span&gt;, which
+returns a new instance of a different class called &lt;span
+class='code'&gt;ActiveRecord::Relation&lt;/span&gt;. In fact, my call to &lt;span
+class='code'&gt;User.where&lt;/span&gt; is entirely equivalent to calling &lt;span
+class='code'&gt;User.all.where&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/user-all.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;ActiveRecord actually implements the &lt;span class='code'&gt;where&lt;/span&gt; method
+using the new instance of &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;.
+Internally, &lt;span class='code'&gt;where&lt;/span&gt; is implemented by the &lt;span
+class='code'&gt;ActiveRecord::QueryMethods&lt;/span&gt; module, included into &lt;span
+class='code'&gt;ActiveRecord::Relation&lt;/span&gt;.  Next, &lt;span
+class='code'&gt;ActiveRecord::QueryMethods#where&lt;/span&gt; returns, in turn, a second
+new instance of &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;If you look at the right, you can see the second &lt;span
+class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object contains information about
+what record we’re looking for, that we want the records where the name is
+“Captain Nemo.”&lt;/p&gt;
+
+&lt;p&gt;Of course, we don’t want all of the Captain Nemo users; we just
+want the first one. Next, we call the &lt;span class='code'&gt;first&lt;/span&gt; method on
+the new &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation2.png"/&gt;&lt;/p&gt;
+
+&lt;h2&gt;The Internal Implementation of ActiveRecord::FinderMethods#first&lt;/h2&gt;
+
+&lt;p&gt;Now you can see ActiveRecord creates a third instance of &lt;span
+class='code'&gt;ActiveRecord::Relation&lt;/span&gt;
+&amp;ndash; this time with even more information about the query we’d like to execute.
+  But what are all those other values: &lt;span class='code'&gt;order&lt;/span&gt;, &lt;span
+  class='code'&gt;limit&lt;/span&gt; and &lt;span class='code'&gt;offset&lt;/span&gt;? Where do they
+  come from? We can find out by taking a look at the implementation of &lt;span
+  class='code'&gt;first&lt;/span&gt;. The &lt;span
+  class='code'&gt;ActiveRecord::FinderMethods&lt;/span&gt; module implements this, which
+  ActiveRecord includes into the &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; class.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/first1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Here you can see because we didn’t pass in a value for limit, ActiveRecord
+calls &lt;span class='code'&gt;find_nth&lt;/span&gt; and passes in a value of 0,
+indicating we want the first record from the query result set. The second
+argument, &lt;span class='code'&gt;offset_index&lt;/span&gt;, turns out to have a value of
+zero, meaning we want to count into a window of records at the beginning of the
+result set, not a window located somewhere farther along the result set.&lt;/p&gt;
+
+&lt;p&gt;ActiveRecord implements a series of similar methods that will return the
+second, third, fourth or even fifth record:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/second-fifth.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;You can see the pattern here; the first argument is a zero-based index
+indicating which record we want. And just in case we want the forty second
+record from the result set, ActiveRecord implements this useful method&amp;hellip; :)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/forty-second.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;It’s no joke! &lt;span class='code'&gt;forty_two&lt;/span&gt; is actually in the
+ActiveRecord source code; you can try it for yourself. Replacing &lt;span
+class='code'&gt;first&lt;/span&gt; with the equivalent call to &lt;span
+class='code'&gt;find_nth&lt;/span&gt;, here’s our example again:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/find-nth.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Following the code path through the &lt;span
+class='code'&gt;ActiveRecord::FinderMethods&lt;/span&gt; module, we can see &lt;span
+class='code'&gt;find_nth&lt;/span&gt; calls, in turn, &lt;span
+class='code'&gt;find_nth_with_limit&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/find-nth-with-limit.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now the arguments have been reversed; the first argument, 0, is now the offset
+and the second, 1, is the number of records we want, or the limit value.&lt;/p&gt;
+
+&lt;p&gt;Substituting one more time, let’s replace &lt;span
+class='code'&gt;find_nth_with_limit&lt;/span&gt; with more detailed calls it makes to
+&lt;span class='code'&gt;order&lt;/span&gt; and &lt;span class='code'&gt;limit&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/detailed-calls.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now you can see where all of the values in the final &lt;span
+class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object come from. Each call to a
+scoping method saves a new piece of information about our query, and returns a
+new instance of the &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; class.
+(We’ll see what &lt;span class='code'&gt;arel_table&lt;/span&gt; means in a minute.)&lt;/p&gt;
+
+&lt;h2&gt;The Beauty of ActiveRecord::Relation&lt;/h2&gt;
+
+&lt;p&gt;Taking a step back, we can see that our simple line of code, &lt;span
+class='code'&gt;User.where(name: &amp;quot;Captain Nemo&amp;quot;).first&lt;/span&gt;, is creating a
+series of &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; objects like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/method-chain.png"/&gt;&lt;/p&gt;
+
+&lt;div style="float: right; padding: 7px 0px 0px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/south-pacific.png"&gt;&lt;br/&gt;
+  &lt;i&gt;Captain Nemo allowed Canadian harpoonist Ned Land&lt;br/&gt;to leave the submarine for a short time and explore a&lt;br/&gt;tropical island off the coast of Papua New Guinea.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;There are two interesting and beautiful things about this, I think. First,
+notice the pattern that ActiveRecord uses: each call to a method returns a new
+instance of the class that implemented that method. This is what allows us to
+easily chain together different method calls. We can add on as many different
+scopes as we wish; because each new object is also an &lt;span
+class='code'&gt;ActiveRecord::Relation&lt;/span&gt;, it implements all of the same
+methods. You can use the same pattern in your own code. All you need to do is
+create a new instance of the class that implements each method, and return
+that. One reason to study internal code like this is to learn about and find
+new ideas that you can use in your own code.&lt;/p&gt;
+
+&lt;p&gt;The second beautiful thing about &lt;span
+class='code'&gt;ActiveRecord::Relation&lt;/span&gt; is that it’s lazy.  Using this chain
+of method calls we are building up metadata or information about our query,
+without actually executing the query itself. It’s almost as if we were using a
+functional programming language like Haskell or Lisp. Using this trick,
+ActiveRecord allows us to specify exactly the query we want, without having to
+worry about executing it until we’re ready.&lt;/p&gt;
+
+&lt;p&gt;It’s not until we call the &lt;span class='code'&gt;to_a&lt;/span&gt; method, in other to convert the
+&lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object into an array and access the result set, that
+ActiveRecord executes the query:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/to-a.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;You can see here that &lt;span class='code'&gt;to_a&lt;/span&gt; calls &lt;span class='code'&gt;load&lt;/span&gt; internally,
+which later calls the &lt;span class='code'&gt;ActiveRecord::ConnectionAdapters::DatabaseStatements#select_all&lt;/span&gt;
+method.&lt;/p&gt;
+
+&lt;h2&gt;Next time&lt;/h2&gt;
+
+&lt;p&gt;In the next few days I’ll post the second part of my presentation from Barcelona. We’ll look
+at what “Relational Algebra” means and how the Arel gem converts our
+&lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object into a string
+containing a SQL statement.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>A Rule of Thumb for Strong Parameters</title>
     <link href="http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters</id>
@@ -2037,354 +2293,6 @@ different programming languages, you often find the same fundamental ideas and
 algorithms are used by all of them. Modern programming languages owe a great
 deal to the ground breaking computer science research that John McCarthy and
 his contemporaries did back in the 1960s and 1970s.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Visualizing Garbage Collection in Ruby and Python</title>
-    <link href="http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python" rel="alternate"/>
-    <id>http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python</id>
-    <published>2013-10-24T00:00:00Z</published>
-    <updated>2013-10-24T00:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;p&gt;&lt;b&gt;
-  &lt;p&gt;
-  Note: This post is based on a presentation I just did at &lt;a href="http://13.rupy.eu"&gt;RuPy&lt;/a&gt; in Budapest.
-  Instead of just posting my slides I thought it would be more useful if I wrote
-  it down as a blog post while it’s still fresh in my mind. I’ll post the video
-  link here when the RuPy folks have it online.  FYI I’m planning to do a &lt;a href="http://rubyconf.org/program#pat-sha</summary>
-    <content type="html">&lt;p&gt;&lt;b&gt;
-  &lt;p&gt;
-  Note: This post is based on a presentation I just did at &lt;a href="http://13.rupy.eu"&gt;RuPy&lt;/a&gt; in Budapest.
-  Instead of just posting my slides I thought it would be more useful if I wrote
-  it down as a blog post while it’s still fresh in my mind. I’ll post the video
-  link here when the RuPy folks have it online.  FYI I’m planning to do a &lt;a href="http://rubyconf.org/program#pat-shaughnessy"&gt;similar presentation at RubyConf&lt;/a&gt;,
-  except I’ll remove the Python info, and instead compare how
-  GC works inside of MRI vs.  JRuby and Rubinius.&lt;/p&gt;&lt;/p&gt;
-
-&lt;p&gt;  &lt;p&gt;
-  For a more detailed explanation of GC in Ruby and of Ruby internals generally,
-  see my upcoming book, &lt;a href="http://nostarch.com/rum"&gt;Ruby Under a Microscope&lt;/a&gt;,
-  due out very soon from No Starch Press.&lt;/p&gt; &lt;/b&gt;&lt;/p&gt;
-
-&lt;div style="float: left; padding: 7px 30px 10px 0px; text-align: center; margin-top: 20px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2013/10/24/circuitory-system-polish.png"&gt;&lt;br/&gt;
-  &lt;i&gt;If your algorithms and business logic are the brain of your&lt;br/&gt;
-  application, which organ would the garbage collector be?&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Since this is the “Ruby Python” conference, I thought it would be fun to
-compare how garbage collection works inside of Ruby and Python. But before we
-get to that, why talk about garbage collection at all? After all, it’s not the
-most glamorous, exciting topic, is it? How many of you get excited by
-garbage collection? [ A number of RuPy attendees actually raised their hands! ]&lt;/p&gt;
-
-&lt;p&gt;Recently in the Ruby community there was a &lt;a href="http://fredwu.me/post/60441991350/protip-ruby-devs-please-tweak-your-gc-settings-for"&gt;blog
-post&lt;/a&gt;
-about how you can speed up your unit tests by changing your Ruby GC settings. I
-think that’s great. It’s good to run your tests faster and to run your app with
-fewer GC pauses, but somehow GC doesn’t really &lt;em&gt;excite&lt;/em&gt; me. It seems like a
-boring, dry, technical topic at first glance.&lt;/p&gt;
-
-&lt;p&gt;But actually, garbage collection is a fascinating topic: GC algorithms are both
-an important part of computer science history, and a subject of cutting edge
-research. For example, the Mark and Sweep algorithm used by MRI Ruby is over 50
-years old, while one of the GC algorithms used inside of Rubinius, an
-alternative implementation of Ruby, was invented just recently in 2008.&lt;/p&gt;
-
-&lt;p&gt;However, the name “garbage collection,” is actually misnomer.&lt;/p&gt;
-
-&lt;h2&gt;The Beating Heart of Your Application&lt;/h2&gt;
-
-&lt;p&gt;GC systems do much more than just “collect garbage.” In fact, they perform
-three important tasks. They&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;allocate memory for new objects,&lt;/li&gt;
-&lt;li&gt;identify garbage objects, and&lt;/li&gt;
-&lt;li&gt;reclaim memory from garbage objects.&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2013/10/24/heart-polish.png"&gt;&lt;br/&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Imagine if your application was a human body: All of the elegant code you
-write, your business logic, your algorithms, would be the brain or the
-intelligence inside the application. Following this analogy, what part of the
-body do you think the garbage collector would be? [ I got lots of fun answers from the RuPy audience: kidneys, white blood cells :) ]&lt;/p&gt;
-
-&lt;p&gt;I think the garbage collector is the beating heart of your application. Just as
-your heart provides blood and nutrients to the rest of the your body, the
-garbage collector provides memory and objects for your application to use. If
-your heart stopped beating you would die in seconds. If the garbage collector
-stopped or ran slowly &amp;ndash; if it had clogged arteries &amp;ndash; your
-application would slow down and eventually die!&lt;/p&gt;
-
-&lt;h2&gt;A Simple Example&lt;/h2&gt;
-
-&lt;p&gt;It’s always helpful to work through theories using examples. Here’s a simple
-class, written in both Python and Ruby, that we can use as an example today:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/code.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;By the way, it’s amazing to me how similar this code is in both languages: Ruby
-and Python are really just slightly different ways of saying the same thing.
-But are the languages also &lt;em&gt;implemented&lt;/em&gt; in a similar way internally?&lt;/p&gt;
-
-&lt;h2&gt;The Free List&lt;/h2&gt;
-
-&lt;p&gt;When we call &lt;span class="code"&gt;Node.new(1)&lt;/span&gt; above, what does Ruby do,
-exactly? How does Ruby go about creating a new object for us?&lt;/p&gt;
-
-&lt;p&gt;Surprisingly, it does very little! In fact, long before your code starts to
-run, Ruby creates thousands of objects ahead of time and places them on a linked
-list, called the &lt;em&gt;free list&lt;/em&gt;. Here’s what the free list might look like,
-conceptually:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/free-list1.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Imagine each of the white squares above is an unused, precreated Ruby object.
-When we call &lt;span class="code"&gt;Node.new&lt;/span&gt;, Ruby simply takes one of these objects and hands it to
-us:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/free-list2.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;In the diagram above, the gray square on the left represents an active Ruby
-object we’re using in our code, while the remaining white squares are unused
-objects. [ Note: of course, my diagrams are a simplified version of reality. In
-fact, Ruby would use another object to hold the string “ABC,” a third object to
-hold the class definition of Node, and still other objects to hold the parsed,
-abstract syntax tree (AST) representation of my code, etc. ]&lt;/p&gt;
-
-&lt;p&gt;If we call &lt;span class="code"&gt;Node.new&lt;/span&gt; again, Ruby just hands
-us another object:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/free-list3.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2013/10/24/mccarthy.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;John McCarthy’s 1960 implementation of Lisp contained&lt;br/&gt;the first garbage collector.&lt;/i&gt;
-  &lt;i&gt;(Courtesy MIT Museum)&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;This simple algorithm of using a linked list of precreated objects was
-invented over 50 years ago by a legendary computer scientist named John
-McCarthy, while he was working on the original implementation of Lisp. Lisp was
-not only one of the first functional programming languages, but also contained
-a number of other groundbreaking advances in computer science. One of these was
-the concept of automatically managing your application’s memory using garbage
-collection.&lt;/p&gt;
-
-&lt;p&gt;The standard version of Ruby, also known as “Matz’s Ruby Interpreter” (MRI),
-uses a GC algorithm similar to the one used by McCarthy’s implementation
-of Lisp in 1960. For better or worse, Ruby uses a 53 year old algorithm for
-garbage collection. Just as Lisp did, Ruby creates objects ahead of time and
-hands them to your code when you allocate new objects or values.&lt;/p&gt;
-
-&lt;h2&gt;Allocating Objects in Python&lt;/h2&gt;
-
-&lt;p&gt;We’ve seen that Ruby creates objects ahead of time and saves them in the free
-list. What about Python?&lt;/p&gt;
-
-&lt;p&gt;While Python also uses free lists for various reasons internally (it recycles
-certain objects such as lists), it normally allocates memory for new objects
-and values differently than Ruby does.&lt;/p&gt;
-
-&lt;p&gt;Suppose we create a Node object using Python:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/python1.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Python, unlike Ruby, will ask the operating system for memory immediately when
-you create the object. (Python actually implements its own memory allocation
-system which provides an additional layer of abstraction on top of the OS heap.
-But I don’t have time to get into those details today.)&lt;/p&gt;
-
-&lt;p&gt;When we create a second object, Python will again ask the OS for more memory:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/python2.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2013/10/24/mess.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;Ruby leaves unused objects lying around in&lt;br/&gt;memory until the next GC process runs.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Seems simple enough; at the moment we create an object Python takes the time to
-find and allocate memory for us.&lt;/p&gt;
-
-&lt;h2&gt;Ruby Developers Live in a Messy House&lt;/h2&gt;
-
-&lt;p&gt;Back to Ruby. As we allocate more and more objects, Ruby will continue to hand
-us precreated objects from the free list. As it does this, the free list will
-become shorter:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/free-list4.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;&amp;hellip;and shorter:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/free-list5.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Notice as I continue to assign new values to &lt;span class="code"&gt;n1&lt;/span&gt;, Ruby
-leaves the old values behind. The ABC, JKL and MNO nodes remain in memory. Ruby
-doesn’t immediately clean up old objects my code is no longer using! Working as
-a Ruby developer is like living in a messy house, with clothes lying on the
-floor or dirty dishes in the kitchen sink. As a Ruby developer you have to work
-with unused, garbage objects surrounding you.&lt;/p&gt;
-
-&lt;div style="clear: right"&gt;&lt;/div&gt;
-
-
-&lt;h2&gt;Python Developers Live in a Tidy Household&lt;/h2&gt;
-
-&lt;div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2013/10/24/clean.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;Python cleans up garbage objects immediately &lt;br/&gt;
-    after your code is done using them.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Garbage collection works quite differently in Python than in Ruby. Let’s return
-to our three Python Node objects from earlier:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/python3b.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Internally, whenever we create an object Python saves an integer inside the
-object’s C structure, called the &lt;em&gt;reference count&lt;/em&gt;. Initially, Python sets this
-value to 1:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/python4.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;The value of 1 indicates there is one pointer or reference to each of the three
-objects. Now suppose we create a new node, JKL:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/python5.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Just as before, Python sets the reference count in JKL to be 1. However, also
-notice since we changed &lt;span class="code"&gt;n1&lt;/span&gt; to point to JKL, it no
-longer references ABC, and that Python decremented its reference count down to
-0.&lt;/p&gt;
-
-&lt;p&gt;At this point, the Python garbage collector immediately jumps into action! Whenever an
-object’s reference count reaches zero, Python immediately frees it, returning
-it’s memory to the operating system:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/python6.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Above Python reclaims the memory used by the ABC node. Remember, Ruby simply
-leaves old objects lying around and doesn’t release their memory.&lt;/p&gt;
-
-&lt;p&gt;This garbage collection algorithm is known as &lt;em&gt;reference counting&lt;/em&gt;. It was
-invented by George Collins in 1960 &amp;ndash; not coincidentally the same year John
-McCarthy invented the free list algorithm. As &lt;a href="https://twitter.com/mrb_bk"&gt;Mike Bernstein&lt;/a&gt; said in his
-fantastic &lt;a href="http://www.confreaks.com/videos/2545-goruco2013-to-know-a-garbage-collector"&gt;presentation on garbage collection&lt;/a&gt;
-at the &lt;a href="http://goruco.com"&gt;Gotham Ruby Conference&lt;/a&gt; back in June: &lt;i&gt;“1960 was a good year for Garbage Collectors&amp;hellip;.”&lt;/i&gt;&lt;/p&gt;
-
-&lt;p&gt;Working as a Python developer is like living in a tidy house; you know, the
-kind of place where your roommates are a bit OCD and are constantly cleaning up
-after you. As soon as you put down a dirty dish or glass, someone has already
-put it away in the dishwasher!&lt;/p&gt;
-
-&lt;p&gt;Now for a second example. Suppose we set &lt;span class="code"&gt;n2&lt;/span&gt; to refer
-to the same node as &lt;span class="code"&gt;n1&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/python8.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Above to the left you can see Python has decremented the reference count for
-DEF and will immediately garbage collect the DEF node. Also note that the JKL
-now has a reference count of 2, since both &lt;span class="code"&gt;n1&lt;/span&gt; and
-&lt;span class="code"&gt;n2&lt;/span&gt; point to it.&lt;/p&gt;
-
-&lt;h2&gt;Mark and Sweep&lt;/h2&gt;
-
-&lt;p&gt;Eventually a messy house fills up with trash and life can’t continue as usual.
-After your Ruby program runs for some time, the free list will eventually be
-entirely used up:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep1.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here all of the precreated Ruby objects have been used by our application
-(they are all gray) and no objects remain on the free list (no white squares
-are left).&lt;/p&gt;
-
-&lt;p&gt;At this point Ruby uses another algorithm invented by McCarthy known as &lt;em&gt;Mark
-and Sweep&lt;/em&gt;. First Ruby stops your application; Ruby uses “stop the world garbage
-collection.” Ruby then loops through all of the pointers, variables and other
-references our code makes to objects and other values. Ruby also iterates over
-internal pointers used by its virtual machine. It &lt;em&gt;marks&lt;/em&gt; each object that
-it is able to reach using these pointers. I indicate these marks using the letter M
-here:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep2.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Above the three objects marked with “M” are live, active objects that our
-application is still using. Internally, Ruby actually uses a series of bits
-known as the &lt;em&gt;free bitmap&lt;/em&gt; to keep track of which objects are marked or not:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep3.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Ruby saves the free bitmap in a separate memory location in order to take full
-advantage of Unix copy-on-write optimization. For more information on this, see
-my article &lt;a
-  href="http://patshaughnessy.net/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0"&gt;Why
-  You Should Be Excited About Garbage Collection in Ruby 2.0.&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;If the marked objects are live, the remaining, unmarked objects must be garbage,
-meaning they are no longer being used by our code. I’ll show the garbage objects
-as white squares below:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep4.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Next Ruby &lt;em&gt;sweeps&lt;/em&gt; the unused, garbage objects back onto the free list:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep5.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Internally this happens quite quickly, since Ruby doesn’t actually copy objects
-around from one place to another. Instead, Ruby places the garbage objects back
-onto the free list by adjusting internal pointers to form a new linked list.&lt;/p&gt;
-
-&lt;p&gt;Now Ruby can give these garbage objects back to us the next time we create a
-new Ruby object. In Ruby, objects are reincarnated, and enjoy multiple lives!&lt;/p&gt;
-
-&lt;h2&gt;Mark and Sweep vs. Reference Counting&lt;/h2&gt;
-
-&lt;p&gt;At first glance, Python’s GC algorithm seems far superior to Ruby’s: why live
-in a messy house when you can live in a tidy one? Why does Ruby force your
-application to stop running periodically each time it cleans up, instead of
-using Python’s algorithm?&lt;/p&gt;
-
-&lt;p&gt;Reference counting isn’t as simple as it seems at first glance, however. There
-are a number of reasons why many languages don’t use a reference counting GC
-algorithm like Python does:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;First, it’s difficult to implement. Python has to leave room inside of each
-object to hold the reference count. There’s a minor space penalty for this. But
-worse, a simple operation such a changing a variable or reference becomes a
-more complex operation since Python needs to increment one counter, decrement
-another, and possibly free the object.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Second, it can be slower. Although Python performs GC work smoothly
-as your application runs (cleaning dirty dishes as soon as you put them in the
-sink), this isn’t necessarily faster. Python is constantly updating the
-reference count values. And when you stop using a large data structure, such as
-a list containing many elements, Python might have to free many objects all at
-once. Decrementing reference counts can be a complex, recursive process.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Finally, it doesn’t always work. As we’ll see in my next post containing my
-notes from the rest of this presentation, reference counting can’t handle
-&lt;em&gt;cyclic data structures&lt;/em&gt; &amp;ndash; data structures that contain circular references.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;h2&gt;Until Next Time&amp;hellip;&lt;/h2&gt;
-
-&lt;p&gt;Next week I’ll type up &lt;a href="http://patshaughnessy.net/2013/10/30/generational-gc-in-python-and-ruby"&gt;the rest of the presentation&lt;/a&gt;. I’ll discuss how Python
-handles cyclic data structures, and how GC works in the upcoming Ruby 2.1 release.&lt;/p&gt;
 </content>
   </entry>
 </feed>
