@@ -268,7 +268,7 @@ Edgar Codd - who have already done the difficult theoretical work that makes
 building apps today possible.
 
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
-  <img src="http://localhost/assets/2014/9/23/south-pole.png"><br/>
+  <img src="http://patshaughnessy.net/assets/2014/9/23/south-pole.png"><br/>
   <i>A citizen of no country, Captain Nemo claimed the <br/>south pole as his own using a black flag with a large "N."</i>
 </div>
 
