@@ -332,15 +332,14 @@ post, I’ll continue our underwater adventure by looking at Postgres internals.
       <name></name>
     </author>
     <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://localhost/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
   &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;onboard a submarine called the “Nautilus.”&lt;/i&gt;
 &lt;/div&gt;
 
 
-&lt;p&gt;&lt;b&gt;
-Th</summary>
+</summary>
     <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://localhost/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
   &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;onboard a submarine called the “Nautilus.”&lt;/i&gt;
 &lt;/div&gt;
 
@@ -369,7 +368,7 @@ returns it to us as a Ruby object.&lt;/p&gt;
 &lt;div style="clear: left"/&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/example1.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;But why talk about ActiveRecord? We all know how to use ActiveRecord; most of
 you understand exactly what this line of code does. You didn’t need to come to
@@ -383,10 +382,10 @@ somewhere. It was amazing!  Before that I was using PHP or Java &amp;ndash; I’
 blocked out all memory of that so I’m not quite sure which it was :) &amp;ndash; and when
 I saw how easy it was to use Rails to query a database I was very impressed.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/irb.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/irb.png"/&gt;&lt;/p&gt;
 
 &lt;div style="float: right; padding: 7px 0px 0px 30px; text-align: center;"&gt;
-  &lt;img src="http://localhost/assets/2014/9/17/underwater-walk.png"&gt;&lt;br/&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/underwater-walk.png"&gt;&lt;br/&gt;
   &lt;i&gt;Captain Nemo takes Professor Aronnax, Conseil and Ned Land&lt;br/&gt;on a hike through an underwater “forest.” Verne’s novel has&lt;br/&gt;many beautiful, detailed descriptions of underwater worlds&lt;br/&gt;he had never actually seen, and could only imagine.&lt;/i&gt;
 &lt;/div&gt;
 
@@ -415,7 +414,7 @@ class='code'&gt;ActiveRecord::Relation&lt;/span&gt;, the top, public API for
 ActiveRecord many of you use everyday. Then, we’ll look deeper inside of
 ActiveRecord to find out how it converts our Ruby queries into SQL statements.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/agenda.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/agenda.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;Later, in the second half of the presentation we’ll dive even deeper and
 directly into an actual relational database server (RDBMS); today I’ll use
@@ -431,13 +430,13 @@ for Captain Nemo together. Therefore, we’ll start with a &lt;span
 class='code'&gt;User&lt;/span&gt; class, a subclass of &lt;span
 class='code'&gt;ActiveRecord::Base&lt;/span&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/activerecord-base.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-base.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;When I call &lt;span class='code'&gt;where&lt;/span&gt; what happens? It turns out the
 &lt;span class='code'&gt;where&lt;/span&gt; method is defined in the &lt;span
 class='code'&gt;ActiveRecord::Querying&lt;/span&gt; module:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/activerecord-querying.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-querying.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;But as you can see, ActiveRecord delegates the &lt;span class='code'&gt;where&lt;/span&gt;
 method over to another method called &lt;span class='code'&gt;all&lt;/span&gt;, which
@@ -446,7 +445,7 @@ class='code'&gt;ActiveRecord::Relation&lt;/span&gt;. In fact, my call to &lt;spa
 class='code'&gt;User.where&lt;/span&gt; is entirely equivalent to calling &lt;span
 class='code'&gt;User.all.where&lt;/span&gt;:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/user-all.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/user-all.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;ActiveRecord actually implements the &lt;span class='code'&gt;where&lt;/span&gt; method
 using the new instance of &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;.
@@ -456,7 +455,7 @@ class='code'&gt;ActiveRecord::Relation&lt;/span&gt;.  Next, &lt;span
 class='code'&gt;ActiveRecord::QueryMethods#where&lt;/span&gt; returns, in turn, a second
 new instance of &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/activerecord-relation1.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation1.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;If you look at the right, you can see the second &lt;span
 class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object contains information about
@@ -467,7 +466,7 @@ what record we’re looking for, that we want the records where the name is
 want the first one. Next, we call the &lt;span class='code'&gt;first&lt;/span&gt; method on
 the new &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/activerecord-relation2.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation2.png"/&gt;&lt;/p&gt;
 
 &lt;h2&gt;The Internal Implementation of ActiveRecord::FinderMethods#first&lt;/h2&gt;
 
@@ -481,7 +480,7 @@ class='code'&gt;ActiveRecord::Relation&lt;/span&gt;
   class='code'&gt;ActiveRecord::FinderMethods&lt;/span&gt; module implements this, which
   ActiveRecord includes into the &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; class.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/first1.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/first1.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;Here you can see because we didn’t pass in a value for &lt;span class='code'&gt;limit&lt;/span&gt;, ActiveRecord
 calls &lt;span class='code'&gt;find_nth&lt;/span&gt; and passes in a value of 0,
@@ -493,27 +492,27 @@ result set, not a window located somewhere farther along the result set.&lt;/p&g
 &lt;p&gt;ActiveRecord implements a series of similar methods that will return the
 second, third, fourth or even fifth record:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/second-fifth.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/second-fifth.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;You can see the pattern here; the first argument is a zero-based index
 indicating which record we want. And just in case we want the forty second
 record from the result set, ActiveRecord implements this useful method&amp;hellip; :)&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/forty-second.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/forty-second.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;It’s no joke! &lt;span class='code'&gt;forty_two&lt;/span&gt; is actually in the
 ActiveRecord source code; you can try it for yourself. Replacing &lt;span
 class='code'&gt;first&lt;/span&gt; with the equivalent call to &lt;span
 class='code'&gt;find_nth&lt;/span&gt;, here’s our example again:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/find-nth.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/find-nth.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;Following the code path through the &lt;span
 class='code'&gt;ActiveRecord::FinderMethods&lt;/span&gt; module, we can see &lt;span
 class='code'&gt;find_nth&lt;/span&gt; calls, in turn, &lt;span
 class='code'&gt;find_nth_with_limit&lt;/span&gt;:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/find-nth-with-limit.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/find-nth-with-limit.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;Now the arguments have been reversed; the first argument, 0, is now the offset
 and the second, 1, is the number of records we want, or the limit value.&lt;/p&gt;
@@ -522,7 +521,7 @@ and the second, 1, is the number of records we want, or the limit value.&lt;/p&g
 class='code'&gt;find_nth_with_limit&lt;/span&gt; with more detailed calls it makes to
 &lt;span class='code'&gt;order&lt;/span&gt; and &lt;span class='code'&gt;limit&lt;/span&gt;:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/detailed-calls.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/detailed-calls.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;Now you can see where all of the values in the final &lt;span
 class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object come from. Each call to a
@@ -536,10 +535,10 @@ new instance of the &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;
 class='code'&gt;User.where(name: &amp;quot;Captain Nemo&amp;quot;).first&lt;/span&gt;, is creating a
 series of &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; objects like this:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/method-chain.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/method-chain.png"/&gt;&lt;/p&gt;
 
 &lt;div style="float: right; padding: 7px 0px 0px 30px; text-align: center;"&gt;
-  &lt;img src="http://localhost/assets/2014/9/17/south-pacific.png"&gt;&lt;br/&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/south-pacific.png"&gt;&lt;br/&gt;
   &lt;i&gt;Captain Nemo allowed Canadian harpoonist Ned Land&lt;br/&gt;to leave the submarine for a short time and explore a&lt;br/&gt;tropical island off the coast of Papua New Guinea.&lt;/i&gt;
 &lt;/div&gt;
 
@@ -567,7 +566,7 @@ worry about executing it until we’re ready.&lt;/p&gt;
 &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object into an array and access the result set, that
 ActiveRecord executes the query:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2014/9/17/to-a.png"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/to-a.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;You can see here that &lt;span class='code'&gt;to_a&lt;/span&gt; calls &lt;span class='code'&gt;load&lt;/span&gt; internally,
 which later calls the &lt;span class='code'&gt;ActiveRecord::ConnectionAdapters::DatabaseStatements#select_all&lt;/span&gt;
