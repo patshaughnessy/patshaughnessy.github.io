@@ -2,7 +2,7 @@ title: "20,000 Leagues Under ActiveRecord"
 date: 2014/9/17
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"><br/>
+  <img src="http://localhost/assets/2014/9/17/title.jpg"><br/>
   <i>First published in 1870, <a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea">20,000 Leagues Under the Sea</a><br/>describes an underwater adventure that takes place<br/>onboard a submarine called the “Nautilus.”</i>
 </div>
 
@@ -29,7 +29,7 @@ returns it to us as a Ruby object.
 
 <div style="clear: left"/></div>
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/>
+<img src="http://localhost/assets/2014/9/17/example1.png"/>
 
 But why talk about ActiveRecord? We all know how to use ActiveRecord; most of
 you understand exactly what this line of code does. You didn’t need to come to
@@ -43,11 +43,11 @@ somewhere. It was amazing!  Before that I was using PHP or Java - I’ve since
 blocked out all memory of that so I’m not quite sure which it was :) - and when
 I saw how easy it was to use Rails to query a database I was very impressed.
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/irb.png"/>
+<img src="http://localhost/assets/2014/9/17/irb.png"/>
 
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/17/underwater-walk.png"><br/>
-  <i>Captain Nemo takes Professor Arronax, Conseil and Ned Land<br/>on a hike through an underwater “forest.” Verne’s novel has<br/>many beautiful, detailed descriptions of underwater worlds<br/>he had never actually seen, and could only imagine.</i>
+  <img src="http://localhost/assets/2014/9/17/underwater-walk.png"><br/>
+  <i>Captain Nemo takes Professor Aronnax, Conseil and Ned Land<br/>on a hike through an underwater “forest.” Verne’s novel has<br/>many beautiful, detailed descriptions of underwater worlds<br/>he had never actually seen, and could only imagine.</i>
 </div>
 
 Somehow Rails could take a simple, beautiful and readable line of Ruby code and
@@ -58,7 +58,7 @@ But it’s not magic. There are thousands of lines of code and years of computer
 science research behind this simple line of code, the hard work behind the
 scenes that makes ActiveRecord queries possible.
 
-Just as Professor Arronax went on an underwater adventure with Captain Nemo,
+Just as Professor Aronnax went on an underwater adventure with Captain Nemo,
 I’d like to take you on an adventure inside of ActiveRecord to find out how it
 works, how ActiveRecord generates and executes SQL statements.
 
@@ -74,7 +74,7 @@ class='code'>ActiveRecord::Relation</span>, the top, public API for
 ActiveRecord many of you use everyday. Then, we’ll look deeper inside of
 ActiveRecord to find out how it converts our Ruby queries into SQL statements.
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/agenda.png"/>
+<img src="http://localhost/assets/2014/9/17/agenda.png"/>
 
 Later, in the second half of the presentation we’ll dive even deeper and
 directly into an actual relational database server (RDBMS); today I’ll use
@@ -90,13 +90,13 @@ for Captain Nemo together. Therefore, we’ll start with a <span
 class='code'>User</span> class, a subclass of <span
 class='code'>ActiveRecord::Base</span>.
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-base.png"/>
+<img src="http://localhost/assets/2014/9/17/activerecord-base.png"/>
 
 When I call <span class='code'>where</span> what happens? It turns out the
 <span class='code'>where</span> method is defined in the <span
 class='code'>ActiveRecord::Querying</span> module:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-querying.png"/>
+<img src="http://localhost/assets/2014/9/17/activerecord-querying.png"/>
 
 But as you can see, ActiveRecord delegates the <span class='code'>where</span>
 method over to another method called <span class='code'>all</span>, which
@@ -105,7 +105,7 @@ class='code'>ActiveRecord::Relation</span>. In fact, my call to <span
 class='code'>User.where</span> is entirely equivalent to calling <span
 class='code'>User.all.where</span>:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/user-all.png"/>
+<img src="http://localhost/assets/2014/9/17/user-all.png"/>
 
 ActiveRecord actually implements the <span class='code'>where</span> method
 using the new instance of <span class='code'>ActiveRecord::Relation</span>.
@@ -115,7 +115,7 @@ class='code'>ActiveRecord::Relation</span>.  Next, <span
 class='code'>ActiveRecord::QueryMethods#where</span> returns, in turn, a second
 new instance of <span class='code'>ActiveRecord::Relation</span>:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation1.png"/>
+<img src="http://localhost/assets/2014/9/17/activerecord-relation1.png"/>
 
 If you look at the right, you can see the second <span
 class='code'>ActiveRecord::Relation</span> object contains information about
@@ -126,7 +126,7 @@ Of course, we don’t want all of the Captain Nemo users; we just
 want the first one. Next, we call the <span class='code'>first</span> method on
 the new <span class='code'>ActiveRecord::Relation</span>:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation2.png"/>
+<img src="http://localhost/assets/2014/9/17/activerecord-relation2.png"/>
 
 ## The Internal Implementation of ActiveRecord::FinderMethods#first
 
@@ -140,7 +140,7 @@ class='code'>ActiveRecord::Relation</span>
   class='code'>ActiveRecord::FinderMethods</span> module implements this, which
   ActiveRecord includes into the <span class='code'>ActiveRecord::Relation</span> class.
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/first1.png"/>
+<img src="http://localhost/assets/2014/9/17/first1.png"/>
 
 Here you can see because we didn’t pass in a value for <span class='code'>limit</span>, ActiveRecord
 calls <span class='code'>find\_nth</span> and passes in a value of 0,
@@ -152,27 +152,27 @@ result set, not a window located somewhere farther along the result set.
 ActiveRecord implements a series of similar methods that will return the
 second, third, fourth or even fifth record:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/second-fifth.png"/>
+<img src="http://localhost/assets/2014/9/17/second-fifth.png"/>
 
 You can see the pattern here; the first argument is a zero-based index
 indicating which record we want. And just in case we want the forty second
 record from the result set, ActiveRecord implements this useful method... :)
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/forty-second.png"/>
+<img src="http://localhost/assets/2014/9/17/forty-second.png"/>
 
 It’s no joke! <span class='code'>forty_two</span> is actually in the
 ActiveRecord source code; you can try it for yourself. Replacing <span
 class='code'>first</span> with the equivalent call to <span
 class='code'>find\_nth</span>, here’s our example again:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/find-nth.png"/>
+<img src="http://localhost/assets/2014/9/17/find-nth.png"/>
 
 Following the code path through the <span
 class='code'>ActiveRecord::FinderMethods</span> module, we can see <span
 class='code'>find\_nth</span> calls, in turn, <span
 class='code'>find\_nth\_with\_limit</span>:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/find-nth-with-limit.png"/>
+<img src="http://localhost/assets/2014/9/17/find-nth-with-limit.png"/>
 
 Now the arguments have been reversed; the first argument, 0, is now the offset
 and the second, 1, is the number of records we want, or the limit value.
@@ -181,7 +181,7 @@ Substituting one more time, let’s replace <span
 class='code'>find\_nth\_with\_limit</span> with more detailed calls it makes to
 <span class='code'>order</span> and <span class='code'>limit</span>:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/detailed-calls.png"/>
+<img src="http://localhost/assets/2014/9/17/detailed-calls.png"/>
 
 Now you can see where all of the values in the final <span
 class='code'>ActiveRecord::Relation</span> object come from. Each call to a
@@ -195,10 +195,10 @@ Taking a step back, we can see that our simple line of code, <span
 class='code'>User.where(name: &quot;Captain Nemo&quot;).first</span>, is creating a
 series of <span class='code'>ActiveRecord::Relation</span> objects like this:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/method-chain.png"/>
+<img src="http://localhost/assets/2014/9/17/method-chain.png"/>
 
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/17/south-pacific.png"><br/>
+  <img src="http://localhost/assets/2014/9/17/south-pacific.png"><br/>
   <i>Captain Nemo allowed Canadian harpoonist Ned Land<br/>to leave the submarine for a short time and explore a<br/>tropical island off the coast of Papua New Guinea.</i>
 </div>
 
@@ -225,7 +225,7 @@ It’s not until we call the <span class='code'>to\_a</span> method, in other to
 <span class='code'>ActiveRecord::Relation</span> object into an array and access the result set, that
 ActiveRecord executes the query:
 
-<img src="http://patshaughnessy.net/assets/2014/9/17/to-a.png"/>
+<img src="http://localhost/assets/2014/9/17/to-a.png"/>
 
 You can see here that <span class='code'>to\_a</span> calls <span class='code'>load</span> internally,
 which later calls the <span class='code'>ActiveRecord::ConnectionAdapters::DatabaseStatements#select\_all</span>
