@@ -228,8 +228,14 @@ ActiveRecord executes the query:
 <img src="http://patshaughnessy.net/assets/2014/9/17/to-a.png"/>
 
 You can see here that <span class='code'>to\_a</span> calls <span class='code'>load</span> internally,
-which later calls the <span class='code'>ActiveRecord::ConnectionAdapters::DatabaseStatements#select\_all</span>
-method.
+which later calls the <span class='code'>DatabaseStatements#select\_all</span>
+method. Note the <span class="code">find\_nth\_with\_limit</span> method also calls
+<span class="code">to\_a</span>, so <span class="code">first</span>,
+<span class="code">second</span> and <span class="code">forty\_two</span> are
+not lazy and will all execute the query immediately. Because of this, these are
+known as “terminating methods.” To prevent the query from executing immediately -
+to keep it lazy - just use <span class="code">order</span> and <span
+class="code">limit</span> instead.
 
 ## Next time
 

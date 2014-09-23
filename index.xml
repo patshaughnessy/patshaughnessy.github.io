@@ -569,8 +569,14 @@ ActiveRecord executes the query:&lt;/p&gt;
 &lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/to-a.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;You can see here that &lt;span class='code'&gt;to_a&lt;/span&gt; calls &lt;span class='code'&gt;load&lt;/span&gt; internally,
-which later calls the &lt;span class='code'&gt;ActiveRecord::ConnectionAdapters::DatabaseStatements#select_all&lt;/span&gt;
-method.&lt;/p&gt;
+which later calls the &lt;span class='code'&gt;DatabaseStatements#select_all&lt;/span&gt;
+method. Note the &lt;span class="code"&gt;find_nth_with_limit&lt;/span&gt; method also calls
+&lt;span class="code"&gt;to_a&lt;/span&gt;, so &lt;span class="code"&gt;first&lt;/span&gt;,
+&lt;span class="code"&gt;second&lt;/span&gt; and &lt;span class="code"&gt;forty_two&lt;/span&gt; are
+not lazy and will all execute the query immediately. Because of this, these are
+known as “terminating methods.” To prevent the query from executing immediately &amp;ndash;
+to keep it lazy &amp;ndash; just use &lt;span class="code"&gt;order&lt;/span&gt; and &lt;span
+class="code"&gt;limit&lt;/span&gt; instead.&lt;/p&gt;
 
 &lt;h2&gt;Next time&lt;/h2&gt;
 
