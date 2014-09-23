@@ -50,8 +50,8 @@ are they created? What do these class names mean?
 
 It turns out that ActiveRecord itself doesn’t convert your
 <span class="code">ActiveRecord::Relation</span> query to SQL; instead, it uses
-a separate gem called Arel. Googling for “Arel” we can easily find its Github
-repo:
+a separate gem called Arel to do that. Googling for “Arel” we can easily find
+its Github repo:
 
 <img src="http://patshaughnessy.net/assets/2014/9/23/arel1.png"/><br/>
 <img src="http://patshaughnessy.net/assets/2014/9/23/arel2.png"/>
@@ -133,7 +133,7 @@ Here’s the AST Arel creates internally for our example query:
 
 You can see the top or root of the tree is a Ruby object called
 <span class="code">SelectStatement</span>, and under that the various branches
-of the tree represent the where, order by and limit clauses in our
+of the tree represent the from, where, order by and limit clauses in our
 select statement.
 
 The Arel gem “is a Relational Algebra” in the sense that it provides a Ruby API
@@ -143,9 +143,10 @@ concepts from Relational Algebra. Internally, these methods create Ruby objects
 and save them in the AST. Arel’s API is similar to ActiveRecord’s, but is
 somewhat more granular and detailed. When we call ActiveRecord methods such as
 <span class="code">where</span> and <span class="code">limit</span>, internally
-ActiveRecord calls the corresponding methods in the Arel gem. Here’s our
-example query written using both ActiveRecord (top) and Arel (bottom) method
-calls:
+ActiveRecord calls the corresponding methods in the Arel gem.
+
+Here’s our example query written using both ActiveRecord (top) and Arel
+(bottom) method calls:
 
 <img src="http://patshaughnessy.net/assets/2014/9/23/arel-and-ar.png"/>
 
@@ -200,9 +201,10 @@ the visitor cumulatively builds up as it goes.
 
 <img src="http://patshaughnessy.net/assets/2014/9/23/tree2b.png"/>
 
-Above you can see the visitor arrow next to the <span class="code">SelectStatement</span> node. Above the
-diagram I’ve written the word “SELECT.” Arel’s visitor knows to write SELECT
-when it encounters <span class="code">SelectStatement</span> root node.
+Here you can see the visitor arrow next to the <span
+class="code">SelectStatement</span> node. Above the diagram I’ve written the
+word “SELECT.” Arel’s visitor knows to write SELECT when it encounters <span
+class="code">SelectStatement</span> root node.
 
 Next Arel moves down to the left:
 
@@ -284,5 +286,5 @@ But why stop here? Why not dive even deeper? … farther below the surface of
 your Rails app into the PostgreSQL server itself! Next we’ll leave the world of
 Ruby entirely and look at what the Postgres server does when it receives this
 select statement. How does it understand the SQL we send it? How does it
-actually find our data… the user record with the name “Captain Nemo?” In my next
+actually find our data, the user record with the name “Captain Nemo?” In my next
 post, I’ll continue our underwater adventure by looking at Postgres internals.

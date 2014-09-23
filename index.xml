@@ -75,8 +75,8 @@ are they created? What do these class names mean?&lt;/p&gt;
 
 &lt;p&gt;It turns out that ActiveRecord itself doesn’t convert your
 &lt;span class="code"&gt;ActiveRecord::Relation&lt;/span&gt; query to SQL; instead, it uses
-a separate gem called Arel. Googling for “Arel” we can easily find its Github
-repo:&lt;/p&gt;
+a separate gem called Arel to do that. Googling for “Arel” we can easily find
+its Github repo:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/23/arel1.png"/&gt;&lt;br/&gt;
 &lt;img src="http://patshaughnessy.net/assets/2014/9/23/arel2.png"/&gt;&lt;/p&gt;
@@ -161,7 +161,7 @@ represents a SQL statement.&lt;/p&gt;
 
 &lt;p&gt;You can see the top or root of the tree is a Ruby object called
 &lt;span class="code"&gt;SelectStatement&lt;/span&gt;, and under that the various branches
-of the tree represent the where, order by and limit clauses in our
+of the tree represent the from, where, order by and limit clauses in our
 select statement.&lt;/p&gt;
 
 &lt;p&gt;The Arel gem “is a Relational Algebra” in the sense that it provides a Ruby API
@@ -171,9 +171,10 @@ concepts from Relational Algebra. Internally, these methods create Ruby objects
 and save them in the AST. Arel’s API is similar to ActiveRecord’s, but is
 somewhat more granular and detailed. When we call ActiveRecord methods such as
 &lt;span class="code"&gt;where&lt;/span&gt; and &lt;span class="code"&gt;limit&lt;/span&gt;, internally
-ActiveRecord calls the corresponding methods in the Arel gem. Here’s our
-example query written using both ActiveRecord (top) and Arel (bottom) method
-calls:&lt;/p&gt;
+ActiveRecord calls the corresponding methods in the Arel gem.&lt;/p&gt;
+
+&lt;p&gt;Here’s our example query written using both ActiveRecord (top) and Arel
+(bottom) method calls:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/23/arel-and-ar.png"/&gt;&lt;/p&gt;
 
@@ -232,9 +233,10 @@ the visitor cumulatively builds up as it goes.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/23/tree2b.png"/&gt;&lt;/p&gt;
 
-&lt;p&gt;Above you can see the visitor arrow next to the &lt;span class="code"&gt;SelectStatement&lt;/span&gt; node. Above the
-diagram I’ve written the word “SELECT.” Arel’s visitor knows to write SELECT
-when it encounters &lt;span class="code"&gt;SelectStatement&lt;/span&gt; root node.&lt;/p&gt;
+&lt;p&gt;Here you can see the visitor arrow next to the &lt;span
+class="code"&gt;SelectStatement&lt;/span&gt; node. Above the diagram I’ve written the
+word “SELECT.” Arel’s visitor knows to write SELECT when it encounters &lt;span
+class="code"&gt;SelectStatement&lt;/span&gt; root node.&lt;/p&gt;
 
 &lt;p&gt;Next Arel moves down to the left:&lt;/p&gt;
 
@@ -317,7 +319,7 @@ pattern and an AST to convert these Ruby method calls into a SQL string.&lt;/p&g
 your Rails app into the PostgreSQL server itself! Next we’ll leave the world of
 Ruby entirely and look at what the Postgres server does when it receives this
 select statement. How does it understand the SQL we send it? How does it
-actually find our data… the user record with the name “Captain Nemo?” In my next
+actually find our data, the user record with the name “Captain Nemo?” In my next
 post, I’ll continue our underwater adventure by looking at Postgres internals.&lt;/p&gt;
 </content>
   </entry>
