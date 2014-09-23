@@ -569,8 +569,9 @@ method.&lt;/p&gt;
 
 &lt;h2&gt;Next time&lt;/h2&gt;
 
-&lt;p&gt;In the next few days I’ll post the second part of my presentation from Barcelona. We’ll look
-at what “Relational Algebra” means and how the Arel gem converts our
+&lt;p&gt;In the next few days I’ll post &lt;a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements"&gt;the second part of my presentation from
+Barcelona&lt;/a&gt;.
+We’ll look at what “Relational Algebra” means and how the Arel gem converts our
 &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object into a string
 containing a SQL statement.&lt;/p&gt;
 </content>

@@ -233,7 +233,8 @@ method.
 
 ## Next time
 
-In the next few days I’ll post the second part of my presentation from Barcelona. We’ll look
-at what “Relational Algebra” means and how the Arel gem converts our
+In the next few days I’ll post [the second part of my presentation from
+Barcelona](http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements).
+We’ll look at what “Relational Algebra” means and how the Arel gem converts our
 <span class='code'>ActiveRecord::Relation</span> object into a string
 containing a SQL statement.
