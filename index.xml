@@ -570,7 +570,7 @@ ActiveRecord executes the query:&lt;/p&gt;
 
 &lt;p&gt;You can see here that &lt;span class='code'&gt;to_a&lt;/span&gt; calls &lt;span class='code'&gt;load&lt;/span&gt; internally,
 which later calls the &lt;span class='code'&gt;DatabaseStatements#select_all&lt;/span&gt;
-method. Note the &lt;span class="code"&gt;find_nth_with_limit&lt;/span&gt; method also calls
+method. Note the &lt;span class="code"&gt;find_nth_with_limit&lt;/span&gt; method calls
 &lt;span class="code"&gt;to_a&lt;/span&gt;, so &lt;span class="code"&gt;first&lt;/span&gt;,
 &lt;span class="code"&gt;second&lt;/span&gt; and &lt;span class="code"&gt;forty_two&lt;/span&gt; are
 not lazy and will all execute the query immediately. Because of this, these are

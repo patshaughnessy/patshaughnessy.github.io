@@ -229,7 +229,7 @@ ActiveRecord executes the query:
 
 You can see here that <span class='code'>to\_a</span> calls <span class='code'>load</span> internally,
 which later calls the <span class='code'>DatabaseStatements#select\_all</span>
-method. Note the <span class="code">find\_nth\_with\_limit</span> method also calls
+method. Note the <span class="code">find\_nth\_with\_limit</span> method calls
 <span class="code">to\_a</span>, so <span class="code">first</span>,
 <span class="code">second</span> and <span class="code">forty\_two</span> are
 not lazy and will all execute the query immediately. Because of this, these are
