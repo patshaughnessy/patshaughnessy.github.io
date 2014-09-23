@@ -267,6 +267,11 @@ because we are standing on the shoulders of giants - computer scientists like
 Edgar Codd - who have already done the difficult theoretical work that makes
 building apps today possible.
 
+<div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
+  <img src="http://localhost/assets/2014/9/23/south-pole.png"><br/>
+  <i>A citizen of no country, Captain Nemo claimed the <br/>south pole as his own using a black flag with a large "N."</i>
+</div>
+
 ## Why Stop Here?
 
 We’ve learned a lot about ActiveRecord and the Arel gem. Now we know what
