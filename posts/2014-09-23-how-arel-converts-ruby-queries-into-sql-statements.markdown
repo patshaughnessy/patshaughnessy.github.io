@@ -3,7 +3,7 @@ date: 2014/9/23
 
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/9/23/battle.png"><br/>
-  <i>In one of the climactic scenes in</i> 20,000 Leagues Under the<br/>Sea, <i>Captain Nemo and his crew battle a giant octopus.</i>
+  <i>In one of the climactic scenes in <a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea">20,000 Leagues Under the<br/>Sea</a>, Captain Nemo and his crew battle a giant octopus.</i>
 </div>
 
 <b>
