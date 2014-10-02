@@ -10,8 +10,8 @@
     <title>How Arel Converts Ruby Queries Into SQL Statements</title>
     <link href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements</id>
-    <published>2014-09-23T03:00:00Z</published>
-    <updated>2014-09-23T03:00:00Z</updated>
+    <published>2014-09-23T00:00:00Z</published>
+    <updated>2014-09-23T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -31,11 +31,11 @@ This is the second in a serie</summary>
 
 
 &lt;p&gt;&lt;b&gt;
-This is the second in a series of posts based on a presentation I did at the
-&lt;a href="http://www.baruco.org"&gt;Barcelona Ruby Conference&lt;/a&gt; called “20,000 Leagues Under
-ActiveRecord.”&lt;/b&gt; I took an innocent and unsuspecting audience on an adventure
-inside and underneath ActiveRecord to find out how Rails and PostgreSQL
-actually execute a simple SQL query.&lt;/p&gt;
+This is the second in a series of posts based on &lt;a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4"&gt;a presentation I did at the
+Barcelona Ruby Conference&lt;/a&gt; called
+“20,000 Leagues Under ActiveRecord.”&lt;/b&gt; I took an innocent and unsuspecting
+audience on an adventure inside and underneath ActiveRecord to find out how
+Rails and PostgreSQL actually execute a simple SQL query.&lt;/p&gt;
 
 &lt;p&gt;In the &lt;a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord"&gt;first part of the
 presentation&lt;/a&gt;
@@ -326,8 +326,8 @@ post, I’ll continue our underwater adventure by looking at Postgres internals.
     <title>20,000 Leagues Under ActiveRecord</title>
     <link href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord</id>
-    <published>2014-09-17T03:00:00Z</published>
-    <updated>2014-09-17T03:00:00Z</updated>
+    <published>2014-09-17T00:00:00Z</published>
+    <updated>2014-09-17T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -594,8 +594,8 @@ containing a SQL statement.&lt;/p&gt;
     <title>A Rule of Thumb for Strong Parameters</title>
     <link href="http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters</id>
-    <published>2014-06-16T03:00:00Z</published>
-    <updated>2014-06-16T03:00:00Z</updated>
+    <published>2014-06-16T00:00:00Z</published>
+    <updated>2014-06-16T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -825,8 +825,8 @@ class="code"&gt;ActiveModel::ForbiddenAttributesError&lt;/span&gt; exception.&lt
     <title>Using a Ruby Class To Write Functional Code</title>
     <link href="http://patshaughnessy.net/2014/4/8/using-a-ruby-class-to-write-functional-code" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/4/8/using-a-ruby-class-to-write-functional-code</id>
-    <published>2014-04-08T03:00:00Z</published>
-    <updated>2014-04-08T03:00:00Z</updated>
+    <published>2014-04-08T00:00:00Z</published>
+    <updated>2014-04-08T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1135,8 +1135,8 @@ for more background on &amp;ldquo;Tell, Don&amp;rsquo;t Ask.&amp;rdquo;&lt;/p&gt
     <title>Use An Ask, Don’t Tell Policy With Ruby</title>
     <link href="http://patshaughnessy.net/2014/2/10/use-an-ask-dont-tell-policy-with-ruby" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/2/10/use-an-ask-dont-tell-policy-with-ruby</id>
-    <published>2014-02-10T04:00:00Z</published>
-    <updated>2014-02-10T04:00:00Z</updated>
+    <published>2014-02-10T01:00:00Z</published>
+    <updated>2014-02-10T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1387,8 +1387,8 @@ He also disagrees with my opinion that the &lt;span
     <title>What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</title>
     <link href="http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean</id>
-    <published>2014-01-30T04:00:00Z</published>
-    <updated>2014-01-30T04:00:00Z</updated>
+    <published>2014-01-30T01:00:00Z</published>
+    <updated>2014-01-30T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1596,8 +1596,8 @@ pass along a link.&lt;/p&gt;
     <title>Ruby Multiplies Like a Fourth Grader</title>
     <link href="http://patshaughnessy.net/2014/1/24/ruby-multiplies-like-a-fourth-grader" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/1/24/ruby-multiplies-like-a-fourth-grader</id>
-    <published>2014-01-24T04:00:00Z</published>
-    <updated>2014-01-24T04:00:00Z</updated>
+    <published>2014-01-24T01:00:00Z</published>
+    <updated>2014-01-24T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1841,8 +1841,8 @@ to enable GMP support and how to use it.&lt;/p&gt;
     <title>How Big is a Bignum?</title>
     <link href="http://patshaughnessy.net/2014/1/9/how-big-is-a-bignum" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/1/9/how-big-is-a-bignum</id>
-    <published>2014-01-09T04:00:00Z</published>
-    <updated>2014-01-09T04:00:00Z</updated>
+    <published>2014-01-09T01:00:00Z</published>
+    <updated>2014-01-09T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2075,8 +2075,8 @@ it. And Ruby 2.1 adds yet another new algorithm to the mix with GMP.&lt;/p&gt;
     <title>Three RubyConf Surprises</title>
     <link href="http://patshaughnessy.net/2013/12/4/three-rubyconf-surprises" rel="alternate"/>
     <id>http://patshaughnessy.net/2013/12/4/three-rubyconf-surprises</id>
-    <published>2013-12-04T04:00:00Z</published>
-    <updated>2013-12-04T04:00:00Z</updated>
+    <published>2013-12-04T01:00:00Z</published>
+    <updated>2013-12-04T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2111,8 +2111,8 @@ it. And Ruby 2.1 adds yet another new algorithm to the mix with GMP.&lt;/p&gt;
     <title>Expanded Ruby Under a Microscope Available in Print!</title>
     <link href="http://patshaughnessy.net/2013/11/7/expanded-ruby-under-a-microscope-available-in-print" rel="alternate"/>
     <id>http://patshaughnessy.net/2013/11/7/expanded-ruby-under-a-microscope-available-in-print</id>
-    <published>2013-11-07T04:00:00Z</published>
-    <updated>2013-11-07T04:00:00Z</updated>
+    <published>2013-11-07T01:00:00Z</published>
+    <updated>2013-11-07T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>

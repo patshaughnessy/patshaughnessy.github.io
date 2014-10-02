@@ -7,11 +7,11 @@ date: 2014/9/23
 </div>
 
 <b>
-This is the second in a series of posts based on a presentation I did at the
-[Barcelona Ruby Conference](http://www.baruco.org) called “20,000 Leagues Under
-ActiveRecord.”</b> I took an innocent and unsuspecting audience on an adventure
-inside and underneath ActiveRecord to find out how Rails and PostgreSQL
-actually execute a simple SQL query.
+This is the second in a series of posts based on [a presentation I did at the
+Barcelona Ruby Conference](https://www.youtube.com/watch?v=rnLnRPZZ1Q4) called
+“20,000 Leagues Under ActiveRecord.”</b> I took an innocent and unsuspecting
+audience on an adventure inside and underneath ActiveRecord to find out how
+Rails and PostgreSQL actually execute a simple SQL query.
 
 In the [first part of the
 presentation](http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
