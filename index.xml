@@ -31,11 +31,11 @@ This is the second in a serie</summary>
 
 
 &lt;p&gt;&lt;b&gt;
-This is the second in a series of posts based on &lt;a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4"&gt;a presentation I did at the
-Barcelona Ruby Conference&lt;/a&gt; called
-“20,000 Leagues Under ActiveRecord.”&lt;/b&gt; I took an innocent and unsuspecting
-audience on an adventure inside and underneath ActiveRecord to find out how
-Rails and PostgreSQL actually execute a simple SQL query.&lt;/p&gt;
+This is the second in a series of posts based on a presentation I did at the
+&lt;a href="http://www.baruco.org"&gt;Barcelona Ruby Conference&lt;/a&gt; called “20,000 Leagues Under
+ActiveRecord” (&lt;a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4"&gt;video&lt;/a&gt;).&lt;/b&gt; I took an innocent and unsuspecting audience on an adventure
+inside and underneath ActiveRecord to find out how Rails and PostgreSQL
+actually execute a simple SQL query.&lt;/p&gt;
 
 &lt;p&gt;In the &lt;a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord"&gt;first part of the
 presentation&lt;/a&gt;
