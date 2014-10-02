@@ -8,9 +8,11 @@ date: 2014/9/17
 
 <b>
 This is the first in a series of posts based on a presentation I just did
-last Friday at the [Barcelona Ruby Conference](http://www.baruco.org). I’ll
-also post a link to the video recording when the Baruco team has time to edit
-and post it online.  </b>
+last Friday at the [Barcelona Ruby Conference](http://www.baruco.org). You can
+also watch the [video recording of the
+presentation](https://www.youtube.com/watch?v=rnLnRPZZ1Q4).
+
+</b>
 
 Let me start with a question: How many of you have actually read 20,000 Leagues
 Under the Sea, either in the original French or in some translation? [ A few

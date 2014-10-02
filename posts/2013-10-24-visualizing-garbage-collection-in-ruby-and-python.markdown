@@ -5,15 +5,16 @@ date: 2013/10/24
   <p>
   Note: This post is based on a presentation I just did at <a href="http://13.rupy.eu">RuPy</a> in Budapest.
   Instead of just posting my slides I thought it would be more useful if I wrote
-  it down as a blog post while it’s still fresh in my mind. I’ll post the video
-  link here when the RuPy folks have it online.  FYI I’m planning to do a <a href="http://rubyconf.org/program#pat-shaughnessy">similar presentation at RubyConf</a>,
-  except I’ll remove the Python info, and instead compare how
-  GC works inside of MRI vs.  JRuby and Rubinius.</p>
+  it down as a blog post while it’s still fresh in my mind. You can
+also watch the [video recording of the
+presentation](https://www.youtube.com/watch?v=qzEekAnAS_g). FYI I’m planning to
+do a <a href="https://www.youtube.com/watch?v=yl_zYzPiDto">similar presentation
+at RubyConf</a>, except I’ll remove the Python info, and instead compare how GC
+works inside of MRI vs.  JRuby and Rubinius.</p>
   
-  <p>
-  For a more detailed explanation of GC in Ruby and of Ruby internals generally,
-  see my upcoming book, <a href="http://nostarch.com/rum">Ruby Under a Microscope</a>,
-  due out very soon from No Starch Press.</p> </b>
+  <p> For a more detailed explanation of GC in Ruby and of Ruby internals
+  generally, see my upcoming book, <a href="http://nostarch.com/rum">Ruby Under
+  a Microscope</a>, due out very soon from No Starch Press.</p> </b>
 
 <div style="float: left; padding: 7px 30px 10px 0px; text-align: center; margin-top: 20px">
   <img src="http://patshaughnessy.net/assets/2013/10/24/circuitory-system-polish.png"><br/>

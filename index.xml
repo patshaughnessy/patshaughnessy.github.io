@@ -347,9 +347,11 @@ post, I’ll continue our underwater adventure by looking at Postgres internals.
 
 &lt;p&gt;&lt;b&gt;
 This is the first in a series of posts based on a presentation I just did
-last Friday at the &lt;a href="http://www.baruco.org"&gt;Barcelona Ruby Conference&lt;/a&gt;. I’ll
-also post a link to the video recording when the Baruco team has time to edit
-and post it online.  &lt;/b&gt;&lt;/p&gt;
+last Friday at the &lt;a href="http://www.baruco.org"&gt;Barcelona Ruby Conference&lt;/a&gt;. You can
+also watch the &lt;a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4"&gt;video recording of the
+presentation&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;/b&gt;&lt;/p&gt;
 
 &lt;p&gt;Let me start with a question: How many of you have actually read 20,000 Leagues
 Under the Sea, either in the original French or in some translation? [ A few
