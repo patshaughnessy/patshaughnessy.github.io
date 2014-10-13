@@ -7,6 +7,499 @@
     <name></name>
   </author>
   <entry>
+    <title>Following a Select Statement Through Postgres Internals</title>
+    <link href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals" rel="alternate"/>
+    <id>http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals</id>
+    <published>2014-10-13T00:00:00Z</published>
+    <updated>2014-10-13T00:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/10/13/engine-room.png"&gt;&lt;br/&gt;
+  &lt;i&gt;Captain Nemo takes Professor Aronnax on a tour&lt;br/&gt;of the engine room, a fascinating description&lt;br/&gt;of future technology from an 1870 perspective.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;&lt;b&gt;
+This is the third of a series of posts based on a presentation I did at the</summary>
+    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/10/13/engine-room.png"&gt;&lt;br/&gt;
+  &lt;i&gt;Captain Nemo takes Professor Aronnax on a tour&lt;br/&gt;of the engine room, a fascinating description&lt;br/&gt;of future technology from an 1870 perspective.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;&lt;b&gt;
+This is the third of a series of posts based on a presentation I did at the
+&lt;a href="http://www.baruco.org"&gt;Barcelona Ruby Conference&lt;/a&gt; called “20,000 Leagues Under
+ActiveRecord.” (posts:
+&lt;a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord"&gt;one&lt;/a&gt;
+&lt;a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements"&gt;two&lt;/a&gt;
+and &lt;a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4"&gt;video&lt;/a&gt;).  &lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;Preparing for this presentation over the Summer, I decided to read through
+parts of the PostgreSQL C source code. I executed a very simple select
+statement and watched what Postgres did with it using LLDB, a C debugger. How
+did Postgres understand my query? How did it actually find the data I was
+looking for?&lt;/p&gt;
+
+&lt;p&gt;This post is an informal journal of my trip through the guts of Postgres. I’ll
+describe the path I took and what I saw along the way. I’ll use a series of
+simple, conceptual diagrams to explain how Postgres executed my query.
+In case you understand C, I’ll also leave you a few landmarks and signposts you
+can look for if you ever decide to hack on Postgres internals.&lt;/p&gt;
+
+&lt;p&gt;In the end, the Postgres source code delighted me. It was clean, well
+documented and easy to follow. Find out for yourself how Postgres works
+internally by following me on a journey deep inside a tool you use everyday.&lt;/p&gt;
+
+&lt;div style="clear: left"&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Finding Captain Nemo&lt;/h2&gt;
+
+&lt;p&gt;Here’s the example query from &lt;a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord"&gt;the first half of my
+presentation&lt;/a&gt;;
+we’ll follow Postgres as it searches for Captain Nemo:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/23/sql.png"/&gt;&lt;/p&gt;
+
+&lt;div style="float: right; padding: 7px 0px 0px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/10/13/maps.png"&gt;&lt;br/&gt;
+  &lt;i&gt;Professor Aronnax and Captain Nemo&lt;br/&gt;plot the course of the Nautilus.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Finding a single name in string column like this should be straightforward,
+shouldn’t it? We’ll hold tightly onto this select statement while we explore
+Postgres internals, like a rope deep sea divers use to find their way back to
+the surface.&lt;/p&gt;
+
+&lt;h2&gt;The Big Picture&lt;/h2&gt;
+
+&lt;p&gt;What does Postgres do with this SQL string? How does it understand what we
+meant? How does it know what data we are looking for?&lt;/p&gt;
+
+&lt;p&gt;Postgres processes each SQL command we send it using a four step process.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/4-steps.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In the first step, Postgres &lt;em&gt;parses&lt;/em&gt; our SQL statement and converts it into a
+series of C memory structures, a &lt;em&gt;parse tree&lt;/em&gt;. Next Postgres &lt;em&gt;analyzes and
+rewrites&lt;/em&gt; our query, optimizing and simplifying it using a series of complex
+algorithms. After that, Postgres generates a &lt;em&gt;plan&lt;/em&gt; for finding our data. Like
+an obsessive compulsive person who won’t leave home without every suitcase
+packed perfectly, Postgres doesn’t run our query until it has a plan. Finally,
+Postgres actually &lt;em&gt;executes&lt;/em&gt; our query. In this presentation I’ll briefly touch
+on the first three topics, and then focus more on the last step: &lt;em&gt;Execute&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;The C function inside of Postgres that implements this 4 step process is called
+&lt;span class="code"&gt;exec_simple_query&lt;/span&gt;. You can find a link to it below, along with an LLDB
+backtrace which gives some context about exactly when and how Postgres calls
+&lt;span class="code"&gt;exec_simple_query&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;
+&lt;div class="sign"&gt;
+  &lt;div class="sign-icon"&gt;&lt;/div&gt;
+  &lt;div class="function-info"&gt;
+    &lt;div class="function-name"&gt;exec_simple_query&lt;/div&gt;
+    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/postgres_8c.html#a7908e75bd9f9494fdb8c4b47f01a9de9"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="function-code"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_simple_query.png"/&gt;
+  &lt;/div&gt;
+  &lt;div class="function-bt"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_simple_query_bt.png"/&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/p&gt;
+
+
+&lt;h2&gt;Parse&lt;/h2&gt;
+
+&lt;p&gt;How does Postgres understand the SQL string we sent it? How does it make sense
+of the SQL keywords and expressions in our select statement? Through a process
+called &lt;em&gt;parsing&lt;/em&gt;, Postgres converts our SQL string into an internal data
+structure it understands, the parse tree.&lt;/p&gt;
+
+&lt;p&gt;It turns out that Postgres uses the same parsing technology that Ruby does, a
+&lt;em&gt;parser generator&lt;/em&gt; called &lt;a href="http://www.gnu.org/software/bison/"&gt;Bison&lt;/a&gt;. Bison
+runs during the Postgres C build process and generates parser code based on a
+series of grammar rules. The generated parser code is what runs inside of
+Postgres when we send it SQL commands. Each grammar rule is triggered when the
+generated parser finds a corresponding pattern or syntax in the SQL string,
+and inserts a new C memory structure into the parse tree data structure.&lt;/p&gt;
+
+&lt;p&gt;I won’t take the time today to explain how parsing algorithms work in detail.
+If you’re interested in that sort of thing, I’d suggest taking a look at my
+book &lt;a href="http://patshaughnessy.net/ruby-under-a-microscope"&gt;Ruby Under a
+Microscope&lt;/a&gt;. In Chapter One
+I go through a detailed example of the LALR parse algorithm used by Bison and
+Ruby. Postgres parses SQL statements in exactly the same way.&lt;/p&gt;
+
+&lt;p&gt;Using LLDB and enabling some C logging code, I observed the Postgres parser
+produce this parse tree for our Captain Nemo query:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/parse-tree.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;At the top is a node representing the entire SQL statement, and below that are
+child nodes or branches that represent the different portions of the SQL
+statement syntax: the target list (a list of columns), the from clause (a list
+of tables), the where clause, the sort order and a limit count.&lt;/p&gt;
+
+&lt;p&gt;If you want to learn more about how Postgres parses SQL statements, follow the
+flow of control down from &lt;span class="code"&gt;exec_simple_query&lt;/span&gt; through
+another C function called &lt;span class="code"&gt;pg_parse_query&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;
+&lt;div class="sign"&gt;
+  &lt;div class="sign-icon"&gt;&lt;/div&gt;
+  &lt;div class="function-info"&gt;
+    &lt;div class="function-name"&gt;pg_parse_query&lt;/div&gt;
+    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/postgres_8c.html#a0449a974d1a66a2fcdee8896a0690521"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="function-code"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_parse_query.png"/&gt;
+  &lt;/div&gt;
+  &lt;div class="function-bt"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_parse_query_bt.png"/&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/p&gt;
+
+
+&lt;p&gt;As you can see there are many helpful and detailed comments in the Postgres
+source code that not only explain what is happening but also point out important
+design decisions.&lt;/p&gt;
+
+&lt;h2&gt;All That Hard Work For Nothing&lt;/h2&gt;
+
+&lt;p&gt;The parse tree above should look familiar &amp;ndash; it’s almost precisely the same as
+the abstract syntax tree (AST) we saw ActiveRecord create earlier. Recall from
+the &lt;a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord"&gt;first half of the
+presentation&lt;/a&gt;
+ActiveRecord generated our Captain Nemo select statement when we executed this
+Ruby query:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;We saw that ActiveRecord internally created an AST when we called methods such
+as &lt;span class="code"&gt;where&lt;/span&gt; and &lt;span class="code"&gt;first&lt;/span&gt;. Later
+(see the &lt;a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements"&gt;second
+post&lt;/a&gt;),
+we watched as the Arel gem converted the AST into our example select statement
+using an algorithm based on the visitor pattern.&lt;/p&gt;
+
+&lt;p&gt;Thinking about this, it’s ironic that the first thing Postgres does with your
+SQL statement is convert it from a string back into an AST. Postgres’s parse
+process reverses everything ActiveRecord did earlier; all of that hard work the
+Arel gem did was for nothing! The only reason for creating the SQL string at
+all was to communicate with Postgres over a network connection. Once Postgres
+has the string, it converts it back into an AST, which is a much more
+convenient and useful way of representing queries.&lt;/p&gt;
+
+&lt;p&gt;Learning this you might ask: Is there a better way? Is there some way of
+conceptually specifying the data we want to Postgres without writing a SQL
+statement? Without learning the complex SQL language or paying the performance
+overhead of using ActiveRecord and Arel? It seems like a waste of time to go to
+such lengths to generate a SQL string from an AST, just to convert it back to
+an AST again. Maybe we should be using a NoSQL database solution instead?&lt;/p&gt;
+
+&lt;p&gt;Of course, the AST Postgres uses is much different from the AST used by
+ActiveRecord. ActiveRecord’s AST was comprised of Ruby objects, while
+Postgres’s AST is formed of a series of C memory structures. Same idea but very
+different implementations.&lt;/p&gt;
+
+&lt;h2&gt;Analyze and Rewrite&lt;/h2&gt;
+
+&lt;p&gt;Once Postgres has generated a parse tree, it then converts it into a another
+tree structure using a different set of nodes. This is known as the &lt;em&gt;query
+tree&lt;/em&gt;. Returning to the &lt;span class="code"&gt;exec_simple_query&lt;/span&gt; C
+function, you can see it next calls another C function &lt;span
+class="code"&gt;pg_analyze_and_rewrite&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;
+&lt;div class="sign"&gt;
+  &lt;div class="sign-icon"&gt;&lt;/div&gt;
+  &lt;div class="function-info"&gt;
+    &lt;div class="function-name"&gt;pg_analyze_and_rewrite&lt;/div&gt;
+    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/postgres_8c.html#a66930c41c305d22f3371cad134fd3dee"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="function-code"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_analyze_and_rewrite.png"/&gt;
+  &lt;/div&gt;
+  &lt;div class="function-bt"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_analyze_and_rewrite_bt.png"/&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/p&gt;
+
+
+&lt;p&gt;Waving my hands a bit and glossing over many important details, the analyze and
+rewrite process applies a series of sophisticated algorithms and heuristics to
+try to optimize and simplify your SQL statement. If you had executed a complex
+select statement with sub-selects and multiple inner and outer joins, then
+there is a lot of room for optimization. It’s quite possible that Postgres
+could reduce the number of sub-select clauses or joins to produce a simpler
+query that runs faster.&lt;/p&gt;
+
+&lt;p&gt;For our simple select statement, here’s the query tree that &lt;span
+class="code"&gt;pg_analyze_and_rewrite&lt;/span&gt; produces:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/query-tree.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;I don’t pretend to understand the detailed algorithms behind &lt;span
+class="code"&gt;pg_analyze_and_rewrite&lt;/span&gt;. I simply observed that for our
+example the query tree largely resembled the parse tree. This means the
+select statement was so straightforward Postgres wasn’t able to simplify it further.&lt;/p&gt;
+
+&lt;h2&gt;Plan&lt;/h2&gt;
+
+&lt;p&gt;The last step Postgres takes before starting to execute our query is to create
+a plan. This involves generating a third tree of nodes that form a list of
+instructions for Postgres to follow. Here’s the plan tree for our select
+statement.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/plan-tree.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Imagine that each node in the plan tree is a machine or worker of some
+kind. The plan tree resembles a pipeline of data or a conveyor belt in a
+factory. In my simple example there is only one branch in the tree. Each node
+in the plan tree takes some the output data from the node below, processes it,
+and returns results as input to the node above. We’ll follow Postgres as it
+executes the plan in the next section.&lt;/p&gt;
+
+&lt;p&gt;The C function that starts the query planning process is called &lt;span
+class="code"&gt;pg_plan_queries&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;
+&lt;div class="sign"&gt;
+  &lt;div class="sign-icon"&gt;&lt;/div&gt;
+  &lt;div class="function-info"&gt;
+    &lt;div class="function-name"&gt;pg_plan_queries&lt;/div&gt;
+    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/postgres_8c.html#a34e18d3874224b3b670ec0a3ae9c970c"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="function-code"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_plan_queries.png"/&gt;
+  &lt;/div&gt;
+  &lt;div class="function-bt"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_plan_queries_bt.png"/&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/p&gt;
+
+
+&lt;p&gt;Note the &lt;span class="code"&gt;startup_cost&lt;/span&gt; and &lt;span
+class="code"&gt;total_cost&lt;/span&gt; values in each plan node. Postgres uses these
+values to estimate how long the plan will take to complete. You don’t have
+to use a C debugger to see the execution plan for your query. Just prepend the
+SQL &lt;span class="code"&gt;EXPLAIN&lt;/span&gt; command to your query, like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/explain.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This is a powerful way to understand what Postgres is doing internally with one
+of your queries, and why it might be slow or inefficient &amp;ndash; despite the
+sophisticated planning algorithms in &lt;span class="code"&gt;pg_plan_queries&lt;/span&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Executing a Limit Plan Node&lt;/h2&gt;
+
+&lt;p&gt;By now, Postgres has parsed your SQL statement and converted it back into an
+AST. Then it optimized and rewrote your query, possibly in a simpler way.
+Third, Postgres wrote a plan which it will follow to find and return the data
+you are looking for. Finally it’s time for Postgres to actually execute your
+query. How does it do this? It follows the plan, of course!&lt;/p&gt;
+
+&lt;p&gt;Let’s start at the top of the plan tree and move down. Skipping the root node,
+the first worker that Postgres uses for our Captain Nemo query is called Limit.
+The Limit node, as you might guess, implements the &lt;span
+class="code"&gt;LIMIT&lt;/span&gt; SQL command, which limits the result set to the
+specified number of records. The same plan node also implements the &lt;span
+class="code"&gt;OFFSET&lt;/span&gt; command, which starts the result set window at the
+specified row.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/limit1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The first time Postgres calls the Limit node, it calculates what the limit and
+offset values should be, because they might be set to the result of some
+dynamic calculation. In our example, offset is 0 and limit is 1.&lt;/p&gt;
+
+&lt;p&gt;Next, the Limit plan node repeatedly calls the subplan, in our case Sort,
+counting until it reaches the offset value:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/limit2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In our example the offset value is zero, so this loop will load the first data
+value and stop iterating. Then Postgres returns the last data value loaded from
+the subplan to the calling or upper plan. For us, this will be that first value
+from the subplan.&lt;/p&gt;
+
+&lt;p&gt;Finally when Postgres continues to call the Limit node, it will pass the data
+values through from the subplan one at a time:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/limit3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In our example, because the limit value is 1 Limit will immediately return NULL
+indicating to the upper plan there is no more data available.&lt;/p&gt;
+
+&lt;p&gt;Postgres implements the Limit node using code in a file called nodeLimit.c&lt;/p&gt;
+
+&lt;p&gt;
+&lt;div class="sign"&gt;
+  &lt;div class="sign-icon"&gt;&lt;/div&gt;
+  &lt;div class="function-info"&gt;
+    &lt;div class="function-name"&gt;ExecLimit&lt;/div&gt;
+    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nodeLimit_8c.html#a9fe32874f36f4a955f5b4b762d814631"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="function-code"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_limit.png"/&gt;
+  &lt;/div&gt;
+  &lt;div class="function-bt"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_limit_bt.png"/&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/p&gt;
+
+
+&lt;p&gt;You can see the Postgres source code uses words such as &lt;em&gt;tuple&lt;/em&gt; (a set a
+values, one from each column) and &lt;em&gt;subplan&lt;/em&gt;. The subplan in this example is the
+Sort node, which appears below Limit in the plan.&lt;/p&gt;
+
+&lt;h2&gt;Executing a Sort Plan Node&lt;/h2&gt;
+
+&lt;p&gt;Where do the data values Limit filters come from? From the Sort plan node
+that appears under Limit in the plan tree. Sort loads data values from its
+subplan and returns them to its calling plan, Limit. Here’s what Sort does when
+the Limit node calls it for the first time, to get the first data value:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/sort1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;You can see that Sort functions very differently from Limit. It immediately
+loads all of the available data from the subplan into a buffer, before
+returning anything. Then it sorts the buffer using the
+&lt;a href="http://en.wikipedia.org/wiki/Quicksort"&gt;Quicksort&lt;/a&gt; algorithm, and finally
+returns the first sorted value.&lt;/p&gt;
+
+&lt;p&gt;For the second and subsequent calls, Sort simply returns additional values from
+the sorted buffer, and never needs to call the subplan again:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/sort2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The Sort plan node is implemented by a C function called ExecSort:&lt;/p&gt;
+
+&lt;p&gt;
+&lt;div class="sign"&gt;
+  &lt;div class="sign-icon"&gt;&lt;/div&gt;
+  &lt;div class="function-info"&gt;
+    &lt;div class="function-name"&gt;ExecSort&lt;/div&gt;
+    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nodeSort_8c.html#afe145ec8ff9b3d3a654022f73eab2810"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="function-code"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_sort.png"/&gt;
+  &lt;/div&gt;
+  &lt;div class="function-bt"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_sort_bt.png"/&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/p&gt;
+
+
+&lt;h2&gt;Executing a SeqScan Plan Node&lt;/h2&gt;
+
+&lt;p&gt;Where does ExecSort get its values? From its subplan, or the SeqScan node that
+appears at the bottom of the plan tree. SeqScan stands for &lt;em&gt;sequence scan&lt;/em&gt;, which
+means to look through the values in a table, returning values that match a
+given filter. To understand how the scan works with our filter, let’s step
+through an imaginary users table filled with fake names, looking for Captain
+Nemo.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Postgres starts at the first record in a table (known as a &lt;em&gt;relation&lt;/em&gt; in the
+Postgres source code) and executes the boolean expression from the plan tree.
+In simple terms, Postgres asks the question: “Is this Captain Nemo?” Because
+Laurianne Goodwin is not Captain Nemo, Postgres steps down to the next record.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;No, Candace is also not Captain Nemo. Postgres continues:&lt;/p&gt;
+
+&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;… and eventually finds Captain Nemo!&lt;/p&gt;
+
+&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Postgres implements the SeqScan node using a C function called ExecSeqScan.&lt;/p&gt;
+
+&lt;p&gt;
+&lt;div class="sign"&gt;
+  &lt;div class="sign-icon"&gt;&lt;/div&gt;
+  &lt;div class="function-info"&gt;
+    &lt;div class="function-name"&gt;ExecSeqScan&lt;/div&gt;
+    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nodeSeqscan_8c.html#af80d84501ff7621d2ef6249b148e7f44"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="function-code"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_seq_scan.png"/&gt;
+  &lt;/div&gt;
+  &lt;div class="function-bt"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_seq_scan_bt.png"/&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/p&gt;
+
+
+&lt;h2&gt;What Are We Doing Wrong?&lt;/h2&gt;
+
+&lt;p&gt;Now we’re done! We’ve followed a simple select statement all the way through
+the guts of Postgres, and have seen how it was parsed, rewritten, planned and finally
+executed. After executing many thousands of lines of C code, Postgres has found the
+data we are looking for! Now all Postgres has to do is return the Captain Nemo
+string back to our Rails application and ActiveRecord can create a Ruby object.
+We can finally return to the surface of our application.&lt;/p&gt;
+
+&lt;p&gt;But Postgres doesn’t stop! Instead of simply returning, Postgres continues to
+scan through the users table, even though we’ve already found Captain Nemo:&lt;/p&gt;
+
+&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/&gt;&lt;/p&gt;
+
+&lt;div style="float: right; padding: 117px 0px 70px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/10/13/suffocating.png"&gt;&lt;br/&gt;
+  &lt;i&gt;While returning from the South Pole, the air&lt;br/&gt; supply inside the Nautilus began to run out.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;What’s going on here? Why is Postgres wasting its time, continuing to search
+even though it’s already found the data we’re looking for?&lt;/p&gt;
+
+&lt;p&gt;The answer lies farther up the plan tree in the Sort node. Recall that in order
+to sort all of the users, ExecSort first loads all of the values into a buffer,
+by calling the subplan repeatedly until there are no values left. That means
+that &lt;em&gt;ExecSeqScan will continue to scan to the end of the table&lt;/em&gt;, until it has
+all of the matching users. If our users table contained thousands or even
+millions of records (imagine we work at Facebook or Twitter), ExecSeqScan will
+have to loop over every single user record and execute the string comparison
+for each one. This is obviously inefficient and slow, and will get slower as
+more and more user records are added.&lt;/p&gt;
+
+&lt;p&gt;If we have only one Captain Nemo record, then ExecSort will “sort” just that
+single matching record, and ExecLimit will pass that single record through its
+offset/limit filter… but only after ExecSeqScan has iterated over all of the
+names.&lt;/p&gt;
+
+&lt;h2&gt;Next Time&lt;/h2&gt;
+
+&lt;p&gt;How do we fix this problem? What should we do if our SQL queries on the users
+table take more and more time to execute? The answer is simple: we  create an
+index.&lt;/p&gt;
+
+&lt;p&gt;In the next and final post in this series we’ll learn how to create a Postgres
+index and to avoid the use of ExecSeqScan. More importantly, I’ll show you what
+a Postgres index looks like: &lt;em&gt;how&lt;/em&gt; it works and &lt;em&gt;why&lt;/em&gt; it speeds up queries like
+this one.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>How Arel Converts Ruby Queries Into SQL Statements</title>
     <link href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements</id>
@@ -2105,163 +2598,6 @@ it. And Ruby 2.1 adds yet another new algorithm to the mix with GMP.&lt;/p&gt;
 
 
 &lt;p&gt;Read the full article on &lt;a href="http://www.sitepoint.com/three-rubyconf-surprises/"&gt;sitepoint.com&lt;/a&gt;.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Expanded Ruby Under a Microscope Available in Print!</title>
-    <link href="http://patshaughnessy.net/2013/11/7/expanded-ruby-under-a-microscope-available-in-print" rel="alternate"/>
-    <id>http://patshaughnessy.net/2013/11/7/expanded-ruby-under-a-microscope-available-in-print</id>
-    <published>2013-11-07T01:00:00Z</published>
-    <updated>2013-11-07T01:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 0px 30px 10px 0px; text-align: center; margin-top: 8px; margin-bottom: 9px"&gt;
-  &lt;a href="http://nostarch.com/rum"&gt;&lt;img src="http://patshaughnessy.net/assets/2013/11/7/RUM_coverfront.png"&gt;&lt;br/&gt;&lt;i&gt;Order your copy today at NoStarch.com&lt;/a&gt;.&lt;br/&gt;
-    Use coupon code LENS to get a 40% discount!&lt;/i&gt;&lt;/a&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;&lt;b&gt;I’m happy to announce &lt;em&gt;Ruby Under a Microscope&lt;/em&gt;</summary>
-    <content type="html">&lt;div style="float: left; padding: 0px 30px 10px 0px; text-align: center; margin-top: 8px; margin-bottom: 9px"&gt;
-  &lt;a href="http://nostarch.com/rum"&gt;&lt;img src="http://patshaughnessy.net/assets/2013/11/7/RUM_coverfront.png"&gt;&lt;br/&gt;&lt;i&gt;Order your copy today at NoStarch.com&lt;/a&gt;.&lt;br/&gt;
-    Use coupon code LENS to get a 40% discount!&lt;/i&gt;&lt;/a&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;&lt;b&gt;I’m happy to announce &lt;em&gt;Ruby Under a Microscope&lt;/em&gt; is now available in print!&lt;/b&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Ruby Under a Microscope&lt;/em&gt; gives you a hands-on look at Ruby’s core, using
-extensive diagrams and thorough explanations to show you how Ruby is
-implemented (no C skills required). I take a scientific approach, laying out a
-series of experiments with Ruby code to take you behind the scenes of how
-programming languages work. You’ll even find information on JRuby and Rubinius
-(two alternative implementations of Ruby), as well as in-depth explorations of
-Ruby’s garbage collection algorithm.&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Ruby Under a Microscope&lt;/em&gt; will teach you:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;How a few computer science concepts underpin Ruby’s complex implementation&lt;/li&gt;
-&lt;li&gt;How Ruby executes your code using a virtual machine&lt;/li&gt;
-&lt;li&gt;How classes and modules are the same inside Ruby&lt;/li&gt;
-&lt;li&gt;How Ruby employs algorithms originally developed for Lisp&lt;/li&gt;
-&lt;li&gt;How Ruby uses grammar rules to parse and understand your code&lt;/li&gt;
-&lt;li&gt;How your Ruby code is translated into a different language by a compiler.&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;No programming language needs to be a black box. Whether you’re already
-intrigued by language implementation or just want to dig deeper into Ruby,
-you’ll find &lt;em&gt;Ruby Under a Microscope&lt;/em&gt; a fascinating way to become a better
-programmer.&lt;/p&gt;
-
-&lt;h2&gt;What’s New in the Expanded Book?&lt;/h2&gt;
-
-&lt;p&gt;Professionally edited and produced, the expanded book covers important new
-features introduced with Ruby 2.0: &lt;span class="code"&gt;Module#prepend&lt;/span&gt;,
-keyword arguments, refinements and more. You’ll learn how to use them… and even
-how Ruby 2.0 implements them internally! I also updated the text and diagrams
-from my 2012 eBook to account for important changes to Ruby&amp;rsquo;s virtual machine
-(YARV) made during 2.0 release, and added new chapters covering JRuby, Rubinius
-and garbage collection.&lt;/p&gt;
-
-&lt;p&gt;I had the honor of working with &lt;a href="https://twitter.com/tenderlove"&gt;Aaron “tenderlove”
-Patterson&lt;/a&gt; on the project, who was the
-technical reviewer.  Thanks to Aaron, the expanded book is both more accurate and
-more interesting: Aaron had a number of great suggestions for new content which
-I included as well.&lt;/p&gt;
-
-&lt;div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px"&gt;
-  &lt;a href="http://nostarch.com/download/samples/RUM_CH6_excerpt.pdf"&gt;&lt;img src="http://patshaughnessy.net/assets/2013/11/7/ch6.png"&gt;&lt;br/&gt;&lt;i&gt;Download Chapter 6 as a free PDF&lt;/i&gt;&lt;/a&gt;.
-&lt;/div&gt;
-
-
-&lt;h2&gt;A 40% Discount&lt;/h2&gt;
-
-&lt;p&gt;For the next seven days only, I’m offering a special discount: &lt;b&gt;Use coupon
-  code “LENS” on &lt;a href="http://nostarch.com/rum"&gt;NoStarch.com&lt;/a&gt; to get a 40%
-  discount.&lt;/b&gt; The LENS code will be valid for one week only, so be sure to
-order your copy today! No Starch plans to start shipping the new books Monday,
-Nov. 11th.&lt;/p&gt;
-
-&lt;h2&gt;A Free Chapter Online&lt;/h2&gt;
-
-&lt;p&gt;No Starch has posted Chapter 6, “Module Lookup and Constant Lookup,” as a &lt;a href="http://nostarch.com/download/samples/RUM_CH6_excerpt.pdf"&gt;free
-online PDF&lt;/a&gt;. It
-discusses how internally Ruby implements modules as classes, how Ruby finds
-methods you call, and how Ruby uses lexical scope to find constants.&lt;/p&gt;
-
-&lt;h2&gt;Expanded Table of Contents&lt;/h2&gt;
-
-&lt;table id='toc'&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Foreword by Aaron Patterson&lt;/td&gt;
-    &lt;td&gt;xv&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Acknowledgments&lt;/td&gt;
-    &lt;td&gt;xvii&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Introduction&lt;/td&gt;
-    &lt;td&gt;xix&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 1: Tokenization and Parsing&lt;/td&gt;
-    &lt;td&gt;3&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 2: Compilation&lt;/td&gt;
-    &lt;td&gt;31&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 3: How Ruby Executes Your Code&lt;/td&gt;
-    &lt;td&gt;55&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 4: Control Structures and Method Dispatch&lt;/td&gt;
-    &lt;td&gt;83&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 5: Objects and Classes&lt;/td&gt;
-    &lt;td&gt;105&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;&lt;a href="http://nostarch.com/download/samples/RUM_CH6_excerpt.pdf"&gt;Chapter 6: Method Lookup and Constant Lookup&lt;/a&gt;&lt;/td&gt;
-    &lt;td&gt;133&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 7: The Hash Table: The Workhorse of Ruby Internals&lt;/td&gt;
-    &lt;td&gt;167&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 8: How Ruby Borrowed a Decades-Old Idea from Lisp&lt;/td&gt;
-    &lt;td&gt;191&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 9: Metaprogramming&lt;/td&gt;
-    &lt;td&gt;219&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 10: JRuby: Ruby on the JVM&lt;/td&gt;
-    &lt;td&gt;251&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 11: Rubinius: Ruby Implemented with Ruby&lt;/td&gt;
-    &lt;td&gt;273&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Chapter 12: Garbage Collection in MRI, JRuby, and Rubinius&lt;/td&gt;
-    &lt;td&gt;295&lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-    &lt;td class='main'&gt;Index&lt;/td&gt;
-    &lt;td&gt;327&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/table&gt;
-
 </content>
   </entry>
 </feed>
