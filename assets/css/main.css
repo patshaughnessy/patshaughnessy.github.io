@@ -606,3 +606,65 @@ border: 1px solid #999;
     font-weight: bold; }
   #toc tr:last-child td {
     border-bottom: none; }
+
+div.sign {
+  width: 600px;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: rgb(223, 223, 223);
+  border-color: rgb(81, 38, 14);
+  /*
+  margin-left: auto;
+  margin-right: auto;
+  */
+}
+
+div.function-info {
+  width: 300px;
+  float: left;
+}
+
+div.function-name {
+  font-family: Courier;
+  font-size: 18pt;
+  margin-top: 8px;
+  margin-bottom: 5px;
+}
+
+div.function-link {
+  font-family: Courier;
+  font-size: 10pt;
+}
+
+div.sign-icon {
+  background-image:url('/assets/images/sign.png');
+  background-repeat: no-repeat;
+  width:75px; 
+  height:75px;
+  margin: 0 10px 10px 0;
+  float: left;
+}
+
+div.function-code {
+  clear: left;
+  border-top: thin dotted;
+  border-color: rgb(81, 38, 14);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+div.function-bt {
+  clear: left;
+  border-top: thin dotted;
+  border-color: rgb(81, 38, 14);
+  padding-top: 10px;
+  padding-bottom: 0;
+}
+
+img.centered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
