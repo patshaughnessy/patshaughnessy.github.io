@@ -311,7 +311,7 @@ class="code">_bt_search</span> function.
     <div class="function-link"><a href="http://doxygen.postgresql.org/nbtsearch_8c.html#a9053c37f2c25187580f3f690ad41bf01">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2014/11/11/_bt_search.png"/>
+    <img src="http://patshaughnessy.net/assets/2014/11/11/bt_search.png"/>
   </div>
 </div>
 </p>
@@ -352,7 +352,7 @@ B-Tree node, read the <span class="code">_bt_binsrch</span> function:
     <div class="function-link"><a href="http://doxygen.postgresql.org/nbtsearch_8c.html#acd3770ac6d3bc26d6f319d3255721280">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2014/11/11/_bt_binsrch.png"/>
+    <img src="http://patshaughnessy.net/assets/2014/11/11/bt_binsrch.png"/>
   </div>
 </div>
 </p>
