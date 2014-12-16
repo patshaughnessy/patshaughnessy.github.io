@@ -12,4 +12,6 @@ group :development, :test do
   #gem 'minitest-colorize', github: 'ysbaddaden/minitest-colorize'
   gem 'minitest-reporters'
   gem 'mocha', require: false
+  gem 'guard'
+  gem 'guard-shell'
 end
