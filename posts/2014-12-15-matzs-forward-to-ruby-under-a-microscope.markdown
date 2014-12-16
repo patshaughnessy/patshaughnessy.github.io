@@ -2,7 +2,7 @@ title: "Matz’s Forward to Ruby Under a Microscope"
 date: 2014/12/15
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://localhost/assets/2014/12/15/rumja_cover.png"><br/>
+  <img src="http://patshaughnessy.net/assets/2014/12/15/rumja_cover.png"><br/>
   <i><a href="http://shop.ohmsha.co.jp/shopdetail/000000004065/">A Japanese translation</a> of Ruby Under a<br/>Microscope was published last month.</i>
 </div>
 
