@@ -668,3 +668,31 @@ img.centered {
   margin-right: auto;
 }
 
+div.jp {
+  margin-top: 40px;
+  margin-left: 100px;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: rgb(235, 235, 235);
+  border-color: rgb(220, 220, 220);
+}
+
+div.jp p {
+  margin-top: 0px !important;
+  text-indent: 10px;
+}
+
+div.jp h2 {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #880000;
+  font-weight: normal;
+}
+
+hr {
+  align: left;
+  width: 200px;
+  height: 1px;
+}
+

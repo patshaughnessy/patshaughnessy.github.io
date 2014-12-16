@@ -7,11 +7,140 @@
     <name></name>
   </author>
   <entry>
+    <title>Matz’s Forward to Ruby Under a Microscope</title>
+    <link href="http://patshaughnessy.net/2014/12/15/matzs-forward-to-ruby-under-a-microscope" rel="alternate"/>
+    <id>http://patshaughnessy.net/2014/12/15/matzs-forward-to-ruby-under-a-microscope</id>
+    <published>2014-12-15T01:00:00Z</published>
+    <updated>2014-12-15T01:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://localhost/assets/2014/12/15/rumja_cover.png"&gt;&lt;br/&gt;
+  &lt;i&gt;&lt;a href="http://shop.ohmsha.co.jp/shopdetail/000000004065/"&gt;A Japanese translation&lt;/a&gt; of Ruby Under a&lt;br/&gt;Microscope was published last month.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Matz wrote a new forward to &lt;a href="http://patshaughnessy.net/ruby-under-a-microscope"&gt;Ruby</summary>
+    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://localhost/assets/2014/12/15/rumja_cover.png"&gt;&lt;br/&gt;
+  &lt;i&gt;&lt;a href="http://shop.ohmsha.co.jp/shopdetail/000000004065/"&gt;A Japanese translation&lt;/a&gt; of Ruby Under a&lt;br/&gt;Microscope was published last month.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Matz wrote a new forward to &lt;a href="http://patshaughnessy.net/ruby-under-a-microscope"&gt;Ruby Under a
+Microscope&lt;/a&gt;, which was
+included in the Japanese version of the book published just last month. Today
+I’d like to share a translation so everyone has a chance to read it. The
+Japanese edition also includes a new appendix written by Koichi Sasada about
+YARV, Ruby’s virtual machine. I’ll post a translation of that tomorrow.&lt;/p&gt;
+
+&lt;p&gt;I love Matz’s sentiment about inspiring someone to work on Ruby… I hope that
+might happen too. Thank you for writing this, Matz! You’ve already inspired so
+many of us for years with your personality, your philosophy and with the
+beautiful programming language you created.&lt;/p&gt;
+
+&lt;p&gt;Japanese-language edition copyright &amp;copy; 2014 by Ohmsha, Ltd. Reproduced with
+permission of the copyright owner.&lt;/p&gt;
+
+&lt;div style="clear: left"&gt;&lt;/div&gt;
+
+
+
+
+&lt;div class="jp"&gt;
+&lt;h2&gt;日本語版序文&lt;/h2&gt;
+&lt;p class="jp"&gt;
+私が小学生のときに読んで記憶に残っている一冊として、マーク・トウェインによる「アーサー王とあった男」&lt;sup&gt;*1&lt;/sup&gt;というSF作品があります。1880年代のアメリカ人がアーサー王時代にタイムスリップしてしまうものの、現代（出版当時）の知識を活用して活躍するというストーリーです。5世紀に電話や自転車、銃などの知識を持ち込めばさぞかし無敵でしょう。しかし、仮に21世紀の我々が5世紀にタイムスリップしたとして、我々の持っている知識をどれだけ活用することができるでしょう。自転車くらいならともかく、何もないところからコンピュータやネットワークを構築することなどできそうもありません。現代のテクノロジーは個人レベルで再現するには高度化しすぎています。普段はなにげなく使っている技術でも中身までは理解していないものです。
+&lt;/p&gt;
+&lt;/div&gt;
+
+
+
+
+&lt;h2&gt;Foreword for Japanese Edition&lt;/h2&gt;
+
+
+&lt;p&gt;The science fiction novel &lt;cite class="book"&gt;A Connecticut Yankee in King Arthur's
+Court&lt;/cite&gt;&lt;sup&gt;*1&lt;/sup&gt; by Mark Twain is one of the books I still remember reading from my
+elementary school days. It is the story of an American living in the 1880s who accidentally
+time travels to King Arthur era England and nonetheless survives, taking
+advantage of his knowledge from the modern (1880) era. Surely you would be very
+powerful in the 5th century if you had knowledge of telephones, bicycles, and
+guns.  But if we time travelled from the 21st century to the 5th century, how
+much of our knowledge could we utilize?  Bicycles are okay, but how about
+computers? It seems almost impossible to build computers and networks from
+scratch ourselves.  Modern technology products are too advanced for individuals
+to reproduce. We don't know how technologies work even when we use them in our
+everyday lives.&lt;/p&gt;
+
+
+
+
+&lt;div class="jp"&gt;
+&lt;p&gt;
+私たちが普段使っているRubyもそのような現代テクノロジーのひとつです。Rubyを便利に使っていても、その中がどうなっていて、どのように実行されているのか、あるいはRubyのような言語をどうすれば再現できるのか正確な知識を持っている人はほとんどいないでしょう。本書はそのような謎に包まれている「Rubyの中身」を明らかにしてくれる一冊です。
+&lt;/p&gt;
+&lt;p&gt;
+本書はRubyのソフトウェア構造から、オブジェクトシステムの構成、性能を向上させるための工夫まで解説されています。さらにCRubyだけでなく、JRubyやRubiniusについてまでカバーしています。このような知識を学べる書籍はなかなかありません。日本には類書として「Rubyソースコード完全解説」&lt;sup&gt;*2&lt;/sup&gt;がありますが、入手困難になって久しいですし、対象のRubyバージョンも1.7と古いので、YARVのような新しい技術については当然解説されていません。このような書物の登場は、Rubyの内部知識の一般化に貢献すると信じます。
+&lt;/p&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Ruby is one such technology. Even though we use it every day, not many of us
+seem to know what it looks like on the inside, how it runs internally, or how
+one could recreate such a programming language. This book sheds light on this and
+reveals the mystery of Ruby internals.&lt;/p&gt;
+
+&lt;p&gt;This book explains the software architecture of Ruby, the structure of its
+object system, and tips for performance improvement. In addition to that, it
+covers not only CRuby but also JRuby and Rubinius as well. I know of few books
+where you can find this type of knowledge. Though we have the &lt;cite
+class="book"&gt;Ruby Hacking Guide&lt;/cite&gt;&lt;sup&gt;*2&lt;/sup&gt; in Japan, it&amp;rsquo;s been
+difficult to obtain a copy for a long time. It explains a version of Ruby as
+old as 1.7 and naturally does not cover newer technologies like YARV. I believe
+RUM will contribute to a wider understanding of Ruby internals.&lt;/p&gt;
+
+&lt;div class="jp"&gt;
+&lt;p&gt;
+本書の知識をもとにして、もしかすると本書の読者のうちの誰か、もしかするとあなたがRubyの開発に関わるようになるかもしれませんし、そうなれば我々は大歓迎します。あるいは、次世代の言語処理系を開発するきっかけになるかもしれません。そのような未来が見たいものです。
+&lt;/p&gt;
+&lt;p&gt;
+&lt;br/&gt;
+2014年10月、松江にて&lt;br/&gt;
+まつもと ゆきひろ
+&lt;/p&gt;
+&lt;br/&gt;
+&lt;hr align="left"/&gt;
+&lt;small&gt;*1 マーク・トウェーン作、亀山龍樹訳「アーサー王とあった男」（岩崎書店、1971）&lt;br/&gt;
+*2 青木峰郎著「Rubyソースコード完全解説」（インプレス、2002）&lt;/small&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;In the future someone inspired by this book may join the development of Ruby.
+It may be you. We will definitely welcome that. Or, he/she may begin creating a
+next generation programming language. I hope to see that happen.&lt;/p&gt;
+
+&lt;p&gt;In Matsue, October 2014&lt;br/&gt;
+Yukihiro Matsumoto&lt;/p&gt;
+
+&lt;br/&gt;
+
+
+&lt;hr align="left"/&gt;
+
+
+&lt;p&gt;&lt;small&gt;*1 Twain, Mark, A Connecticut Yankee in King Arthur’s Court. (Kameyama Nagarjuna translation, Iwasaki Bookstore, 1971)&lt;br/&gt;
+*2 Aoki Minero al., Ruby Hacking Guide. (Impress, 2002)&lt;/small&gt;&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Discovering the Computer Science Behind Postgres Indexes</title>
     <link href="http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes</id>
-    <published>2014-11-10T11:00:00Z</published>
-    <updated>2014-11-10T11:00:00Z</updated>
+    <published>2014-11-11T01:00:00Z</published>
+    <updated>2014-11-11T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -349,7 +478,7 @@ class="code"&gt;_bt_search&lt;/span&gt; function.&lt;/p&gt;
     &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nbtsearch_8c.html#a9053c37f2c25187580f3f690ad41bf01"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/11/11/_bt_search.png"/&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/11/11/bt_search.png"/&gt;
   &lt;/div&gt;
 &lt;/div&gt;
 &lt;/p&gt;
@@ -391,7 +520,7 @@ B-Tree node, read the &lt;span class="code"&gt;_bt_binsrch&lt;/span&gt; function
     &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nbtsearch_8c.html#acd3770ac6d3bc26d6f319d3255721280"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/11/11/_bt_binsrch.png"/&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2014/11/11/bt_binsrch.png"/&gt;
   &lt;/div&gt;
 &lt;/div&gt;
 &lt;/p&gt;
@@ -463,8 +592,8 @@ insights and knowledge you could never have imagined before.&lt;/p&gt;
     <title>Following a Select Statement Through Postgres Internals</title>
     <link href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals</id>
-    <published>2014-10-12T11:00:00Z</published>
-    <updated>2014-10-12T11:00:00Z</updated>
+    <published>2014-10-13T00:00:00Z</published>
+    <updated>2014-10-13T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -956,8 +1085,8 @@ this one.&lt;/p&gt;
     <title>How Arel Converts Ruby Queries Into SQL Statements</title>
     <link href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements</id>
-    <published>2014-09-22T11:00:00Z</published>
-    <updated>2014-09-22T11:00:00Z</updated>
+    <published>2014-09-23T00:00:00Z</published>
+    <updated>2014-09-23T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1272,8 +1401,8 @@ post, I’ll continue our underwater adventure by looking at Postgres internals.
     <title>20,000 Leagues Under ActiveRecord</title>
     <link href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord</id>
-    <published>2014-09-16T11:00:00Z</published>
-    <updated>2014-09-16T11:00:00Z</updated>
+    <published>2014-09-17T00:00:00Z</published>
+    <updated>2014-09-17T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1540,8 +1669,8 @@ containing a SQL statement.&lt;/p&gt;
     <title>A Rule of Thumb for Strong Parameters</title>
     <link href="http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters</id>
-    <published>2014-06-15T11:00:00Z</published>
-    <updated>2014-06-15T11:00:00Z</updated>
+    <published>2014-06-16T00:00:00Z</published>
+    <updated>2014-06-16T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1771,8 +1900,8 @@ class="code"&gt;ActiveModel::ForbiddenAttributesError&lt;/span&gt; exception.&lt
     <title>Using a Ruby Class To Write Functional Code</title>
     <link href="http://patshaughnessy.net/2014/4/8/using-a-ruby-class-to-write-functional-code" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/4/8/using-a-ruby-class-to-write-functional-code</id>
-    <published>2014-04-07T11:00:00Z</published>
-    <updated>2014-04-07T11:00:00Z</updated>
+    <published>2014-04-08T00:00:00Z</published>
+    <updated>2014-04-08T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2081,8 +2210,8 @@ for more background on &amp;ldquo;Tell, Don&amp;rsquo;t Ask.&amp;rdquo;&lt;/p&gt
     <title>Use An Ask, Don’t Tell Policy With Ruby</title>
     <link href="http://patshaughnessy.net/2014/2/10/use-an-ask-dont-tell-policy-with-ruby" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/2/10/use-an-ask-dont-tell-policy-with-ruby</id>
-    <published>2014-02-09T11:00:00Z</published>
-    <updated>2014-02-09T11:00:00Z</updated>
+    <published>2014-02-10T01:00:00Z</published>
+    <updated>2014-02-10T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2333,8 +2462,8 @@ He also disagrees with my opinion that the &lt;span
     <title>What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</title>
     <link href="http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean</id>
-    <published>2014-01-29T11:00:00Z</published>
-    <updated>2014-01-29T11:00:00Z</updated>
+    <published>2014-01-30T01:00:00Z</published>
+    <updated>2014-01-30T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2542,8 +2671,8 @@ pass along a link.&lt;/p&gt;
     <title>Ruby Multiplies Like a Fourth Grader</title>
     <link href="http://patshaughnessy.net/2014/1/24/ruby-multiplies-like-a-fourth-grader" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/1/24/ruby-multiplies-like-a-fourth-grader</id>
-    <published>2014-01-23T11:00:00Z</published>
-    <updated>2014-01-23T11:00:00Z</updated>
+    <published>2014-01-24T01:00:00Z</published>
+    <updated>2014-01-24T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2781,240 +2910,6 @@ large numbers, the &lt;span class="code"&gt;Bignum&lt;/span&gt; class also conta
 mathematical algorithms for multiplication, division and more. Ruby 2.1 also now optionally supports the GMP, the &lt;a href="https://gmplib.org"&gt;GNU
 Multiple Precision Arithmetic Library&lt;/a&gt;. In my next post I’ll take a look at how
 to enable GMP support and how to use it.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>How Big is a Bignum?</title>
-    <link href="http://patshaughnessy.net/2014/1/9/how-big-is-a-bignum" rel="alternate"/>
-    <id>http://patshaughnessy.net/2014/1/9/how-big-is-a-bignum</id>
-    <published>2014-01-08T11:00:00Z</published>
-    <updated>2014-01-08T11:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 20px 0px; text-align: center; margin-top: 20px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/1/9/classes.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Ruby represents small integers using Fixnum&lt;br/&gt;
-    and large integers using Bignum.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Most of us don’t use Ruby to perform complex calculations for science,
-engineering or cryptography applications; instead, we migh</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 20px 0px; text-align: center; margin-top: 20px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/1/9/classes.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Ruby represents small integers using Fixnum&lt;br/&gt;
-    and large integers using Bignum.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Most of us don’t use Ruby to perform complex calculations for science,
-engineering or cryptography applications; instead, we might turn to R, Matlab
-or some other programming language or tool for that sort of thing. When we calculate
-values using Ruby, it’s often to process simple values while generating a web
-page using ERB or Haml, or to handle the result of a database query using
-ActiveRecord. Almost all of the time, Ruby’s &lt;span class="code"&gt;Fixnum&lt;/span&gt;
-class is more than sufficient.&lt;/p&gt;
-
-&lt;p&gt;For most Ruby developers, therefore, the &lt;span class="code"&gt;Bignum&lt;/span&gt; class is a dark, unfamiliar
-corner of the language. Today I’d like to shed some light on &lt;span class="code"&gt;Bignum&lt;/span&gt; by looking
-at how Ruby represents integers internally inside the &lt;span class="code"&gt;Fixnum&lt;/span&gt; and &lt;span class="code"&gt;Bignum&lt;/span&gt;
-classes. What’s the largest integer that fits inside a &lt;span
-  class="code"&gt;Fixnum&lt;/span&gt;; just how big is a &lt;span
-  class="code"&gt;Bignum&lt;/span&gt;?&lt;/p&gt;
-
-&lt;p&gt;Also, it turns out that Ruby 2.1 contains an important new change for the
-&lt;span class="code"&gt;Bignum&lt;/span&gt; class: support for the &lt;a href="https://gmplib.org"&gt;GNU Multiple Precision Arithmetic Library (GMP)&lt;/a&gt; library.
-In my next post, I’ll take a look at mathematical theory and history behind
-some of the algorithms used by &lt;span class="code"&gt;Bignum&lt;/span&gt; internally and how Ruby 2.1 works
-with GMP. But for now, let’s start with the basics.&lt;/p&gt;
-
-&lt;h2&gt;64-Bit Integers&lt;/h2&gt;
-
-&lt;p&gt;Most computers these days represent numbers as 64 digit binary values
-internally. For example, the number ten thousand looks like this expressed as a
-binary value:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/64-bits.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;My rectangle here represents how a 64-bit computer would save an integer in a
-microprocessor register or a RAM memory location. The numbers 63 and 0 indicate
-that there are spaces for 64 binary digits, each of which can contain a zero or
-one. The most significant binary digit, #63, is on the left, while the least
-significant digit, #0, is on the right. I’m not showing all of the leading
-zeroes here to keep things simple.&lt;/p&gt;
-
-&lt;p&gt;The term &lt;em&gt;64-bit architecture&lt;/em&gt; means the logic gates, transistors and circuits
-located on your microprocessor chip are designed to process binary values using
-64 binary digits like this, in parallel. Whenever your code uses an integer,
-the microprocessor retrieves all of these on/off values from one of the RAM
-chips in your CPU using a “bus” or set of 64 parallel connections.&lt;/p&gt;
-
-&lt;h2&gt;64-Bit Integers in MRI Ruby&lt;/h2&gt;
-
-&lt;p&gt;The standard implementation of Ruby, Matz’s Ruby Interpreter (MRI), saves
-integers using a slightly different, custom format; it hard codes the least
-significant digit (on the right in my diagram) to one and shifts the actual
-integer value one bit to the left. As we’ll see in a moment, if this bit were
-zero Ruby would instead consider the integer to be a pointer to some Ruby
-object.&lt;/p&gt;
-
-&lt;p&gt;Here’s how Ruby represents ten thousand
-internally:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/64-bits-ruby.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;span class="code"&gt;FIXNUM_FLAG&lt;/span&gt;=1 indicates this integer represents an instance of the &lt;span class="code"&gt;Fixnum&lt;/span&gt;
-class. The flag is a performance optimization, removing the need for Ruby to
-create a separate C structure the way it normally would for other types of
-objects. (Ruby uses a similar trick for symbols and special values such as
-&lt;span class="code"&gt;true&lt;/span&gt;, &lt;span class="code"&gt;false&lt;/span&gt; and &lt;span class="code"&gt;nil&lt;/span&gt;.)&lt;/p&gt;
-
-&lt;h2&gt;Two’s Complement in Ruby&lt;/h2&gt;
-
-&lt;p&gt;Like most other computer languages and also like your microprocessor’s actual hardware
-circuits, Ruby uses a binary format called &lt;a href="http://en.wikipedia.org/wiki/Two's_complement"&gt;two’s complement&lt;/a&gt; to save negative
-integers. Here’s how the value -10,000 would be saved inside your Ruby program:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/twos-complement-ruby.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Note the first bit on the left, the sign bit, is set to 1. This indicates this
-is a negative integer. Ruby still sets the lowest bit, &lt;span
-  class="code"&gt;FIXNUM_FLAG&lt;/span&gt;, to 1. The other bits contain the value
-itself. To calculate a two’s complement value for a negative integer, your
-microprocessor adds one to the absolute value (getting 10,001 in this example)
-and then reverses the zeroes and ones. This is equivalent to subtracting the
-absolute value from the next highest power of two. Ruby uses two’s complement
-in the same way, except it adds &lt;span class="code"&gt;FIXNUM_FLAG&lt;/span&gt; on the
-right and shifts the rest of the value to the left.&lt;/p&gt;
-
-&lt;h2&gt;The Largest Fixnum Value: 4611686018427387903&lt;/h2&gt;
-
-&lt;p&gt;Using 64-bit binary values with &lt;span class="code"&gt;FIXNUM_FLAG&lt;/span&gt;, Ruby is able to take advantage of
-your computer’s microprocessor to represent integer values efficiently. Addition,
-subtraction and other integer operations can be handled using the
-corresponding assembly language instructions by removing and then re-adding
-&lt;span class="code"&gt;FIXNUM_FLAG&lt;/span&gt; internally as needed. This design only
-works, however, for integer values that are small enough to fit into a single
-64-bit word. We can see what the largest positive &lt;span
-  class="code"&gt;Fixnum&lt;/span&gt; integer must be by setting all 62 of the middle
-bits to one, like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/largest-value.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here we have a zero on the left (indicating this is a positive integer) and a
-one on the right (for &lt;span class="code"&gt;FIXNUM_FLAG&lt;/span&gt;). The remaining 62 bits in the middle hold
-this binary number:&lt;br/&gt;
-11111111111111111111111111111111111111111111111111111111111111&lt;/p&gt;
-
-&lt;p&gt;Converting this to decimal we get: 4611686018427387903, the largest integer
-that fits into a &lt;span class="code"&gt;Fixnum&lt;/span&gt; object. (If you compiled Ruby on a 32-bit computer, of
-course, the largest &lt;span class="code"&gt;Fixnum&lt;/span&gt; would be much smaller than this, only 30-bits wide.)&lt;/p&gt;
-
-&lt;h2&gt;The Smallest Bignum: 4611686018427387904&lt;/h2&gt;
-
-&lt;p&gt;But what does Ruby do if we want to use larger numbers? For example, this Ruby
-program works just fine:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/code.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;But now the sum doesn’t fit into a 64-bit &lt;span class="code"&gt;Fixnum&lt;/span&gt; value, since expressing
-4611686018427387904 as a binary value requires 63 digits, not 62:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/doesnt-fit.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;This is where the &lt;span class="code"&gt;Bignum&lt;/span&gt; class comes in. While calculating
-4611686018427387903+1, Ruby has to create a new type of object to represent
-4611686018427387904 &amp;ndash; an instance of the &lt;span class="code"&gt;Bignum&lt;/span&gt; class. Here’s how that looks
-inside of Ruby:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/pointer.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the right you can see Ruby has reset the &lt;span class="code"&gt;FIXNUM_FLAG&lt;/span&gt; to zero, indicating
-this value is not a &lt;span class="code"&gt;Fixnum&lt;/span&gt; but instead a pointer to some other type of object.
-(C programs like MRI Ruby that use &lt;span class="code"&gt;malloc&lt;/span&gt; to allocate memory always get
-addresses that end in zero, that are &lt;em&gt;aligned&lt;/em&gt;. This means the &lt;span class="code"&gt;FIXNUM_FLAG&lt;/span&gt;, a
-zero, is actually also part of the pointer’s value.)&lt;/p&gt;
-
-&lt;h2&gt;The RBignum Structure&lt;/h2&gt;
-
-&lt;p&gt;Now let’s take a closer look at the &lt;span class="code"&gt;RBignum&lt;/span&gt; C structure and find out what’s
-inside it. Here’s how Ruby saves the value 4611686018427387904 internally:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/closer-look.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the left, you can see &lt;span class="code"&gt;RBignum&lt;/span&gt; contains an inner structure called &lt;span class="code"&gt;RBasic&lt;/span&gt;,
-which contains internal, technical values used by all Ruby objects. Below that
-I show values specific to &lt;span class="code"&gt;Bignum&lt;/span&gt; objects: &lt;span class="code"&gt;digits&lt;/span&gt; and &lt;span class="code"&gt;len&lt;/span&gt;. &lt;span class="code"&gt;digits&lt;/span&gt; is a pointer
-to an array of 32-bit values that contain the actual big integer’s bits grouped
-into sets of 32. &lt;span class="code"&gt;len&lt;/span&gt; records how many 32-bit groups are in the &lt;span class="code"&gt;digits&lt;/span&gt; array.
-Since there can be any number of groups in the &lt;span class="code"&gt;digits&lt;/span&gt; array, Ruby can represent
-arbitrarily large integers using &lt;span class="code"&gt;RBignum&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;Ruby divides up the bits of the big integer into 32-bit pieces. On the left,
-the first 32-bit value contains the least significant 32 bits from the big
-integer, bit 31 down to bit 0. Following that, the second value contains bits
-63-32. If the big integer were larger, the third value would contain bits
-95-64, etc. Therefore, the large integer’s bits are actually not in order: The
-groups of bits are in reverse order, while the bits inside each group are in
-the proper order.&lt;/p&gt;
-
-&lt;p&gt;To save a &lt;span class="code"&gt;Bignum&lt;/span&gt; value, Ruby starts by saving the
-least significant bits of the target integer into the first 32-bit digit group.
-Then it shifts the remaining bits 32 places to the right and saves the next 32
-least significant bits into the next group. Ruby continues shifting and saving
-until the entire big integer has been processed.&lt;/p&gt;
-
-&lt;p&gt;Ruby allocates enough 32-bit pieces in the &lt;span class="code"&gt;digits&lt;/span&gt; array to provide enough room
-for the entire large integer. For example, for an extremely large number
-requiring 320 bits, Ruby could use 10 32-bit values by setting &lt;span class="code"&gt;len&lt;/span&gt; to 10 and
-allocating more memory:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/ten-digits.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;In my example Ruby needs just two 32-bit values. This makes sense because, as
-we saw above, 4611686018427387903 is a 62-bit integer (all ones) and when I add one I get a 63-bit value. When I add
-one, Ruby first copies the 62 bits in the target value into a new &lt;span class="code"&gt;Bignum&lt;/span&gt; structure, like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/copy-to-bignum.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Ruby copies the least significant 32 bits into the first digit
-value on the left, and the most significant 30 into the second digit value on
-the right (there is space for two leading zeroes in the second digit value).&lt;/p&gt;
-
-&lt;p&gt;Once Ruby has copied 4611686018427387903 into a new &lt;span
-  class="code"&gt;RBignum&lt;/span&gt; structure, it can then use a special algorithm
-implemented in bignum.c to perform an addition operation on the new Bignum. Now
-there is enough room to hold the 63-bit result, 4611686018427387904 (diagram copied from above):&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/9/closer-look.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;A few other minor details to learn about this:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Ruby saves the sign bit inside the &lt;span class="code"&gt;RBasic&lt;/span&gt;
-  structure, and not in the binary digit values themselves. This saves a bit of
-  space, and makes the code inside bignum.c simpler.&lt;/li&gt;
-
-  &lt;li&gt;Ruby also doesn’t need to save the &lt;span class="code"&gt;FIXNUM_FLAG&lt;/span&gt;
-  in the digits, since it already knows this is a &lt;span
-    class="code"&gt;Bignum&lt;/span&gt; value and not a &lt;span class="code"&gt;Fixnum&lt;/span&gt;.&lt;/li&gt;
-
-  &lt;li&gt;For small &lt;span class="code"&gt;Bignum&lt;/span&gt;’s, Ruby saves memory and time
-by storing the digits values right inside the &lt;span class="code"&gt;RBignum&lt;/span&gt; structure itself, using a
-C &lt;i&gt;union&lt;/i&gt; trick. I don’t have time to explain that here today, but you can see
-how the same optimization works for strings in my article &lt;a href="http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters"&gt;Never create Ruby strings longer than 23 characters&lt;/a&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;h2&gt;Next time&lt;/h2&gt;
-
-&lt;p&gt;In my next post I’ll look at how Ruby performs an actual mathematical operation
-using &lt;span class="code"&gt;Bignum&lt;/span&gt; objects. It turns out there’s more to multiplication that you
-might think: Ruby uses one of a few different multiplication algorithms
-depending on how large the integers are, each with a different history behind
-it. And Ruby 2.1 adds yet another new algorithm to the mix with GMP.&lt;/p&gt;
 </content>
   </entry>
 </feed>
