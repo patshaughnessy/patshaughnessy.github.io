@@ -696,3 +696,47 @@ hr {
   height: 1px;
 }
 
+.epigraph {
+  float: left;
+  width: 390px;
+  position: relative;
+}
+  
+.epigraph-text {
+  font-size: 14px;
+  text-align: center;
+  font-style: italic;
+  position: absolute;
+  top: 90px;
+  left: 120px;
+}
+
+.epigraph-caption {
+  font-style: italic;
+}
+
+.appendix {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 60px;
+  padding-top: 100px;
+  width: 100%;
+  text-align: center;
+  font-size: 160pt;
+}
+
+.appendix-title {
+  font-size: 21pt;
+  padding-top: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  text-align: center;
+  line-height: 40px;
+}
+
+.appendix-translation {
+  font-size: 21pt;
+  text-align: center;
+  font-style: italic;
+}

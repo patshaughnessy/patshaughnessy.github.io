@@ -1,0 +1,145 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Yet More Ruby Virtual Machines - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Yet More Ruby Virtual Machines - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Yet More Ruby Virtual Machines</h1>
+  
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
+  <img src="http://patshaughnessy.net/assets/2014/12/15/rumja_cover.png"><br/>
+  <i><a href="http://shop.ohmsha.co.jp/shopdetail/000000004065/">A Japanese translation</a> of Ruby Under a<br/>Microscope was published last month.</i>
+</div>
+
+
+<p>TBD&hellip;</p>
+
+<p>Japanese-language edition copyright &copy; 2014 by Ohmsha, Ltd. Reproduced with
+permission of the copyright owner.</p>
+
+<div style="clear: left"></div>
+
+
+
+
+<div class="jp">
+<h2>さらにそのほかの<br/>Ruby仮想マシン</h2>
+<p class="jp">
+今回、私（笹田）がYARV：Yet Another RubyVMの開発者であるという縁で、本書の付録にYARVについて寄稿する機会を得た。本書では、多くのページを割いてYARVの中身を解説していただいている。しかも、原著は英語の著作であるので、世界中で読まれていることになる。ソフトウェア開発者として、たいへん光栄であると共に、読みながら実装の非効率な部分などを見つけてしまい、恥ずかしい思いもある。本稿では、YARVについて少し補足する。
+</p>
+</div>
+
+
+
+
+<h2>Yet More Ruby Virtual Machines</h2>
+
+
+<p>
+I (Koichi Sasada) am thankful to have a chance to write about YARV in this
+appendix as a developer of YARV: Yet Another Ruby VM. In this book, a lot of
+pages are spent on the internals of YARV. Furthermore, the original edition is
+written in English and read by people all over the world. I am greatly honored
+by that as a software developer, while it makes me humble to have found several
+inefficiencies in YARV implementation by reading the book. In this appendix, I
+will give some supplemental information and background on design and
+implementation of YARV.</p>
+
+
+  </section>
+
+  
+</article>
+
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                
+                  <li><a href="/2014/12/17/yet-more-ruby-virtual-machines">Yet More Ruby Virtual Machines</a></li>
+                
+                  <li><a href="/2014/12/15/matzs-forward-to-ruby-under-a-microscope">Matz’s Foreword to Ruby Under a Microscope</a></li>
+                
+                  <li><a href="/2014/11/11/discovering-the-computer-science-behind-postgres-indexes">Discovering the Computer Science Behind Postgres Indexes</a></li>
+                
+                  <li><a href="/2014/10/13/following-a-select-statement-through-postgres-internals">Following a Select Statement Through Postgres Internals</a></li>
+                
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy</a>
+    </div>
+  </div>
+
+</body>
+</html>
+
