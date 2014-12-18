@@ -38,14 +38,8 @@ permission of the copyright owner.
 <div style="clear: left"></div>
 
 <div class="appendix">A</div>
-<div class="appendix-title">さらにそのほかの<br/>Ruby仮想マシン</div>
-<br/>
-<div class="appendix-translation">
+<div class="appendix-title">
 Yet More Ruby Virtual Machines
-</div>
-
-<div class="jp">
-<p>今回、私（笹田）がYARV：Yet Another RubyVMの開発者であるという縁で、本書の付録にYARVについて寄稿する機会を得た。本書では、多くのページを割いてYARVの中身を解説していただいている。しかも、原著は英語の著作であるので、世界中で読まれていることになる。ソフトウェア開発者として、たいへん光栄であると共に、読みながら実装の非効率な部分などを見つけてしまい、恥ずかしい思いもある。本稿では、YARVについて少し補足する。</p>
 </div>
 
 I (Koichi Sasada) am thankful to have a chance to write about YARV in this
@@ -56,13 +50,6 @@ that as a software developer, although it humbles me to have found several
 inefficiencies in YARV’s implementation while reading the book. In this appendix,
 I will give some supplemental information and background on the design and
 implementation of YARV.
-
-<div class="jp">
-<h2>YARV: Yet Another RubyVM</h2>
-<p>YARVは、2004年の正月に、その当時より興味のあったRuby向け仮想マシンとして開発に着手し、簡単なものを1週間程度で開発した。おそらく、暇だったのだと思う。最初のアナウンスメール（[ruby-dev:22494]）を見ると、フィボナッチ数を求めるプログラムは動いていたようである。</p>
-<p>開発当初、YARVはRuby 1.8向けの拡張ライブラリとして実装していた。つまり、実行エンジンをすべて差し替えるのではなく、Ruby 1.8処理系から、指定したRubyプログラムをYARV上で実行する、という構造としていた。Ruby 1.8処理系の上に、もう1つRuby処理系を重ねていたことになる。この構造により、十分に安定しているRuby 1.8処理系を用いて、YARVの試験を比較的容易に行うことができた。また、GCやC APIなどの関数といった基盤コードをそのまま利用することもできた。そして、開発が進んだ後、スレッドなどをサポートするため、一気にRuby 1.8処理系のコア部分を取り除き、YARVに置き換えた。しかし、GCなどの基盤コードはその後も流用を続けた。当初より、Rubyインタプリタ（MRI/CRuby）はC言語と親和性の高い処理系として知られているが、YARVもその特長を受け継いでいる。そして、置き換えたものがRuby 1.9としてリリースされ、2014年現在も、RubyVMとして利用されている。</p>
-<p>よく、YARV：Yet Another RubyVMは、公式に取り込まれたので、Yet Anotherな処理系ではないのではないか、という指摘を受けるが、なんとなく語呂が良いので利用を続けている。ただし、ファイル名やクラス名には利用しないようにしている。開発当時、Ruby向け仮想マシンは、既にいくつか提案されていた。特に、Rubyの生みの親であるまつもと氏によるRiteVM、そしてByteCodeRubyというプロジェクトが知られていたと思う。そのため、“Yet Another”という名前を付けた。もちろん、yaccに代表されるように、この業界では“Yet Another”なものが多く利用されることも多かったため、同じようにYARVも多く利用されるよう、願をかけたということもある。ちなみに、RiteVMは、まつもと氏が鋭意開発しているmrubyの仮想マシンの名前となっている。</p>
-</div>
 
 ## YARV: Yet Another RubyVM
 
@@ -99,12 +86,6 @@ of software programs that have “Yet Another” in their names and nevertheless
 popular: for example yacc. By the way, RiteVM is now the name of the mruby VM
 which Matz is actively developing.
 
-<div class="jp">
-<h2>YARVの設計方針</h2>
-<p>YARVは当時の最新版であるRuby 1.8の仕様を踏襲するのではなく、その次の版である、Ruby 1.9の仕様を実装することとした。当時はRuby 1.9の仕様をどうするか議論していた。YARVではそのRuby 1.9の仕様のもとで開発を進めることにした。別の戦略として、Ruby 1.8に完全互換の仮想マシンを開発することで、多くの人に、即座に利用してもらうこともできた。しかし、いくつかのRuby 1.8の仕様がYARVで用いているスタックマシンでは実現困難であろうと思われたため、新しい仕様をベースに実装しつつ、困難な仕様は仕様変更できないか、交渉しながら開発を進めることとした。この戦略により、Ruby 1.9を実現するRubyインタプリタのひとつとなることができた。後に公式処理系としてマージされた理由のひとつだろうと思う。</p>
-<p>YARVの詳細設計は本書で解説しているとおりである。ただし、本書で説明している設計に辿り着くまでには紆余曲折があった。特に思い浮かぶのは仮想マシンのスタックの構造である。本書では、2重スタックマシンと表現されているが、当初は1つのスタックしか用いていなかった。仮想ではない現実のプロセッサでは、1つのスタックの上に、計算領域と関数呼び出しフレーム構造を交互に確保する。YARVも当初はそのような構造であったが、あまりに複雑となってしまい、性能を犠牲にしても、2つのスタックを用いて管理しよう、という結論に至った。ブロックをクロージャとして取り出す仕組みを実装するとき、特に操作が複雑となったためである。幸いにして本書ではこのあたりの説明をうまく回避しており、読者がこのような複雑さに悩まなくて済むようになっている。ただ、一番難しく、苦労した部分でもあるため、機会があれば解説してみたい。ちなみに、2つのスタックを持つ、ということは、スタックオーバーフローのチェックコストも2倍になる、ということである。そこで、2つのスタックを、1つのメモリブロックで下端から上へ伸ばすスタック、上端から下へ伸ばすスタックとして実装した。この工夫により、2つのスタックのスタックオーバフローのチェックは、2つのスタックポインタの位置関係を1度確認するだけでよく、若干軽量にすることができた。</p>
-</div>
-
 ## Design Principles of YARV
 
 We chose to implement YARV for the Ruby 1.9 specification, instead of 1.8. At
@@ -135,13 +116,6 @@ also doubles. So I implemented them both in the same memory block: one going
 from bottom to top and the other going from top to bottom.  This trick somewhat
 reduced the cost of checking for stack overflows, because we only have to check
 the positions of two stack pointers once.
-
-<div class="jp">
-<h2>YARVの開発までの経緯</h2>
-<p>開発に至った経緯についても触れておく。もともと、私は言語処理系の実装に興味があったため、Javaの仮想マシンを2つほど開発したことがあった。そのため、オブジェクト指向言語処理系に必要となる仮想マシンに必要な要件を、既にいくつか知っていた。そのころ、「計算機プログラムの構造と解釈」、通称SICPの読書会が山下伸夫氏により定期的に開催されており、これに参加することで、Schemeの言語処理系についての知見を得ることができた。本書の第8章で紹介されているように、RubyのブロックはLispの関数にあたるものであったため、この知見は重要なものであった。</p>
-<p>2002年12月に青木峰郎氏による、Rubyのソースコードを逐一解説するという異色の書、「Rubyソースコード完全解説」、通称RHGが発売された。そして、高橋征義氏によりRHG読書会が企画され、月1度程度の頻度で開催された。参加者で本書を読み上げていく、というスタイルであったが、不明点は著者である青木氏を含めた参加者で議論できたため、Ruby処理系の詳細を知ることができた。余談だが、SICP読書会、およびRHG読書会は、当時山下氏が勤めていた、新宿にある株式会社タイムインターメディアの会議室で行われていた。私は、これらの読書会に参加するために、月に数回、タイムインターメディアに通っていたことになる。このような大切な機会を与えてくれた諸氏に深く感謝したい。</p>
-<p>RHGによってRuby処理系の構造を学べば、Rubyプログラムを実行する心臓部となる評価器が、Java仮想マシンなどに比べ、あまりに非効率であることは明らかであった。そのため、Rubyの文法を適切に、高速に評価する仮想マシンはどのようなものであるか、ということに興味を持ち、検討を続けた。そして、正月休みの機会に一気に書き上げた。その頃は、まさかRuby 1.9の一部としてリリースされることになるとは思わなかった。最初の動機が性能向上であったため、最初から性能のことを強く意識したソースコードであった。今思えば、早すぎる最適化といえると思う。</p>
-</div>
 
 ## YARV Development Prehistory 
 
@@ -178,13 +152,6 @@ as a part of Ruby 1.9. My first motivation was performance improvement - my
 source code surely reflected that. In hindsight, it was such an early
 optimization.
 
-<div class="jp">
-<h2>さらにそのほかのRuby仮想マシン</h2>
-<p>本書では、YARVの構造を既知のものとして紹介しており、もしかしたら、このように実装するのが正しいRuby処理系だ、とも読めるかもしれない。しかし、本稿で紹介したとおり、YARVをはじめ、Ruby処理系は人間が試行錯誤しながら、なんとか作り上げてきたソフトウェアにすぎない。本書はRuby 2.0をベースに紹介しているが、Ruby 2.1では、さらに品質を向上するためにさまざまな修正を行った。そして、これからリリースする予定であるRuby 2.2を、より良いものにするため、改善を続けている。</p>
-<p>たとえば、キーワード引数の改善である。本書の第4章では、キーワード引数の実装方法について紹介している。簡単に要約すると、呼び出しにおいて、キーワード引数として渡した名前と値の対を、1つのHashオブジェクトとしてまとめ、通常の引数として渡す。受け側はそのHashオブジェクトから必要な値を読み出すコードをコンパイル時に暗黙に展開する。さて、キーワード引数はRuby 2.0から導入された新機能なので、利用頻度が低いようであり、問題になっていないが、この実装は非効率である。メソッド呼び出しごとにHashオブジェクトが生成されることになり、Hashオブジェクト生成、およびGCのコストがかかる。また、暗黙に展開されるHashオブジェクトの読み込みも、複数のメソッド呼び出しを含むため、遅い。</p>
-<p>この問題を改善するため、Ruby 2.2から、可能な限りHashオブジェクトを生成しないようにキーワード引数を実装し直した。その代わり、コンパイル時にキーワード引数の名前をまとめておき、呼び出し側では値のみ渡すことにした。そして、受け側では渡された値と、コンパイル時に作成した名前を用いて対を復元するようにした。この工夫によりキーワード引数を用いるメソッド呼び出しを、場合によっては10倍以上高速化することができた。今後も、実行速度を含む、Ruby処理系の品質向上を続けていきたい。</p>
-</div>
-
 ## Yet More Ruby Virtual Machines
 
 This book explains the current architecture of YARV, which you might conclude
@@ -214,15 +181,6 @@ runtime. The callee will then recombine the values with the names collected
 by the compiler. This design change will allow Ruby to process keyword
 arguments 10 times faster. I would like to keep on improving the quality of
 Ruby's implementation, including runtime efficiency.
-
-<div class="jp">
-<p>もし、本書によってYARV、そしてRuby処理系に興味を持ち、改良方法を思いついたら、ぜひ「さらにそのほかのRuby処理系」として実装し、試してほしい。Ruby処理系開発コミュニティは、あなたの挑戦を歓迎する。
-<br/>
-<br/>
-2014年11月<br/>
-笹田耕一<br/>
-Heroku, Inc.
-</div>
 
 If you become interested in YARV and Ruby implementations after reading this
 book, if you have ideas for improving them, I encourage you to develop your own
