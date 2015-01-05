@@ -23,7 +23,7 @@ class Layout
   end
 
   def erb(template, page)
-    recent_posts = posts.reverse[0..3]
+    recent_posts = posts[0..3]
     page.instance_eval { ERB.new(File.read("erb/#{template}.erb")).result(binding) }
   end
 

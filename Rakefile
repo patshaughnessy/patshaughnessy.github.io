@@ -12,23 +12,24 @@ end
 
 markdown_files = FileList['posts/*.markdown']
 posts = markdown_files.map {|markdown| Post.new(markdown) }
-html_files = posts.map {|post| ".#{post.url}.html" }
+sorted_posts = posts.sort {|p1, p2| p1.date <=> p2.date }.reverse
+html_files = sorted_posts.map {|post| ".#{post.url}.html" }
 
-html_files.zip(posts, markdown_files).each do |html, post, markdown|
-  file html => markdown do
-    Layout.new(posts).render(post, html)
+html_files.zip(sorted_posts).each do |html, post|
+  file html => post.source_file do
+    Layout.new(sorted_posts).render(post, html)
   end
 end
 task :posts => html_files
 
 file 'index.html' => markdown_files do
-  home_page = HomePage.new(posts)
-  Layout.new(posts).render(home_page, 'index.html')
+  home_page = HomePage.new(sorted_posts)
+  Layout.new(sorted_posts).render(home_page, 'index.html')
 end
 task :home_page => 'index.html'
 
 file 'index.xml' => markdown_files do
-  Feed.new(posts).render('index.xml')
+  Feed.new(sorted_posts).render('index.xml')
 end
 task :feed => 'index.xml'
 

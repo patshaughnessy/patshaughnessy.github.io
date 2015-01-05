@@ -6,7 +6,7 @@ class Feed
   attr_reader :posts
 
   def initialize(posts)
-    @posts = posts.reverse[0..9]
+    @posts = posts[0..9]
   end
 
   def render(path)

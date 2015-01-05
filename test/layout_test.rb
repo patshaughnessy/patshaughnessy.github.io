@@ -38,7 +38,7 @@ describe Layout do
     let("post#{n+1}".to_sym) { Post.new("/path/to/some_article#{n+1}.html") }
   end
 
-  let(:posts) { [ post1, post2, post3, post4, post5 ] }
+  let(:posts) { [ post5, post4, post3, post2, post1 ] }
   let(:layout) { Layout.new(posts) }
   let(:output_file) { Pathname.new(__FILE__).dirname.join('support/erb_output_dir/erb_output.html') }
 

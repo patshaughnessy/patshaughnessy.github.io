@@ -6,32 +6,32 @@ require root.join('lib/home_page.rb')
 describe HomePage do
 
   let(:posts) { FileList["#{root}/posts/*.markdown"].map{|markdown| Post.new(markdown) } }
-  let(:home_page) { HomePage.new(posts) }
+  let(:home_page) { HomePage.new(posts.reverse) }
 
-  it 'has posts, saved in a reverse order' do
+  it 'has posts' do
     home_page.posts.must_equal posts.reverse
   end
 
   it 'returns a list of posts sorted by date' do
     posts = home_page.posts
-    posts.size.must_equal 120
-    posts.first.title.must_equal "A Rule of Thumb for Strong Parameters"
+    posts.size.must_equal 126
+    posts.first.title.must_equal "Koichi Sasada Encourages Us To Contribute To Ruby"
     posts.last.title.must_equal "Why to use TDD with Drupal"
   end
 
   it 'returns a list of month strings for these posts, but using empty strings for duplicates' do
     months = home_page.month_strings
     size = months.size
-    size.must_equal 120
+    size.must_equal 126
     months[0..7].must_equal [
+      "December 2014",
+      "",
+      "November 2014",
+      "October 2014",
+      "September 2014",
+      "",
       "June 2014",
-      "April 2014",
-      "February 2014",
-      "January 2014",
-      "",
-      "",
-      "December 2013",
-      "November 2013"
+      "April 2014"
     ]
   end
 

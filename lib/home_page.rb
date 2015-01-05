@@ -3,7 +3,7 @@ class HomePage
   attr_reader :posts
 
   def initialize(posts)
-    @posts = posts.reverse
+    @posts = posts
   end
 
   def urls
