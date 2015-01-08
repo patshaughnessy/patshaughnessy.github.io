@@ -7,6 +7,264 @@
     <name></name>
   </author>
   <entry>
+    <title>Using Rake to Generate a Blog</title>
+    <link href="http://patshaughnessy.net/2015/1/8/using-rake-to-generate-a-blog" rel="alternate"/>
+    <id>http://patshaughnessy.net/2015/1/8/using-rake-to-generate-a-blog</id>
+    <published>2015-01-08T01:00:00Z</published>
+    <updated>2015-01-08T01:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2015/1/8/power-rake.png"&gt;&lt;br/&gt;
+  &lt;i&gt;Jim Weirich showing a real power rake at &lt;a href="http://www.confreaks.com/videos/988-goruco2012-power-rake"&gt;GORUCO 2012&lt;/a&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Last year I needed to replace the software I use to serve this web site.
+Instead of just using &lt;a href="h</summary>
+    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2015/1/8/power-rake.png"&gt;&lt;br/&gt;
+  &lt;i&gt;Jim Weirich showing a real power rake at &lt;a href="http://www.confreaks.com/videos/988-goruco2012-power-rake"&gt;GORUCO 2012&lt;/a&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Last year I needed to replace the software I use to serve this web site.
+Instead of just using &lt;a href="https://github.com/jekyll/jekyll"&gt;Jekyll&lt;/a&gt;,
+&lt;a href="https://middlemanapp.com"&gt;Middleman&lt;/a&gt;, &lt;a href="http://nanoc.ws"&gt;Nanoc&lt;/a&gt; or one of the
+&lt;a href="https://www.ruby-toolbox.com/categories/static_website_generation"&gt;many other available
+options&lt;/a&gt;, I
+decided to implement my own &lt;a href="https://github.com/patshaughnessy/patshaughnessy.github.io"&gt;custom blog
+software&lt;/a&gt;. After a
+fair amount of work, I was able to implement a static blog site generator using
+only &lt;a href="https://github.com/jimweirich/rake"&gt;Rake&lt;/a&gt; and a handful of simple Ruby classes. Although it took a bit longer,
+it was a lot of fun and I learned a few tricks which I’d like to pass along
+today.&lt;/p&gt;
+
+&lt;p&gt;I first got the idea of using Rake as a static site generator from a
+presentation called &lt;a href="http://www.confreaks.com/videos/988-goruco2012-power-rake"&gt;Power Rake&lt;/a&gt;,
+given by the late Jim Weirich at GORUCO 2012. This was one of the first Ruby
+conferences I had ever attended, and was also the first time I had ever seen
+Jim speak in public. It still stands out in my memory as one of the best
+conference presentations I&amp;rsquo;ve ever seen. Funny, engaging, interesting, but most
+of all &lt;em&gt;genuine&lt;/em&gt;, Jim had me and the rest of the audience enthralled as he talked
+about &lt;a href="https://github.com/jimweirich/rake"&gt;Rake&lt;/a&gt;, his Ruby reinterpretation of
+the old C make utility from the 1970s.&lt;/p&gt;
+
+&lt;p&gt;The key idea behind using Rake to generate a static site is to generate and
+manipulate files using Rake file tasks. What are file tasks? How are they
+different from standard Rake tasks? To find out watch Jim’s presentation, or
+read &lt;a href="http://devblog.avdi.org/2014/04/21/rake-part-1-basics/."&gt;an excellent series of articles and
+screencasts&lt;/a&gt; by Avdi
+Grimm. Today I’ll explain how I used Rake to create this blog. But first, let’s review
+what a blog really is.&lt;/p&gt;
+
+&lt;h2&gt;A Blog or a Static Web Site?&lt;/h2&gt;
+
+&lt;p&gt;Most of the blogs in the world consist of a few dynamically generated web pages
+served by either &lt;a href="http://wordpress.com"&gt;wordpress.com&lt;/a&gt; or
+&lt;a href="http://blogger.com"&gt;blogger.com&lt;/a&gt;. To be honest, I should just use one of these
+two free services for my site as well. However, I have a few years worth of
+markdown files that contain all of my old content which would be a hassle to
+import into whatever format Wordpress or Google uses. Plus using these sites
+would be no fun at all; instead, I was looking for an excuse to write some Ruby
+code and to learn more about Rake.&lt;/p&gt;
+
+&lt;p&gt;What I really needed was an automated process for converting my markdown source
+files into a series of static HTML files that were navigable using URL patterns that
+readers expect. That is, I wanted a Rake task that would do this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/convert-file.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;On the top is one of my markdown files; on the bottom is the HTML version. I
+needed a way to generate the bottom file from the top one. I needed to write a Rake
+task that would iterate over all of the markdown files in the “posts” directory,
+and generate the corresponding HTML files in the proper target directory.  The
+markdown file name (“posts/2014-10-13-…”) was a naming convention I used to stay
+organized. However, the name and path of the HTML file was what readers would see
+in the post’s URL online &amp;ndash; for example:
+&lt;a href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals"&gt;http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals&lt;/a&gt;.
+This was a problem well suited to Rake file tasks, because they allow you to
+create a series of dependencies between source and target files.&lt;/p&gt;
+
+&lt;p&gt;But before I was ready to use file tasks, I needed to use a few tricks to make
+those tasks easier to write.&lt;/p&gt;
+
+&lt;h2&gt;Iterating Over Files Using Rake::FileList&lt;/h2&gt;
+
+&lt;p&gt;Ruby objects are easier to work with than text files are, so the first thing I
+decided to do was to write a Ruby class that represented one of my markdown
+files. I called it &lt;span class="code"&gt;Post&lt;/span&gt; because each markdown file represented a single blog
+post.&lt;/p&gt;
+
+&lt;p&gt;Next, I needed to create a post object for each of the files in the posts
+directory, by listing the files and iterating over them. It turns out Rake
+provides a very simple way to do this: the &lt;span class="code"&gt;Rake::FileList&lt;/span&gt; class. To quote &lt;a href="http://ruby-doc.org/stdlib-2.2.0/libdoc/rake/rdoc/Rake/FileList.html"&gt;the
+documentation&lt;/a&gt;:&lt;/p&gt;
+
+&lt;br/&gt;
+
+
+
+
+&lt;blockquote&gt;
+A FileList is essentially an array with a few helper methods defined to make file manipulation a bit easier.
+&lt;/blockquote&gt;
+
+
+&lt;p&gt;I like things that are easier. Here’s how I used &lt;span class="code"&gt;FileList&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/mapping-posts.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;On the left are my markdown files with the corresponding post objects on the right. My
+code above first created a &lt;span class="code"&gt;FileList&lt;/span&gt;, using the &lt;span class="code"&gt;posts/*.markdown&lt;/span&gt; pattern. You
+can think of the &lt;span class="code"&gt;FileList&lt;/span&gt; as an array of files that match the given pattern.
+Once I had this array, I &lt;em&gt;mapped&lt;/em&gt; the array to a second array of ruby objects using
+&lt;span class="code"&gt;Enumerable#map&lt;/span&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Blog Post Routing&lt;/h2&gt;
+
+&lt;p&gt;Now that I had a &lt;span class="code"&gt;Post&lt;/span&gt; object for each source markdown file, I could add methods
+to the &lt;span class="code"&gt;Post&lt;/span&gt; class to make manipulating the markdown files easier. Most
+importantly, what I needed to know for each markdown file is where its HTML
+should go in the generated site. That is, I needed to know the URL of the post:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/post-url.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This did the trick. The &lt;span class="code"&gt;date&lt;/span&gt; and &lt;span class="code"&gt;title&lt;/span&gt; methods parsed some metadata values I
+saved in the markdown file along with the text. The &lt;span class="code"&gt;url&lt;/span&gt; method returned a string using
+the year/month/day pattern most people are familiar with. The &lt;span class="code"&gt;slugize&lt;/span&gt; method
+removed characters from the title that weren’t compatible with URL strings. As I
+explained earlier, the URL is also the file system path for each post’s HTML
+file: The single line of code above mapped the posts to an array of strings, each
+one the path to an HTML file, the URL of that post appended with a file
+extension.&lt;/p&gt;
+
+&lt;h2&gt;Grouping Two Arrays Together&lt;/h2&gt;
+
+&lt;p&gt;Now I had two arrays: &lt;span class="code"&gt;Post&lt;/span&gt; objects and HTML file paths. I was almost ready to
+write a Rake file task that would convert the posts into HTML files. But, as
+you&amp;rsquo;ll see in a minute, writing a file task requires two files: a source file
+and a target file. Somehow I needed to convert these two separate arrays into a
+single array of pairs, like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/zipping.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see, Ruby’s &lt;span class="code"&gt;Enumerable#zip&lt;/span&gt; method was
+perfect solution. It yielded object pairs, one object taken from the receiver
+(&lt;span class="code"&gt;html_files&lt;/span&gt;) and the other object taken from the
+argument (&lt;span class="code"&gt;posts&lt;/span&gt;). If you pass in 2, 3 or more
+arguments, it will yield triplets, quadruplets or n-tuples to the block
+instead. I first learned about &lt;span class="code"&gt;zip&lt;/span&gt; from Jim Weirich’s
+2012 Power Rake presentation; he used it in his static web site example in a
+very similar way.  Of course, you can use &lt;span class="code"&gt;zip&lt;/span&gt; to
+process multiple arrays for any purpose. It’s one of Ruby’s most beautiful
+features I think.&lt;/p&gt;
+
+&lt;h2&gt;Writing Rake File Tasks&lt;/h2&gt;
+
+&lt;p&gt;As you probably know, a standard Rake task runs when you execute the task
+directly, or when you run another task that depends on it. A file task,
+however, will only execute the Ruby code inside the block if:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The source file is newer than the target file, or&lt;/li&gt;
+&lt;li&gt;The target file doesn’t exist at all.&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;This behavior is ideal for generating a static web site, or for any other job
+that requires generating a file from another file. Rake will build the target
+file for the first time if it doesn’t exist, or update it if the source file
+has changed.&lt;/p&gt;
+
+&lt;p&gt;Now that I had pairs of HTML paths and &lt;span class="code"&gt;Post&lt;/span&gt; objects,
+it was easy for me to write a file task using one of these pairs. Here’s what I
+came up with:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/file-task.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;By calling &lt;span class="code"&gt;file&lt;/span&gt; inside of the &lt;span class="code"&gt;zip&lt;/span&gt; block, I created a file task for each one
+of the paths in &lt;span class="code"&gt;html_files&lt;/span&gt;. Now if I created a single, standard Rake task that
+depended on the array of html file paths, I could test whether any or all of the
+HTML files needed to be generated:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/rake-posts.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now I could generate all of my blog posts with one command: &lt;span class="code"&gt;rake posts&lt;/span&gt;!&lt;/p&gt;
+
+&lt;h2&gt;Rendering Each Post Using ERB&lt;/h2&gt;
+
+&lt;p&gt;What did the code inside the file task do? It generated the HTML file for a
+single post using &lt;span class="code"&gt;ERB&lt;/span&gt;, using a method I wrote called &lt;span class="code"&gt;Layout#render&lt;/span&gt;. If you’re
+interested, here’s the &lt;span class="code"&gt;Layout&lt;/span&gt; class (&lt;a href="https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/lib/layout.rb"&gt;github&lt;/a&gt;):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/layout.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;I won’t explain this line by line, but there were a couple of interesting tricks
+here also. First, the &lt;span class="code"&gt;contents&lt;/span&gt; method used nested calls to
+ERB to render a page layout surrounding the post, along
+with the article text itself. This required I call &lt;span
+class="code"&gt;yield&lt;/span&gt; somewhere inside my &lt;span class="code"&gt;layout.erb&lt;/span&gt; file in just the same
+way I would in &lt;span class="code"&gt;application.html.erb&lt;/span&gt; for a Rails app.&lt;/p&gt;
+
+&lt;p&gt;The complex line of code at the bottom that uses &lt;span class="code"&gt;instance_eval&lt;/span&gt; and
+&lt;span class="code"&gt;binding&lt;/span&gt; seems impossible to understand at first. But actually it’s fairly
+standard boilerplate Ruby metaprogramming code that evaluates the ERB template
+in the context of the &lt;span class="code"&gt;page&lt;/span&gt; object and the current method.&lt;/p&gt;
+
+&lt;p&gt;Let’s take a closer look at this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/metaprogramming.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;On the left I show the the &lt;span class="code"&gt;page&lt;/span&gt; object, an instance of the &lt;span class="code"&gt;Post&lt;/span&gt; class, in the
+center the code running the ERB transformation, and on the right the Ruby call
+stack.&lt;/p&gt;
+
+&lt;p&gt;The arrow from ERB going to the left represents the use of &lt;span class="code"&gt;instance_eval&lt;/span&gt;. This
+method, built into the Ruby language, resets the &lt;span class="code"&gt;self&lt;/span&gt; pointer to the
+receiver or the &lt;span class="code"&gt;page&lt;/span&gt; object in this example. This allows the ERB code to access
+the instance variables of the &lt;span class="code"&gt;page&lt;/span&gt; object and the methods of the &lt;span class="code"&gt;Post&lt;/span&gt; class.&lt;/p&gt;
+
+&lt;p&gt;The arrow from ERB going to the right, in turn, represents the call to &lt;span class="code"&gt;binding&lt;/span&gt;.
+The &lt;span class="code"&gt;binding&lt;/span&gt; method, also part of the Ruby core language, refers to the
+current Ruby stack frame allowing the ERB code to access all of the local
+variables present there, such as &lt;span class="code"&gt;recent_posts&lt;/span&gt;.&lt;/p&gt;
+
+&lt;h2&gt;My Rakefile&lt;/h2&gt;
+
+&lt;p&gt;Of course, I’m glossing over some other important details here, such as
+generating the index or home page, the RSS feed and a few other things. For
+reference, here’s my entire Rakefile (&lt;a href="https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/Rakefile"&gt;github&lt;/a&gt;):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/rakefile.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;You can see the call to &lt;span class="code"&gt;Layout#render&lt;/span&gt; and the &lt;span class="code"&gt;rake :posts&lt;/span&gt; task I described
+above. Here are some other coding details, if you’re interested:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;After creating the &lt;span class="code"&gt;posts&lt;/span&gt; array, I sort it by date, reversed.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;I generate the home page using another file task: &lt;span class="code"&gt;index.html&lt;/span&gt;, and a &lt;span class="code"&gt;HomePage&lt;/span&gt; class.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;I generate the RSS in a similar way using a third file task: &lt;span class="code"&gt;index.xml&lt;/span&gt;, and a &lt;span class="code"&gt;Feed&lt;/span&gt; class.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;h2&gt;Ideas, Not Code&lt;/h2&gt;
+
+&lt;p&gt;If you’re interested in using this code for your own site, it’s on &lt;a href="https://github.com/patshaughnessy/patshaughnessy.github.io"&gt;github&lt;/a&gt;.
+However, I wouldn’t recommended using it: It’s always a better idea to use a
+well tested, robust free service such as wordpress.com or Jekyll.&lt;/p&gt;
+
+&lt;p&gt;Instead of using this code, use the ideas behind it! Take the time to use
+&lt;span class="code"&gt;Rake::FileList&lt;/span&gt; and Rake file tasks in whatever application you’re working on. And
+please take the time to watch the &lt;a href="http://www.confreaks.com/videos/988-goruco2012-power-rake"&gt;PowerRake presentation&lt;/a&gt;. You’ll learn more about one
+of Ruby’s most powerful tools &amp;ndash; and you’ll be able spend some time with Jim.
+Jim’s bright personality and sense of humor can live on in our memory, at
+least.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Koichi Sasada Encourages Us To Contribute To Ruby</title>
     <link href="http://patshaughnessy.net/2014/12/17/koichi-sasada-encourages-us-to-contribute-to-ruby" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/12/17/koichi-sasada-encourages-us-to-contribute-to-ruby</id>
@@ -2728,215 +2986,6 @@ different but related point about object oriented design.  Dave explains here:
 Jargon&lt;/a&gt;.
 He also disagrees with my opinion that the &lt;span
   class="code"&gt;parse_lines&lt;/span&gt; example was written in a functional style.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</title>
-    <link href="http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean" rel="alternate"/>
-    <id>http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean</id>
-    <published>2014-01-30T01:00:00Z</published>
-    <updated>2014-01-30T01:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;p&gt;This week I’ve been spending some free time between projects working on my
-function programming skills. I’m a Ruby developer but have always been
-fascinated by functional languages such as Haskell, Clojure and of course Lisp.
-I was excited this morning when I stumbled across a fascinating article called
-&lt;a href="http://matt.might.net/articles/implementing-a-programming-language/"&gt;7 lines of code</summary>
-    <content type="html">&lt;p&gt;This week I’ve been spending some free time between projects working on my
-function programming skills. I’m a Ruby developer but have always been
-fascinated by functional languages such as Haskell, Clojure and of course Lisp.
-I was excited this morning when I stumbled across a fascinating article called
-&lt;a href="http://matt.might.net/articles/implementing-a-programming-language/"&gt;7 lines of code, 3 minutes: Implement a programming language from scratch&lt;/a&gt;. The
-author, &lt;a href="https://twitter.com/mattmight"&gt;Matthew Might&lt;/a&gt;, touches on Lambda Calculus notation before implementing
-a simple interpreter for Lambda Calculus using just seven lines of Scheme code.
-He later proceeds to write a Scheme interpreter in about 100 lines of code,
-using a dialect of Scheme called &lt;a href="http://racket-lang.org"&gt;Racket&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Matthew starts by introducing the basics of Lambda Calculus notation like this:&lt;/p&gt;
-
-&lt;div style="margin: 20px 0 0 100px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/1/30/basics.png"&gt;&lt;br/&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Matthew explains that all of Lambda Calculus is based on these two simple
-concepts, along with variable references. He then shows a couple of simple examples:&lt;/p&gt;
-
-&lt;div style="margin: 20px 0 0 100px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/1/30/examples.png"&gt;&lt;br/&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;&amp;hellip;and then asks the reader this simple question:&lt;/p&gt;
-
-&lt;div style="margin: 20px 0 0 100px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/1/30/question.png"&gt;&lt;br/&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;In this post I’ll try to answer this question using a series of diagrams. I’m a
-visual learner, and teacher. For me drawing something makes it much easier to
-understand and to explain to someone else. Lambda Calculus experts (“Lambda
-Mathematicians?”) probably have accepted styles for drawing these concepts
-which I’m not aware of. I’ll just draw what comes naturally to me.&lt;/p&gt;
-
-&lt;h2&gt;Getting Rid of All Those Parentheses&lt;/h2&gt;
-
-&lt;p&gt;If I had a whiteboard, I’d rewrite the complex Lambda Calculus expression above
-with circles instead of parentheses. This makes it much easier for me to see
-the nesting and order of operations. An even better visualization might be a tree structure, but I&amp;rsquo;ll keep things inline with cirlces today.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/one.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;For me, the biggest challenge to understanding Lisp or Scheme has always been
-all the nested parentheses. This picture is still cryptic and meaningless, but
-now at least I can see the order of operations and nesting more easily.&lt;/p&gt;
-
-&lt;h2&gt;Start From the Inside and Work Your Way Out&lt;/h2&gt;
-
-&lt;p&gt;To understand what’s going on here, I started with the innermost lambda
-expression:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/two.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Referring to Matthew’s explanation above, &lt;span class="code"&gt;(f x)&lt;/span&gt; means evaluate the function &lt;span class="code"&gt;f&lt;/span&gt;
-on the argument &lt;span class="code"&gt;x&lt;/span&gt;. Therefore, this expression represents an anonymous function
-that applies some function &lt;span class="code"&gt;f&lt;/span&gt; to its argument, &lt;span class="code"&gt;x&lt;/span&gt;. The oval on the left is the
-function and I’ve written this explanation on the right: what the function
-does.&lt;/p&gt;
-
-&lt;p&gt;I usually visualize functions with inputs and outputs, like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/three.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here you can see the input &lt;span class="code"&gt;x&lt;/span&gt; comes from the left, and I’ve shown the anonymous
-function in the center using a half-oval. It applies a function &lt;span class="code"&gt;f&lt;/span&gt;, which is
-almost like a second input value, to &lt;span class="code"&gt;x&lt;/span&gt; and returns an output value on the
-right.&lt;/p&gt;
-
-&lt;h2&gt;Higher Order Functions&lt;/h2&gt;
-
-&lt;p&gt;Now let’s substitute this simple function back into the complex expression:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/four.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;You can see I’ve pasted the text “Apply f to my argument” into the center of
-the expression where the previous lambda was located. Working my way out, let’s
-take a look at what the next lambda expression means:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/five.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here you can see a definition for another anonymous function, another lambda
-expression, which takes &lt;span class="code"&gt;f&lt;/span&gt; as an argument. The body of the function is our
-previous expression.&lt;/p&gt;
-
-&lt;p&gt;What this boils down to, therefore, is a function that takes a function as an
-argument and returns a second function as a result. Here’s what this might look
-like using my input/output diagram style:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/six.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the left you can see the function takes a function, &lt;span class="code"&gt;f&lt;/span&gt;, as input. On the
-right the dashed rectangle represents a single output value: another function.
-This is an example of a higher order function, a function that can use other
-functions as inputs or outputs.&lt;/p&gt;
-
-&lt;p&gt;In this example, the output is a new function which applies &lt;span class="code"&gt;f&lt;/span&gt;, the input of the
-higher order function, to its argument &lt;span class="code"&gt;x&lt;/span&gt;. We don’t have a value for &lt;span class="code"&gt;x&lt;/span&gt; yet, but
-we have a new function which later can take an input &lt;span class="code"&gt;x&lt;/span&gt;. It will apply the
-present input, &lt;span class="code"&gt;f&lt;/span&gt;, to whatever argument it receives later, &lt;span class="code"&gt;x&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;The other subtle detail to think about here is that above, when we looked at
-the innermost lambda expression, the value &lt;span class="code"&gt;f&lt;/span&gt; was undefined. The inner lambda
-applied &lt;span class="code"&gt;f&lt;/span&gt; to its input &lt;span class="code"&gt;x&lt;/span&gt;, not knowing what &lt;span class="code"&gt;f&lt;/span&gt; was. Now &lt;span class="code"&gt;f&lt;/span&gt; has been provided by
-the surrounding expression, the outer lambda. &lt;span class="code"&gt;f&lt;/span&gt; is the input to the outer
-lambda. I’m not sure about this, but I suspect lambda mathematicians would say
-the outer lambda is a closure around the free variable, &lt;span class="code"&gt;f&lt;/span&gt;.&lt;/p&gt;
-
-&lt;h2&gt;Identity Functions&lt;/h2&gt;
-
-&lt;p&gt;Substituting again, here’s the entire expression simplified:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/seven.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;The two lambdas on the right are easier to follow. These are examples of the
-identity function, a function that returns its argument. Matthew showed this
-syntax as one of his examples.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/eight.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;You can see here the identity function simply passes its input along as an
-output:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/nine.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;h2&gt;Evaluating a Function&lt;/h2&gt;
-
-&lt;p&gt;Substituting again, here’s what we have now:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/ten.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Earlier we saw the higher order function on the left returns a function that
-will later operate on an argument, which I showed as &lt;span class="code"&gt;x&lt;/span&gt;. Now its time has come.
-Recall that &lt;span class="code"&gt;(f x)&lt;/span&gt; in Lambda Calculus means “evaluate the function &lt;span class="code"&gt;f&lt;/span&gt; on the
-argument &lt;span class="code"&gt;x&lt;/span&gt;.”&lt;/p&gt;
-
-&lt;p&gt;In other words, this expression:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/eleven.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;… means: “evaluate the higher order function on the left, providing the
-function on the right as an argument.”&lt;/p&gt;
-
-&lt;p&gt;The higher order function will take one function (the identity function) and
-return another:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/twelve.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;The output is a new function which will apply the identity function (the
-argument) to its own argument &lt;span class="code"&gt;x&lt;/span&gt;. Of course, this is equivalent to the identity
-function itself!&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/thirteen.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;There must be some Lambda Calculus axiom (the “lambda identity axiom?”) behind
-this deduction, but I’m not sure. I’ll consider it obvious and just move on.&lt;/p&gt;
-
-&lt;h2&gt;The Result&lt;/h2&gt;
-
-&lt;p&gt;Substituting this result back into the original expression, we’re left with
-this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/fourteen.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Reapplying the “lambda identity axiom” again it’s
-obvious this is equivalent to the identity function:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/1/30/fifteen.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;That is, the identity function is also a higher order function. It returns the
-same functions you pass to it, unchanged.&lt;/p&gt;
-
-&lt;p&gt;Stepping back and taking stock, we’ve deduced that:&lt;/p&gt;
-
-&lt;p&gt;&lt;span class="code"&gt;(((λ f . (λ x . (f x))) (λ a . a)) (λ b . b))&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;Is equivalent to:&lt;/p&gt;
-
-&lt;p&gt;&lt;span class="code"&gt;(λ x . x)&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;Or the identity function.&lt;/p&gt;
-
-&lt;h2&gt;What Did I Get Wrong?&lt;/h2&gt;
-
-&lt;p&gt;As I mentioned, I’m just learning about functional programming and lambda
-calculus. If you have some computer science training and see something wrong
-here, let me know. Or if you know the real name for the “lambda identity axiom”
-or have examples of better diagrams for representing lambda expressions, please
-pass along a link.&lt;/p&gt;
 </content>
   </entry>
 </feed>
