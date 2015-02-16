@@ -49,18 +49,17 @@ First, let’s quickly review what a class variable is, and how they work in Rub
 here’s a simple Ruby class, <span class="code">Polygon</span>, that contains a single class variable,
 <span class="code">@@sides</span>:
 
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">class</span> <span class="cl">Polygon</span>
-  <span class="cv">@@sides</span> = <span class="i">10</span>
-  <span class="r">def</span> <span class="pc">self</span>.<span class="fu">sides</span>
-    <span class="cv">@@sides</span>
-  <span class="r">end</span>
-<span class="r">end</span>
+<pre type="ruby">
+class Polygon
+  @@sides = 10
+  def self.sides
+    @@sides
+  end
+end
 
-puts <span class="co">Polygon</span>.sides
-=&gt; 10
-</pre></div>
-</div>
+puts Polygon.sides
+=> 10
+</pre>
 
 This is simple enough: <span class="code">@@sides</span> is a variable that any class or instance
 method of <span class="code">Polygon</span> can access. Here the <span class="code">sides</span> class method returns it. At a
@@ -72,17 +71,16 @@ same memory structure used to represent the <span class="code">Polygon</span> cl
 The confusion comes in when you define a subclass; again here is another one of
 John Nunemaker’s examples:
 
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">class</span> <span class="cl">Triangle</span> &lt; <span class="co">Polygon</span>
-  <span class="cv">@@sides</span> = <span class="i">3</span>
-<span class="r">end</span>
+<pre type="ruby">
+class Triangle < Polygon
+  @@sides = 3
+end
 
-puts <span class="co">Triangle</span>.sides
-=&gt; 3
-puts <span class="co">Polygon</span>.sides
-=&gt; 3
-</pre></div>
-</div>
+puts Triangle.sides
+#=> 3
+puts Polygon.sides
+#=> 3
+</pre>
 
 Notice both class variables, <span class="code">Triangle.sides</span> and <span class="code">Polygon.sides</span>, were changed to
 3. In fact, internally Ruby creates a single variable that both classes share:
@@ -207,28 +205,30 @@ and the language began to make more sense to me.
 Here is the same <span class="code">Polygon</span> class again - now I have Smalltalk on the left, and
 Ruby on the right:
 
-<div class="CodeRay">
-  <div class="code"><pre><div style="float: left; width: 350px;">Object <span class="r">subclass:</span> Polygon [
-  Sides := <span class="cl">10</span>.
+<pre type="smalltalk" style="display: inline-block; width: 40%;">
+Object subclass: Polygon [
+  Sides := 10.
 ]
 
-Polygon <span class="r">class</span> extend [
+Polygon class extend [
   sides [ ^Sides ]
 ]
 
 Polygon sides printNl.
-=&gt; 10</div><div style="float: left;"><span class="r">class</span> <span class="cl">Polygon</span>
-  <span class="cv">@@sides</span> = <span class="i">10</span>
-  <span class="r">def</span> <span class="pc">self</span>.<span class="fu">sides</span>
-    <span class="cv">@@sides</span>
-  <span class="r">end</span>
-<span class="r">end</span>
+=> 10
+</pre>
+<pre type="ruby" style="display: inline-block; width: 40%;">
+class Polygon
+  @@sides = 10
+  def self.sides
+    @@sides
+  end
+end
 
 
-puts <span class="co">Polygon</span>.sides
-=&gt; 10</div>
-</pre></div>
-</div>
+puts Polygon.sides
+#=> 10
+</pre>
 
 Here’s a quick explanation of what the Smalltalk code does:
 
@@ -261,48 +261,52 @@ As I said at the top, Smalltalk shares class variables among subclasses the
 same way Ruby does. Here’s how I would declare the Triangle subclass in
 Smalltalk and Ruby:
 
-<div class="CodeRay">
-  <div class="code"><pre><div style="float: left; width: 350px;">Polygon <span class="r">subclass:</span> Triangle [
+<pre type="smalltalk" style="display: inline-block; width: 40%;">
+Polygon subclass: Triangle [
 ]
-Triangle <span class="r">class</span> extend [
+Triangle class extend [
   set_sides: num [ Sides := num ]
 ]
-
 Polygon sides printNl.
-=&gt; 10 </div><div style="float: left;"><span class="r">class</span> <span class="cl">Triangle</span> &lt; <span class="co">Polygon</span>
-  <span class="r">def</span> <span class="pc">self</span>.<span class="fu">sides=</span>(num)
-    <span class="cv">@@sides</span> = num
-  <span class="r">end</span>
-<span class="r">end</span>
+=> 10 
 
-puts <span class="co">Triangle</span>.sides
-=&gt; 10</div>
-</pre></div>
-</div>
+</pre>
+<pre type="ruby" style="display: inline-block; width: 40%;">
+class Triangle < Polygon
+  def self.sides=(num)
+    @@sides = num
+  end
+end
+
+puts Triangle.sides
+#=> 10
+</pre>
 
 Here I declare the <span class="code">Triangle</span> subclass and a method to set the class variable’s
 value. Now let’s try changing the value of the class variable from the
 subclass:
 
-<div class="CodeRay">
-  <div class="code"><pre><div style="float: left; width: 350px;">Triangle set_sides: <span class="cl">3</span>.
+<pre type="smalltalk" style="display: inline-block; width: 40%;">
+Triangle set_sides: 3.
 Triangle sides printNl.
-=&gt; 3</div><div style="float: left;"><span class="co">Triangle</span>.sides = <span class="i">3</span>
-puts <span class="co">Triangle</span>.sides
-=&gt; 3</div>
-</pre></div>
-</div>
+=> 3</pre>
+<pre type="ruby" style="display: inline-block; width: 40%;">
+Triangle.sides = 3
+puts Triangle.sides
+=> 3</pre>
 
 No surprise; by calling the <span class="code">set_slides</span> class method (<span class="code">sides=</span> in Ruby) I can
 update the value. But notice since both <span class="code">Polygon</span> and <span class="code">Triangle</span> share the same
 class variable, it’s changed for <span class="code">Polygon</span> also:
 
-<div class="CodeRay">
-  <div class="code"><pre><div style="float: left; width: 350px;">Polygon sides printNl.
-=> 3</div><div style="float: left;">puts <span class="co">Polygon</span>.sides
-=&gt; 3</div>
-</pre></div>
-</div>
+<pre type="smalltalk" style="display: inline-block; width: 40%;">
+Polygon sides printNl.
+=> 3
+</pre>
+<pre type="ruby" style="display: inline-block; width: 40%;">
+puts Polygon.sides
+=> 3
+</pre>
 
 Again, we’ve seen Ruby and Smalltalk behave in exactly the same way.
 
@@ -345,18 +349,17 @@ In Ruby if you want to keep a separate value for each class, then you need to
 use a class instance variable instead of a class variable. What does this mean?
 Let’s take a look at another one of John Nunemaker’s examples:
 
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">class</span> <span class="cl">Polygon</span>
-  <span class="r">def</span> <span class="pc">self</span>.<span class="fu">sides</span>
-    <span class="iv">@sides</span>
-  <span class="r">end</span>
-  <span class="iv">@sides</span> = <span class="i">8</span>
-<span class="r">end</span>
+<pre type="ruby" style="display: inline-block; width: 40%;">
+class Polygon
+  def self.sides
+    @sides
+  end
+  @sides = 8
+end
 
-puts <span class="co">Polygon</span>.sides
-=&gt; 8
-</pre></div>
-</div>
+puts Polygon.sides
+#=> 8
+</pre>
 
 Now since I used the <span class="code">@sides</span> notation instead of <span class="code">@@sides</span>, Ruby created an
 instance variable instead of a class variable:
@@ -380,21 +383,26 @@ src="http://patshaughnessy.net/assets/2012/12/17/polygon-and-triangle-instance.p
 Now let’s try the same thing in Smalltalk. In Smalltalk to declare an instance
 variable you call the <span class="code">instanceVariableNames</span> method on a class:
 
-<div class="CodeRay">
-  <div class="code"><pre><div style="float: left; width: 350px;">Object <span class="r">subclass:</span> Polygon [
+<pre type="smalltalk" style="display: inline-block; width: 40%;">
+Object subclass: Polygon [
 ]
 
-Polygon <span class="r">instanceVariableNames:</span> <span class="pc">'Sides '</span>!
+Polygon instanceVariableNames: 'Sides '!
 
 Polygon extend [
   sides [ ^Sides ]
-]</div><div style="float: left;"><span class="r">class</span> <span class="cl">Polygon</span>
-  <span class="r">def</span> <span class="fu">sides</span>
-    <span class="iv">@sides</span>
-  <span class="r">end</span>
-<span class="r">end</span></div>
-</pre></div>
-</div>
+]
+</pre>
+<pre type="ruby" style="display: inline-block; width: 40%;">
+class Polygon
+  def sides
+    @sides
+  end
+end
+
+
+
+</pre>
 
 Here I’ve created a new class <span class="code">Polygon</span>, a subclass of <span class="code">Object</span>. Then I send
 the <span class="code">instanceVariableNames</span> message to this new class, telling Smalltalk to
@@ -407,21 +415,26 @@ and not of the <span class="code">Polygon</span> class. To create a class instan
 you instead have to send the <span class="code">class</span> message to <span class="code">Polygon</span> first before calling
 <span class="code">instanceVariableNames</span> or <span class="code">extend</span>, like this:
 
-<div class="CodeRay">
-  <div class="code"><pre><div style="float: left; width: 350px;">Object <span class="r">subclass:</span> Polygon [
+<pre type="smalltalk" style="display: inline-block; width: 50%;">
+Object subclass: Polygon [
 ]
 
-Polygon class <span class="r">instanceVariableNames:</span> <span class="pc">'Sides '</span>!
+Polygon class instanceVariableNames: 'Sides '!
 
 Polygon class extend [
   sides [ ^Sides ]
-]</div><div style="float: left;"><span class="r">class</span> <span class="cl">Polygon</span>
-  <span class="r">def</span> <span class="pc">self</span>.<span class="fu">sides</span>
-    <span class="iv">@sides</span>
-  <span class="r">end</span>
-<span class="r">end</span></div>
-</pre></div>
-</div>
+]
+</pre>
+<pre type="ruby" style="display: inline-block; width: 30%;">
+class Polygon
+  def self.sides
+    @sides
+  end
+end
+
+
+
+</pre>
 
 Again, notice that the Smalltalk and Ruby code snippets are really just two
 different ways of expressing the same commands. In Smalltalk you say <span class="code">Polygon
