@@ -326,6 +326,12 @@ pre {
   text-align: center;
 }
 
+span.code {
+  font-family: Monaco;
+  padding: 2px;
+  font-size: 14px;
+}
+
 .reminder {
   background-color: #FFCCCC;
   padding: 2px;
@@ -773,7 +779,7 @@ ol.CodeRay li { white-space: pre }
 .CodeRay .global-variable { color:teal;}
 .CodeRay .hex { color:#058; font-weight:bold }
 .CodeRay .integer  { color:#099; }
-.CodeRay .include { color:#B44; font-weight:bold }
+.CodeRay .include { color:#B44; }
 .CodeRay .inline { color: black }
 .CodeRay .inline .inline { background: #ccc }
 .CodeRay .inline .inline .inline { background: #bbb }
@@ -786,7 +792,7 @@ ol.CodeRay li { white-space: pre }
 .CodeRay .local-variable { color:#963 }
 .CodeRay .octal { color:#40E; font-weight:bold }
 .CodeRay .operator { }
-.CodeRay .predefined-constant {  font-weight:bold }
+.CodeRay .predefined-constant { color:#a71d5d; }
 .CodeRay .predefined { color:#369; font-weight:bold }
 .CodeRay .preprocessor { color:#579; }
 .CodeRay .pseudo-class { color:#00C; font-weight:bold }
