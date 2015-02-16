@@ -14,24 +14,23 @@ describe HomePage do
 
   it 'returns a list of posts sorted by date' do
     posts = home_page.posts
-    posts.size.must_equal 126
-    posts.first.title.must_equal "Koichi Sasada Encourages Us To Contribute To Ruby"
+    posts.size.must_equal Dir["posts/*"].length
     posts.last.title.must_equal "Why to use TDD with Drupal"
   end
 
   it 'returns a list of month strings for these posts, but using empty strings for duplicates' do
     months = home_page.month_strings
     size = months.size
-    size.must_equal 126
+    size.must_equal Dir["posts/*"].length
     months[0..7].must_equal [
+      "January 2015",
       "December 2014",
       "",
       "November 2014",
       "October 2014",
       "September 2014",
       "",
-      "June 2014",
-      "April 2014"
+      "June 2014"
     ]
   end
 
