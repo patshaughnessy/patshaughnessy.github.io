@@ -1,0 +1,457 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Mark Methods Private When You Don’t Test Them - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Mark Methods Private When You Don’t Test Them - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Mark Methods Private When You Don’t Test Them</h1>
+  
+    <div class="metadata">
+    <span class="date">February 16th 2015</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2015/2/16/mark-methods-private-when-you-dont-test-them" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
+    
+      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Mark Methods Private When You Don’t Test Them">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
+    
+    </div>
+  
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
+  <img src="http://patshaughnessy.net/assets/2015/2/16/plaza-de-la-merced.jpg"><br/>
+  <i>My father in law once lived in same building where Picasso<br/>was born, near the Plaza de la Merced in Málaga, Spain.</i>
+</div>
+
+
+<p>In Ruby and many other languages, you write private methods to implement
+internal logic you don’t want to expose. You want the freedom to rename,
+repurpose or even delete them without worrying about impacting anything else.
+The <span class="code">private</span> keyword signals other developers: Don’t rely on this; don’t call
+it; it might change. This is especially important when writing framework or
+library code that many other developers will use.</p>
+
+<p>But which methods should you make private? Sometimes this is obvious; sometimes
+it isn’t. A good rule of thumb to use is: If you’re not testing a method, it
+should be private.</p>
+
+<br/>
+
+
+<br/>
+
+
+<p>But wait a minute! Aren’t we supposed to test everything? Isn’t 100% code
+coverage the nirvana every Ruby developer seeks? Let me clarify. You should
+mark methods private when you test them indirectly by calling the other, public
+methods in the same class. Use the <span class="code">private</span> keyword to help organize your code,
+to remind yourself what you still need to test, and what you don’t.</p>
+
+<h2>Three Paintings</h2>
+
+<p>A simple example will make this clear. Suppose I have a class that describes a
+painting:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="constant">Painting</span> = <span class="constant">Struct</span>.new(<span class="symbol">:name</span>, <span class="symbol">:year</span>)
+</pre></div>
+</div>
+
+
+
+<p>Now I can create a list of three paintings in a <span
+class="code">Minitest::Spec</span> file like this:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+let(<span class="symbol">:one</span>) { <span class="constant">Painting</span>.new(<span class="string"><span class="delimiter">&quot;</span><span class="content">Spanish Couple In Front Of Inn</span><span class="delimiter">&quot;</span></span>, <span class="integer">1900</span>) }
+let(<span class="symbol">:two</span>) { <span class="constant">Painting</span>.new(<span class="string"><span class="delimiter">&quot;</span><span class="content">Guernica</span><span class="delimiter">&quot;</span></span>, <span class="integer">1937</span>) }
+let(<span class="symbol">:three</span>) { <span class="constant">Painting</span>.new(<span class="string"><span class="delimiter">&quot;</span><span class="content">Petite Fleurs</span><span class="delimiter">&quot;</span></span>, <span class="integer">1958</span>) }
+let(<span class="symbol">:paintings</span>) { [one, two, three] }
+</pre></div>
+</div>
+
+
+
+<p>Suppose my first requirement is to return the first painting from the list.
+Simple enough:</p>
+
+<div class="CodeRay" style="display: inline-block; width: 200px;">
+  <div class="code"><pre>
+<span class="keyword">def</span> <span class="function">first</span>(list)
+  list.first
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<div class="CodeRay" style="display: inline-block;">
+  <div class="code"><pre>
+it <span class="string"><span class="delimiter">&quot;</span><span class="content">should return the first element</span><span class="delimiter">&quot;</span></span> <span class="keyword">do</span>
+  first(paintings).must_equal one
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>I just call <span class="code">Array#first</span> and I’m done. Returning the
+rest of the list is slightly more interesting:</p>
+
+<div class="CodeRay" style="display: inline-block; width: 200px;">
+  <div class="code"><pre>
+<span class="keyword">def</span> <span class="function">rest</span>(list)
+  _, *rest = list
+  rest
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<div class="CodeRay" style="display: inline-block">
+  <div class="code"><pre>
+it <span class="string"><span class="delimiter">&quot;</span><span class="content">returns the rest of the elements</span><span class="delimiter">&quot;</span></span> <span class="keyword">do</span>
+  rest(paintings).must_equal [two, three]
+<span class="keyword">end</span>
+
+</pre></div>
+</div>
+
+
+
+<p>Using <a href="http://devblog.avdi.org/2010/01/31/first-and-rest-in-ruby/">a trick I learned from
+Avdi</a>, <span
+class="code">rest</span> always returns an array even if the input list was
+empty or had only one element. So far, so good. I’ve written two methods and
+two tests:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/2/16/two-tests.png"/></p>
+
+<h2>A New Requirement</h2>
+
+<p>Now suppose my business requirement changes slightly and I instead need to
+return the first painting sorted alphabetically by name. Once again, it’s not
+hard to do.</p>
+
+<div class="CodeRay" style="display: inline-block; width: 300px;">
+  <div class="code"><pre>
+<span class="keyword">def</span> <span class="function">first</span>(list)
+  list.sort <span class="keyword">do</span> |p1, p2|
+    p1.name &lt;=&gt; p2.name
+  <span class="keyword">end</span>.first
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<div class="CodeRay" style="display: inline-block">
+  <div class="code"><pre>
+it <span class="string"><span class="delimiter">&quot;</span><span class="content">should return the first element</span><span class="delimiter">&quot;</span></span> <span class="keyword">do</span>
+  first(paintings).name.must_equal <span class="string"><span class="delimiter">&quot;</span><span class="content">Guernica</span><span class="delimiter">&quot;</span></span>
+<span class="keyword">end</span>
+
+
+</pre></div>
+</div>
+
+
+
+<p>And I need rest to use the same sort order, so I repeat the call to sort:</p>
+
+<div class="CodeRay" style="display: inline-block; width: 300px;">
+  <div class="code"><pre>
+<span class="keyword">def</span> <span class="function">rest</span>(list)
+  _, *rest = list.sort <span class="keyword">do</span> |p1, p2|
+    p1.name &lt;=&gt; p2.name
+  <span class="keyword">end</span> 
+  rest
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<div class="CodeRay" style="display: inline-block">
+  <div class="code"><pre>
+it <span class="string"><span class="delimiter">&quot;</span><span class="content">returns the rest of the elements</span><span class="delimiter">&quot;</span></span> <span class="keyword">do</span>
+  rest(paintings).map(&amp;<span class="symbol">:name</span>).must_equal [
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">Petite Fleurs</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">Spanish Couple In Front Of Inn</span><span class="delimiter">&quot;</span></span>
+  ]
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>I’ve implemented new behavior, but still have two methods and two tests:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/2/16/two-tests.png"/></p>
+
+<h2>Extracting a Method</h2>
+
+<p>Because both of my methods are covered by tests, I’m free to refactor them. I
+decide to extract a new method <span class="code">sorted_by_name</span>:</p>
+
+<div class="CodeRay" style="display: inline-block; width: 300px;">
+  <div class="code"><pre>
+<span class="keyword">def</span> <span class="function">first</span>(list)
+  sorted_by_name(list).first
+<span class="keyword">end</span>
+
+<span class="keyword">def</span> <span class="function">rest</span>(list)
+  _, *rest = sorted_by_name(list)
+  rest
+<span class="keyword">end</span>
+
+
+
+
+<span class="keyword">def</span> <span class="function">sorted_by_name</span>(list)
+  list.sort <span class="keyword">do</span> |p1, p2|
+    p1.name &lt;=&gt; p2.name
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+
+
+<div class="CodeRay" style="display: inline-block; width: 400px;">
+  <div class="code"><pre>
+it <span class="string"><span class="delimiter">&quot;</span><span class="content">returns the element with the first name</span><span class="delimiter">&quot;</span></span> <span class="keyword">do</span>
+  first(paintings).name.must_equal <span class="string"><span class="delimiter">&quot;</span><span class="content">Guernica</span><span class="delimiter">&quot;</span></span>
+<span class="keyword">end</span>
+
+it <span class="string"><span class="delimiter">&quot;</span><span class="content">returns the rest after the first name</span><span class="delimiter">&quot;</span></span> <span class="keyword">do</span>
+  rest(paintings).map(&amp;<span class="symbol">:name</span>).must_equal [
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">Petite Fleurs</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">Spanish Couple In Front Of Inn</span><span class="delimiter">&quot;</span></span>
+  ]
+<span class="keyword">end</span>
+
+
+
+
+
+
+
+</pre></div>
+</div>
+
+
+
+<p>Here I’ve simply moved the call to sort into a utility method called
+<span class="code">sorted_by_name</span>. Now <span class="code">first</span>
+and <span class="code">rest</span> both call <span
+class="code">sorted_by_name</span>, making the code a bit clearer and DRY-er. But
+now I have three methods and only two tests:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/2/16/two-tests-three-methods.png"/></p>
+
+<h2>Mark Methods Private When You Don’t Test Them</h2>
+
+<p>Notice I didn’t bother writing a test for <span class="code">sorted_by_name</span>. I know it works
+because my other tests still pass. The existing tests are sufficient; I am
+testing <span class="code">sorted_by_name</span> indirectly. Because I extracted <span class="code">sorted_by_name</span> from
+<span class="code">first</span> and <span class="code">rest</span>, because I
+refactored my code without adding any new behavior, no new test were required.</p>
+
+<p>In this scenario, take the time to mark the new, untested method as private:</p>
+
+<div class="CodeRay" style="display: inline-block; width: 300px;">
+  <div class="code"><pre>
+<span class="keyword">def</span> <span class="function">first</span>(list)
+  sorted_by_name(list).first
+<span class="keyword">end</span>
+
+<span class="keyword">def</span> <span class="function">rest</span>(list)
+  _, *rest = sorted_by_name(list)
+  rest
+<span class="keyword">end</span>
+
+
+
+private
+
+<span class="keyword">def</span> <span class="function">sorted_by_name</span>(list)
+  list.sort <span class="keyword">do</span> |p1, p2|
+    p1.name &lt;=&gt; p2.name
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+
+
+<div class="CodeRay" style="display: inline-block; width: 400px;">
+  <div class="code"><pre>
+it <span class="string"><span class="delimiter">&quot;</span><span class="content">returns the element with the first name</span><span class="delimiter">&quot;</span></span> <span class="keyword">do</span>
+  first(paintings).name.must_equal <span class="string"><span class="delimiter">&quot;</span><span class="content">Guernica</span><span class="delimiter">&quot;</span></span>
+<span class="keyword">end</span>
+
+it <span class="string"><span class="delimiter">&quot;</span><span class="content">returns the rest after the first name</span><span class="delimiter">&quot;</span></span> <span class="keyword">do</span>
+  rest(paintings).map(&amp;<span class="symbol">:name</span>).must_equal [
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">Petite Fleurs</span><span class="delimiter">&quot;</span></span>,
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">Spanish Couple In Front Of Inn</span><span class="delimiter">&quot;</span></span>
+  ]
+<span class="keyword">end</span>
+
+
+
+
+
+
+
+
+</pre></div>
+</div>
+
+
+
+<p>The <span class="code">private</span> keyword here reminds me I’ve already tested <span
+class="code">sorted_by_name</span>, that I don’t need to write new tests for
+it. Now <span class="code">private</span> is helping me organize my code; it’s helping me remember
+which methods I don’t need to test… and which methods are missing important
+tests.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/2/16/two-tests-three-methods-private.png"/></p>
+
+<p>If my tests don’t need to know about <span class="code">sorted_by_name</span>, then certainly other
+developers don’t. It should be private. Marking it private reminds me that it
+is being tested indirectly, that I didn’t just forget to write a test for it.
+Marking it private tells other developers about what I’ve learned from my own
+test suite.</p>
+
+  </section>
+
+  
+    <section class="comments">
+      <div id="disqus_thread"><script type='text/javascript'> 
+          var disqus_identifier = 'http://patshaughnessy.net/2015/2/16/mark-methods-private-when-you-dont-test-them';
+          var disqus_shortname = 'patshaughnessy';
+          var disqus_title = 'Mark Methods Private When You Don’t Test Them';
+        </script></div>
+      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
+      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
+    </section>
+  
+</article>
+
+  <script type="text/javascript">
+    var disqus_identifier = 'http://patshaughnessy.net/2015/2/16/mark-methods-private-when-you-dont-test-them';
+    var disqus_shortname = 'patshaughnessy';
+    var disqus_title = 'Mark Methods Private When You Don’t Test Them';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+  </script>
+
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                
+                  <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
+                
+                  <li><a href="/2015/1/8/using-rake-to-generate-a-blog">Using Rake to Generate a Blog</a></li>
+                
+                  <li><a href="/2014/12/17/koichi-sasada-encourages-us-to-contribute-to-ruby">Koichi Sasada Encourages Us To Contribute To Ruby</a></li>
+                
+                  <li><a href="/2014/12/15/matzs-forward-to-ruby-under-a-microscope">Matz’s Foreword to Ruby Under a Microscope</a></li>
+                
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy</a>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+  try {
+  var pageTracker = _gat._getTracker("UA-5273122-4");
+  pageTracker._trackPageview();
+  } catch(err) {}</script>
+
+</body>
+</html>
+
