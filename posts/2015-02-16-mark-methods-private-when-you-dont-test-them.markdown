@@ -104,7 +104,7 @@ end
 
 </pre>
 
-And I need rest to use the same sort order, so I repeat the call to sort:
+And I need <span class="code">rest</span> to use the same sort order, so I repeat the call to <span class="code">sort</span>:
 
 <pre type="ruby" style="display: inline-block; width: 300px;">
 def rest(list)
@@ -130,7 +130,7 @@ I’ve implemented new behavior, but still have two methods and two tests:
 ## Extracting a Method
 
 Because both of my methods are covered by tests, I’m free to refactor them. I
-decide to extract a new method <span class="code">sorted_by_name</span>:
+decide to extract a new method, <span class="code">sorted_by_name</span>:
 
 <pre type="ruby" style="display: inline-block; width: 300px;">
 def first(list)

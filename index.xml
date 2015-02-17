@@ -166,7 +166,7 @@ it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&
 
 
 
-&lt;p&gt;And I need rest to use the same sort order, so I repeat the call to sort:&lt;/p&gt;
+&lt;p&gt;And I need &lt;span class="code"&gt;rest&lt;/span&gt; to use the same sort order, so I repeat the call to &lt;span class="code"&gt;sort&lt;/span&gt;:&lt;/p&gt;
 
 &lt;div class="CodeRay" style="display: inline-block; width: 300px;"&gt;
   &lt;div class="code"&gt;&lt;pre&gt;
@@ -201,7 +201,7 @@ it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&
 &lt;h2&gt;Extracting a Method&lt;/h2&gt;
 
 &lt;p&gt;Because both of my methods are covered by tests, I’m free to refactor them. I
-decide to extract a new method &lt;span class="code"&gt;sorted_by_name&lt;/span&gt;:&lt;/p&gt;
+decide to extract a new method, &lt;span class="code"&gt;sorted_by_name&lt;/span&gt;:&lt;/p&gt;
 
 &lt;div class="CodeRay" style="display: inline-block; width: 300px;"&gt;
   &lt;div class="code"&gt;&lt;pre&gt;
