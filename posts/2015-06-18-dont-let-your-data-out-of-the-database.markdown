@@ -2,7 +2,7 @@ title: "Don’t Let Your Data Out of the Database"
 date: 2015/6/18
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://pathshaughnessy.net/assets/2015/6/18/escape.png"><br/>
+  <img src="http://patshaughnessy.net/assets/2015/6/18/escape.png"><br/>
   <i>Don’t let your data escape from your database<br/>
   and cause unintended performance mistakes.</i>
 </div>
@@ -82,7 +82,7 @@ post.latest_comment.author
 </pre>
 
 <div style="float: right; padding: 7px 0px 50px 30px; text-align: center;">
-  <img src="http://pathshaughnessy.net/assets/2015/6/18/open-cell.jpg"><br/>
+  <img src="http://patshaughnessy.net/assets/2015/6/18/open-cell.jpg"><br/>
 </div>
 
 ## Where Is My Data?
@@ -97,7 +97,7 @@ the database do the work for me.
 
 Let’s take a closer look at how <span class="code">latest_comment</span> works:
 
-<img src="http://pathshaughnessy.net/assets/2015/6/18/filter-sort.png"/>
+<img src="http://patshaughnessy.net/assets/2015/6/18/filter-sort.png"/>
 
 On the right, I start with all of the comments in the database, tens of
 thousands of them let’s say. Next, I need to search for the comments associated
@@ -110,7 +110,7 @@ database, but the sorting in Ruby. In between, the entire subset of comments
 for a post have to be transmitted from the database server to my Ruby
 application server:
 
-<img src="http://pathshaughnessy.net/assets/2015/6/18/ruby-sort.png"/>
+<img src="http://patshaughnessy.net/assets/2015/6/18/ruby-sort.png"/>
 
 To transmit all of these records, the database needs to serialize them to some
 binary format, which my Ruby code (or my DB driver actually) later needs to
@@ -148,7 +148,7 @@ This will run much faster than my previous solution, because my database only
 transmits one comment record over the network to my Ruby server: the latest
 one. And Ruby only creates one Ruby object, for the latest comment:
 
-<img src="http://pathshaughnessy.net/assets/2015/6/18/db-sort.png"/>
+<img src="http://patshaughnessy.net/assets/2015/6/18/db-sort.png"/>
 
 Now highly optimized C code, running on the same server that holds the comments
 table data, filters the comments by post, and sorts the matches by timestamp.
@@ -239,7 +239,7 @@ class="code">each</span>, I’ve triggered this series of repeated SQL commands.
 Now I’m transmitting all of the post data, and then more data back and forth
 for each post between my database and my Ruby application:
 
-<img src="http://pathshaughnessy.net/assets/2015/6/18/ruby-iterate.png"/>
+<img src="http://patshaughnessy.net/assets/2015/6/18/ruby-iterate.png"/>
 
 Just like my previous code, this migration will perform poorly. If I have just
 a few posts it probably doesn’t matter. But imagine if there are thousands or
@@ -258,7 +258,7 @@ optimized format, likely loaded into memory. It can iterate over the posts and
 update them very quickly.
 
 <div style="float: right; padding: 17px 0px 10px 30px; text-align: center;">
-  <img src="http://pathshaughnessy.net/assets/2015/6/18/prison.jpg"><br/>
+  <img src="http://patshaughnessy.net/assets/2015/6/18/prison.jpg"><br/>
 </div>
 
 But how? How do ask the database server to update all the posts? I need to
@@ -284,7 +284,7 @@ all of the posts with a single command!
 
 How does this work? Let’s take a look:
 
-<img src="http://pathshaughnessy.net/assets/2015/6/18/db-iterate.png"/>
+<img src="http://patshaughnessy.net/assets/2015/6/18/db-iterate.png"/>
 
 Using a SQL migration, my Ruby code sends a single SQL command to the database
 server, which is transmitted over the network to the database. Then, on the
@@ -311,7 +311,7 @@ subquery](https://en.wikipedia.org/wiki/Correlated_subquery), because the inner
 <span class="code">SELECT</span> uses a value from the outer query. Here’s the
 SQL again:
 
-<img src="http://pathshaughnessy.net/assets/2015/6/18/correlated-subquery.png"/>
+<img src="http://patshaughnessy.net/assets/2015/6/18/correlated-subquery.png"/>
 
 Notice the inner <span class="code">SELECT</span> statement refers to <span
 class="code">posts.id</span>, a value from the surrounding <span
