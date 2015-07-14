@@ -261,7 +261,7 @@ update them very quickly.
   <img src="http://patshaughnessy.net/assets/2015/6/18/prison.jpg"><br/>
 </div>
 
-But how? How do ask the database server to update all the posts? I need to
+But how? How do I ask the database server to update all the posts? I need to
 speak the database’s language: SQL. By writing SQL directly, I can be sure the
 database is doing exactly what I want, that it’s using the most efficient
 algorithm possible. I can be sure my database and I understand each other.
