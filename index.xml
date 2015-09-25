@@ -7,6 +7,280 @@
     <name></name>
   </author>
   <entry>
+    <title>What Do Perl and Go Have in Common?</title>
+    <link href="http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common" rel="alternate"/>
+    <id>http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common</id>
+    <published>2015-09-25T00:00:00Z</published>
+    <updated>2015-09-25T00:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;p&gt;&lt;strong&gt;TL/DR:&lt;/strong&gt; &lt;em&gt;Both Perl and Go only partially implement object oriented
+programming, in a confusing way. Using either language you can create
+structures equivalent to objects but without using keywords such as &lt;span
+class="code"&gt;class&lt;/span&gt; or &lt;span class="code"&gt;new&lt;/span&gt;.  Converting a Go
+function into a method by adding a receiver reminds me of &amp;ldquo;blessing&amp;rdquo; a Perl has</summary>
+    <content type="html">&lt;p&gt;&lt;strong&gt;TL/DR:&lt;/strong&gt; &lt;em&gt;Both Perl and Go only partially implement object oriented
+programming, in a confusing way. Using either language you can create
+structures equivalent to objects but without using keywords such as &lt;span
+class="code"&gt;class&lt;/span&gt; or &lt;span class="code"&gt;new&lt;/span&gt;.  Converting a Go
+function into a method by adding a receiver reminds me of &amp;ldquo;blessing&amp;rdquo; a Perl hash
+reference.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;It’s hard to imagine two programming languages that are more different. Larry
+Wall created Perl  almost 30 years ago in 1987. Google introduced Go much more
+recently in 2009. Perl is a dynamic, interpreted language while Go uses a
+compiler and static types. Perl syntax is quirky, fun and sometimes bizarre,
+while Go syntax is clean and simple, almost boring at times.&lt;/p&gt;
+
+&lt;p&gt;This year, coincidentally, I tried to learn both Perl and Go around the same
+time. Oddly, I found something in common between these two dramatically
+different languages. They both allow you to create objects and to write
+methods, but without supporting &lt;span class="code"&gt;class&lt;/span&gt;, &lt;span
+class="code"&gt;new&lt;/span&gt; or other keywords found in traditional object oriented
+languages like Smalltalk, Java, Ruby or Python.  Both languages leave the door
+partially open to object oriented design, but don’t provide the syntax or
+features you expect and need for using objects and classes.&lt;/p&gt;
+
+&lt;h2&gt;Writing a Perl Function&lt;/h2&gt;
+
+&lt;p&gt;Let’s suppose I want to calculate the density of Jupiter, based on its mass and
+diameter. Using Perl, I could write:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl1.png"/&gt;&lt;/p&gt;
+
+&lt;div style="float: right; padding: 25px 8px 0px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2015/9/25/vw.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;
+  Writing Perl feels like riding a vintage VW bus. Things don’t&lt;br/&gt;
+  work the way you expect, but you can always feel the love.
+&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;As you can see, Perl’s syntax is somewhat odd: The &lt;span class="code"&gt;my&lt;/span&gt;
+keyword indicates each variable belongs to the local lexical scope. The &lt;span
+class="code"&gt;shift&lt;/span&gt; keywords pull the mass and radius values from an
+array of values Perl implicitly passes to every function &amp;ndash; Perl functions
+always take a single array argument! And you have to prefix all of the
+identifiers with either a &lt;span class="code"&gt;$,&lt;/span&gt; &lt;span
+class="code"&gt;@&lt;/span&gt; or &lt;span class="code"&gt;%&lt;/span&gt; character to indicate
+whether it is a scalar (simple value), an array or a hash. Sometimes in more
+complex Perl code you have to combine these prefixes together in cryptic
+patterns, such as &lt;span class="code"&gt;@$var&lt;/span&gt;, or &lt;span
+class="code"&gt;%$var&lt;/span&gt;. Thankfully in this simple function I just use
+numeric values, so &lt;span class="code"&gt;$&lt;/span&gt; is sufficient.&lt;/p&gt;
+
+&lt;p&gt;To me, Perl feels like an old-fashioned, awkward version of Ruby. And this
+makes some sense. Perl was to some extent the model for both Ruby and Python,
+which were created just a few years after Perl in the early 1990s. Ruby and
+Python smoothed out the rough edges of Perl’s syntax (along with adding proper
+support for objects among other things).&lt;/p&gt;
+
+&lt;h2&gt;Creating a Perl Object&lt;/h2&gt;
+
+&lt;p&gt;Now I decide to use an object oriented style instead. I want a Jupiter object
+which has mass and radius attributes, and I’d like the density function to be a
+method, like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In other words, I’d like to think of &lt;span class="code"&gt;$jupiter&lt;/span&gt; as an
+instance of the Planet class.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/jupiter-class.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;By writing a &lt;span class="code"&gt;Planet&lt;/span&gt; class, I group together data
+values that describe each planet (mass and radius) with the functions that use
+those values (density).  Object oriented languages refer to the data values as
+&lt;em&gt;instance variables&lt;/em&gt;, and the functions as &lt;em&gt;methods&lt;/em&gt;. By creating a class, I now
+have a natural place to gather functions and attributes related to planets.&lt;/p&gt;
+
+&lt;p&gt;The problem is that Perl isn’t an object oriented language. There’s no way to
+declare a class, define methods or create objects which are instances of that
+class. However, a few years after Perl was invented, in the mid 1990s, Larry
+Wall and the Perl team introduced some support for object oriented programming
+concepts in Perl 5. They converted Perl into an object oriented language after
+the fact &amp;ndash; at least a partially object oriented language.&lt;/p&gt;
+
+&lt;p&gt;To create a Perl class, I first group my planet functions together using the Perl &lt;span class="code"&gt;package&lt;/span&gt; keyword. In this example I have only one:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This gives me a place to put all of the methods of the &lt;span
+class="code"&gt;Planet&lt;/span&gt; class &amp;ndash; the &lt;span class="code"&gt;package&lt;/span&gt;
+keyword plays the same role the &lt;span class="code"&gt;class&lt;/span&gt; keyword would
+in Java or Ruby, to some extent. Also notice that I’ve rewritten my function to
+use object oriented syntax.  Instead of obtaining the mass and radius from the
+parameters array, I get a single parameter which I call &lt;span
+class="code"&gt;$self&lt;/span&gt;. Then I use &lt;span class="code"&gt;$self&lt;/span&gt; as a hash
+reference to get the mass and radius values, for example: &lt;span
+class="code"&gt;$self-&gt;{&amp;lsquo;mass&amp;rsquo;}&lt;/span&gt;. This is object oriented code. I’ve created
+a class and added a method to it.&lt;/p&gt;
+
+&lt;p&gt;However, let’s think about this for another moment:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/words1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Notice there’s a difference between what I want to say, and the words I have to
+use to say it. The Perl language doesn’t include the &lt;span
+class="code"&gt;class&lt;/span&gt; keyword; instead, I need to use &lt;span
+class="code"&gt;package&lt;/span&gt;. We’ll see this again in a moment.&lt;/p&gt;
+
+&lt;p&gt;To create an instance of my new &lt;span class="code"&gt;Planet&lt;/span&gt; class, an
+object, I need to create a hash (technically a reference to a hash) and then
+“bless” it:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This creates a connection between the hash (the object) and the package that
+contains the methods I want to use (the class). Now I can use syntax such as
+&lt;span class="code"&gt;$jupiter-&gt;density()&lt;/span&gt;. I’ve done it! I’ve created an object using Perl.&lt;/p&gt;
+
+&lt;p&gt;However, once again the language doesn’t supply the words I want to use to
+express the idea I’m thinking of:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/words2.png"/&gt;&lt;/p&gt;
+
+&lt;h2&gt;Expressing Object Oriented Concepts Using Perl&lt;/h2&gt;
+
+&lt;p&gt;Here’s the complete, object oriented version of my example:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl5.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;To me, the Perl code I wrote above seems very confusing. But it’s not Perl’s
+strange, old-fashioned syntax that confuses me. After a while, all the &lt;span
+class="code"&gt;$&lt;/span&gt; symbols and the use of &lt;span class="code"&gt;shift&lt;/span&gt;
+start to make sense. Writing Perl code is a bit like writing Ruby code while on
+drugs &amp;ndash; I start with Ruby and just keep adding &lt;span class="code"&gt;$&lt;/span&gt; and
+semicolon characters until it works.&lt;/p&gt;
+
+&lt;p&gt;The real problem in this example is that Perl allows me to create objects and
+classes, but doesn’t refer to them as objects or classes. Instead, I have
+“blessed references” and “packages.” Perl allows me to get the object oriented
+behavior I want, but doesn’t let me use the words I want to use to describe
+what I’m doing. Perl’s partial support of object oriented programming is
+confusing at best.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Note: Perl 6, under development for the last fifteen years and still not
+released, is planning to introduce more explicit support for objects using the
+&lt;span class="code"&gt;class&lt;/span&gt; and &lt;span class="code"&gt;new&lt;/span&gt; keywords.&lt;/em&gt;&lt;/p&gt;
+
+&lt;div style="float: right; padding: 25px 8px 0px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2015/9/25/driverless-car.png"&gt;&lt;br/&gt;
+  &lt;i&gt;
+Writing Go code feels like riding in a Google driverless car:&lt;br/&gt;
+the compiler and &lt;span class="code"&gt;gofmt&lt;/span&gt; tool are in complete control.
+  &lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;h2&gt;Creating a Go Object&lt;/h2&gt;
+
+&lt;p&gt;Perl was invented many years ago. Now let’s try using a modern, new programming
+language to write the same example: Go. Along the way I’ll compare the Go
+version with the Perl code I wrote above.&lt;/p&gt;
+
+&lt;p&gt;Earlier using Perl I had to use the &lt;span class="code"&gt;package&lt;/span&gt; keyword
+to define a place to put my class’s methods. In Go, I define a group of
+methods in a different way: by associating them with a type. Therefore, I’ll
+start my Go code by creating a &lt;span class="code"&gt;Planet&lt;/span&gt; type:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/go1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The two versions look very different. In Go I define a static type that always
+consists of mass and radius values, while in Perl I dynamically create a hash
+that might contain any values.&lt;/p&gt;
+
+&lt;p&gt;Once again, however, I’m forced to think about my code one way and write it
+another:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/words3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;What Go and Perl really have in common is this: Neither language contains the
+words and syntax I really would like to use to express the object oriented
+concepts I’m trying to use.&lt;/p&gt;
+
+&lt;p&gt;So far I’ve created a type, a static collection of values. Let’s take the next
+step and convert that into a class:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/go2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In Go I don’t need to connect my instance data with the class; the mass and
+radius values are already contained inside the &lt;span class="code"&gt;Planet&lt;/span&gt;
+struct type. Instead, I need to create a connection between the method and the
+class. I do this by typing in a receiver for the Density function, &lt;span
+class="code"&gt;func (p Planet) Density()&lt;/span&gt;, converting it into a method of
+the Planet type.&lt;/p&gt;
+
+&lt;p&gt;In Perl I “bless” a hash by connecting it to a group of functions in a package.
+A blessed hash is an object in Perl. In Go I “bless” a function by connecting
+it to a type containing instance data. A blessed function combined with a type
+is a class in Go. The two languages both use special syntax tricks to allow for
+object oriented programming, but they make the connection between instance
+variables and methods from opposite directions.&lt;/p&gt;
+
+&lt;p&gt;Once again, however, there’s an impedance mismatch between the concepts I’m
+imagining and the words I have to use to to express them:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/words4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Go doesn’t provide me with the vocabulary I want to use. I want to type &lt;span
+class="code"&gt;class&lt;/span&gt;, but Go only allows me to use &lt;span class="code"&gt;type
+struct&lt;/span&gt;. And because there’s no &lt;span class="code"&gt;class&lt;/span&gt; keyword,
+my blessed function, my method, could be anywhere and not necessary right next
+to my type definition.&lt;/p&gt;
+
+&lt;h2&gt;Expressing Object Oriented Concepts Using Go&lt;/h2&gt;
+
+&lt;p&gt;Here’s the complete, object oriented version of my example in Go:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/go3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;I find this Go code just as confusing and misleading as the Perl version above,
+and for the same reason. Both Perl and Go take the first step towards object
+oriented programming, but stop short of providing a complete solution. Instead
+of objects, Go gives us C-style static structures which can have methods
+associated with them. And Go doesn’t provide classes at all: There’s no natural
+place to gather all of the methods belonging to a given type.&lt;/p&gt;
+
+&lt;p&gt;We can guess that Perl 5 didn’t introduce proper support for object oriented
+programming either because it was too difficult to add it to an existing
+language, or for backward compatibility reasons. But the &lt;a href="http://commandcenter.blogspot.com/2012/06/less-is-exponentially-more.html"&gt;designers of Go
+decided from the very
+beginning&lt;/a&gt;
+not to support classes or objects. Then, why support methods at all? Why allow
+developers to create object-like structures, but with a confusing syntax? Or
+why not go all the way and introduce the &lt;span class="code"&gt;class&lt;/span&gt;
+keyword to properly support object structures?&lt;/p&gt;
+
+&lt;div style="float: right; padding: 25px 8px 0px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2015/9/25/jupiter.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;
+The density of Jupiter is 1,326 kg/m&lt;sup&gt;3&lt;/sup&gt;, only &lt;br/&gt;
+1/4th the density of Earth. (source: &lt;a
+href="http://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html"&gt;NASA&lt;/a&gt;).
+&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Go’s tepid, partial support for object oriented programming reminds me of Perl.
+Writing a Go function and making it special &amp;ndash; “blessing” it &amp;ndash; by assigning it a
+receiver reminds me of how I would bless a hash in a Perl program. Perhaps
+Google used Perl as design inspiration for Go; perhaps they wanted to include a
+small bit of Perl’s quirky, bizarre but lovable behavior in Go.&lt;/p&gt;
+
+&lt;p&gt;Regardless, don’t stretch your programming language by using it in ways it
+wasn’t intended to be used. And certainly don’t change your ideas and solutions
+to fit any given programming language. Choose the programming language that has
+keywords and syntax that allow you to express your ideas in a natural,
+straightforward manner. The only purpose of a language, whether a human
+language or programming language, is to express our abstract thoughts using
+words in simple, or even beautiful, ways.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Don’t Let Your Data Out of the Database</title>
     <link href="http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database</id>
@@ -332,7 +606,7 @@ update them very quickly.&lt;/p&gt;
 &lt;/div&gt;
 
 
-&lt;p&gt;But how? How do ask the database server to update all the posts? I need to
+&lt;p&gt;But how? How do I ask the database server to update all the posts? I need to
 speak the database’s language: SQL. By writing SQL directly, I can be sure the
 database is doing exactly what I want, that it’s using the most efficient
 algorithm possible. I can be sure my database and I understand each other.&lt;/p&gt;
@@ -2947,237 +3221,6 @@ Barcelona&lt;/a&gt;.
 We’ll look at what “Relational Algebra” means and how the Arel gem converts our
 &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object into a string
 containing a SQL statement.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>A Rule of Thumb for Strong Parameters</title>
-    <link href="http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters" rel="alternate"/>
-    <id>http://patshaughnessy.net/2014/6/16/a-rule-of-thumb-for-strong-parameters</id>
-    <published>2014-06-16T00:00:00Z</published>
-    <updated>2014-06-16T00:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/6/16/security.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;It can be hard to open the Strong Parameters&lt;br/&gt;door and let permitted values into your Rails 4 app.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Last week I banged my head against the wall for a few hours trying to figure
-out how to whitelist input values for my Rails 4 app</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/6/16/security.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;It can be hard to open the Strong Parameters&lt;br/&gt;door and let permitted values into your Rails 4 app.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Last week I banged my head against the wall for a few hours trying to figure
-out how to whitelist input values for my Rails 4 app using the &lt;a href="http://edgeguides.rubyonrails.org/action_controller_overview.html#strong-parameters"&gt;Strong
-Parameters&lt;/a&gt;
-feature. Calling &lt;span class="code"&gt;permit&lt;/span&gt; when you have a simple
-attributes hash for a single new object is straightforward, but figuring out
-how to call &lt;span class="code"&gt;permit&lt;/span&gt; for a complex, nested set of attributes can be nearly
-impossible.&lt;/p&gt;
-
-&lt;p&gt;&lt;b&gt;TL;DR:&lt;/b&gt; Use this rule of thumb when trying to figure out how to whitelist nested attributes:&lt;/p&gt;
-
-&lt;blockquote&gt;To Permit a Hash, Pass an Array&lt;br/&gt;
-  To Permit an Array, Pass a Hash&lt;/blockquote&gt;
-
-
-&lt;p&gt;After studying the problem for a while, I noticed this curious pattern: To whitelist a simple hash of attributes, you pass
-&lt;span class="code"&gt;permit&lt;/span&gt; an array. To whitelist an array of nested objects, you pass it a hash,
-including that hash in the surrounding array.&lt;/p&gt;
-
-&lt;p&gt;Not familiar with Strong Parameters yet? What do I mean by “whitelist?” Why do
-you need this rule of thumb? My post today will explain.&lt;/p&gt;
-
-&lt;h2&gt;To Permit a Hash, Pass an Array&lt;/h2&gt;
-
-&lt;p&gt;Rails 4 requires you to whitelist or authorize input values for your app. This
-important new feature, known as Strong Parameters, adds an extra layer of
-security that prevents attackers from posting harmful or garbage information to
-your site.&lt;/p&gt;
-
-&lt;p&gt;Here’s how it works: Suppose you have a &lt;span class="code"&gt;Post&lt;/span&gt; model
-with title and body columns. Using Rails 4, you would write a create controller
-action like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/simple_controller.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here you first tell Rails which attributes are allowed for new post objects &amp;ndash;
-title and body in this example &amp;ndash; and then you create the new post. This is
-simple enough and quite readable. You are telling Rails: “data for a post is
-required and it’s attributes may only include title and body attributes.”&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/diagram1.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;In the diagram above you can see the post attribute hash on the left, and the
-arguments for &lt;span class="code"&gt;permit&lt;/span&gt; on the right. Notice the arguments are actually a
-single array (internally Rails processes the arguments as an array). Each key/value pair on the left maps to an array element on the
-right. You permit a hash by passing an array.&lt;/p&gt;
-
-&lt;h2&gt;Strong Parameters Confusion&lt;/h2&gt;
-
-&lt;p&gt;However, now suppose you add a second model to your app, &lt;span
-  class="code"&gt;Comment&lt;/span&gt;. Let’s suppose a post has many comments, and each
-comment has a single text attribute.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/has-many.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Because your app is a REST-ful JSON service (what else do people use Rails for
-these days?) you have a requirement to create a post and its comments from a
-single JSON string:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/json.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Because the comment array is named “comments” you assume ActiveRecord will
-create the associated comment models along with the new post. That is,
-ActiveRecord should call &lt;span class="code"&gt;comments=&lt;/span&gt; on the new post
-and pass in the comment attributes. But it doesn’t work. Instead, using the
-code from earlier you get:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/warning.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Ah &amp;ndash; you forgot to whitelist the comments attribute. You try adjusting the call
-to &lt;span class="code"&gt;permit&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/permit-comments.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;It still doesn’t work. You get the same warning:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/warning.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Clearly Rails isn’t listening! You just told it comments is permitted &amp;ndash; why
-does Rails give you the same warning again? Maybe you need to create the
-comment objects yourself, as a separate step:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/create-comments.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Now things are even worse: Rails raises an exception!&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/exception.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;The problem here is that the &lt;span class="code"&gt;Comment&lt;/span&gt; model is
-complaining that you haven’t whitelisted its attributes. Somehow each
-ActiveRecord model has knowledge about which attributes were whitelisted and
-which weren’t!&lt;/p&gt;
-
-&lt;p&gt;If you happened to know that Rails 4 saves the parameters inside an &lt;span
-  class="code"&gt;ActionController::Parameters&lt;/span&gt; object, you could try
-creating a separate instance of this class for each comment, and whitelist it&amp;rsquo;s text attribute directly:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/permit-comments2.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;But you’ll still get the same “Unpermitted parameters” warning when you try to
-create the post next &amp;ndash; not to mention that your code has become incredibly
-confusing and verbose. What’s going on here? There must be some way of creating
-nested objects without warnings or exceptions.&lt;/p&gt;
-
-&lt;h2&gt;To Permit an Array, Pass a Hash&lt;/h2&gt;
-
-&lt;p&gt;The solution is to permit all the post and comment attributes with a single
-call to &lt;span class="code"&gt;ActionController::Parameters#permit&lt;/span&gt;, like
-this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/nested-solution.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;What? What does the complex argument list to &lt;span class="code"&gt;permit&lt;/span&gt; mean? How in the world
-would anyone know to pass that in?&lt;/p&gt;
-
-&lt;p&gt;My rule of thumb can help. In this example, you are permitting an array of
-comments by passing a hash. Imagine if your app received a post with two
-comments, like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/diagram2.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the left you see the nested attributes for the post and its comments. Rails
-has parsed this for you from a JSON string. On the right are the arguments you
-pass to &lt;span class="code"&gt;permit&lt;/span&gt;. Notice how the hash of post
-attributes contains an array for the comments &amp;ndash; in the call to &lt;span class="code"&gt;permit&lt;/span&gt; you
-replace this array with a hash! To permit an array, pass a hash.&lt;/p&gt;
-
-&lt;p&gt;This hash, in turn, contains an array listing the attributes of each comment
-object (just &lt;span class="code"&gt;[:text]&lt;/span&gt; here).&lt;/p&gt;
-
-&lt;h2&gt;Whitelisting Rails Nested Attributes&lt;/h2&gt;
-
-&lt;p&gt;Note: if your Rails app was in fact a web site, you might use the Rails nested
-attributes feature with a complex HTML form. In this case, you would declare
-that posts accept nested attributes for comments, directing ActiveRecord to
-automatically create the comment objects for you:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/accepts-nested.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;To make this work you will need to adjust your call to &lt;span
-class="code"&gt;permit&lt;/span&gt; slightly:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/nested-attribs-permit.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;With &lt;span class="code"&gt;accepts_nested_attribute_for&lt;/span&gt;, Rails expects the
-comments to be saved as &lt;span class="code"&gt;comments_attributes&lt;/span&gt;. Also,
-each comment must have an &lt;span class="code"&gt;id&lt;/span&gt; attribute in order for
-the web forms to update existing comments properly. (Also, Rails represents the
-comment array as a hash, with the id as the key for each comment.)&lt;/p&gt;
-
-&lt;p&gt;But the syntax is almost the same, and the same rule applies: to permit an
-array of comments you call &lt;span class="code"&gt;permit&lt;/span&gt; with a hash.&lt;/p&gt;
-
-&lt;h2&gt;Under the Hood&lt;/h2&gt;
-
-&lt;p&gt;Internally, Rails uses a trick to tell ActiveRecord which attributes were
-permitted and which weren’t. Here’s how it works:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/hashes.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the left is a normal hash &amp;ndash; you can create an ActiveRecord model using this
-hash without worrying about whitelisting parameters. On the right is an &lt;span
-class="code"&gt;ActionController::Parameters&lt;/span&gt; object; notice it looks almost
-the same.  &lt;span class="code"&gt;ActionController::Parameters&lt;/span&gt; is actually a
-subclass of &lt;span class="code"&gt;Hash&lt;/span&gt; (via &lt;span
-class="code"&gt;ActiveSupport::HashWithIndifferentAccess&lt;/span&gt;).&lt;/p&gt;
-
-&lt;p&gt;But on the right notice that the &lt;span
-  class="code"&gt;ActionController::Parameters&lt;/span&gt; object contains a &lt;span class="code"&gt;permitted?&lt;/span&gt;
-method. This tells ActiveRecord whether the attributes in that hash were
-whitelisted or not.&lt;/p&gt;
-
-&lt;p&gt;When you create a new post or any &lt;span class="code"&gt;ActiveRecord::Base&lt;/span&gt;
-object, code inside of Rails checks whether the attributes hash implements the
-&lt;span class="code"&gt;permitted?&lt;/span&gt; method or not:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/internals1.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Because a normal hash doesn’t respond to &lt;span class="code"&gt;permitted?&lt;/span&gt;,
-ActiveRecord creates the new post without complaining.&lt;/p&gt;
-
-&lt;p&gt;However, if you try to create a post from an &lt;span
-  class="code"&gt;ActionController::Parameters&lt;/span&gt; object, Rails finds the
-&lt;span class="code"&gt;permitted?&lt;/span&gt; method:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/internals2.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;If you didn’t whitelist this hash using a call to &lt;span class="code"&gt;permit&lt;/span&gt;, &lt;span class="code"&gt;permitted?&lt;/span&gt; will
-return &lt;span class="code"&gt;false&lt;/span&gt; and Rails will raise the &lt;span class="code"&gt;ActiveModel::ForbiddenAttributesError&lt;/span&gt;
-exception.&lt;/p&gt;
-
-&lt;h2&gt;Still Confused? Just Use a Normal Hash&lt;/h2&gt;
-
-&lt;p&gt;If all of this is still confusing you &amp;ndash; if you’re still having trouble figuring
-out the call to &lt;span class="code"&gt;permit&lt;/span&gt; properly for your complex JSON input &amp;ndash; then remember you
-can always just use normal hashes instead of &lt;span class="code"&gt;ActionController::Parameters&lt;/span&gt;
-objects.&lt;/p&gt;
-
-&lt;p&gt;For example:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/6/16/normal-hashes.png"&gt;&lt;br/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here you are whitelisting or permitting each attribute manually by copying them
-into normal hashes. Since &lt;span class="code"&gt;Hash&lt;/span&gt; doesn&amp;rsquo;t implement &lt;span
-class="code"&gt;permitted?&lt;/span&gt;, ActiveRecord won’t raise a &lt;span
-class="code"&gt;ActiveModel::ForbiddenAttributesError&lt;/span&gt; exception.&lt;/p&gt;
 </content>
   </entry>
 </feed>
