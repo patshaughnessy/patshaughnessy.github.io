@@ -1,0 +1,646 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="A Look at How Postgres Executes a Tiny Join - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>A Look at How Postgres Executes a Tiny Join - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>A Look at How Postgres Executes a Tiny Join</h1>
+  
+    <div class="metadata">
+    <span class="date">November 24th 2015</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
+    
+      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="A Look at How Postgres Executes a Tiny Join">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
+    
+    </div>
+  
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
+  <img src="http://patshaughnessy.net/assets/2015/11/24/lecture-hall.jpg"><br/>
+  <i>
+  Reading the Postgres source code is like attending a free<br/> Computer Science lecture, complete with working examples.
+  </i>
+</div>
+
+
+<p>Aside from saving and retrieving data, the primary feature of a relational
+database is the ability to execute join queries, to <em>relate</em> data in one table
+with data from another. While many developers are turning to NoSQL solutions,
+joining one set of data values with another remains one of our most common and
+important use cases while writing server code.</p>
+
+<p>But what does the word “join” actually mean? And what really happens when I
+execute a join query?  Too often we take our tools for granted, without really
+understanding what they are doing. This month I decided to look at the source
+code for <a href="http://www.postgresql.org">PostgreSQL</a>, a popular open source
+database server, to see how it implements join queries.</p>
+
+<p>Reading and experimenting with the Postgres source code turned out to be a
+great learning experience. Today I’d like to report my observations; I&rsquo;ll
+show you exactly how Postgres executed a tiny join consisting of just a few
+records, using the <em>hash join</em> algorithm. In future articles I’ll show you some
+interesting optimizations Postgres uses for larger joins, and other computer
+science algorithms at work inside of Postgres.</p>
+
+<h2>What is a Join?</h2>
+
+<p>But before we get to the Postgres source code, let’s start by reviewing what
+join queries are. Here&rsquo;s an introduction from <a href="http://www.postgresql.org/docs/current/static/tutorial-join.html">the excellent Postgres
+documentation</a>:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/postgres-join-tutorial.png"/></p>
+
+<p>The Postgres docs then explain how to use joins: inner vs. outer joins, joining
+a table with itself, etc. But I’m intrigued by the highlighted disclaimer.
+What is that “more efficient manner?” And how could Postgres possibly get away
+with not “actually comparing each possible pair of rows?”</p>
+
+<h2>A Tiny Join</h2>
+
+<p>As an example today let’s work with two tables: <em>publications</em>, which contains
+three ground breaking computer science journal articles I never read in
+college, and <em>authors</em>, which records where each author worked.</p>
+
+<pre>
+> select * from publications;
+
+                         title                          |   author   | year 
+--------------------------------------------------------+------------+------
+ A Relational Model of Data for Large Shared Data Banks | Edgar Codd | 1970
+ Relational Completeness of Data Base Sublanguages      | Edgar Codd | 1972
+ The Transaction Concept: Virtues and Limitations       | Jim Gray   | 1981
+(3 rows)
+
+> select * from authors;
+
+    name    |         company         
+------------+-------------------------
+ Edgar Codd | IBM Research Laboratory
+ Jim Gray   | Tandem Computers
+(2 rows)
+</pre>
+
+
+<p>Today’s goal is to understand exactly what happens when Postgres joins one table with the other:</p>
+
+<pre>
+> select title, company from publications, authors where author = name;
+
+                         title                          |         company         
+--------------------------------------------------------+-------------------------
+ Relational Completeness of Data Base Sublanguages      | IBM Research Laboratory
+ A Relational Model of Data for Large Shared Data Banks | IBM Research Laboratory
+ The Transaction Concept: Virtues and Limitations       | Tandem Computers
+(3 rows)
+</pre>
+
+
+<h2>A Conceptual Model for Joining Two Tables</h2>
+
+<p>Before we look at the algorithm Postgres actually uses, let’s review what join
+queries do conceptually. Above the documentation stated that Postgres
+implements joins by “comparing each possible pair of rows,” and then selecting
+“the pairs of rows where these values match.”</p>
+
+<p>Reading this I imagine Postgres takes each publication and loops over all of
+the authors, looking for that publication’s author:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/scan1.png"/></p>
+
+<p>In blue on the left are the publications, and I show the author records on the
+right in green. This process of iterating over the rows in the authors table is
+known as a scan in the Postgres source code. We are scanning over all of the
+authors for the first publication, trying to find matching names.</p>
+
+<p>What do we do with each publication-author pair? We have to evaluate the <span
+class="code">WHERE</span> clause from my example SQL statement:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/where1.png"/></p>
+
+<p>Do the names match? Yes. This pair should be included in the result set. What
+about the second pair?</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/where2.png"/></p>
+
+<p>Do these names match? This time they don’t &ndash; this pair of rows should be
+filtered out.</p>
+
+<p>Once we have a matching pair of rows, we copy just the selected columns into a
+new, joined record and return that to the client:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/select1.png"/></p>
+
+<h2>A Nested Loop</h2>
+
+<p>What’s wrong with this conceptual model? It seems like a very simple,
+straightforward way of obtaining the values we need. If we proceed to scan
+through the rest of the publications, it produces the same result that Postgres
+does, although in a different order. (We’ll see why the order changes later.)</p>
+
+<p>The problem is that it’s very inefficient. First we scan over all of the
+authors for the first row in the publications table:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/scan1b.png"/></p>
+
+<p>And then we repeat the same scan of the authors table for the second
+publication:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/scan2.png"/></p>
+
+<p>And again for the third row. To find all of the matching pairs, in fact, we
+need to loop over all the authors for each publication:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/scan3.png"/></p>
+
+<p>For my tiny query this isn’t a problem. There are 3*2 or 6 combinations of
+rows; comparing names 6 times would only take a few microseconds on a modern
+computer. However, as the number of rows increases in either table, the total
+number of comparisons will explode. If we have 1000 publications and 1000
+authors, suddenly we would have to compare name strings 1000*1000 or 1 million
+times! Computer scientists describe this algorithm as O(n<sup>2</sup>).</p>
+
+<p>But do we really need to search the entire authors table for each publication?
+“Edgar Codd” appears in the publications table twice &ndash; why do we need to scan
+the authors table for the same name more than once? After we find Edgar the
+first time, there should be some way of recording where he was so we can find
+him again. And even if there were no repeated author names in publications, it
+still seems wasteful to loop over the authors table over and over again. There
+must be some way of avoiding all of these repeated scans.</p>
+
+<p>And there is; we can use a <em>hash table</em>.</p>
+
+<h2>Avoiding Repeated Scans</h2>
+
+<p>The problem with our naive algorithm, the conceptual model from the Postgres
+documentation, is that we loop over the authors table over and over again. To
+avoid those repeated loops, imagine if we scanned the authors only once and
+then saved them in some kind of data structure:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/bag1.png"/></p>
+
+<p>Now that we have the author records, what do we need to do with them? Well, we
+have to scan the publications, obtain each publication’s author, and find the
+matching author records, if any. In other words, we need to be able to quickly
+and easily find the author record with a given name:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/bag2.png"/></p>
+
+<p>You’ve probably seen this data structure before; in fact, it might be something
+you use everyday in your own code. If you’re a Rubyist like me, you call this a
+<em>hash</em>. If you prefer Python it’s a <em>dictionary</em>, or in Clojure it’s <em>hash map</em>.</p>
+
+<p>With all the authors organized by their names, we can scan over the
+publications and quickly find out if there’s a matching author record:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/bag3.png"/></p>
+
+<p>But what are hash tables, exactly? And how do they work? If only we could go
+back in time and sneak back into our college Computer Science classroom again.
+But if you installed Postgres from source, using Homebrew or with some Linux
+package manager, you already have an open source, world class implementation of
+the hash table algorithm right on your computer! To learn more about it
+all we have to do is read the Postgres source code.</p>
+
+<h2>Calculating Hashes</h2>
+
+<p>It turns out that for this query Postgres actually hashes the publications and
+then iterates over the authors. Before starting to execute a query, Postgres
+first parses the SQL we give it and generates a “query plan.” Probably because
+the publications table is larger (I’m not sure), Postgres’s query planner
+decides to save the publications, not the authors, in the hash table.</p>
+
+<p>To do this, Postgres has to scan the publications just as we did above:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/scan4.png"/></p>
+
+<p>And for each publication, Postgres selects just two of the three columns:
+author and title. Postgres refers to the query plan and finds out it will need
+the author for the <span class="code">WHERE</span> join condition, and the
+title for the final <span class="code">SELECT</span> returning the result set.
+It leaves the year values behind.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/project1.png"/></p>
+
+<div style="float: right; padding: 7px 0px 20px 30px; text-align: center;">
+  <img src="http://patshaughnessy.net/assets/2014/9/23/codd.jpg"><br/>
+  <i>Edgar Codd</i>
+</div>
+
+
+<p>This process of selecting the desired attributes from the matching pair is
+known in the Postgres C source code as a <em>projection</em>. We “project” a few values
+from one set of columns to another. (The term <em>project</em> is actually much older
+even than Postgres; Edgar Codd first used it in this context in <a href="https://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf">A Relational
+Model of Data for Large Shared Data
+Banks</a> back in 1970.)</p>
+
+<p>Next Postgres calculates a <em>hash</em> based on the author string. A hash is some
+integer value that can be calculated quickly in a repeatable, reproducible way.
+For the same author string, e.g. “Edgar Codd,” Postgres always calculates the
+same hash number. As we’ll see in a moment, Postgres uses the hash value to
+decide where to save the author name in the hash table.</p>
+
+<p>You can find Postgres’s hash algorithm in a C file called hashfunc.c. Even if
+you’re not a C developer, there are extensive code comments explaining what’s
+going on, along with a link to <a href="http://burtleburtle.net/bob/hash/doobs.html">an article written by Bob
+Jenkins</a>, who developed the
+algorithm in 1997.</p>
+
+<p>
+<div class="sign">
+  <div class="sign-icon"></div>
+  <div class="function-info">
+    <div class="function-name">hash_any</div>
+    <div class="function-link"><a href="http://doxygen.postgresql.org/hashfunc_8c.html#a364b7d134ec3c770a3b40abf15b05d37">view on postgresql.org</a></div>
+  </div>
+  <div class="function-code">
+    <img src="http://patshaughnessy.net/assets/2015/11/24/hash_any.png"/>
+  </div>
+</div>
+</p>
+
+
+<p>In my example, Postgres passes “Edgar Codd,” the string value in the author
+column in the first publication record, to <span class="code">hash_any</span>.
+The complex bitwise calculations in <span class="code">hash_any</span> step
+over the characters in Edgar’s name and return this hash value:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/hash1.png"/></p>
+
+<h2>Using a Bitmask to Choose a Hash Bucket</h2>
+
+<p>Now that it has a hash, what does Postgres do with it? You can see a clue above
+in the C comments:</p>
+
+<blockquote>
+The best hash table sizes are powers of 2.  There is no need to do mod a prime
+(mod is sooo slow!). If you need less than 32 bits, use a bitmask.
+</blockquote>
+
+
+<p>A hash table consists of an array of “buckets,” which are a series of pointers
+to linked lists. Initially Postgres creates an empty array of bucket pointers
+just before starting to scan the publications:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/buckets1.png"/></p>
+
+<p>As you can guess, Postgres saves each publication in one of the buckets in the
+hash table, based on the calculated hash value. Later when it scans over the
+authors, it will be able to find the publications again quickly by
+recalculating the same hash values. Instead of scanning over all of the
+publications again, Postgres can just look up each publication’s author using
+the hash. The hash is a record of where each publication is saved in the hash
+table.</p>
+
+<p>However, if two publications turn out to have the same author, as we have in
+our example, then Postgres will have to save them both in the same bucket. This
+is why each bucket is a linked list; each bucket has to save more than one
+publication.</p>
+
+<p>Because our example has three publications, does Postgres use a hash table with
+three buckets? Or with two buckets, because of the repeated author value? No.
+It actually uses 1024 buckets! Why 1024? For two reasons: First, Postgres was
+designed to query large amounts of data. Its hash join algorithm was optimized
+to handle extremely large data sets, containing millions of records or even
+more. A table containing three records is truly tiny! Postgres doesn’t bother
+with small hash tables and uses a minimum size of 1024.</p>
+
+<p>And why a power of two? This makes it easier to decide which bucket to use for
+a given hash. Instead of trying to return hash values that match the number of
+buckets, it’s easier and faster to always returns very large values. What
+Postgres does instead is distribute the large hash values evenly over the number
+of buckets it does have. By choosing a power of two for the bucket array size,
+Postgres can use a fast bitwise operation to decide which bucket to save each
+publication in, like this:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/hash2.png"/></p>
+
+<p>Above you can see how Postgres decides where to put “Edgar Codd” in the hash
+table: It subtracts one from the number of buckets: 1024-1 = 1023. Written in
+binary this is 1111111111. Then using your microprocessor’s binary computing
+circuits, Postgres quickly masks out the left bits, and keeps just the 10 least
+significant or rightmost bits. This yields 0000001111 binary, or the number 15.
+Using this fast calculation, Postgres decides to save Edgar in bucket #15:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/buckets2.png"/></p>
+
+<p>Postgres also saves the title string, because it will need it later to produce
+the final result set. Along with the two strings, Postgres saves the hash value
+and a “next” pointer that will form the linked list.</p>
+
+<h2>Building the Rest of the Hash Table</h2>
+
+<p>Postgres now continues to scan over the publications, arriving at the second
+publication.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/scan5.png"/></p>
+
+<p>We have Edgar again! Clearly he was a central figure behind database theory.
+Calculating the hash again for the same string will always return the same
+value: 2130627599, yielding bucket #15 a second time. We know the Edgar Codd
+records will always appear in bucket 15.</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/buckets3.png"/></p>
+
+<p>Also notice that Postgres saves each new publication at the head of the linked
+list &ndash; this means we have the second Edgar publication first on the left, and
+Edgar’s first publication second on the right. As we’ll see next, this yields
+the reverse order of Edgar’s records we saw above in the conceptual algorithm.</p>
+
+<p>Finally Postgres continues scanning and saves the third publication in the hash
+table; this time Postgres calculates a hash for “Jim Gray:”</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/hash3.png"/></p>
+
+<p>You can see this time the 10 rightmost bits of 3344886182 evaluate to 422. So
+Postgres saves Jim in bucket #422. Drawing the bucket array more to scale it
+might look something like this:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/buckets4.png"/></p>
+
+<h2>Scanning Buckets</h2>
+
+<p>After saving all the publications in the hash table, Postgres can now scan over
+the authors table:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/scan6.png"/></p>
+
+<p>Now finding the matching publication is simple. Instead of scanning over all
+the publications, Postgres simply calls the hash function again on the name
+string from the authors table, and repeats the bitmask operation. Because the
+first author record is Edgar, Postgres knows the matching publications will be
+in bucket #15.</p>
+
+<p>In our tiny example, the only records in bucket 15 will be for Edgar Codd. But
+remember in a large SQL query there might be millions of publications. It’s
+possible that publications with different authors might appear in this bucket.
+This would happen because either:</p>
+
+<ul>
+<li><p>The hash function returned the same hash number for two different author
+strings. This is possible but unlikely. In Computer Science this would be known
+as a <em>hash collision</em>.</p></li>
+<li><p>The 10 least significant bits of the hash were the same. For millions of
+publications this would happen frequently. However, as the number of records in
+the join increases Postgres uses more and more bits in the bitmask. 1024 (10
+bits) was the minimum number it uses for our tiny query. Still, hash table
+buckets in practice will contain multiple key values.</p></li>
+</ul>
+
+
+<p>Therefore, Postgres has to check each author in the matching bucket to be sure
+that it’s a match. This process is known as <em>scanning the bucket</em>. To do this,
+Postgres first checks the hash values:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/scan-buckets1.png"/></p>
+
+<p>This is a simple numerical comparison and so is quite fast. And if the hashes
+are the same, Postgres checks the actual strings just in case the hash function
+did return the same hash for different strings:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/scan-buckets2.png"/></p>
+
+<p>Because the author names match, Postgres can finally perform the join!  To do
+this, it projects the columns that our query selects into a single joined
+record, in the desired order:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/select2.png"/></p>
+
+<p>This becomes the first record in our result set.</p>
+
+<h2>Returning Multiple Records: The Hash Join State Machine</h2>
+
+<p>One of the most beautiful and important aspects of the Postgres implementation
+is the way it orchestrates building up and searching the hash table in the
+midst of a larger enclosing SQL expression. To see this for yourself, take a
+look at the hash join implementation, in nodeHashJoin.c.</p>
+
+<p>
+<div class="sign">
+  <div class="sign-icon"></div>
+  <div class="function-info">
+    <div class="function-name">ExecHashJoin</div>
+    <div class="function-link"><a href="http://doxygen.postgresql.org/nodeHashjoin_8c.html#a538698b031186193de7da58537820e61">view on postgresql.org</a></div>
+  </div>
+  <div class="function-code">
+    <img src="http://patshaughnessy.net/assets/2015/11/24/ExecHashJoin.png"/>
+  </div>
+</div>
+</p>
+
+
+<p>Postgres calls <span class="code">ExecHashJoin</span> once for each record in the join result set. For
+our example with 3 result records Postgres calls <span class="code">ExecHashJoin</span> three times.
+<span class="code">ExecHashJoin</span> keeps track of how many times it has been called, and what it
+needs to do next, using a state machine.</p>
+
+<p>The best way to understand how this state machine works, and how it fits into
+the larger structure of Postgres’s architecture, is to imagine that we asked
+for one record at a time. For example, imagine that we select just a single
+record from the join:</p>
+
+<pre>
+select title, company from publications, authors where author = name limit 1
+</pre>
+
+
+<p>By appending <span class="code">limit 1</span> we tell Postgres to stop after 1
+record. For this query, to return just one record, <span class="code">ExecHashJoin</span> will use the
+following states in its state machine:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/states1.png"/></p>
+
+<p>Here’s what <span class="code">ExecHashJoin</span> does to obtain the first joined record:</p>
+
+<ul>
+<li><p><span class="code">HJ_BUILD_HASHTABLE</span>: This code builds the hash table by scanning over all
+the publications records, as we saw above. Postgres calls publications the
+“inner relation.”</p></li>
+<li><p><span class="code">HJ_NEED_NEW_OUTER</span>: This code starts scanning the “outer relation” or the
+authors table in this example, and returns a single record.</p></li>
+<li><p><span class="code">HJ_SCAN_BUCKET</span>: This code takes one outer relation record (an author) and
+looks for the matching inner relation records in the hash table (publications).</p></li>
+</ul>
+
+
+<p>Now imagine that I ask Postgres for two records, by using limit 2:</p>
+
+<pre>
+select title, company from publications, authors where author = name limit 2
+</pre>
+
+
+<p>The second time Postgres calls <span class="code">ExecHashJoin</span>, it only
+executes <span class="code">HJ_NEED_NEW_OUTER</span> and <span
+class="code">HJ_SCAN_BUCKET</span> &ndash; it already created the hash table the
+first time it was called:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2015/11/24/states2.png"/></p>
+
+<p>Postgres pays the large price of scanning the entire inner relation and
+building the hash table as soon as you ask for one record. Returning the second
+and all subsequent records is much faster because Postgres already has the hash
+table.</p>
+
+<p>If you read the C code you’ll see some interesting optimizations. For example,
+Postgres actually scans the outer relation first to get a single record, just
+in case it might be empty. (This is what the C comment above refers to.)
+There’s no need to build a hash table if we’re not going to look up any values!
+Also, the <span class="code">HJ_FILL_INNER</span> and <span
+class="code">HJ_FILL_OUTER</span> states handle executing right
+or left outer joins respectively. <span class="code">ExecHashJoin</span>
+implements these as well.</p>
+
+<p>By using a state machine like this Postgres can execute this join inside the
+context of a large, complex SQL statement. It could be that we are joining
+together result sets from complex inner SQL clauses, or that the result set
+from this join becomes part of a larger expression. The state inside of <span
+class="code">ExecHashJoin</span> allows Postgres to keep track of what is was
+doing &ndash; and of what it needs to do next &ndash; in the appropriate place on the
+execution stack.</p>
+
+<h2>What’s Next?</h2>
+
+<p>The last state value handled by <span class="code">ExecHashJoin</span>,
+HJ_NEED_NEW_BATCH, handles the case where the hash table doesn’t fit into
+the server’s memory. In this case, Postgres will create a series of hash tables
+and save some of them out to disk in “batch files.” This algorithm is what the term
+<a href="https://en.wikipedia.org/wiki/Hash_join">Hybrid Hashjoin</a> refers to.</p>
+
+<p>When I have time, I’d love to write about how Postgres handles a large join
+instead of a tiny one: How do batch files work? What configuration settings
+have an effect on batch files and join performance? And there’s also an
+interesting optimization Postgres uses for frequently occurring join key
+values.</p>
+
+<p>Postgres does some amazing things internally to speed up your queries; it’s
+time to shed some light on the great work the Postgres open source community
+has done over the years!</p>
+
+  </section>
+
+  
+    <section class="comments">
+      <div id="disqus_thread"><script type='text/javascript'> 
+          var disqus_identifier = 'http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join';
+          var disqus_shortname = 'patshaughnessy';
+          var disqus_title = 'A Look at How Postgres Executes a Tiny Join';
+        </script></div>
+      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
+      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
+    </section>
+  
+</article>
+
+  <script type="text/javascript">
+    var disqus_identifier = 'http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join';
+    var disqus_shortname = 'patshaughnessy';
+    var disqus_title = 'A Look at How Postgres Executes a Tiny Join';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+  </script>
+
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                
+                  <li><a href="/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join">A Look at How Postgres Executes a Tiny Join</a></li>
+                
+                  <li><a href="/2015/9/25/what-do-perl-and-go-have-in-common">What Do Perl and Go Have in Common?</a></li>
+                
+                  <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
+                
+                  <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
+                
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2014 Pat Shaughnessy</a>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+  try {
+  var pageTracker = _gat._getTracker("UA-5273122-4");
+  pageTracker._trackPageview();
+  } catch(err) {}</script>
+
+</body>
+</html>
+

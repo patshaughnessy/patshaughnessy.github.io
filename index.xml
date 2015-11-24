@@ -7,6 +7,529 @@
     <name></name>
   </author>
   <entry>
+    <title>A Look at How Postgres Executes a Tiny Join</title>
+    <link href="http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join" rel="alternate"/>
+    <id>http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join</id>
+    <published>2015-11-24T01:00:00Z</published>
+    <updated>2015-11-24T01:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2015/11/24/lecture-hall.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;
+  Reading the Postgres source code is like attending a free&lt;br/&gt; Computer Science lecture, complete with working examples.
+  &lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Aside from saving and retrieving data, the primary feature of a relational
+database is the ability </summary>
+    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2015/11/24/lecture-hall.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;
+  Reading the Postgres source code is like attending a free&lt;br/&gt; Computer Science lecture, complete with working examples.
+  &lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Aside from saving and retrieving data, the primary feature of a relational
+database is the ability to execute join queries, to &lt;em&gt;relate&lt;/em&gt; data in one table
+with data from another. While many developers are turning to NoSQL solutions,
+joining one set of data values with another remains one of our most common and
+important use cases while writing server code.&lt;/p&gt;
+
+&lt;p&gt;But what does the word “join” actually mean? And what really happens when I
+execute a join query?  Too often we take our tools for granted, without really
+understanding what they are doing. This month I decided to look at the source
+code for &lt;a href="http://www.postgresql.org"&gt;PostgreSQL&lt;/a&gt;, a popular open source
+database server, to see how it implements join queries.&lt;/p&gt;
+
+&lt;p&gt;Reading and experimenting with the Postgres source code turned out to be a
+great learning experience. Today I’d like to report my observations; I&amp;rsquo;ll
+show you exactly how Postgres executed a tiny join consisting of just a few
+records, using the &lt;em&gt;hash join&lt;/em&gt; algorithm. In future articles I’ll show you some
+interesting optimizations Postgres uses for larger joins, and other computer
+science algorithms at work inside of Postgres.&lt;/p&gt;
+
+&lt;h2&gt;What is a Join?&lt;/h2&gt;
+
+&lt;p&gt;But before we get to the Postgres source code, let’s start by reviewing what
+join queries are. Here&amp;rsquo;s an introduction from &lt;a href="http://www.postgresql.org/docs/current/static/tutorial-join.html"&gt;the excellent Postgres
+documentation&lt;/a&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/postgres-join-tutorial.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The Postgres docs then explain how to use joins: inner vs. outer joins, joining
+a table with itself, etc. But I’m intrigued by the highlighted disclaimer.
+What is that “more efficient manner?” And how could Postgres possibly get away
+with not “actually comparing each possible pair of rows?”&lt;/p&gt;
+
+&lt;h2&gt;A Tiny Join&lt;/h2&gt;
+
+&lt;p&gt;As an example today let’s work with two tables: &lt;em&gt;publications&lt;/em&gt;, which contains
+three ground breaking computer science journal articles I never read in
+college, and &lt;em&gt;authors&lt;/em&gt;, which records where each author worked.&lt;/p&gt;
+
+&lt;pre&gt;
+&gt; select * from publications;
+
+                         title                          |   author   | year 
+--------------------------------------------------------+------------+------
+ A Relational Model of Data for Large Shared Data Banks | Edgar Codd | 1970
+ Relational Completeness of Data Base Sublanguages      | Edgar Codd | 1972
+ The Transaction Concept: Virtues and Limitations       | Jim Gray   | 1981
+(3 rows)
+
+&gt; select * from authors;
+
+    name    |         company         
+------------+-------------------------
+ Edgar Codd | IBM Research Laboratory
+ Jim Gray   | Tandem Computers
+(2 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;Today’s goal is to understand exactly what happens when Postgres joins one table with the other:&lt;/p&gt;
+
+&lt;pre&gt;
+&gt; select title, company from publications, authors where author = name;
+
+                         title                          |         company         
+--------------------------------------------------------+-------------------------
+ Relational Completeness of Data Base Sublanguages      | IBM Research Laboratory
+ A Relational Model of Data for Large Shared Data Banks | IBM Research Laboratory
+ The Transaction Concept: Virtues and Limitations       | Tandem Computers
+(3 rows)
+&lt;/pre&gt;
+
+
+&lt;h2&gt;A Conceptual Model for Joining Two Tables&lt;/h2&gt;
+
+&lt;p&gt;Before we look at the algorithm Postgres actually uses, let’s review what join
+queries do conceptually. Above the documentation stated that Postgres
+implements joins by “comparing each possible pair of rows,” and then selecting
+“the pairs of rows where these values match.”&lt;/p&gt;
+
+&lt;p&gt;Reading this I imagine Postgres takes each publication and loops over all of
+the authors, looking for that publication’s author:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In blue on the left are the publications, and I show the author records on the
+right in green. This process of iterating over the rows in the authors table is
+known as a scan in the Postgres source code. We are scanning over all of the
+authors for the first publication, trying to find matching names.&lt;/p&gt;
+
+&lt;p&gt;What do we do with each publication-author pair? We have to evaluate the &lt;span
+class="code"&gt;WHERE&lt;/span&gt; clause from my example SQL statement:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/where1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Do the names match? Yes. This pair should be included in the result set. What
+about the second pair?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/where2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Do these names match? This time they don’t &amp;ndash; this pair of rows should be
+filtered out.&lt;/p&gt;
+
+&lt;p&gt;Once we have a matching pair of rows, we copy just the selected columns into a
+new, joined record and return that to the client:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/select1.png"/&gt;&lt;/p&gt;
+
+&lt;h2&gt;A Nested Loop&lt;/h2&gt;
+
+&lt;p&gt;What’s wrong with this conceptual model? It seems like a very simple,
+straightforward way of obtaining the values we need. If we proceed to scan
+through the rest of the publications, it produces the same result that Postgres
+does, although in a different order. (We’ll see why the order changes later.)&lt;/p&gt;
+
+&lt;p&gt;The problem is that it’s very inefficient. First we scan over all of the
+authors for the first row in the publications table:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan1b.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;And then we repeat the same scan of the authors table for the second
+publication:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;And again for the third row. To find all of the matching pairs, in fact, we
+need to loop over all the authors for each publication:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;For my tiny query this isn’t a problem. There are 3*2 or 6 combinations of
+rows; comparing names 6 times would only take a few microseconds on a modern
+computer. However, as the number of rows increases in either table, the total
+number of comparisons will explode. If we have 1000 publications and 1000
+authors, suddenly we would have to compare name strings 1000*1000 or 1 million
+times! Computer scientists describe this algorithm as O(n&lt;sup&gt;2&lt;/sup&gt;).&lt;/p&gt;
+
+&lt;p&gt;But do we really need to search the entire authors table for each publication?
+“Edgar Codd” appears in the publications table twice &amp;ndash; why do we need to scan
+the authors table for the same name more than once? After we find Edgar the
+first time, there should be some way of recording where he was so we can find
+him again. And even if there were no repeated author names in publications, it
+still seems wasteful to loop over the authors table over and over again. There
+must be some way of avoiding all of these repeated scans.&lt;/p&gt;
+
+&lt;p&gt;And there is; we can use a &lt;em&gt;hash table&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Avoiding Repeated Scans&lt;/h2&gt;
+
+&lt;p&gt;The problem with our naive algorithm, the conceptual model from the Postgres
+documentation, is that we loop over the authors table over and over again. To
+avoid those repeated loops, imagine if we scanned the authors only once and
+then saved them in some kind of data structure:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/bag1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now that we have the author records, what do we need to do with them? Well, we
+have to scan the publications, obtain each publication’s author, and find the
+matching author records, if any. In other words, we need to be able to quickly
+and easily find the author record with a given name:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/bag2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;You’ve probably seen this data structure before; in fact, it might be something
+you use everyday in your own code. If you’re a Rubyist like me, you call this a
+&lt;em&gt;hash&lt;/em&gt;. If you prefer Python it’s a &lt;em&gt;dictionary&lt;/em&gt;, or in Clojure it’s &lt;em&gt;hash map&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;With all the authors organized by their names, we can scan over the
+publications and quickly find out if there’s a matching author record:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/bag3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;But what are hash tables, exactly? And how do they work? If only we could go
+back in time and sneak back into our college Computer Science classroom again.
+But if you installed Postgres from source, using Homebrew or with some Linux
+package manager, you already have an open source, world class implementation of
+the hash table algorithm right on your computer! To learn more about it
+all we have to do is read the Postgres source code.&lt;/p&gt;
+
+&lt;h2&gt;Calculating Hashes&lt;/h2&gt;
+
+&lt;p&gt;It turns out that for this query Postgres actually hashes the publications and
+then iterates over the authors. Before starting to execute a query, Postgres
+first parses the SQL we give it and generates a “query plan.” Probably because
+the publications table is larger (I’m not sure), Postgres’s query planner
+decides to save the publications, not the authors, in the hash table.&lt;/p&gt;
+
+&lt;p&gt;To do this, Postgres has to scan the publications just as we did above:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;And for each publication, Postgres selects just two of the three columns:
+author and title. Postgres refers to the query plan and finds out it will need
+the author for the &lt;span class="code"&gt;WHERE&lt;/span&gt; join condition, and the
+title for the final &lt;span class="code"&gt;SELECT&lt;/span&gt; returning the result set.
+It leaves the year values behind.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/project1.png"/&gt;&lt;/p&gt;
+
+&lt;div style="float: right; padding: 7px 0px 20px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2014/9/23/codd.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;Edgar Codd&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;This process of selecting the desired attributes from the matching pair is
+known in the Postgres C source code as a &lt;em&gt;projection&lt;/em&gt;. We “project” a few values
+from one set of columns to another. (The term &lt;em&gt;project&lt;/em&gt; is actually much older
+even than Postgres; Edgar Codd first used it in this context in &lt;a href="https://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf"&gt;A Relational
+Model of Data for Large Shared Data
+Banks&lt;/a&gt; back in 1970.)&lt;/p&gt;
+
+&lt;p&gt;Next Postgres calculates a &lt;em&gt;hash&lt;/em&gt; based on the author string. A hash is some
+integer value that can be calculated quickly in a repeatable, reproducible way.
+For the same author string, e.g. “Edgar Codd,” Postgres always calculates the
+same hash number. As we’ll see in a moment, Postgres uses the hash value to
+decide where to save the author name in the hash table.&lt;/p&gt;
+
+&lt;p&gt;You can find Postgres’s hash algorithm in a C file called hashfunc.c. Even if
+you’re not a C developer, there are extensive code comments explaining what’s
+going on, along with a link to &lt;a href="http://burtleburtle.net/bob/hash/doobs.html"&gt;an article written by Bob
+Jenkins&lt;/a&gt;, who developed the
+algorithm in 1997.&lt;/p&gt;
+
+&lt;p&gt;
+&lt;div class="sign"&gt;
+  &lt;div class="sign-icon"&gt;&lt;/div&gt;
+  &lt;div class="function-info"&gt;
+    &lt;div class="function-name"&gt;hash_any&lt;/div&gt;
+    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/hashfunc_8c.html#a364b7d134ec3c770a3b40abf15b05d37"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="function-code"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2015/11/24/hash_any.png"/&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/p&gt;
+
+
+&lt;p&gt;In my example, Postgres passes “Edgar Codd,” the string value in the author
+column in the first publication record, to &lt;span class="code"&gt;hash_any&lt;/span&gt;.
+The complex bitwise calculations in &lt;span class="code"&gt;hash_any&lt;/span&gt; step
+over the characters in Edgar’s name and return this hash value:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/hash1.png"/&gt;&lt;/p&gt;
+
+&lt;h2&gt;Using a Bitmask to Choose a Hash Bucket&lt;/h2&gt;
+
+&lt;p&gt;Now that it has a hash, what does Postgres do with it? You can see a clue above
+in the C comments:&lt;/p&gt;
+
+&lt;blockquote&gt;
+The best hash table sizes are powers of 2.  There is no need to do mod a prime
+(mod is sooo slow!). If you need less than 32 bits, use a bitmask.
+&lt;/blockquote&gt;
+
+
+&lt;p&gt;A hash table consists of an array of “buckets,” which are a series of pointers
+to linked lists. Initially Postgres creates an empty array of bucket pointers
+just before starting to scan the publications:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/buckets1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can guess, Postgres saves each publication in one of the buckets in the
+hash table, based on the calculated hash value. Later when it scans over the
+authors, it will be able to find the publications again quickly by
+recalculating the same hash values. Instead of scanning over all of the
+publications again, Postgres can just look up each publication’s author using
+the hash. The hash is a record of where each publication is saved in the hash
+table.&lt;/p&gt;
+
+&lt;p&gt;However, if two publications turn out to have the same author, as we have in
+our example, then Postgres will have to save them both in the same bucket. This
+is why each bucket is a linked list; each bucket has to save more than one
+publication.&lt;/p&gt;
+
+&lt;p&gt;Because our example has three publications, does Postgres use a hash table with
+three buckets? Or with two buckets, because of the repeated author value? No.
+It actually uses 1024 buckets! Why 1024? For two reasons: First, Postgres was
+designed to query large amounts of data. Its hash join algorithm was optimized
+to handle extremely large data sets, containing millions of records or even
+more. A table containing three records is truly tiny! Postgres doesn’t bother
+with small hash tables and uses a minimum size of 1024.&lt;/p&gt;
+
+&lt;p&gt;And why a power of two? This makes it easier to decide which bucket to use for
+a given hash. Instead of trying to return hash values that match the number of
+buckets, it’s easier and faster to always returns very large values. What
+Postgres does instead is distribute the large hash values evenly over the number
+of buckets it does have. By choosing a power of two for the bucket array size,
+Postgres can use a fast bitwise operation to decide which bucket to save each
+publication in, like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/hash2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Above you can see how Postgres decides where to put “Edgar Codd” in the hash
+table: It subtracts one from the number of buckets: 1024-1 = 1023. Written in
+binary this is 1111111111. Then using your microprocessor’s binary computing
+circuits, Postgres quickly masks out the left bits, and keeps just the 10 least
+significant or rightmost bits. This yields 0000001111 binary, or the number 15.
+Using this fast calculation, Postgres decides to save Edgar in bucket #15:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/buckets2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Postgres also saves the title string, because it will need it later to produce
+the final result set. Along with the two strings, Postgres saves the hash value
+and a “next” pointer that will form the linked list.&lt;/p&gt;
+
+&lt;h2&gt;Building the Rest of the Hash Table&lt;/h2&gt;
+
+&lt;p&gt;Postgres now continues to scan over the publications, arriving at the second
+publication.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan5.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;We have Edgar again! Clearly he was a central figure behind database theory.
+Calculating the hash again for the same string will always return the same
+value: 2130627599, yielding bucket #15 a second time. We know the Edgar Codd
+records will always appear in bucket 15.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/buckets3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Also notice that Postgres saves each new publication at the head of the linked
+list &amp;ndash; this means we have the second Edgar publication first on the left, and
+Edgar’s first publication second on the right. As we’ll see next, this yields
+the reverse order of Edgar’s records we saw above in the conceptual algorithm.&lt;/p&gt;
+
+&lt;p&gt;Finally Postgres continues scanning and saves the third publication in the hash
+table; this time Postgres calculates a hash for “Jim Gray:”&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/hash3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;You can see this time the 10 rightmost bits of 3344886182 evaluate to 422. So
+Postgres saves Jim in bucket #422. Drawing the bucket array more to scale it
+might look something like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/buckets4.png"/&gt;&lt;/p&gt;
+
+&lt;h2&gt;Scanning Buckets&lt;/h2&gt;
+
+&lt;p&gt;After saving all the publications in the hash table, Postgres can now scan over
+the authors table:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan6.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now finding the matching publication is simple. Instead of scanning over all
+the publications, Postgres simply calls the hash function again on the name
+string from the authors table, and repeats the bitmask operation. Because the
+first author record is Edgar, Postgres knows the matching publications will be
+in bucket #15.&lt;/p&gt;
+
+&lt;p&gt;In our tiny example, the only records in bucket 15 will be for Edgar Codd. But
+remember in a large SQL query there might be millions of publications. It’s
+possible that publications with different authors might appear in this bucket.
+This would happen because either:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;The hash function returned the same hash number for two different author
+strings. This is possible but unlikely. In Computer Science this would be known
+as a &lt;em&gt;hash collision&lt;/em&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The 10 least significant bits of the hash were the same. For millions of
+publications this would happen frequently. However, as the number of records in
+the join increases Postgres uses more and more bits in the bitmask. 1024 (10
+bits) was the minimum number it uses for our tiny query. Still, hash table
+buckets in practice will contain multiple key values.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Therefore, Postgres has to check each author in the matching bucket to be sure
+that it’s a match. This process is known as &lt;em&gt;scanning the bucket&lt;/em&gt;. To do this,
+Postgres first checks the hash values:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan-buckets1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This is a simple numerical comparison and so is quite fast. And if the hashes
+are the same, Postgres checks the actual strings just in case the hash function
+did return the same hash for different strings:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan-buckets2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Because the author names match, Postgres can finally perform the join!  To do
+this, it projects the columns that our query selects into a single joined
+record, in the desired order:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/select2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This becomes the first record in our result set.&lt;/p&gt;
+
+&lt;h2&gt;Returning Multiple Records: The Hash Join State Machine&lt;/h2&gt;
+
+&lt;p&gt;One of the most beautiful and important aspects of the Postgres implementation
+is the way it orchestrates building up and searching the hash table in the
+midst of a larger enclosing SQL expression. To see this for yourself, take a
+look at the hash join implementation, in nodeHashJoin.c.&lt;/p&gt;
+
+&lt;p&gt;
+&lt;div class="sign"&gt;
+  &lt;div class="sign-icon"&gt;&lt;/div&gt;
+  &lt;div class="function-info"&gt;
+    &lt;div class="function-name"&gt;ExecHashJoin&lt;/div&gt;
+    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nodeHashjoin_8c.html#a538698b031186193de7da58537820e61"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="function-code"&gt;
+    &lt;img src="http://patshaughnessy.net/assets/2015/11/24/ExecHashJoin.png"/&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;/p&gt;
+
+
+&lt;p&gt;Postgres calls &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; once for each record in the join result set. For
+our example with 3 result records Postgres calls &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; three times.
+&lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; keeps track of how many times it has been called, and what it
+needs to do next, using a state machine.&lt;/p&gt;
+
+&lt;p&gt;The best way to understand how this state machine works, and how it fits into
+the larger structure of Postgres’s architecture, is to imagine that we asked
+for one record at a time. For example, imagine that we select just a single
+record from the join:&lt;/p&gt;
+
+&lt;pre&gt;
+select title, company from publications, authors where author = name limit 1
+&lt;/pre&gt;
+
+
+&lt;p&gt;By appending &lt;span class="code"&gt;limit 1&lt;/span&gt; we tell Postgres to stop after 1
+record. For this query, to return just one record, &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; will use the
+following states in its state machine:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/states1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Here’s what &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; does to obtain the first joined record:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;HJ_BUILD_HASHTABLE&lt;/span&gt;: This code builds the hash table by scanning over all
+the publications records, as we saw above. Postgres calls publications the
+“inner relation.”&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;HJ_NEED_NEW_OUTER&lt;/span&gt;: This code starts scanning the “outer relation” or the
+authors table in this example, and returns a single record.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;HJ_SCAN_BUCKET&lt;/span&gt;: This code takes one outer relation record (an author) and
+looks for the matching inner relation records in the hash table (publications).&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;Now imagine that I ask Postgres for two records, by using limit 2:&lt;/p&gt;
+
+&lt;pre&gt;
+select title, company from publications, authors where author = name limit 2
+&lt;/pre&gt;
+
+
+&lt;p&gt;The second time Postgres calls &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt;, it only
+executes &lt;span class="code"&gt;HJ_NEED_NEW_OUTER&lt;/span&gt; and &lt;span
+class="code"&gt;HJ_SCAN_BUCKET&lt;/span&gt; &amp;ndash; it already created the hash table the
+first time it was called:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/states2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Postgres pays the large price of scanning the entire inner relation and
+building the hash table as soon as you ask for one record. Returning the second
+and all subsequent records is much faster because Postgres already has the hash
+table.&lt;/p&gt;
+
+&lt;p&gt;If you read the C code you’ll see some interesting optimizations. For example,
+Postgres actually scans the outer relation first to get a single record, just
+in case it might be empty. (This is what the C comment above refers to.)
+There’s no need to build a hash table if we’re not going to look up any values!
+Also, the &lt;span class="code"&gt;HJ_FILL_INNER&lt;/span&gt; and &lt;span
+class="code"&gt;HJ_FILL_OUTER&lt;/span&gt; states handle executing right
+or left outer joins respectively. &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt;
+implements these as well.&lt;/p&gt;
+
+&lt;p&gt;By using a state machine like this Postgres can execute this join inside the
+context of a large, complex SQL statement. It could be that we are joining
+together result sets from complex inner SQL clauses, or that the result set
+from this join becomes part of a larger expression. The state inside of &lt;span
+class="code"&gt;ExecHashJoin&lt;/span&gt; allows Postgres to keep track of what is was
+doing &amp;ndash; and of what it needs to do next &amp;ndash; in the appropriate place on the
+execution stack.&lt;/p&gt;
+
+&lt;h2&gt;What’s Next?&lt;/h2&gt;
+
+&lt;p&gt;The last state value handled by &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt;,
+HJ_NEED_NEW_BATCH, handles the case where the hash table doesn’t fit into
+the server’s memory. In this case, Postgres will create a series of hash tables
+and save some of them out to disk in “batch files.” This algorithm is what the term
+&lt;a href="https://en.wikipedia.org/wiki/Hash_join"&gt;Hybrid Hashjoin&lt;/a&gt; refers to.&lt;/p&gt;
+
+&lt;p&gt;When I have time, I’d love to write about how Postgres handles a large join
+instead of a tiny one: How do batch files work? What configuration settings
+have an effect on batch files and join performance? And there’s also an
+interesting optimization Postgres uses for frequently occurring join key
+values.&lt;/p&gt;
+
+&lt;p&gt;Postgres does some amazing things internally to speed up your queries; it’s
+time to shed some light on the great work the Postgres open source community
+has done over the years!&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>What Do Perl and Go Have in Common?</title>
     <link href="http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common</id>
@@ -2953,274 +3476,6 @@ Ruby entirely and look at what the Postgres server does when it receives this
 select statement. How does it understand the SQL we send it? How does it
 actually find our data, the user record with the name “Captain Nemo?” In my next
 post, I’ll continue our underwater adventure by looking at Postgres internals.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>20,000 Leagues Under ActiveRecord</title>
-    <link href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord" rel="alternate"/>
-    <id>http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord</id>
-    <published>2014-09-17T00:00:00Z</published>
-    <updated>2014-09-17T00:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;onboard a submarine called the “Nautilus.”&lt;/i&gt;
-&lt;/div&gt;
-
-
-</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;First published in 1870, &lt;a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea"&gt;20,000 Leagues Under the Sea&lt;/a&gt;&lt;br/&gt;describes an underwater adventure that takes place&lt;br/&gt;onboard a submarine called the “Nautilus.”&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;&lt;b&gt;
-This is the first in a series of posts based on a presentation I just did
-last Friday at the &lt;a href="http://www.baruco.org"&gt;Barcelona Ruby Conference&lt;/a&gt;. You can
-also watch the &lt;a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4"&gt;video recording of the
-presentation&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;/b&gt;&lt;/p&gt;
-
-&lt;p&gt;Let me start with a question: How many of you have actually read 20,000 Leagues
-Under the Sea, either in the original French or in some translation? [ A few
-people raised their hands, but most people in the audience did not. ] Yes, I’m
-not surprised. 20,000 Leagues is one of those classic novels we have all heard
-of, but few of us take the time to read.&lt;/p&gt;
-
-&lt;p&gt;While thinking about this presentation over the Summer, I decided to actually
-read the novel &amp;ndash; and I’m glad that I did! It blew my mind on a number of
-different levels. Today I’m going to take the time to tell you a bit about the
-novel itself as we go.&lt;/p&gt;
-
-&lt;p&gt;However, actually I’m here today to talk about ActiveRecord. I’d like to explore
-how ActiveRecord works internally; how it finds the information we ask for and
-returns it to us as a Ruby object.&lt;/p&gt;
-
-&lt;div style="clear: left"/&gt;&lt;/div&gt;
-
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;But why talk about ActiveRecord? We all know how to use ActiveRecord; most of
-you understand exactly what this line of code does. You didn’t need to come to
-Barcelona to learn how to use ActiveRecord.&lt;/p&gt;
-
-&lt;p&gt;The reason why I want to discuss this is that ActiveRecord hooked me; it
-first got me excited about using Rails. I came across Rails back in 2008, about
-six years ago now. And I can still remember the moment when I first typed a
-line of code similar to this one into the Rails console or into a Rails app
-somewhere. It was amazing!  Before that I was using PHP or Java &amp;ndash; I’ve since
-blocked out all memory of that so I’m not quite sure which it was :) &amp;ndash; and when
-I saw how easy it was to use Rails to query a database I was very impressed.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/irb.png"/&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 7px 0px 0px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/underwater-walk.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Captain Nemo takes Professor Aronnax, Conseil and Ned Land&lt;br/&gt;on a hike through an underwater “forest.” Verne’s novel has&lt;br/&gt;many beautiful, detailed descriptions of underwater worlds&lt;br/&gt;he had never actually seen, and could only imagine.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Somehow Rails could take a simple, beautiful and readable line of Ruby code and
-convert it into a SQL statement like this. How could this possibly work? It
-seemed like magic!&lt;/p&gt;
-
-&lt;p&gt;But it’s not magic. There are thousands of lines of code and years of computer
-science research behind this simple line of code, the hard work behind the
-scenes that makes ActiveRecord queries possible.&lt;/p&gt;
-
-&lt;p&gt;Just as Professor Aronnax went on an underwater adventure with Captain Nemo,
-I’d like to take you on an adventure inside of ActiveRecord to find out how it
-works, how ActiveRecord generates and executes SQL statements.&lt;/p&gt;
-
-&lt;p&gt;And why stop there? Later we’ll dive underneath ActiveRecord and inside an
-actual database server to find out how it works too. How does it understand the SQL
-statements we give it? How does it find the data we ask for and return it to
-us? Let’s find out!&lt;/p&gt;
-
-&lt;h2&gt;Agenda&lt;/h2&gt;
-
-&lt;p&gt;Here’s our plan: First we’ll start with a look at &lt;span
-class='code'&gt;ActiveRecord::Relation&lt;/span&gt;, the top, public API for
-ActiveRecord many of you use everyday. Then, we’ll look deeper inside of
-ActiveRecord to find out how it converts our Ruby queries into SQL statements.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/agenda.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Later, in the second half of the presentation we’ll dive even deeper and
-directly into an actual relational database server (RDBMS); today I’ll use
-PostgreSQL as an example. How does Postgres understand the SQL statement that
-ActiveRecord sent it? How does it find the data we want? Finally, if we have
-time we’ll look at the B-Tree Algorithm, which is part of the real magic that
-allows database servers to work.&lt;/p&gt;
-
-&lt;h2&gt;ActiveRecord::Relation&lt;/h2&gt;
-
-&lt;p&gt;Let’s use my line of code from earlier as an example &amp;ndash; today we’ll be searching
-for Captain Nemo together. Therefore, we’ll start with a &lt;span
-class='code'&gt;User&lt;/span&gt; class, a subclass of &lt;span
-class='code'&gt;ActiveRecord::Base&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-base.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;When I call &lt;span class='code'&gt;where&lt;/span&gt; what happens? It turns out the
-&lt;span class='code'&gt;where&lt;/span&gt; method is defined in the &lt;span
-class='code'&gt;ActiveRecord::Querying&lt;/span&gt; module:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-querying.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;But as you can see, ActiveRecord delegates the &lt;span class='code'&gt;where&lt;/span&gt;
-method over to another method called &lt;span class='code'&gt;all&lt;/span&gt;, which
-returns a new instance of a different class called &lt;span
-class='code'&gt;ActiveRecord::Relation&lt;/span&gt;. In fact, my call to &lt;span
-class='code'&gt;User.where&lt;/span&gt; is entirely equivalent to calling &lt;span
-class='code'&gt;User.all.where&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/user-all.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;ActiveRecord actually implements the &lt;span class='code'&gt;where&lt;/span&gt; method
-using the new instance of &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;.
-Internally, &lt;span class='code'&gt;where&lt;/span&gt; is implemented by the &lt;span
-class='code'&gt;ActiveRecord::QueryMethods&lt;/span&gt; module, included into &lt;span
-class='code'&gt;ActiveRecord::Relation&lt;/span&gt;.  Next, &lt;span
-class='code'&gt;ActiveRecord::QueryMethods#where&lt;/span&gt; returns, in turn, a second
-new instance of &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;If you look at the right, you can see the second &lt;span
-class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object contains information about
-what record we’re looking for, that we want the records where the name is
-“Captain Nemo.”&lt;/p&gt;
-
-&lt;p&gt;Of course, we don’t want all of the Captain Nemo users; we just
-want the first one. Next, we call the &lt;span class='code'&gt;first&lt;/span&gt; method on
-the new &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation2.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;The Internal Implementation of ActiveRecord::FinderMethods#first&lt;/h2&gt;
-
-&lt;p&gt;Now you can see ActiveRecord creates a third instance of &lt;span
-class='code'&gt;ActiveRecord::Relation&lt;/span&gt;
-&amp;ndash; this time with even more information about the query we’d like to execute.
-  But what are all those other values: &lt;span class='code'&gt;order&lt;/span&gt;, &lt;span
-  class='code'&gt;limit&lt;/span&gt; and &lt;span class='code'&gt;offset&lt;/span&gt;? Where do they
-  come from? We can find out by taking a look at the implementation of &lt;span
-  class='code'&gt;first&lt;/span&gt;. The &lt;span
-  class='code'&gt;ActiveRecord::FinderMethods&lt;/span&gt; module implements this, which
-  ActiveRecord includes into the &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; class.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/first1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here you can see because we didn’t pass in a value for &lt;span class='code'&gt;limit&lt;/span&gt;, ActiveRecord
-calls &lt;span class='code'&gt;find_nth&lt;/span&gt; and passes in a value of 0,
-indicating we want the first record from the query result set. The second
-argument, &lt;span class='code'&gt;offset_index&lt;/span&gt;, turns out to have a value of
-zero, meaning we want to count into a window of records at the beginning of the
-result set, not a window located somewhere farther along the result set.&lt;/p&gt;
-
-&lt;p&gt;ActiveRecord implements a series of similar methods that will return the
-second, third, fourth or even fifth record:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/second-fifth.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;You can see the pattern here; the first argument is a zero-based index
-indicating which record we want. And just in case we want the forty second
-record from the result set, ActiveRecord implements this useful method&amp;hellip; :)&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/forty-second.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;It’s no joke! &lt;span class='code'&gt;forty_two&lt;/span&gt; is actually in the
-ActiveRecord source code; you can try it for yourself. Replacing &lt;span
-class='code'&gt;first&lt;/span&gt; with the equivalent call to &lt;span
-class='code'&gt;find_nth&lt;/span&gt;, here’s our example again:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/find-nth.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Following the code path through the &lt;span
-class='code'&gt;ActiveRecord::FinderMethods&lt;/span&gt; module, we can see &lt;span
-class='code'&gt;find_nth&lt;/span&gt; calls, in turn, &lt;span
-class='code'&gt;find_nth_with_limit&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/find-nth-with-limit.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Now the arguments have been reversed; the first argument, 0, is now the offset
-and the second, 1, is the number of records we want, or the limit value.&lt;/p&gt;
-
-&lt;p&gt;Substituting one more time, let’s replace &lt;span
-class='code'&gt;find_nth_with_limit&lt;/span&gt; with more detailed calls it makes to
-&lt;span class='code'&gt;order&lt;/span&gt; and &lt;span class='code'&gt;limit&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/detailed-calls.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Now you can see where all of the values in the final &lt;span
-class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object come from. Each call to a
-scoping method saves a new piece of information about our query, and returns a
-new instance of the &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; class.
-(We’ll see what &lt;span class='code'&gt;arel_table&lt;/span&gt; means in a minute.)&lt;/p&gt;
-
-&lt;h2&gt;The Beauty of ActiveRecord::Relation&lt;/h2&gt;
-
-&lt;p&gt;Taking a step back, we can see that our simple line of code, &lt;span
-class='code'&gt;User.where(name: &amp;quot;Captain Nemo&amp;quot;).first&lt;/span&gt;, is creating a
-series of &lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; objects like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/method-chain.png"/&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 7px 0px 0px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/9/17/south-pacific.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Captain Nemo allowed Canadian harpoonist Ned Land&lt;br/&gt;to leave the submarine for a short time and explore a&lt;br/&gt;tropical island off the coast of Papua New Guinea.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;There are two interesting and beautiful things about this, I think. First,
-notice the pattern that ActiveRecord uses: each call to a method returns a new
-instance of the class that implemented that method. This is what allows us to
-easily chain together different method calls. We can add on as many different
-scopes as we wish; because each new object is also an &lt;span
-class='code'&gt;ActiveRecord::Relation&lt;/span&gt;, it implements all of the same
-methods. You can use the same pattern in your own code. All you need to do is
-create a new instance of the class that implements each method, and return
-that. One reason to study internal code like this is to learn about and find
-new ideas that you can use in your own code.&lt;/p&gt;
-
-&lt;p&gt;The second beautiful thing about &lt;span
-class='code'&gt;ActiveRecord::Relation&lt;/span&gt; is that it’s lazy.  Using this chain
-of method calls we are building up metadata or information about our query,
-without actually executing the query itself. It’s almost as if we were using a
-functional programming language like Haskell or Lisp. Using this trick,
-ActiveRecord allows us to specify exactly the query we want, without having to
-worry about executing it until we’re ready.&lt;/p&gt;
-
-&lt;p&gt;It’s not until we call the &lt;span class='code'&gt;to_a&lt;/span&gt; method, in other to convert the
-&lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object into an array and access the result set, that
-ActiveRecord executes the query:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/to-a.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;You can see here that &lt;span class='code'&gt;to_a&lt;/span&gt; calls &lt;span class='code'&gt;load&lt;/span&gt; internally,
-which later calls the &lt;span class='code'&gt;DatabaseStatements#select_all&lt;/span&gt;
-method. Note the &lt;span class="code"&gt;find_nth_with_limit&lt;/span&gt; method calls
-&lt;span class="code"&gt;to_a&lt;/span&gt;, so &lt;span class="code"&gt;first&lt;/span&gt;,
-&lt;span class="code"&gt;second&lt;/span&gt; and &lt;span class="code"&gt;forty_two&lt;/span&gt; are
-not lazy and will all execute the query immediately. Because of this, these are
-known as “terminating methods.” To prevent the query from executing immediately &amp;ndash;
-to keep it lazy &amp;ndash; just use &lt;span class="code"&gt;order&lt;/span&gt; and &lt;span
-class="code"&gt;limit&lt;/span&gt; instead.&lt;/p&gt;
-
-&lt;h2&gt;Next time&lt;/h2&gt;
-
-&lt;p&gt;In the next few days I’ll post &lt;a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements"&gt;the second part of my presentation from
-Barcelona&lt;/a&gt;.
-We’ll look at what “Relational Algebra” means and how the Arel gem converts our
-&lt;span class='code'&gt;ActiveRecord::Relation&lt;/span&gt; object into a string
-containing a SQL statement.&lt;/p&gt;
 </content>
   </entry>
 </feed>
