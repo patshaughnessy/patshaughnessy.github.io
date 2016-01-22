@@ -1,0 +1,445 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Is Your Postgres Query Starved for Memory? - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Is Your Postgres Query Starved for Memory? - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Is Your Postgres Query Starved for Memory?</h1>
+  
+    <div class="metadata">
+    <span class="date">January 22nd 2016</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
+    
+      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Is Your Postgres Query Starved for Memory?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
+    
+    </div>
+  
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 7px 30px 20px 0px; text-align: center;">
+  <img src="http://patshaughnessy.net/assets/2016/1/22/sphygmomanometer.png"><br/>
+  <i>
+Like a patient with low blood pressure, a slow SQL<br/>
+query might not be getting the memory it needs.
+  </i>
+</div>
+
+
+<p>For years or even decades, I’ve heard about how important it is to optimize my
+SQL statements and database schema. When my application starts to
+slow down, I look for missing indexes; I look for unnecessary joins; I think
+about caching results with a materialized view.</p>
+
+<p>But instead, the problem might be my Postgres server was not installed and
+tuned properly. Buried inside the <span class="code">postgresql.conf</span>
+file is an obscure, technical setting called <span
+class="code">work_mem</span>. This controls how much “working memory” your
+Postgres server allocates for each sort or join operation. The default value
+for this is only 4MB:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2016/1/22/work_mem.png"/></p>
+
+<div style="clear: left"></div>
+
+
+<p>If your application ever tries to sort or join more than four megabytes worth
+of data, this working memory buffer will fill up. Instead of just returning the
+dataset you want, Postgres will waste time streaming excess data out to disk &ndash;
+only to read it back again later as the hash join or sort algorithm proceeds.</p>
+
+<p>Today I’ll start with a look at how Postgres scales up the hash join algorithm
+for larger and larger data sets. Then I’ll measure how much slower a hash join
+query is when the hash table doesn’t fit into the working memory buffer. You’ll
+learn how to use the EXPLAIN ANALYZE command to find out if your slow query is
+starved for memory.</p>
+
+<h2>Hash Tables Inside of Postgres</h2>
+
+<p>In my last article, I described <a href="http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join">how Postgres implements the hash join
+algorithm</a>.
+I showed how Postgres scans over all the records in one of the tables from the
+join and saves them in a hash table.</p>
+
+<p>Here’s what a hash table might look like conceptually:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2016/1/22/table1.svg"/></p>
+
+<p>On the left is an array of pointers called <em>buckets</em>. Each of these pointers is
+the head of a linked list, which I show on the right using blue rectangles. The
+rectangles represent values from one of the tables in the join. Postgres groups
+the values into lists based on their hash values. By organizing the values from one
+table like this, Postgres can later scan over a second table and repeatedly
+search the hash table to perform the join efficiently. This algorithm is known
+as a <em>hash join</em>.</p>
+
+<p>Postgres’s hash join code gracefully scales up to process larger and larger
+data sets by increasing the number of buckets. If the target table had more
+records, Postgres would use 2048 buckets instead of 1024:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2016/1/22/table2.svg"/></p>
+
+<p>Before starting to execute the hash join algorithm, Postgres estimates how many
+records it will need to add to the hash table, using the query plan. Then
+Postgres chooses a bucket count large enough to fit all of the records.</p>
+
+<p>Postgres’s bucket count formula keeps the average linked list length less than
+10 (the constant <span class="code">NTUP_PER_BUCKET</span> in the Postgres
+source code), to avoid iterating over long lists. It also sets the bucket count
+to a power of two, which allows Postgres to use C bitmask operations to assign
+buckets to hash values. The least significant bits of the hash value for each
+record becomes the bucket number.</p>
+
+<p>If you’re curious, Postgres implements the bucket count formula in a C function
+called <span class="code">ExecChooseHashTableSize</span>.</p>
+
+<p>
+<div class="sign">
+  <div class="sign-icon"></div>
+  <div class="function-info">
+    <div class="function-name">ExecChooseHashTableSize</div>
+    <div class="function-link"><a href="http://doxygen.postgresql.org/nodeHash_8c.html#a5b805ac64e22306b7307b4a07ae2b34e">view on postgresql.org</a></div>
+  </div>
+  <div class="function-code">
+    <img src="http://patshaughnessy.net/assets/2016/1/22/ExecChooseHashTableSize.png"/>
+  </div>
+</div>
+</p>
+
+
+<h2>How Large Can a Postgres Hash Table Grow?</h2>
+
+<p>If the table from your join query was even larger, then Postgres would use 4096
+buckets instead of 2048:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2016/1/22/table3.svg"/></p>
+
+<p>In theory, this doubling of the bucket count could continue forever: 8192
+buckets, 16384 buckets, etc. With 10 records per linked list, this would
+accommodate 81,920 values, 163,840 values, etc.</p>
+
+<p>In practice, as the total size of the data set being saved into the hash table
+continues to increase Postgres will eventually run out of memory. But that
+doesn’t seem to be an immediate problem, does it? Modern server hardware
+contains tens or even hundreds of GBs &ndash; that is plenty of room to hold an
+extremely large hash table.</p>
+
+<p>But in fact, Postgres limits the size of each hash table to only 4MB!</p>
+
+<p><img src="http://patshaughnessy.net/assets/2016/1/22/table4.svg"/></p>
+
+<p>The rectangle I drew around the hash table above is the working memory buffer
+assigned to that table. Regardless of how much memory my server hardware
+actually has, Postgres won’t allow the hash table to consume more than 4MB.
+This value is the <span class="code">work_mem</span> setting found in the
+<span class="code">postgresql.conf</span> file.</p>
+
+<p>At the same time Postgres calculates the number of buckets, it also calculates
+the total amount of memory it expects the hash table to consume. If this amount
+exceeds 4MB, Postgres divides the hash operation up into a series of <em>batches</em>:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2016/1/22/batches.svg"/></p>
+
+<p>In this example, Postgres calculated that it would need up to 8MB to hold the
+hash table. A larger join query might have many more batches, each holding 4MB
+of data. Like the bucket count, Postgres sets the batch count to a power of two
+also.  The first batch, shown on the left, contains the actual hash table in
+memory.  The second batch, shown on the right, contains the records that won’t
+fit into the 4MB hash table in the first batch.  Postgres assigns a batch
+number to each record, along with the bucket number.  Then it saves the records
+from the first batch into the hash table, and streams the remaining data out to
+disk. Each batch gets its own temporary file.</p>
+
+<p>Using an algorithm known as the <a href="https://en.wikipedia.org/wiki/Hash_join#Hybrid_hash_join">Hybrid hash
+join</a>, Postgres first
+searches the hash table already in memory. Then it streams all of the data back
+from disk for the next batch, builds another hash table and searches it,
+repeating this process for each batch.</p>
+
+<br/>
+
+
+
+
+<blockquote>
+Note: Postgres actually holds a second hash table in memory, called the skew
+table. For simplicity I’m not showing this in the diagram. This special hash
+table is an optimization to handle hash values that occur frequently in the
+data. Postgres saves the skew table inside the same 4MB working memory buffer,
+so the primary hash table actually has a bit less than 4MB available to it.
+</blockquote>
+
+
+<h2>Measuring Your SQL Statement’s Blood Pressure</h2>
+
+<p>If one of the SQL queries in your application is running slowly, use the
+<span class="code">EXPLAIN ANALYZE</span> to find out what’s going on:</p>
+
+<pre style="font-size: 10px">
+> explain analyze select title, company from publications, authors where author = name;
+
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=2579.00..53605.00 rows=50000 width=72) (actual time=66.820..959.794 rows=21 loops=1)
+   Hash Cond: ((authors.name)::text = (publications.author)::text)
+   ->  Seq Scan on authors  (cost=0.00..20310.00 rows=1000000 width=50) (actual time=0.059..267.217 rows=1000000 loops=1)
+   ->  Hash  (cost=1270.00..1270.00 rows=50000 width=88) (actual time=38.054..38.054 rows=50000 loops=1)
+         Buckets: 4096  Batches: 2  Memory Usage: 2948kB
+         ->  Seq Scan on publications  (cost=0.00..1270.00 rows=50000 width=88) (actual time=0.010..14.211 rows=50000 loops=1)
+ Planning time: 0.489 ms
+ Execution time: 960.482 ms
+(8 rows)
+</pre>
+
+
+<p>Postgres’s <span class="code">EXPLAIN</span> command displays the query plan, a
+tree data structure containing instructions that Postgres follows when it
+executes the query. By using <span class="code">EXPLAIN ANALYZE</span> we ask
+Postgres to execute the query also, displaying time and data metrics when its
+finished. We can see in this example there were one million records in the
+authors table and 50 thousand records in the publications table. At the bottom
+we see that the join operation took a total of 960ms to finish.</p>
+
+<p><span class="code">EXPLAIN ANALYZE</span> also tells us how many buckets and
+batches the hash table used:</p>
+
+<pre>
+Buckets: 4096  Batches: 2  Memory Usage: 2948kB
+</pre>
+
+
+<p>Like my diagram above, this query used 2 batches: Only half of the data fit
+into the 4MB working memory buffer! Postgres saved the other half of the data
+in the file buffer.</p>
+
+<h2>Increasing work_mem</h2>
+
+<p>Now let’s increase the size of the working memory buffer by editing the <span
+class="code">postgresql.conf</span> file and restarting the Postgres server.</p>
+
+<p>First, I stop my Postgres server:</p>
+
+<pre>
+$ launchctl unload homebrew.mxcl.postgresql.plist
+</pre>
+
+
+<p>Then I edit <span class="code">postgresql.conf</span>:</p>
+
+<pre>
+$ vim /usr/local/var/postgres/postgresql.conf
+</pre>
+
+
+<p>…uncommenting and changing the setting:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2016/1/22/work_mem2.png"/></p>
+
+<p>Finally I restart my server and repeat the test:</p>
+
+<pre>
+$ launchctl load homebrew.mxcl.postgresql.plist
+</pre>
+
+
+
+
+<pre style="font-size: 10px">
+> explain analyze select title, company from publications, authors where author = name;
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Hash Join  (cost=1895.00..32705.00 rows=50000 width=72) (actual time=59.224..624.716 rows=21 loops=1)
+   Hash Cond: ((authors.name)::text = (publications.author)::text)
+   ->  Seq Scan on authors  (cost=0.00..20310.00 rows=1000000 width=50) (actual time=0.031..146.327 rows=1000000 loops=1)
+   ->  Hash  (cost=1270.00..1270.00 rows=50000 width=88) (actual time=34.436..34.436 rows=50000 loops=1)
+         Buckets: 8192  Batches: 1  Memory Usage: 5860kB
+         ->  Seq Scan on publications  (cost=0.00..1270.00 rows=50000 width=88) (actual time=0.008..13.382 rows=50000 loops=1)
+ Planning time: 0.481 ms
+ Execution time: 625.796 ms
+(8 rows)
+</pre>
+
+
+<p>You can see the number of batches is now 1, and the memory usage increased to
+5.8MB:</p>
+
+<pre>
+Buckets: 8192  Batches: 1  Memory Usage: 5860kB
+</pre>
+
+
+<p>Postgres was able to use a working memory buffer size larger than 4MB. This
+allowed it to save the entire data set into a single, in memory hash table and
+avoid using temporary buffer files.</p>
+
+<p>Because of this, the total execution time decreased from 960ms to 625ms:</p>
+
+<p><img src="http://patshaughnessy.net/assets/2016/1/22/chart.png"/></p>
+
+<h2>Too Good To Be True</h2>
+
+<p>If memory intensive Postgres SQL statements could run so much faster, why does
+Postgres use only 4MB by default for the working memory buffer size? In this
+example I increased <span class="code">work_mem</span> modestly from 4MB to
+8MB &ndash; why not increase it to 1GB or 10GB? Why not use all of your server’s
+available memory to run all of your SQL statements as fast as possible, all of
+the time? That’s why you bought that fat box to host your Postgres server,
+isn’t it?</p>
+
+<p>This result seems too easy, too good to be true. And it is.</p>
+
+<p>Database servers like Postgres are optimized to handle many small, concurrent
+requests at the same time. Each request needs its own working memory buffer.
+Not only that, each SQL statement Postgres executes might require multiple
+memory buffers, one for each join or sort operation the query plan calls for.</p>
+
+<div style="float: right; padding: 0px 30px 50px 10px; text-align: center;">
+  <img src="http://patshaughnessy.net/assets/2016/1/22/bp1.png"><br/>
+</div>
+
+
+<p>My Postgres server isn’t entirely dedicated to executing this one example SQL
+statement and nothing else. By increasing the value of <span
+class="code">work_mem</span>, I’ve increased it server-wide for every request,
+not just for my one slow hash join. Given the same amount of total RAM
+available on the server box, increasing <span class="code">work_mem</span>
+means Postgres can handle fewer concurrent requests before running out of
+memory.</p>
+
+<p>However, it certainly might be the case that 8MB or some larger value for <span
+class="code">work_mem</span> is appropriate given the amount of memory I have,
+and the number of concurrent connections I expect.</p>
+
+<p>Be smart about how you configure your Postgres server. Don’t blindly accept the
+default values, or guess what they should be at the moment you install
+Postgres. Instead, after your application is finished and running in
+production, look for memory intensive SQL statements. Measure the SQL queries
+your application actually executes. Take their blood pressure using the <span
+class="code">EXPLAIN ANALYZE</span> command; you might find they are memory
+starved!</p>
+
+  </section>
+
+  
+    <section class="comments">
+      <div id="disqus_thread"><script type='text/javascript'> 
+          var disqus_identifier = 'http://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory';
+          var disqus_shortname = 'patshaughnessy';
+          var disqus_title = 'Is Your Postgres Query Starved for Memory?';
+        </script></div>
+      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
+      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
+    </section>
+  
+</article>
+
+  <script type="text/javascript">
+    var disqus_identifier = 'http://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory';
+    var disqus_shortname = 'patshaughnessy';
+    var disqus_title = 'Is Your Postgres Query Starved for Memory?';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+  </script>
+
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
+                <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
+              </ul>
+            </div>
+            <div class="header">Recent</div>
+            <div class="links">
+              <ul>
+                
+                  <li><a href="/2016/1/22/is-your-postgres-query-starved-for-memory">Is Your Postgres Query Starved for Memory?</a></li>
+                
+                  <li><a href="/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join">A Look at How Postgres Executes a Tiny Join</a></li>
+                
+                  <li><a href="/2015/9/25/what-do-perl-and-go-have-in-common">What Do Perl and Go Have in Common?</a></li>
+                
+                  <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
+                
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2016 Pat Shaughnessy</a>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+  try {
+  var pageTracker = _gat._getTracker("UA-5273122-4");
+  pageTracker._trackPageview();
+  } catch(err) {}</script>
+
+</body>
+</html>
+
