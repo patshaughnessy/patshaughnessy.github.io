@@ -7,11 +7,403 @@
     <name></name>
   </author>
   <entry>
+    <title>Two Dumb Ruby Mistakes</title>
+    <link href="http://patshaughnessy.net/2016/4/2/two-dumb-ruby-mistakes" rel="alternate"/>
+    <id>http://patshaughnessy.net/2016/4/2/two-dumb-ruby-mistakes</id>
+    <published>2016-04-02T00:00:00Z</published>
+    <updated>2016-04-02T00:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: right; padding: 0px 0px 20px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/4/2/rope-climber.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;Coding is like climbing: You need equipment&lt;br/&gt; that will catch you when you make a mistake.&lt;br/&gt;
+    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:Free_climbing_20060701.jpg"&gt;Elke Wetzig via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;</summary>
+    <content type="html">&lt;div style="float: right; padding: 0px 0px 20px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/4/2/rope-climber.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;Coding is like climbing: You need equipment&lt;br/&gt; that will catch you when you make a mistake.&lt;br/&gt;
+    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:Free_climbing_20060701.jpg"&gt;Elke Wetzig via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Most Ruby blog posts show you examples of code you should write: how to solve a
+certain problem, how to use some library or gem, how Ruby itself works. But
+today I decided to write about a few dumb mistakes I’ve made using Ruby
+recently. Read on to see two things you &lt;em&gt;should not do&lt;/em&gt; with the Ruby language,
+for a change.&lt;/p&gt;
+
+&lt;p&gt;The depressing thing about this is that I made these dumb mistakes just in the
+past few weeks! I’ve been using Ruby professionally every day for eight years,
+I’ve researched and written about Ruby in my spare time as a hobby, and &lt;em&gt;I still
+make dumb mistakes with the language all the time!&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Coding is like climbing: Sooner or later we all make mistakes and fall. What
+you need to do is plan on this happening and use the appropriate equipment to
+avoid disaster. Climbers use carabiners, ropes and harnesses to catch them when
+they fall. Developers should use a language that will catch them when they make
+dumb mistakes.&lt;/p&gt;
+
+&lt;h2&gt;Searching For An Array Element&lt;/h2&gt;
+
+&lt;p&gt;Let’s start with some test data. Here’s an array of &lt;span
+class="code"&gt;Person&lt;/span&gt; objects, each with a first name, last name and an
+insult count:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+    &lt;span class="constant"&gt;Person&lt;/span&gt; = &lt;span class="constant"&gt;Struct&lt;/span&gt;.new(&lt;span class="symbol"&gt;:first_name&lt;/span&gt;, &lt;span class="symbol"&gt;:last_name&lt;/span&gt;, &lt;span class="symbol"&gt;:insults&lt;/span&gt;)
+    candidates = [ 
+        &lt;span class="constant"&gt;Person&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Ted&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Cruz&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="integer"&gt;432&lt;/span&gt;),
+        &lt;span class="constant"&gt;Person&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Donald&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Trump&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="integer"&gt;892&lt;/span&gt;),
+        &lt;span class="constant"&gt;Person&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Marco&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Rubio&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="integer"&gt;321&lt;/span&gt;)
+    ]
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;A couple of weeks ago (using different data of course) I wrote this line of
+code to search for a specific element in the array:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/mistake1.png"/&gt;&lt;/p&gt;
+
+&lt;div style="clear: both"&gt;&lt;/div&gt;
+
+
+&lt;p&gt;What I wanted was the first person in the array named “Marco.” Instead when I
+ran the code what I got was the first element of the array, but with the first
+name set to “Marco:”&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+p marco
+=&amp;gt; &lt;span class="comment"&gt;#&amp;lt;struct Person first_name=&amp;quot;Marco&amp;quot;, last_name=&amp;quot;Cruz&amp;quot;, insults=432&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Of course, I should have known better. The proper line of code is:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/correct1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;I should have used &lt;span class="code"&gt;==&lt;/span&gt; instead of &lt;span
+class="code"&gt;=&lt;/span&gt;. What a dumb mistake. I can’t believe I wrote this code;
+how embarrassing! I’m sure you all saw the problem right away, and maybe a few
+of you have made the same mistake before. But let’s walk through what happened
+when I ran the incorrect code, just to be sure we thoroughly understand the
+problem.&lt;/p&gt;
+
+&lt;p&gt;Ruby started with the &lt;span class="code"&gt;candidates&lt;/span&gt; array, and called
+the &lt;span class="code"&gt;find&lt;/span&gt; method on it:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/array1.svg"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The &lt;span class="code"&gt;find&lt;/span&gt; method is actually a member of the &lt;span
+class="code"&gt;Enumerable&lt;/span&gt; module, which Ruby includes automatically into
+the &lt;span class="code"&gt;Array&lt;/span&gt; class. When &lt;span class="code"&gt;find&lt;/span&gt;
+ran, it iterated over the elements of the array and called the block I
+provided, passing in each element. The first element was the “Ted Cruz” person
+object:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/call-block1.svg"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now the block executed. And my dumb mistake came into play. What I intended was
+for the block to return whether or not the first name of the given person was
+equal to “Marco.” If the first name was “Marco” then &lt;span
+class="code"&gt;Person#first_name == &amp;quot;Marco&amp;quot;&lt;/span&gt; would return true, the block
+would return &lt;span class="code"&gt;true&lt;/span&gt; and &lt;span
+class="code"&gt;Enumerable#find&lt;/span&gt; would return the target person. In this
+case, &amp;ldquo;Ted&amp;rdquo; is not &amp;ldquo;Marco&amp;rdquo; so the block would return &lt;span
+class="code"&gt;false&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;But my block didn’t check whether the person is named “Marco;” instead, it
+called the &lt;span class="code"&gt;Person#first_name=&lt;/span&gt; method, setting the
+person’s name to “Marco!”&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/set-first-name.svg"/&gt;&lt;/p&gt;
+
+&lt;p&gt;And now, to make matters worse, the block returned the value returned by
+&lt;span class="code"&gt;Person#first_name=&lt;/span&gt;, which was the string “Marco,” the new value of the first
+name attribute. Because Ruby considered “Marco” to be &lt;em&gt;truthy&lt;/em&gt;, &lt;span class="code"&gt;Enumerable#find&lt;/span&gt;
+returned the first person, even though that person was originally named Ted
+Cruz. My surrounding code now thinks it found Marco Rubio, but instead has Ted
+Cruz, renamed to Marco Cruz. What a mess.&lt;/p&gt;
+
+&lt;h2&gt;Why Didn’t Ruby Tell Me Something Was Wrong?&lt;/h2&gt;
+
+&lt;div style="float: right; padding: 0px 0px 20px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/4/2/bouldering.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt; As a developer, you’re always just one&lt;br/&gt; keystroke away from falling off a cliff.  &lt;br/&gt;
+    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:Bouldering.jpg"&gt;DecafGrub47393 via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Think about this for a moment: I used the &lt;span class="code"&gt;find&lt;/span&gt;
+method, which called a block and expected that block to return &lt;span
+class="code"&gt;true&lt;/span&gt; or &lt;span class="code"&gt;false&lt;/span&gt;.  But my block
+returned neither &lt;span class="code"&gt;true&lt;/span&gt; nor &lt;span
+class="code"&gt;false&lt;/span&gt;. It returned “Marco.”&lt;/p&gt;
+
+&lt;p&gt;Why didn’t Ruby issue some sort of error or warning in this case? Yes, I
+understand that Ruby considers all values, except for &lt;span
+class="code"&gt;false&lt;/span&gt; and &lt;span class="code"&gt;nil&lt;/span&gt;, to be equivalent
+to &lt;span class="code"&gt;true&lt;/span&gt;. In fact, Ruby developers quite often take
+advantage of this fact to write more concise readable code: We can write: &lt;span
+class="code"&gt;if value&lt;/span&gt; instead of &lt;span class="code"&gt;if value !=
+false&lt;/span&gt; or &lt;span class="code"&gt;if value != nil&lt;/span&gt; or whatever.&lt;/p&gt;
+
+&lt;p&gt;But in this case, Ruby’s silence allowed my simple coding mistake to become a
+serious problem. If Ruby had given me some sort of warning or error the first
+time I ran this code, I would have found the problem and fixed it in 5 seconds.
+Instead, this code ran for weeks and failed every single time, and I had no
+idea.&lt;/p&gt;
+
+&lt;p&gt;When I fell, Ruby didn’t catch me, it allowed me to fall off the cliff!&lt;/p&gt;
+
+&lt;h2&gt;Finding The Maximum Value in an Array&lt;/h2&gt;
+
+&lt;p&gt;We all have a bad day from time to time. After making that mistake I just
+continued to work on my project, trying harder not to make any more dumb
+mistakes. It was my fault, I thought. I just needed to be a better programmer.&lt;/p&gt;
+
+&lt;p&gt;But of course, it happened again! I made another dumb Ruby mistake just a few
+days later. This time I wanted to sort the same array. Specifically, I wanted
+to find the array element with the maximum value for some attribute. I was
+using different data, of course, but we can translate the problem to our
+candidate data set easily.&lt;/p&gt;
+
+&lt;p&gt;Suppose I wanted to find the candidate with the maximum number of insults.
+Easy, right? Here’s the line of code I wrote:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/mistake2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Can you spot the problem here? When I run that code I don’t get Donald Trump, who has the most insults. Instead, I get:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+p most_insulting
+=&amp;gt; &lt;span class="comment"&gt;#&amp;lt;struct Person first_name=&amp;quot;Marco&amp;quot;, last_name=&amp;quot;Rubio&amp;quot;, insults=321&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Again a simple, dumb mistake. I should have called &lt;span
+class="code"&gt;max_by&lt;/span&gt;, instead of &lt;span class="code"&gt;max&lt;/span&gt;. Here’s
+the correct code:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/correct2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class="code"&gt;Enumerable#max_by&lt;/span&gt; does what I thought &lt;span
+class="code"&gt;Enumerable#max&lt;/span&gt; would do: It sorts the values returned by
+the block, and then returns the object corresponding to the maximum value.
+This is only slightly less embarrassing than my first dumb mistake. Almost all
+modern programming languages use &lt;span class="code"&gt;==&lt;/span&gt; and &lt;span
+class="code"&gt;=&lt;/span&gt; for equality vs. assignment. There’s no excuse for making
+that mistake: It was just dumb.&lt;/p&gt;
+
+&lt;p&gt;The difference between &lt;span class="code"&gt;max&lt;/span&gt; and &lt;span
+class="code"&gt;max_by&lt;/span&gt; is not quite as obvious. But again, I’ve been using
+Ruby for 8 years now. I should know better! I’m just a bad Ruby developer. But
+before we blame this mistake entirely on me, let’s take a closer look at what
+actually happened when I ran my bad code. Let’s step through what &lt;span
+class="code"&gt;Enumerable#max&lt;/span&gt; did, just as we did before with &lt;span
+class="code"&gt;Enumerable#find&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;Again Ruby started by calling &lt;span class="code"&gt;Enumerable#max&lt;/span&gt; on the
+candidates array:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/array2.svg"/&gt;&lt;/p&gt;
+
+&lt;p&gt;And again, just like &lt;/span&gt;find&lt;/span&gt;, &lt;span class="code"&gt;max&lt;/span&gt; iterates
+over the array elements. However, instead of passing each person to the block
+one at a time, it actually passes the array elements in pairs:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/call-block2.svg"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Why did Ruby pass two &lt;span class="code"&gt;Person&lt;/span&gt; objects to my block?
+&lt;span class="code"&gt;Enumerable#max&lt;/span&gt; searches for the array element &amp;ndash; not
+the return value of a block &amp;ndash; which has the maximum value. It assumes that the
+values in the array can be compared, that they have a natural sort order.
+&lt;span class="code"&gt;Enumerable#max&lt;/span&gt; is perfect for an array of integers or
+an array of strings. Ruby can sort them automatically and find the maximum
+value by returning the last element.&lt;/p&gt;
+
+&lt;p&gt;Additionally, Ruby allows you to use &lt;span class="code"&gt;max&lt;/span&gt; when the
+array elements can’t be sorted automatically, when you have an array of
+objects, like my &lt;span class="code"&gt;Person&lt;/span&gt; structures. Because Ruby
+doesn’t know whether one person is greater or less than another, it allows you
+to pass a block to &lt;span class="code"&gt;max&lt;/span&gt; that answers that question.
+The block should accept two arguments return one of three numeric values: -1, 0
+or 1:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;-1 if the first value is less than the second (they are in ascending order)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;0 indicates they are the same, at least in terms of their sort order, and&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;1 if the first value is greater than the second (they are in descending order)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;So what happened here was that by using &lt;span
+class="code"&gt;Enumerable#max&lt;/span&gt; and providing a block, Ruby assumed my block
+was there to determine the sort order of the Person objects, not to return an
+attribute for each one.&lt;/p&gt;
+
+&lt;p&gt;As you probably know, Ruby makes our lives easier by providing the “space ship”
+operator, &lt;span class="code"&gt;&amp;lt;=&gt;&lt;/span&gt;, that compares two values and returns
+this sort order number: -1, 0 or 1. The correct way to find the most insulting
+candidate using &lt;span class="code"&gt;max&lt;/span&gt; would be to compare the two
+values of &lt;span class="code"&gt;Person#insults&lt;/span&gt; using &lt;span
+class="code"&gt;&amp;lt;=&gt;:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+most_insulting = candidates.max{|person1, person2| person1.insults &amp;lt;=&amp;gt; person2.insults}
+p most_insulting
+=&amp;gt; &lt;span class="comment"&gt;#&amp;lt;struct Person first_name=&amp;quot;Donald&amp;quot;, last_name=&amp;quot;Trump&amp;quot;, insults=892&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;h2&gt;Why Didn’t Ruby Tell Me Something Was Wrong?&lt;/h2&gt;
+
+&lt;p&gt;I knew all about the space ship operator and sort order blocks, but for
+whatever reason in the moment I typed in my bad code I just forgot. Maybe I was
+in a rush, maybe I was just tired. Maybe I really thought I typed &lt;span
+class="code"&gt;max_by&lt;/span&gt; but somehow the “_by” part just didn’t leave my
+brain and make it to the keyboard.&lt;/p&gt;
+
+&lt;p&gt;But Ruby knew I should have used &lt;span class="code"&gt;max_by&lt;/span&gt;, or least
+that I should have accepted two parameters in my block. Why didn’t it tell me?&lt;/p&gt;
+
+&lt;p&gt;That is, my block expected only one argument, not two. I wrote:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+{|person| etc…}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;and not:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+{|person1, person2| etc… }
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Why didn’t Ruby complain when it tried to pass two objects, but my block
+only accepted one? It turns out when you pass extra arguments to a block Ruby
+silently ignores them. Note: Ruby does check the number of arguments when you
+explicitly use &lt;span class="code"&gt;lambda{}&lt;/span&gt; or &lt;span
+class="code"&gt;&amp;ndash;&gt;()&lt;/span&gt; and then call it using the &lt;span
+class="code"&gt;Proc.call&lt;/span&gt; method.  But 99% of the time Ruby developers use
+blocks in the standard, default manner and don’t create &lt;span
+class="code"&gt;Proc&lt;/span&gt; objects explicitly.&lt;/p&gt;
+
+&lt;p&gt;Ruby could have told me something was wrong by displaying a warning or an error
+message, maybe: “wrong number of arguments (2 for 1) (ArgumentError).” But
+instead, it remained silent. It assumed that I just didn’t need that second
+block argument, that I wanted to keep my code simpler and easier to read, and
+conveniently allowed me to leave it out of the block’s argument list. Ruby
+assumed I was a smart, experienced developer who doesn’t make dumb mistakes
+like this. Ruby was so wrong!&lt;/p&gt;
+
+&lt;p&gt;What happened next? Ruby continued to run my block, and things got really ugly.
+Take another look at the block’s code:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+{|person| person.insults}
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;It returns the insult count for the given person &amp;ndash; a number! Next Ruby
+interpreted the numerical value my block returned, 432, 892 or 321, as the sort
+order indicator. That’s right: Ruby will accept any positive value from the
+sort order block, not just 1, and consider that to mean the two objects are in
+descending order. Similarly, it will take any negative value to mean the values
+are in ascending order.&lt;/p&gt;
+
+&lt;p&gt;Again, Ruby could have told me: “wrong type for block return value (Integer for
+SortOrder) (TypeError).” But, of course, Ruby isn’t a statically typed
+language. It doesn&amp;rsquo;t check the types of method and block arguments, or their
+return values.&lt;/p&gt;
+
+&lt;div style="float: right; padding: 70px 0px 30px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/4/2/carabiner.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;Your coding equipment should catch you&lt;br/&gt;when you make a mistake and fall.&lt;/i&gt;&lt;br/&gt;
+    &lt;small&gt;(source: &lt;a
+href="https://commons.wikimedia.org/wiki/File:Carabiner.jpg"&gt;Marcin Jahr via
+Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; &lt;/div&gt;
+
+
+&lt;p&gt;Once again, Ruby erred on the side of convenience, and assumed I knew what I
+was doing. It conveniently allowed me to return 321 instead of 1, just in case
+I really wanted to return 321 without having to convert it to 1.  As we’ve
+seen, I make dumb mistakes all the time. Ruby is very wrong to believe I know
+what I am doing.&lt;/p&gt;
+
+&lt;h2&gt;Our Programming Language Should Catch Our Dumb Mistakes&lt;/h2&gt;
+
+&lt;p&gt;We actually make dumb mistakes all the time, not just once or twice a week, but
+probably hundreds of times every day. Every time we misspell a keyword, forget
+a method argument, or use an API the wrong way we have made a mistake. But we
+don’t think of these mistakes as mistakes &amp;ndash; they are just how we work as
+humans. When we type, we usually press the backspace key quite often. When we
+use an API or run shell commands we have to check the documentation or
+StackOverflow to remind ourselves what arguments or options to use.&lt;/p&gt;
+
+&lt;p&gt;And usually our programming language, whether it’s Ruby or something else,
+finds our mistakes immediately and tells us about them with a syntax error
+message. We correct the mistake within seconds and continue coding, climbing
+higher and higher up the cliff. But in my two examples the mistakes,
+unfortunately, weren’t apparent immediately.  This incorrect code ran for weeks
+before I discovered the problem. You always want to fail fast: The worst
+mistakes are the ones you never notice until it’s too late.&lt;/p&gt;
+
+&lt;p&gt;But why didn’t I discover these mistakes sooner by running tests? Don’t I use
+TDD? Don’t I at least write tests to check my code after I’ve written it? Yes.
+But in my actual project, these mistakes were part of my test code. They
+allowed my tests to pass, but caused them to return a false positive result. My
+tests were green, but actually weren’t functioning at all. Tests aren&amp;rsquo;t
+perfect. They are only as good as the code you write to implement them.&lt;/p&gt;
+
+&lt;p&gt;Maybe these two dumb Ruby mistakes were exactly that: mistakes Ruby made and
+not me. I’m only human; it’s normal for me to type in nonsense and garbage all
+day long into the computer. But Ruby is a programming language. It’s job &amp;ndash; it’s
+most important job &amp;ndash; is to tell me when my code is incorrect as soon as
+possible. In these two examples, it was the Ruby language itself that made the
+dumb mistake. The bugs weren’t in my code, they were in the language itself.&lt;/p&gt;
+
+&lt;p&gt;Of course, I could just switch to a statically typed language, like Java or Go.
+These languages automatically check the types of arguments and return values
+for me. If I used Swift I could take advantage of static types and use
+blocks/closures. I could even use a language like Haskell where the type system
+is so powerful that merely by allowing my code to run with no errors, the
+compiler has mathematically proven my code is correct. (If this could only be
+true!)&lt;/p&gt;
+
+&lt;p&gt;But I love Ruby. It’s a joy to use. Ruby code has a very human elegance to it
+that I haven’t seen in other programming languages. I just wish Ruby would
+catch me every time I fall.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Is Your Postgres Query Starved for Memory?</title>
     <link href="http://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory" rel="alternate"/>
     <id>http://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory</id>
-    <published>2016-01-22T04:00:00Z</published>
-    <updated>2016-01-22T04:00:00Z</updated>
+    <published>2016-01-22T01:00:00Z</published>
+    <updated>2016-01-22T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -333,8 +725,8 @@ starved!&lt;/p&gt;
     <title>A Look at How Postgres Executes a Tiny Join</title>
     <link href="http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join</id>
-    <published>2015-11-24T04:00:00Z</published>
-    <updated>2015-11-24T04:00:00Z</updated>
+    <published>2015-11-24T01:00:00Z</published>
+    <updated>2015-11-24T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -856,8 +1248,8 @@ has done over the years!&lt;/p&gt;
     <title>What Do Perl and Go Have in Common?</title>
     <link href="http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common</id>
-    <published>2015-09-25T03:00:00Z</published>
-    <updated>2015-09-25T03:00:00Z</updated>
+    <published>2015-09-25T00:00:00Z</published>
+    <updated>2015-09-25T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1130,8 +1522,8 @@ words in simple, or even beautiful, ways.&lt;/p&gt;
     <title>Don’t Let Your Data Out of the Database</title>
     <link href="http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database</id>
-    <published>2015-06-18T03:00:00Z</published>
-    <updated>2015-06-18T03:00:00Z</updated>
+    <published>2015-06-18T00:00:00Z</published>
+    <updated>2015-06-18T00:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1552,8 +1944,8 @@ the values your application really needs.&lt;/p&gt;
     <title>Mark Methods Private When You Don’t Test Them</title>
     <link href="http://patshaughnessy.net/2015/2/16/mark-methods-private-when-you-dont-test-them" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/2/16/mark-methods-private-when-you-dont-test-them</id>
-    <published>2015-02-16T04:00:00Z</published>
-    <updated>2015-02-16T04:00:00Z</updated>
+    <published>2015-02-16T01:00:00Z</published>
+    <updated>2015-02-16T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1884,8 +2276,8 @@ test suite.&lt;/p&gt;
     <title>Using Rake to Generate a Blog</title>
     <link href="http://patshaughnessy.net/2015/1/8/using-rake-to-generate-a-blog" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/1/8/using-rake-to-generate-a-blog</id>
-    <published>2015-01-08T04:00:00Z</published>
-    <updated>2015-01-08T04:00:00Z</updated>
+    <published>2015-01-08T01:00:00Z</published>
+    <updated>2015-01-08T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2142,8 +2534,8 @@ least.&lt;/p&gt;
     <title>Koichi Sasada Encourages Us To Contribute To Ruby</title>
     <link href="http://patshaughnessy.net/2014/12/17/koichi-sasada-encourages-us-to-contribute-to-ruby" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/12/17/koichi-sasada-encourages-us-to-contribute-to-ruby</id>
-    <published>2014-12-17T04:00:00Z</published>
-    <updated>2014-12-17T04:00:00Z</updated>
+    <published>2014-12-17T01:00:00Z</published>
+    <updated>2014-12-17T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2414,8 +2806,8 @@ Heroku, Inc.&lt;/p&gt;
     <title>Matz’s Foreword to Ruby Under a Microscope</title>
     <link href="http://patshaughnessy.net/2014/12/15/matzs-forward-to-ruby-under-a-microscope" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/12/15/matzs-forward-to-ruby-under-a-microscope</id>
-    <published>2014-12-15T04:00:00Z</published>
-    <updated>2014-12-15T04:00:00Z</updated>
+    <published>2014-12-15T01:00:00Z</published>
+    <updated>2014-12-15T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2543,8 +2935,8 @@ Yukihiro Matsumoto&lt;/p&gt;
     <title>Discovering the Computer Science Behind Postgres Indexes</title>
     <link href="http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes" rel="alternate"/>
     <id>http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes</id>
-    <published>2014-11-11T04:00:00Z</published>
-    <updated>2014-11-11T04:00:00Z</updated>
+    <published>2014-11-11T01:00:00Z</published>
+    <updated>2014-11-11T01:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2990,499 +3382,6 @@ people like Lehman and Yao, and the open source developers who used their
 theories to build Postgres. Don’t take the tools you use everyday for granted &amp;ndash;
 take a look inside them! You’ll become a wiser developer and you’ll find
 insights and knowledge you could never have imagined before.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Following a Select Statement Through Postgres Internals</title>
-    <link href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals" rel="alternate"/>
-    <id>http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals</id>
-    <published>2014-10-13T03:00:00Z</published>
-    <updated>2014-10-13T03:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/10/13/engine-room.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Captain Nemo takes Professor Aronnax on a tour&lt;br/&gt;of the engine room, a fascinating description&lt;br/&gt;of future technology from an 1870 perspective.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;&lt;b&gt;
-This is the third of a series of posts based on a presentation I did at the</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/10/13/engine-room.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Captain Nemo takes Professor Aronnax on a tour&lt;br/&gt;of the engine room, a fascinating description&lt;br/&gt;of future technology from an 1870 perspective.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;&lt;b&gt;
-This is the third of a series of posts based on a presentation I did at the
-&lt;a href="http://www.baruco.org"&gt;Barcelona Ruby Conference&lt;/a&gt; called “20,000 Leagues Under
-ActiveRecord.” (posts:
-&lt;a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord"&gt;one&lt;/a&gt;
-&lt;a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements"&gt;two&lt;/a&gt;
-and &lt;a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4"&gt;video&lt;/a&gt;).  &lt;/b&gt;&lt;/p&gt;
-
-&lt;p&gt;Preparing for this presentation over the Summer, I decided to read through
-parts of the PostgreSQL C source code. I executed a very simple select
-statement and watched what Postgres did with it using LLDB, a C debugger. How
-did Postgres understand my query? How did it actually find the data I was
-looking for?&lt;/p&gt;
-
-&lt;p&gt;This post is an informal journal of my trip through the guts of Postgres. I’ll
-describe the path I took and what I saw along the way. I’ll use a series of
-simple, conceptual diagrams to explain how Postgres executed my query.
-In case you understand C, I’ll also leave you a few landmarks and signposts you
-can look for if you ever decide to hack on Postgres internals.&lt;/p&gt;
-
-&lt;p&gt;In the end, the Postgres source code delighted me. It was clean, well
-documented and easy to follow. Find out for yourself how Postgres works
-internally by following me on a journey deep inside a tool you use everyday.&lt;/p&gt;
-
-&lt;div style="clear: left"&gt;&lt;/div&gt;
-
-
-&lt;h2&gt;Finding Captain Nemo&lt;/h2&gt;
-
-&lt;p&gt;Here’s the example query from &lt;a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord"&gt;the first half of my
-presentation&lt;/a&gt;;
-we’ll follow Postgres as it searches for Captain Nemo:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/23/sql.png"/&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 7px 0px 0px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/10/13/maps.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Professor Aronnax and Captain Nemo&lt;br/&gt;plot the course of the Nautilus.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Finding a single name in string column like this should be straightforward,
-shouldn’t it? We’ll hold tightly onto this select statement while we explore
-Postgres internals, like a rope deep sea divers use to find their way back to
-the surface.&lt;/p&gt;
-
-&lt;h2&gt;The Big Picture&lt;/h2&gt;
-
-&lt;p&gt;What does Postgres do with this SQL string? How does it understand what we
-meant? How does it know what data we are looking for?&lt;/p&gt;
-
-&lt;p&gt;Postgres processes each SQL command we send it using a four step process.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/4-steps.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;In the first step, Postgres &lt;em&gt;parses&lt;/em&gt; our SQL statement and converts it into a
-series of C memory structures, a &lt;em&gt;parse tree&lt;/em&gt;. Next Postgres &lt;em&gt;analyzes and
-rewrites&lt;/em&gt; our query, optimizing and simplifying it using a series of complex
-algorithms. After that, Postgres generates a &lt;em&gt;plan&lt;/em&gt; for finding our data. Like
-an obsessive compulsive person who won’t leave home without every suitcase
-packed perfectly, Postgres doesn’t run our query until it has a plan. Finally,
-Postgres actually &lt;em&gt;executes&lt;/em&gt; our query. In this presentation I’ll briefly touch
-on the first three topics, and then focus more on the last step: &lt;em&gt;Execute&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;The C function inside of Postgres that implements this 4 step process is called
-&lt;span class="code"&gt;exec_simple_query&lt;/span&gt;. You can find a link to it below, along with an LLDB
-backtrace which gives some context about exactly when and how Postgres calls
-&lt;span class="code"&gt;exec_simple_query&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;exec_simple_query&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/postgres_8c.html#a7908e75bd9f9494fdb8c4b47f01a9de9"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_simple_query.png"/&gt;
-  &lt;/div&gt;
-  &lt;div class="function-bt"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_simple_query_bt.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;h2&gt;Parse&lt;/h2&gt;
-
-&lt;p&gt;How does Postgres understand the SQL string we sent it? How does it make sense
-of the SQL keywords and expressions in our select statement? Through a process
-called &lt;em&gt;parsing&lt;/em&gt;, Postgres converts our SQL string into an internal data
-structure it understands, the parse tree.&lt;/p&gt;
-
-&lt;p&gt;It turns out that Postgres uses the same parsing technology that Ruby does, a
-&lt;em&gt;parser generator&lt;/em&gt; called &lt;a href="http://www.gnu.org/software/bison/"&gt;Bison&lt;/a&gt;. Bison
-runs during the Postgres C build process and generates parser code based on a
-series of grammar rules. The generated parser code is what runs inside of
-Postgres when we send it SQL commands. Each grammar rule is triggered when the
-generated parser finds a corresponding pattern or syntax in the SQL string,
-and inserts a new C memory structure into the parse tree data structure.&lt;/p&gt;
-
-&lt;p&gt;I won’t take the time today to explain how parsing algorithms work in detail.
-If you’re interested in that sort of thing, I’d suggest taking a look at my
-book &lt;a href="http://patshaughnessy.net/ruby-under-a-microscope"&gt;Ruby Under a
-Microscope&lt;/a&gt;. In Chapter One
-I go through a detailed example of the LALR parse algorithm used by Bison and
-Ruby. Postgres parses SQL statements in exactly the same way.&lt;/p&gt;
-
-&lt;p&gt;Using LLDB and enabling some C logging code, I observed the Postgres parser
-produce this parse tree for our Captain Nemo query:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/parse-tree.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;At the top is a node representing the entire SQL statement, and below that are
-child nodes or branches that represent the different portions of the SQL
-statement syntax: the target list (a list of columns), the from clause (a list
-of tables), the where clause, the sort order and a limit count.&lt;/p&gt;
-
-&lt;p&gt;If you want to learn more about how Postgres parses SQL statements, follow the
-flow of control down from &lt;span class="code"&gt;exec_simple_query&lt;/span&gt; through
-another C function called &lt;span class="code"&gt;pg_parse_query&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;pg_parse_query&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/postgres_8c.html#a0449a974d1a66a2fcdee8896a0690521"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_parse_query.png"/&gt;
-  &lt;/div&gt;
-  &lt;div class="function-bt"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_parse_query_bt.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;p&gt;As you can see there are many helpful and detailed comments in the Postgres
-source code that not only explain what is happening but also point out important
-design decisions.&lt;/p&gt;
-
-&lt;h2&gt;All That Hard Work For Nothing&lt;/h2&gt;
-
-&lt;p&gt;The parse tree above should look familiar &amp;ndash; it’s almost precisely the same as
-the abstract syntax tree (AST) we saw ActiveRecord create earlier. Recall from
-the &lt;a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord"&gt;first half of the
-presentation&lt;/a&gt;
-ActiveRecord generated our Captain Nemo select statement when we executed this
-Ruby query:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;We saw that ActiveRecord internally created an AST when we called methods such
-as &lt;span class="code"&gt;where&lt;/span&gt; and &lt;span class="code"&gt;first&lt;/span&gt;. Later
-(see the &lt;a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements"&gt;second
-post&lt;/a&gt;),
-we watched as the Arel gem converted the AST into our example select statement
-using an algorithm based on the visitor pattern.&lt;/p&gt;
-
-&lt;p&gt;Thinking about this, it’s ironic that the first thing Postgres does with your
-SQL statement is convert it from a string back into an AST. Postgres’s parse
-process reverses everything ActiveRecord did earlier; all of that hard work the
-Arel gem did was for nothing! The only reason for creating the SQL string at
-all was to communicate with Postgres over a network connection. Once Postgres
-has the string, it converts it back into an AST, which is a much more
-convenient and useful way of representing queries.&lt;/p&gt;
-
-&lt;p&gt;Learning this you might ask: Is there a better way? Is there some way of
-conceptually specifying the data we want to Postgres without writing a SQL
-statement? Without learning the complex SQL language or paying the performance
-overhead of using ActiveRecord and Arel? It seems like a waste of time to go to
-such lengths to generate a SQL string from an AST, just to convert it back to
-an AST again. Maybe we should be using a NoSQL database solution instead?&lt;/p&gt;
-
-&lt;p&gt;Of course, the AST Postgres uses is much different from the AST used by
-ActiveRecord. ActiveRecord’s AST was comprised of Ruby objects, while
-Postgres’s AST is formed of a series of C memory structures. Same idea but very
-different implementations.&lt;/p&gt;
-
-&lt;h2&gt;Analyze and Rewrite&lt;/h2&gt;
-
-&lt;p&gt;Once Postgres has generated a parse tree, it then converts it into a another
-tree structure using a different set of nodes. This is known as the &lt;em&gt;query
-tree&lt;/em&gt;. Returning to the &lt;span class="code"&gt;exec_simple_query&lt;/span&gt; C
-function, you can see it next calls another C function &lt;span
-class="code"&gt;pg_analyze_and_rewrite&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;pg_analyze_and_rewrite&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/postgres_8c.html#a66930c41c305d22f3371cad134fd3dee"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_analyze_and_rewrite.png"/&gt;
-  &lt;/div&gt;
-  &lt;div class="function-bt"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_analyze_and_rewrite_bt.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;p&gt;Waving my hands a bit and glossing over many important details, the analyze and
-rewrite process applies a series of sophisticated algorithms and heuristics to
-try to optimize and simplify your SQL statement. If you had executed a complex
-select statement with sub-selects and multiple inner and outer joins, then
-there is a lot of room for optimization. It’s quite possible that Postgres
-could reduce the number of sub-select clauses or joins to produce a simpler
-query that runs faster.&lt;/p&gt;
-
-&lt;p&gt;For our simple select statement, here’s the query tree that &lt;span
-class="code"&gt;pg_analyze_and_rewrite&lt;/span&gt; produces:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/query-tree.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;I don’t pretend to understand the detailed algorithms behind &lt;span
-class="code"&gt;pg_analyze_and_rewrite&lt;/span&gt;. I simply observed that for our
-example the query tree largely resembled the parse tree. This means the
-select statement was so straightforward Postgres wasn’t able to simplify it further.&lt;/p&gt;
-
-&lt;h2&gt;Plan&lt;/h2&gt;
-
-&lt;p&gt;The last step Postgres takes before starting to execute our query is to create
-a plan. This involves generating a third tree of nodes that form a list of
-instructions for Postgres to follow. Here’s the plan tree for our select
-statement.&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/plan-tree.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Imagine that each node in the plan tree is a machine or worker of some
-kind. The plan tree resembles a pipeline of data or a conveyor belt in a
-factory. In my simple example there is only one branch in the tree. Each node
-in the plan tree takes some the output data from the node below, processes it,
-and returns results as input to the node above. We’ll follow Postgres as it
-executes the plan in the next section.&lt;/p&gt;
-
-&lt;p&gt;The C function that starts the query planning process is called &lt;span
-class="code"&gt;pg_plan_queries&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;pg_plan_queries&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/postgres_8c.html#a34e18d3874224b3b670ec0a3ae9c970c"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_plan_queries.png"/&gt;
-  &lt;/div&gt;
-  &lt;div class="function-bt"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/pg_plan_queries_bt.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;p&gt;Note the &lt;span class="code"&gt;startup_cost&lt;/span&gt; and &lt;span
-class="code"&gt;total_cost&lt;/span&gt; values in each plan node. Postgres uses these
-values to estimate how long the plan will take to complete. You don’t have
-to use a C debugger to see the execution plan for your query. Just prepend the
-SQL &lt;span class="code"&gt;EXPLAIN&lt;/span&gt; command to your query, like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/explain.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This is a powerful way to understand what Postgres is doing internally with one
-of your queries, and why it might be slow or inefficient &amp;ndash; despite the
-sophisticated planning algorithms in &lt;span class="code"&gt;pg_plan_queries&lt;/span&gt;.&lt;/p&gt;
-
-&lt;h2&gt;Executing a Limit Plan Node&lt;/h2&gt;
-
-&lt;p&gt;By now, Postgres has parsed your SQL statement and converted it back into an
-AST. Then it optimized and rewrote your query, possibly in a simpler way.
-Third, Postgres wrote a plan which it will follow to find and return the data
-you are looking for. Finally it’s time for Postgres to actually execute your
-query. How does it do this? It follows the plan, of course!&lt;/p&gt;
-
-&lt;p&gt;Let’s start at the top of the plan tree and move down. Skipping the root node,
-the first worker that Postgres uses for our Captain Nemo query is called Limit.
-The Limit node, as you might guess, implements the &lt;span
-class="code"&gt;LIMIT&lt;/span&gt; SQL command, which limits the result set to the
-specified number of records. The same plan node also implements the &lt;span
-class="code"&gt;OFFSET&lt;/span&gt; command, which starts the result set window at the
-specified row.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/limit1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The first time Postgres calls the Limit node, it calculates what the limit and
-offset values should be, because they might be set to the result of some
-dynamic calculation. In our example, offset is 0 and limit is 1.&lt;/p&gt;
-
-&lt;p&gt;Next, the Limit plan node repeatedly calls the subplan, in our case Sort,
-counting until it reaches the offset value:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/limit2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;In our example the offset value is zero, so this loop will load the first data
-value and stop iterating. Then Postgres returns the last data value loaded from
-the subplan to the calling or upper plan. For us, this will be that first value
-from the subplan.&lt;/p&gt;
-
-&lt;p&gt;Finally when Postgres continues to call the Limit node, it will pass the data
-values through from the subplan one at a time:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/limit3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;In our example, because the limit value is 1 Limit will immediately return NULL
-indicating to the upper plan there is no more data available.&lt;/p&gt;
-
-&lt;p&gt;Postgres implements the Limit node using code in a file called nodeLimit.c&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;ExecLimit&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nodeLimit_8c.html#a9fe32874f36f4a955f5b4b762d814631"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_limit.png"/&gt;
-  &lt;/div&gt;
-  &lt;div class="function-bt"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_limit_bt.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;p&gt;You can see the Postgres source code uses words such as &lt;em&gt;tuple&lt;/em&gt; (a set a
-values, one from each column) and &lt;em&gt;subplan&lt;/em&gt;. The subplan in this example is the
-Sort node, which appears below Limit in the plan.&lt;/p&gt;
-
-&lt;h2&gt;Executing a Sort Plan Node&lt;/h2&gt;
-
-&lt;p&gt;Where do the data values Limit filters come from? From the Sort plan node
-that appears under Limit in the plan tree. Sort loads data values from its
-subplan and returns them to its calling plan, Limit. Here’s what Sort does when
-the Limit node calls it for the first time, to get the first data value:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/sort1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;You can see that Sort functions very differently from Limit. It immediately
-loads all of the available data from the subplan into a buffer, before
-returning anything. Then it sorts the buffer using the
-&lt;a href="http://en.wikipedia.org/wiki/Quicksort"&gt;Quicksort&lt;/a&gt; algorithm, and finally
-returns the first sorted value.&lt;/p&gt;
-
-&lt;p&gt;For the second and subsequent calls, Sort simply returns additional values from
-the sorted buffer, and never needs to call the subplan again:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/10/13/sort2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The Sort plan node is implemented by a C function called ExecSort:&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;ExecSort&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nodeSort_8c.html#afe145ec8ff9b3d3a654022f73eab2810"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_sort.png"/&gt;
-  &lt;/div&gt;
-  &lt;div class="function-bt"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_sort_bt.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;h2&gt;Executing a SeqScan Plan Node&lt;/h2&gt;
-
-&lt;p&gt;Where does ExecSort get its values? From its subplan, or the SeqScan node that
-appears at the bottom of the plan tree. SeqScan stands for &lt;em&gt;sequence scan&lt;/em&gt;, which
-means to look through the values in a table, returning values that match a
-given filter. To understand how the scan works with our filter, let’s step
-through an imaginary users table filled with fake names, looking for Captain
-Nemo.&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Postgres starts at the first record in a table (known as a &lt;em&gt;relation&lt;/em&gt; in the
-Postgres source code) and executes the boolean expression from the plan tree.
-In simple terms, Postgres asks the question: “Is this Captain Nemo?” Because
-Laurianne Goodwin is not Captain Nemo, Postgres steps down to the next record.&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;No, Candace is also not Captain Nemo. Postgres continues:&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;… and eventually finds Captain Nemo!&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Postgres implements the SeqScan node using a C function called ExecSeqScan.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;ExecSeqScan&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nodeSeqscan_8c.html#af80d84501ff7621d2ef6249b148e7f44"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_seq_scan.png"/&gt;
-  &lt;/div&gt;
-  &lt;div class="function-bt"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/10/13/exec_seq_scan_bt.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;h2&gt;What Are We Doing Wrong?&lt;/h2&gt;
-
-&lt;p&gt;Now we’re done! We’ve followed a simple select statement all the way through
-the guts of Postgres, and have seen how it was parsed, rewritten, planned and finally
-executed. After executing many thousands of lines of C code, Postgres has found the
-data we are looking for! Now all Postgres has to do is return the Captain Nemo
-string back to our Rails application and ActiveRecord can create a Ruby object.
-We can finally return to the surface of our application.&lt;/p&gt;
-
-&lt;p&gt;But Postgres doesn’t stop! Instead of simply returning, Postgres continues to
-scan through the users table, even though we’ve already found Captain Nemo:&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 117px 0px 70px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/10/13/suffocating.png"&gt;&lt;br/&gt;
-  &lt;i&gt;While returning from the South Pole, the air&lt;br/&gt; supply inside the Nautilus began to run out.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;What’s going on here? Why is Postgres wasting its time, continuing to search
-even though it’s already found the data we’re looking for?&lt;/p&gt;
-
-&lt;p&gt;The answer lies farther up the plan tree in the Sort node. Recall that in order
-to sort all of the users, ExecSort first loads all of the values into a buffer,
-by calling the subplan repeatedly until there are no values left. That means
-that &lt;em&gt;ExecSeqScan will continue to scan to the end of the table&lt;/em&gt;, until it has
-all of the matching users. If our users table contained thousands or even
-millions of records (imagine we work at Facebook or Twitter), ExecSeqScan will
-have to loop over every single user record and execute the string comparison
-for each one. This is obviously inefficient and slow, and will get slower as
-more and more user records are added.&lt;/p&gt;
-
-&lt;p&gt;If we have only one Captain Nemo record, then ExecSort will “sort” just that
-single matching record, and ExecLimit will pass that single record through its
-offset/limit filter… but only after ExecSeqScan has iterated over all of the
-names.&lt;/p&gt;
-
-&lt;h2&gt;Next Time&lt;/h2&gt;
-
-&lt;p&gt;How do we fix this problem? What should we do if our SQL queries on the users
-table take more and more time to execute? The answer is simple: we  create an
-index.&lt;/p&gt;
-
-&lt;p&gt;In the next and final post in this series we’ll learn how to create a Postgres
-index and to avoid the use of ExecSeqScan. More importantly, I’ll show you what
-a Postgres index looks like: &lt;em&gt;how&lt;/em&gt; it works and &lt;em&gt;why&lt;/em&gt; it speeds up queries like
-this one.&lt;/p&gt;
 </content>
   </entry>
 </feed>
