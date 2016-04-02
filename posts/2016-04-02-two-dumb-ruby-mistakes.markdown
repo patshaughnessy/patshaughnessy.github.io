@@ -144,7 +144,7 @@ marco = candidates.find { |person| 'Marco' = person.first_name }
 …then Ruby will immediately report a syntax error and tell you where the
 problem was if you ever confuse <span class="code">=</span> with <span
 class="code">==</span>. Joshua Ballanco told us that this style of putting the
-constant before variable is known as a [Yoda
+constant before the variable is known as a [Yoda
 condition](https://en.wikipedia.org/wiki/Yoda_conditions).
 
 
