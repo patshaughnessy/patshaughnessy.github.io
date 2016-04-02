@@ -112,10 +112,10 @@ object:&lt;/p&gt;
 &lt;p&gt;Now the block executed. And my dumb mistake came into play. What I intended was
 for the block to return whether or not the first name of the given person was
 equal to “Marco.” If the first name was “Marco” then &lt;span
-class="code"&gt;Person#first_name == &amp;quot;Marco&amp;quot;&lt;/span&gt; would return true, the block
-would return &lt;span class="code"&gt;true&lt;/span&gt; and &lt;span
-class="code"&gt;Enumerable#find&lt;/span&gt; would return the target person. In this
-case, &amp;ldquo;Ted&amp;rdquo; is not &amp;ldquo;Marco&amp;rdquo; so the block would return &lt;span
+class="code"&gt;Person#first_name == &amp;quot;Marco&amp;quot;&lt;/span&gt; would return &lt;span
+class="code"&gt;true&lt;/span&gt;, the block would return &lt;span class="code"&gt;true&lt;/span&gt;
+and &lt;span class="code"&gt;Enumerable#find&lt;/span&gt; would return the target person.
+In this case, &amp;ldquo;Ted&amp;rdquo; is not &amp;ldquo;Marco&amp;rdquo; so the block would return &lt;span
 class="code"&gt;false&lt;/span&gt;.&lt;/p&gt;
 
 &lt;p&gt;But my block didn’t check whether the person is named “Marco;” instead, it
@@ -150,9 +150,9 @@ class="code"&gt;false&lt;/span&gt;. It returned “Marco.”&lt;/p&gt;
 understand that Ruby considers all values, except for &lt;span
 class="code"&gt;false&lt;/span&gt; and &lt;span class="code"&gt;nil&lt;/span&gt;, to be equivalent
 to &lt;span class="code"&gt;true&lt;/span&gt;. In fact, Ruby developers quite often take
-advantage of this fact to write more concise readable code: We can write: &lt;span
+advantage of this fact to write more concise readable code: We can write &lt;span
 class="code"&gt;if value&lt;/span&gt; instead of &lt;span class="code"&gt;if value !=
-false&lt;/span&gt; or &lt;span class="code"&gt;if value != nil&lt;/span&gt; or whatever.&lt;/p&gt;
+false&lt;/span&gt; or &lt;span class="code"&gt;if value != nil&lt;/span&gt;.&lt;/p&gt;
 
 &lt;p&gt;But in this case, Ruby’s silence allowed my simple coding mistake to become a
 serious problem. If Ruby had given me some sort of warning or error the first
@@ -163,7 +163,7 @@ idea.&lt;/p&gt;
 &lt;p&gt;When I fell, Ruby didn’t catch me, it allowed me to fall off the cliff!&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; Erik Michaels-Ober &lt;a href="https://twitter.com/sferik/status/716289922005475328"&gt;pointed out today on
-Twitter&lt;/a&gt; that it you
+Twitter&lt;/a&gt; that if you
 always put the variable on the right and the constant on the left, for example
 like this:&lt;/p&gt;
 
@@ -368,9 +368,7 @@ Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; &lt;/div&gt;
 
 &lt;p&gt;Once again, Ruby erred on the side of convenience, and assumed I knew what I
 was doing. It conveniently allowed me to return 321 instead of 1, just in case
-I really wanted to return 321 without having to convert it to 1.  As we’ve
-seen, I make dumb mistakes all the time. Ruby is very wrong to believe I know
-what I am doing.&lt;/p&gt;
+I really wanted to return 321 without having to convert it to 1.&lt;/p&gt;
 
 &lt;h2&gt;Our Programming Language Should Catch Our Dumb Mistakes&lt;/h2&gt;
 
