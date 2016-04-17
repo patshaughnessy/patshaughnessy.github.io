@@ -7,10 +7,13 @@ date: 2014/9/17
 </div>
 
 <b>
-This is the first in a series of posts based on a presentation I just did
-last Friday at the [Barcelona Ruby Conference](http://www.baruco.org). You can
-also watch the [video recording of the
-presentation](https://www.youtube.com/watch?v=rnLnRPZZ1Q4).
+This is the first of a series of four posts based on a presentation I did at the
+[Barcelona Ruby Conference](http://www.baruco.org) called “20,000 Leagues Under
+ActiveRecord.” (posts:
+[two](http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements)
+[three](http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals)
+[four](http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
+and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).</b>
 
 </b>
 

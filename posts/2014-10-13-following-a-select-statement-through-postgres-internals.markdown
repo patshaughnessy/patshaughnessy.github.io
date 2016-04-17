@@ -5,13 +5,15 @@ date: 2014/10/13
   <img src="http://patshaughnessy.net/assets/2014/10/13/engine-room.png"><br/>
   <i>Captain Nemo takes Professor Aronnax on a tour<br/>of the engine room, a fascinating description<br/>of future technology from an 1870 perspective.</i>
 </div>
+
 <b>
-This is the third of a series of posts based on a presentation I did at the
+This is the third of a series of four posts based on a presentation I did at the
 [Barcelona Ruby Conference](http://www.baruco.org) called “20,000 Leagues Under
 ActiveRecord.” (posts:
 [one](http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
 [two](http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements)
-and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).  </b>
+[four](http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
+and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).</b>
 
 Preparing for this presentation over the Summer, I decided to read through
 parts of the PostgreSQL C source code. I executed a very simple select

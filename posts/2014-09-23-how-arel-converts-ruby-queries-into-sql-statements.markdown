@@ -7,9 +7,15 @@ date: 2014/9/23
 </div>
 
 <b>
-This is the second in a series of posts based on a presentation I did at the
+This is the second of a series of four posts based on a presentation I did at the
 [Barcelona Ruby Conference](http://www.baruco.org) called “20,000 Leagues Under
-ActiveRecord” ([video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).</b> I took an innocent and unsuspecting audience on an adventure
+ActiveRecord.” (posts:
+[one](http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
+[three](http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals)
+[four](http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
+and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).</b>
+
+I took an innocent and unsuspecting audience on an adventure
 inside and underneath ActiveRecord to find out how Rails and PostgreSQL
 actually execute a simple SQL query.
 
