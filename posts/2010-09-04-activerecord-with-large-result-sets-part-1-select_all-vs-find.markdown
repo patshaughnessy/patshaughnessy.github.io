@@ -1,6 +1,6 @@
 title: "ActiveRecord with large result sets - part 1: select_all vs. find"
 date: 2010/09/04
-tag: ActiveRecord with large data sets
+tag: Ruby
 
 <p>It&rsquo;s well documented that using ActiveRecord::Base.connection.select_all can speed up ActiveRecord database queries when you are expecting a large result set. This is because select_all just returns an array of hashes containing the results, and ActiveRecord doesn&rsquo;t have to do the work of instantiating a new model object for each row in the result.</p>
 <p>Here&rsquo;s an example:</p>

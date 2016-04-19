@@ -1,5 +1,6 @@
 title: "Taming the beast: Using JRuby and RSpec to test a J2EE application"
 date: 2009/06/25
+tag: JRuby
 
 <p>Working with J2EE applications is something like wandering in a jungle: you never quite know what wild animal you&rsquo;ll find around the next corner&hellip; it might be an ORM tool like Hibernate; it could be an application framework like Spring or Struts with lots of confusing XML files, or it might just be a long list of obscure JAR files that you need to find and download&hellip; whatever it is, you&rsquo;re guaranteed to spend countless hours wasting time learning things you really didn&rsquo;t want to know. This article will show how you can get your J2EE application under control by using JRuby and RSpec&hellip; but first, let&rsquo;s take a quick look at what RSpec is and how it&rsquo;s normally used with Ruby.</p>
 <p/>

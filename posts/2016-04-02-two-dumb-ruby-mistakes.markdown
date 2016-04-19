@@ -1,5 +1,6 @@
 title: "Two Dumb Ruby Mistakes"
 date: 2016/4/2
+tag: Ruby
 
 <div style="float: right; padding: 0px 0px 20px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2016/4/2/rope-climber.jpg"><br/>

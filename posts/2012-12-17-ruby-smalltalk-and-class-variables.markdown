@@ -1,5 +1,6 @@
 title: "Ruby, Smalltalk and Class Variables"
 date: 2012/12/17
+tag: Ruby
 
 <div style="float: left; padding: 17px 30px 10px 0px;
 line-height:16px">

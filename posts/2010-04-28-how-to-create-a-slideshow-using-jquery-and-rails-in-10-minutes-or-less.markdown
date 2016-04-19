@@ -1,5 +1,6 @@
 title: How to create a slideshow using JQuery and Rails in 10 minutes or less
 date: 2010/04/28
+tag: Ruby
 
 <p>Today I want to demonstrate a JQuery slideshow tool that my friend <a href="http://www.flyingmachinestudios.com/">Daniel Higginbotham</a> wrote: <a href="http://github.com/flyingmachine/electric-slide">Electric Slide</a>. It&rsquo;s tremendously simple to use, while still providing ways to customize and adapt its behavior as you need to.</p>
 <p>Suppose you have a long series of slides containing text and/or images that you want to display as a slideshow on a web page; let&rsquo;s use these Mickey images as an example:</p>

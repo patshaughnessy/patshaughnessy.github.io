@@ -1,6 +1,6 @@
 title: "An Interview With Jim Weirich"
 date: 2012/12/13
-tag: RubySource
+tag: Interviews
 
 This appeared [on
 RubySource.com](http://rubysource.com/an-interview-with-jim-weirich/) last

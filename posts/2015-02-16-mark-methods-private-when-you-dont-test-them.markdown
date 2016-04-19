@@ -1,5 +1,6 @@
 title: "Mark Methods Private When You Don’t Test Them"
 date: 2015/2/16
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2015/2/16/plaza-de-la-merced.jpg"><br/>

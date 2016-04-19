@@ -1,5 +1,6 @@
 title: "Koichi Sasada Encourages Us To Contribute To Ruby"
 date: 2014/12/17
+tag: Ruby
 
 <div class="epigraph">
   <img src="http://patshaughnessy.net/assets/2014/12/17/microscope.png">

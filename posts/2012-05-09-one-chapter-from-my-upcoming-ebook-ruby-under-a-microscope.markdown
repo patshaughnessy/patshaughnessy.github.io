@@ -1,5 +1,6 @@
 title: "One Chapter From My Upcoming eBook: Ruby Under a Microscope"
 date: 2012/5/9
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">

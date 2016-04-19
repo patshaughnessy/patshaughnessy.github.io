@@ -1,6 +1,6 @@
 title: "Ruby 2.0 Works Hard So You Can Be Lazy"
 date: 2013/4/3
-tag: Ruby 2.0 Internals
+tag: Ruby
 
 <div style="float: left; padding: 8px 30px 10px 0px;
 line-height:16px">

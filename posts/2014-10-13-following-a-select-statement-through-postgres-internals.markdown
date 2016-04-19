@@ -1,5 +1,6 @@
 title: "Following a Select Statement Through Postgres Internals"
 date: 2014/10/13
+tag: Postgres
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/10/13/engine-room.png"><br/>

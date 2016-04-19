@@ -1,6 +1,6 @@
 title: "Meet Fifteen Ruby Core Committers"
 date: 2013/6/18
-tag: RubySource
+tag: Ruby
 
 We all know Yukihiro Matsumoto invented Ruby, but how many of the other people
 behind Ruby can you name? Judging from this photo taken just a few weeks ago at

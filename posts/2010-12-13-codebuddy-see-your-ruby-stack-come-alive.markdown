@@ -1,6 +1,7 @@
 title: "CodeBuddy: See your Ruby stack come alive!"
 date: 2010/12/13
 url: /code_buddy
+tag: Ruby
 
 <p><a href="http://www.alexrothenberg.com/">Alex Rothenberg</a>, <a href="http://www.flyingmachinestudios.com/">Daniel Higginbotham</a> and I just published a new gem called <a href="http://github.com/patshaughnessy/code_buddy">CodeBuddy</a> that displays a Ruby stack trace inside your browser like this:
 <p><img src="http://patshaughnessy.net/assets/2010/12/13/code_buddy.png"></p>

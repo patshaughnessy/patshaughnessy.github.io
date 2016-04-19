@@ -1,6 +1,6 @@
 title: "An Interview With Laurent Sansonetti"
 date: 2013/2/12
-tag: RubySource
+tag: Interviews
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">

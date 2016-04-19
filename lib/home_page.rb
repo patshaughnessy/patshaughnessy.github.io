@@ -22,6 +22,10 @@ class HomePage
     @month_strings ||= months_with_empty_duplicates
   end
 
+  def tag
+    nil
+  end
+
   private
   def months_with_empty_duplicates
     posts.map(&:month_string).reduce([]) do |months, month_string|

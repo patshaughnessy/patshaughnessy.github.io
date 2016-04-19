@@ -1,6 +1,6 @@
 title: "Ruby’s Missing Data Structure"
 date: 2013/4/11
-tag: RubySource
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
   <img src="http://patshaughnessy.net/assets/2013/4/11/linked-list2.png">

@@ -1,6 +1,6 @@
 title: "Learning from the masters: some of my favorite Rails commits"
-tag: Learning from the Masters
 date: 2011/12/6
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">

@@ -1,5 +1,6 @@
 title: "ruby187gc.patch"
 date: 2010/09/28
+tag: Ruby
 
 <p>I just ported the RailsBench <a href="http://rubyforge.org/tracker/download.php/1814/7062/17676/3291/ruby186gc.patch">ruby186gc.patch</a> over to Ruby 1.8.7 - you can use this to measure garbage collection statistics for a Rails 3 app. I posted a <a href="http://github.com/patshaughnessy/ruby187gc">new ruby187gc.patch file</a> on github.</p>
 <h2>Why do you need this?</h2>

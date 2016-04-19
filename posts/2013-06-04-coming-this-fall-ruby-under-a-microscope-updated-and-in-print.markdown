@@ -1,5 +1,6 @@
 title: "Coming This Fall: “Ruby Under a Microscope” Updated and in Print"
 date: 2013/6/4
+tag: Ruby
 
 <div style="float: left; padding: 8px 30px 10px 0px;
 line-height:16px">

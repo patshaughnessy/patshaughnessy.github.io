@@ -1,5 +1,6 @@
 title: "How Big is a Bignum?"
 date: 2014/1/9
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 20px 0px; text-align: center; margin-top: 20px">
   <img src="http://patshaughnessy.net/assets/2014/1/9/classes.png"><br/>

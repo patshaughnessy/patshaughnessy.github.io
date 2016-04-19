@@ -1,5 +1,6 @@
 title: "Getting started with Ruby metaprogramming"
 date: 2010/02/20
+tag: Ruby
 
 <p>The <a href="http://github.com/rails/auto_complete">Rails auto_complete plugin</a> was my first exposure to Ruby metaprogramming. It&rsquo;s code was simple enough for a Rails beginner like me to understand, but also just complex enough for me to learn something new. Specifically, I ran into metaprogramming when I took a close look at the &ldquo;auto_complete_for&rdquo; method and tried to figure out how it worked. I won&rsquo;t spend any time here explaining what the auto_complete plugin does or what it&rsquo;s used for, beyond to say that if you add this line to one of your controllers:</p>
   <div class="CodeRay">

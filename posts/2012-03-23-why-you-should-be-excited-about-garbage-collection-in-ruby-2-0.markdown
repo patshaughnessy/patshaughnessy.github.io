@@ -1,6 +1,6 @@
 title: "Why You Should Be Excited About Garbage Collection in Ruby 2.0"
-tag: Ruby internals
 date: 2012/3/23
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px">
 <table cellpadding="0" cellspacing="0" border="0">

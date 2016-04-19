@@ -1,5 +1,6 @@
 title: "It’s time to clean up your mess: refactoring Cucumber step definitions"
 date: 2011/10/7
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">

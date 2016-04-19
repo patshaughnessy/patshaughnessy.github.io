@@ -1,6 +1,6 @@
 title: "Tutorial: How to write a Rails generator"
 date: 2009/08/23
-tag: Rails Generators
+tag: Ruby
 
 <p>I&rsquo;ve been working on a generator called <a href="http://patshaughnessy.net/2009/7/24/generating-view-scaffolding-code-for-existing-models">ViewMapper</a> recently that allows you to create view scaffolding from an existing model. I found writing a Rails generator to be somewhat confusing and hard to do: Where do I need to put my generator class? What does it need to be called? How does it work? This article will show step by step how to write your own Rails generator from scratch &ndash; hopefully it will save you some time if you ever need to write your own.</p>
 <p>First let&#x27;s think of some sample Rails code that I might want to generate as an example. This is admittedly contrived, but it&rsquo;s short and simple enough to show here while still interesting enough to illustrate how a generator would work. Let&rsquo;s suppose my Capistrano deployment scripts wrote the last commit information from Git into a file called &ldquo;version.txt&rdquo; in a folder RAILS_ROOT/../build-info:</p>

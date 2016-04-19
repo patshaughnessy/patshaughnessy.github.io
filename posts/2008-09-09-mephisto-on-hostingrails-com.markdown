@@ -1,6 +1,7 @@
 title: Mephisto Setup on HostingRails.com
 date: 2008/09/09
 url: /2008/9/9/mephisto-on-hostingrails-com
+tag: Ruby
 
 In the past I’ve setup blog sites using [B2Evolution](http://b2evolution.net/), [WordPress](http://wordpress.org/) and other PHP frameworks and had no trouble at all. Last week I setup this web site using [Mephisto](http://mephistoblog.com/) on a Rails hosting service ([hostingrails.com](http://www.hostingrails.com/)), and expected to get it up and running in just a few minutes; after all, if installing and configuring a PHP blog site in 2005 was easy, certainly doing the same in 2008 with better technology (Rails) should be even easier.
 

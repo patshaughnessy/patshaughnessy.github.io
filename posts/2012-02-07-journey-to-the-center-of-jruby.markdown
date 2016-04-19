@@ -1,6 +1,6 @@
 title: "Journey to the center of JRuby"
-tag: Ruby internals
 date: 2012/2/7
+tag: JRuby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">

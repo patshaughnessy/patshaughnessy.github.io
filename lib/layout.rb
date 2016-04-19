@@ -23,8 +23,12 @@ class Layout
   end
 
   def erb(template, page)
-    recent_posts = posts[0..3]
+    recent_posts = find_recent_posts(page)
     page.instance_eval { ERB.new(File.read("erb/#{template}.erb")).result(binding) }
+  end
+
+  def find_recent_posts(page)
+    @recent ||= posts.reject{|post| post == page}.select{|post| post.tag == page.tag}.take(4) if page.tag
   end
 
 end

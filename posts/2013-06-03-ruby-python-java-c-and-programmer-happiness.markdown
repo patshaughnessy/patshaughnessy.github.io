@@ -1,6 +1,6 @@
 title: "Ruby, Python, Java, C and Programmer Happiness"
 date: 2013/6/3
-tag: RubySource
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
   <img src="http://patshaughnessy.net/assets/2013/6/3/python-cropped.png">

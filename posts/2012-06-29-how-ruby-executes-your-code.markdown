@@ -1,5 +1,6 @@
 title: "How Ruby Executes Your Code"
 date: 2012/6/29
+tag: Ruby
 
 <b>This is an excerpt from the second chapter of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.
 

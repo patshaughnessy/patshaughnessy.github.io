@@ -1,6 +1,6 @@
 title: Using LEFT OUTER JOIN with SearchLogic
 date: 2010/07/09
-tag: SearchLogic
+tag: Ruby
 
 <p>LEFT OUTER JOIN queries are a great way to handle associations that may contain missing or null values. For example, suppose I have an application with a has_one/belongs_to association between books and authors.</p>
 <div class="CodeRay">

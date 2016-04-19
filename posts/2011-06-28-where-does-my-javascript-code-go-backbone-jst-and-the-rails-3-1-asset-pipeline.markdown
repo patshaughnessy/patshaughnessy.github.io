@@ -1,5 +1,6 @@
 title: "Where does my javascript code go? Backbone, JST and the Rails 3.1 asset pipeline"
 date: 2011/6/28
+tag: Ruby
 
 One of the best things about the Rails framework is that each project looks the same:
 

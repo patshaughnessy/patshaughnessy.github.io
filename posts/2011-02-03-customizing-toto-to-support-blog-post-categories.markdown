@@ -1,6 +1,6 @@
 title: "Customizing Toto to support blog post categories"
-tag: Toto
 date: 2011/2/3
+tag: Toto
 
 On this blog I categorize my posts using a few tags, such as [http://patshaughnessy.net/tags/paperclip](http://patshaughnessy.net/tags/paperclip) or [http://patshaughnessy.net/tags/view-mapper](http://patshaughnessy.net/tags/view-mapper) for example. Today I’m going to walk through how I customized the Toto blog engine to display these category pages.
 

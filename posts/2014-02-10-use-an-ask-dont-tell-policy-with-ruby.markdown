@@ -1,5 +1,6 @@
 title: "Use An Ask, Don’t Tell Policy With Ruby"
 date: 2014/2/10
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/2/10/innisfree.jpg"><br/>

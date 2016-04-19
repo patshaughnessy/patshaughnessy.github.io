@@ -1,5 +1,6 @@
 title: "Ruby Multiplies Like a Fourth Grader"
 date: 2014/1/24
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 40px 0px; text-align: center;"> <img
   src="http://patshaughnessy.net/assets/2014/1/24/multiply.jpg"><br/> <i>Ruby

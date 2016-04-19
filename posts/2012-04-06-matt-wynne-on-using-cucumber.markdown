@@ -1,6 +1,6 @@
 title: "Matt Wynne On Using Cucumber"
 date: 2012/4/6
-tag: RubySource
+tag: Interviews
 
 <div style="float: left; padding: 7px 30px 10px 0px">
   <img src="http://patshaughnessy.net/assets/2012/4/6/cucumber.png">

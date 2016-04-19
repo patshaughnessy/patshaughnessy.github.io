@@ -1,7 +1,7 @@
 title: Code record/playback using Rails 3 generators
 date: 2010/07/27
 url: /2010/7/27/code-record-playback-using-rails-3-generators
-tag: Rails Generators
+tag: Ruby
 
 <p>For a while I&rsquo;ve been thinking that writing a Rails generator is a fairly difficult thing to do. First you need to learn about Thor and the Rails generator system: what sort of Ruby class you need to write, how to handle arguments, how to run commands like &ldquo;copy_file&rdquo;, etc. Then you need to write ERB files to produce the code that you&rsquo;d like to generate, which is always a chore.</p>
 <p>So last night I wrote a gem called <a href="http://github.com/patshaughnessy/generate_from_diff">generate_from_diff</a> that let&rsquo;s you create Rails 3 generators automatically using a code record/playback model. Here&rsquo;s how it works:

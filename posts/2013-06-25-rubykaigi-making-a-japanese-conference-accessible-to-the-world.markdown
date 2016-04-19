@@ -1,5 +1,6 @@
 title: "RubyKaigi: Making a Japanese Conference Accessible to the World"
 date: 2013/6/25
+tag: Ruby
 
 _Note: I co-wrote this article with [Chris
 Salzberg](https://twitter.com/shioyama), an Canadian Rubyist living in Japan who attended RubyKaigi._

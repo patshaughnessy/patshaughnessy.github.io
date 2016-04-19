@@ -60,6 +60,16 @@
                 <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
               </ul>
             </div>
+            <% if recent_posts %>
+              <div class="header">More <%= tag == 'Interviews' ? 'Interviews' : "on #{tag}" %></div>
+              <div class="links">
+                <ul>
+                  <% recent_posts.each do |recent| %>
+                    <li><a href="<%= recent.url %>"><%= recent.title %></a></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
             <div class="header">Popular</div>
             <div class="links">
               <ul>
@@ -67,14 +77,6 @@
                 <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
                 <li><a href="/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection in Ruby and Python</a></li>
                 <li><a href="/2012/2/29/the-joke-is-on-us-how-ruby-1-9-supports-the-goto-statement">The Joke Is On Us: How Ruby 1.9 Supports the Goto Statement</a></li>
-              </ul>
-            </div>
-            <div class="header">Recent</div>
-            <div class="links">
-              <ul>
-                <% recent_posts.each do |recent| %>
-                  <li><a href="<%= recent.url %>"><%= recent.title %></a></li>
-                <% end %>
               </ul>
             </div>
             <div class="header"><a href="/">More...</a></div>

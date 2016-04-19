@@ -1,5 +1,6 @@
 title: "Objects, Classes and Modules"
 date: 2012/7/26
+tag: Ruby
 
 <b>This is an excerpt from the third chapter of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.
 

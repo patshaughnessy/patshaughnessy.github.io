@@ -1,5 +1,6 @@
 title: "Visualizing Garbage Collection in Ruby and Python"
 date: 2013/10/24
+tag: Ruby
 
 <b>
   <p>

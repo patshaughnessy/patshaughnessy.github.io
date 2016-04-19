@@ -1,6 +1,6 @@
 title: "Three RubyConf Surprises"
 date: 2013/12/4
-tag: RubySource
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px">
    <img src="http://patshaughnessy.net/assets/2013/11/26/heading-to-the-beach.png"/>

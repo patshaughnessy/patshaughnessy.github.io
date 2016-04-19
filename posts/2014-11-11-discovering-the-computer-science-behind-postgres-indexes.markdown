@@ -1,5 +1,6 @@
 title: "Discovering the Computer Science Behind Postgres Indexes"
 date: 2014/11/11
+tag: Postgres
 
 <div style="float: left; padding: 7px 30px 20px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/11/11/engineering-plans.png"><br/>

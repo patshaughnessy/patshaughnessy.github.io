@@ -1,5 +1,6 @@
 title: "Expanded Ruby Under a Microscope Available in Print!"
 date: 2013/11/7
+tag: Ruby
 
 <div style="float: left; padding: 0px 30px 10px 0px; text-align: center; margin-top: 8px; margin-bottom: 9px">
   <a href="http://nostarch.com/rum"><img src="http://patshaughnessy.net/assets/2013/11/7/RUM_coverfront.png"><br/><i>Order your copy today at NoStarch.com</a>.<br/>

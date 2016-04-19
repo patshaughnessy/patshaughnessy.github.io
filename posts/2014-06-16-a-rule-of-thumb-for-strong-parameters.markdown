@@ -1,5 +1,6 @@
 title: "A Rule of Thumb for Strong Parameters"
 date: 2014/6/16
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/6/16/security.jpg"><br/>

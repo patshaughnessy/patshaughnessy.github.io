@@ -1,5 +1,6 @@
 title: "Generational GC in Python and Ruby"
 date: 2013/10/30
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px; text-align: center; margin-top: 20px">
   <img src="http://patshaughnessy.net/assets/2013/10/30/generations.jpg"><br/>

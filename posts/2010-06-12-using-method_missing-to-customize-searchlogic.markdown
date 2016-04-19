@@ -1,6 +1,6 @@
 title: Using method_missing to customize SearchLogic
 date: 2010/06/12
-tag: SearchLogic
+tag: Ruby
 
 <p>The Ruby interpreter calls method_missing on a Ruby object whenever it receives a message (method call) that it cannot handle. One of the best examples of using method_missing that I&rsquo;ve come across is in the SearchLogic plugin, which allows you to dynamically create named scopes. Today I&rsquo;m going to take some time to explain how method_missing works, show how it&rsquo;s used by SearchLogic, and finally show how you can use method_missing yourself to customize SearchLogic&rsquo;s behavior.</p>
 <p><b>Simple sorting with SearchLogic</b></p>

@@ -1,5 +1,6 @@
 title: "The Start of a Long Journey: How Ruby Parses and Compiles Your Code"
 date: 2012/6/18
+tag: Ruby
 
 <b>This is an excerpt from the beginning of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.
 

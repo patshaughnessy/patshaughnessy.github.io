@@ -1,5 +1,6 @@
 title: "A Look at How Postgres Executes a Tiny Join"
 date: 2015/11/24
+tag: Postgres
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2015/11/24/lecture-hall.jpg"><br/>

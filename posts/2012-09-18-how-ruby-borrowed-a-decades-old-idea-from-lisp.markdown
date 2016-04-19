@@ -1,5 +1,6 @@
 title: "How Ruby Borrowed a Decades Old Idea From Lisp"
 date: 2012/9/18
+tag: Ruby
 
 <b>This is the last of a series of free excerpts from an eBook I’m writing called [Ruby Under a Microscope](http://patshaughnessy.net/ruby-under-a-microscope). I plan to finish the book and make it available for purchase and download from this web site before [RubyConf 2012](http://rubyconf.org) on Nov. 1. You can still [sign up here](http://patshaughnessy.net/ruby-under-a-microscope), if you haven’t already, to receive an email when the book is finished. I plan send that one, single email message out to everyone before November!</b>
 

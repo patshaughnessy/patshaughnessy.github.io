@@ -1,5 +1,6 @@
 title: "Using Rake to Generate a Blog"
 date: 2015/1/8
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2015/1/8/power-rake.png"><br/>

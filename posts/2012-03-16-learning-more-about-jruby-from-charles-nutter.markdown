@@ -1,6 +1,6 @@
 title: "Learning More About JRuby from Charles Nutter"
 date: 2012/3/16
-tag: RubySource
+tag: JRuby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">

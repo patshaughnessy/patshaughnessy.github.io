@@ -43,8 +43,10 @@ section.comments {
 #right .header {
   font-size: 14px;
   color: #880000;
-  margin-top: 10px
-  margin-bottom: 0;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  padding-bottom: 0;
+  line-height: 14px;
 }
 
 #right ul {

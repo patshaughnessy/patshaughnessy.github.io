@@ -22,15 +22,17 @@ describe HomePage do
     months = home_page.month_strings
     size = months.size
     size.must_equal Dir["posts/*"].length
-    months[0..7].must_equal [
+    months[0..9].must_equal [
+      "April 2016",
+      "January 2016",
+      "November 2015",
+      "September 2015",
+      "June 2015",
+      "February 2015",
       "January 2015",
       "December 2014",
       "",
-      "November 2014",
-      "October 2014",
-      "September 2014",
-      "",
-      "June 2014"
+      "November 2014"
     ]
   end
 

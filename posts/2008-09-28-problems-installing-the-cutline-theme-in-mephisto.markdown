@@ -1,5 +1,6 @@
 title: Problems Installing the Cutline Theme in Mephisto
 date: 2008/09/28
+tag: Ruby
 
 My next step was to switch away from the standard “simpla” theme to another more interesting one. Once again I expected this to be a very easy task but ended up spending hours debugging and troubleshooting Mephisto and my blog setup on HostingRails.com.
 

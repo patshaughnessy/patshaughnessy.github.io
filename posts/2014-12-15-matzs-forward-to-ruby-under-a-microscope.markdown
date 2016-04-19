@@ -1,6 +1,7 @@
 title: "Matz’s Foreword to Ruby Under a Microscope"
 date: 2014/12/15
 url: /2014/12/15/matzs-forward-to-ruby-under-a-microscope
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/12/15/rumja_cover.png"><br/>

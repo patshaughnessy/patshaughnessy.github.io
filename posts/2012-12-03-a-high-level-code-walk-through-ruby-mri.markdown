@@ -1,5 +1,6 @@
 title: "A High Level Code Walk Through Ruby MRI"
 date: 2012/12/3
+tag: Ruby
 
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">

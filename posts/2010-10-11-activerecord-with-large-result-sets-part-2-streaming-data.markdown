@@ -1,6 +1,6 @@
 title: "ActiveRecord with large result sets - part 2: streaming data"
 date: 2010/10/11
-tag: ActiveRecord with large data sets
+tag: Ruby
 
 <p>In <a href="http://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">part 1 of this series</a> I showed how using select_all instead of find(:all) can often speed up slow ActiveRecord queries when you expect a large amount of data, by as much as 30 or 40% with Rails 3. However, often 30-40% faster just isn&rsquo;t enough. What difference does it make if I have to wait 3 minutes or 5 minutes for Rails to display a web page? Either way I&rsquo;m going to get frustrated and abandon the web site for something more interesting.</p>
 <p>But let&rsquo;s suppose a Rails web site sets my expectations a little differently. As an example, let&rsquo;s say that I need to download a report containing the entire list of user accounts from a database table. When I click the &ldquo;download user report&rdquo; link, suppose I see this in Firefox:</p>

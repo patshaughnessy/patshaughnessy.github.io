@@ -1,6 +1,7 @@
 title: "Class Factory: Factory_girl-like syntax for dynamically creating Ruby classes"
 date: 2010/03/12
 url: /class_factory
+tag: Ruby
 
 <p>Class Factory will dynamically create classes using a factories model similar to <a href="http://github.com/thoughtbot/factory_girl">factory_girl</a>. But instead of passing a block with model attributes into the factory definition, you pass in a migration defining the attributes of the new model class you want to create:</p>
 <div class="CodeRay">

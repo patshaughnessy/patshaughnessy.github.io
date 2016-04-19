@@ -1,6 +1,6 @@
 title: "4 tips for how to customize a Toto blog site"
-tag: Toto
 date: 2011/1/23
+tag: Toto
 
 During the week between Christmas and New Year’s I finally took the time to redesign and redeploy this site on Heroku using [Toto](https://github.com/cloudhead/toto), a very simple Rack blog engine. Sorry if I spammed your RSS inbox with duplicate articles.
 

@@ -1,5 +1,6 @@
 title: "The technology you never knew you were using to test your Rails site"
 date: 2011/10/1
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">

@@ -1,5 +1,6 @@
 title: "Using a Ruby Class To Write Functional Code"
 date: 2014/4/8
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/4/8/timesheet.jpg"><br/>

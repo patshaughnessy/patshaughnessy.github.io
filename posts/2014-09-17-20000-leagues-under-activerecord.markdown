@@ -1,5 +1,6 @@
 title: "20,000 Leagues Under ActiveRecord"
 date: 2014/9/17
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"><br/>

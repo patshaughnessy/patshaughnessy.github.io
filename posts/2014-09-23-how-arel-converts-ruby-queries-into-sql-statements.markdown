@@ -1,5 +1,6 @@
 title: "How Arel Converts Ruby Queries Into SQL Statements"
 date: 2014/9/23
+tag: Ruby
 
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/9/23/battle.png"><br/>

@@ -1,5 +1,6 @@
 title: "Don’t Let Your Data Out of the Database"
 date: 2015/6/18
+tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2015/6/18/escape.png"><br/>

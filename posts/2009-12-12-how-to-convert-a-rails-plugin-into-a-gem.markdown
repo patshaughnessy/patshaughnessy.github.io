@@ -1,5 +1,6 @@
 title: How to convert a Rails plugin into a gem
 date: 2009/12/12
+tag: Ruby
 
 <p>Recently I decided to convert <a href="http://patshaughnessy.net/repeated_auto_complete">my fork of the auto_complete plugin</a> into a gem; I called it &ldquo;<a href="http://gemcutter.org/gems/repeated_auto_complete">repeated_auto_complete</a>.&rdquo; In the end it was very easy to convert a plugin into a gem; all I had to do was:</p>
 <ul><li>Make sure there was a code file in the lib folder with the same name as the gem, and</li>

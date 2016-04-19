@@ -17,7 +17,7 @@ describe Post do
     post.headers.must_equal({
       title: "\"Ruby, Python, Java, C and Programmer Happiness\"",
       date: "2013/6/3",
-      tag: "RubySource"
+      tag: "Ruby"
     })
   end
 
@@ -58,7 +58,7 @@ describe Post do
   end
 
   it 'parses the tag' do
-    post.tag.must_equal 'RubySource'
+    post.tag.must_equal 'Ruby'
   end
 
   describe 'when no url header is specified' do
