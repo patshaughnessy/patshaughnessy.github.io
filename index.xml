@@ -7,6 +7,764 @@
     <name></name>
   </author>
   <entry>
+    <title>Need a Second Opinion on Your Ruby Code? Ask Crystal</title>
+    <link href="http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal" rel="alternate"/>
+    <id>http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal</id>
+    <published>2016-10-07T00:00:00Z</published>
+    <updated>2016-10-07T00:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 0px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/10/7/x-ray1.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;Running the Crystal compiler on your Ruby code&lt;br/&gt;is like asking a second doctor for their opinion.&lt;/i&gt;&lt;br/&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;When it comes to your health, you don’t hesitate to get a second opinion.
+Doctors don’t always agree, and a second doctor’s app</summary>
+    <content type="html">&lt;div style="float: left; padding: 0px 30px 0px 0px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/10/7/x-ray1.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;Running the Crystal compiler on your Ruby code&lt;br/&gt;is like asking a second doctor for their opinion.&lt;/i&gt;&lt;br/&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;When it comes to your health, you don’t hesitate to get a second opinion.
+Doctors don’t always agree, and a second doctor’s appointment is always time
+well spent when it comes to staying healthy.&lt;/p&gt;
+
+&lt;p&gt;But what about your code? A code review is similar to going to see a doctor:
+Someone examines your code, looks for potential problems and hopefully gives
+you some advice you can take away. Sadly, however, we don’t always have the
+time or opportunity for a real code review.&lt;/p&gt;
+
+&lt;p&gt;Recently I’ve been learning about the &lt;a href="https://crystal-lang.org"&gt;Crystal programming
+language&lt;/a&gt;, a variation on Ruby syntax implemented on
+the &lt;a href="http://llvm.org"&gt;LLVM platform&lt;/a&gt;. What’s interesting about Crystal is that
+is uses static types while at the same time retaining much of Ruby’s original
+elegance and natural feel. The two languages are so similar, in fact, it’s
+possible to use the Crystal compiler to parse your Ruby code after making just
+a few superficial changes. This can be a great way to get helpful feedback on
+your Ruby code, a free code review from a dramatically different perspective.&lt;/p&gt;
+
+&lt;p&gt;Using a compiler for one language on code from another sounds crazy. Will it
+really work? To find out, let’s look at a simple example.&lt;/p&gt;
+
+&lt;h2&gt;Rock Stars&lt;/h2&gt;
+
+&lt;p&gt;Here’s a Ruby class that represents the lead singer of a rock band, and a
+couple of methods that use it:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;class&lt;/span&gt; &lt;span class="class"&gt;Singer&lt;/span&gt;
+
+  attr_reader &lt;span class="symbol"&gt;:band&lt;/span&gt;, &lt;span class="symbol"&gt;:first_name&lt;/span&gt;, &lt;span class="symbol"&gt;:last_name&lt;/span&gt;
+
+  &lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;initialize&lt;/span&gt;(band, first_name, last_name)
+    &lt;span class="instance-variable"&gt;@band&lt;/span&gt; = band
+    &lt;span class="instance-variable"&gt;@first_name&lt;/span&gt; = first_name
+    &lt;span class="instance-variable"&gt;@last_name&lt;/span&gt; = last_name
+  &lt;span class="keyword"&gt;end&lt;/span&gt; 
+
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;lead_singer_for&lt;/span&gt;(band, singers)
+  singers.find{|s| s.band == band}
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;longest_last_name&lt;/span&gt;(singers)
+  singers.map{|s| s.last_name}.max_by{|name| name.size }
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;This is similar to Ruby code I write everyday: small classes containing a few
+instance variables, and short, simple methods. With some test data we can try
+out this code to see if it works:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+lead_singers = [ 
+  &lt;span class="constant"&gt;Singer&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;The Rolling Stones&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Mick&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Jagger&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;),
+  &lt;span class="constant"&gt;Singer&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Queen&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Freddie&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Mercury&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;),
+  &lt;span class="constant"&gt;Singer&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;The Doors&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Jim&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Morrison&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;)
+]
+
+singer = lead_singer_for(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;The Doors&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, lead_singers)
+puts &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="inline"&gt;&lt;span class="inline-delimiter"&gt;#{&lt;/span&gt;singer.first_name&lt;span class="inline-delimiter"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class="content"&gt; &lt;/span&gt;&lt;span class="inline"&gt;&lt;span class="inline-delimiter"&gt;#{&lt;/span&gt;singer.last_name&lt;span class="inline-delimiter"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="comment"&gt;# =&amp;gt; Jim Morrison&lt;/span&gt;
+
+puts longest_last_name(lead_singers)
+&lt;span class="comment"&gt;# =&amp;gt; Morrison&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Everything works well. On a real project I’d express this as a series of
+Minitest expectations, and seeing green I’d go ahead and check it into Git on a
+branch and ask a colleague for a code review.&lt;/p&gt;
+
+&lt;p&gt;But what if no one is around or even awake in my time zone? Or what if I’m
+working alone on this? Well, I’d have to review my own code alone.&lt;/p&gt;
+
+&lt;h2&gt;Code Reviewing Yourself&lt;/h2&gt;
+
+&lt;p&gt;I believe in the medical world doctors have a legal or at least an ethical
+prohibition on treating themselves, for obvious reasons. And just as giving
+yourself a physical exam makes no sense, reviewing your own code doesn’t
+either. You don’t have perspective on what you wrote, especially just after you
+finish writing it. Usually a fresh pair of eyes will see mistakes that you
+can’t see.&lt;/p&gt;
+
+&lt;p&gt;But in this case I have no choice &amp;ndash; I decide to review my own code before
+checking it in. And right away I find a problem: I call &lt;code&gt;find&lt;/code&gt; but never consider
+whether the return value could be &lt;code&gt;nil&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;lead_singer_for&lt;/span&gt;(band, singers)
+  singers.find{|s| s.band == band}
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;In my test, I happened to pick a band name that existed in the test data set,
+but if I misspell it or look for a different band, I would get an error:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+singer = lead_singer_for(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Doors&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, lead_singers)
+puts &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="inline"&gt;&lt;span class="inline-delimiter"&gt;#{&lt;/span&gt;singer.first_name&lt;span class="inline-delimiter"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class="content"&gt; &lt;/span&gt;&lt;span class="inline"&gt;&lt;span class="inline-delimiter"&gt;#{&lt;/span&gt;singer.last_name&lt;span class="inline-delimiter"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="comment"&gt;# =&amp;gt; undefined method `first_name' for nil:NilClass (NoMethodError)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;I make this sort of mistake quite often, actually. In fact, I do it so often
+that checking for &lt;code&gt;nil&lt;/code&gt; after calling &lt;code&gt;find&lt;/code&gt; is part of my mental checklist for
+code reviews.&lt;/p&gt;
+
+&lt;h2&gt;Superficial Syntax Differences: Crystal vs. Ruby&lt;/h2&gt;
+
+&lt;p&gt;But suppose I was tired or in a rush; I might not have noticed the call to
+&lt;code&gt;find&lt;/code&gt;. And often forgetting to check for a &lt;code&gt;nil&lt;/code&gt; return value isn’t as obvious as
+it is here in this example. What if there was a way to find code issues the
+Ruby interpreter doesn’t report? Imagine if this code review could happen before
+my code is ever deployed or used?&lt;/p&gt;
+
+&lt;p&gt;There is; we just need to run my Ruby code through the Crystal compiler:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ cp lead_singers.rb lead_singers.cr
+$ crystal lead_singers.cr
+&lt;/pre&gt;
+
+
+&lt;p&gt;What? Pat, this is nuts. Crystal, while superficially similar to Ruby, is a
+very different language. How in the world can I use a compiler written for one
+language on code written in another?&lt;/p&gt;
+
+&lt;p&gt;Well, you’re right. I run into a syntax error immediately:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ crystal lead_singers.cr 
+Syntax error in ./lead_singers.cr:27: unterminated char literal, use double quotes for strings
+
+singer = lead_singer_for('Doors', lead_singers)
+                         ^
+&lt;/pre&gt;
+
+
+&lt;p&gt;The most common difference of all between Crystal and Ruby is that Crystal uses
+only double quotes for string literals, while Ruby allows either single or
+double quotes. (&lt;a href="https://www.viget.com/articles/just-use-double-quoted-ruby-strings"&gt;Some people
+think&lt;/a&gt; Ruby
+should limit us to double quotes also.) A quick search and replace solves this
+problem:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+singer = lead_singer_for(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Doors&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, lead_singers)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Let’s compile again:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ crystal lead_singers.cr 
+Error in ./lead_singers.cr:3: undefined method 'attr_reader'
+
+  attr_reader :band, :first_name, :last_name
+  ^~~~~~~~~~~
+&lt;/pre&gt;
+
+
+&lt;p&gt;We’ve run into another difference: Crystal uses the &lt;code&gt;property&lt;/code&gt; keyword
+(actually a macro) instead of &lt;code&gt;attr_reader&lt;/code&gt;, &lt;code&gt;attr_writer&lt;/code&gt; and &lt;code&gt;attr_accessor&lt;/code&gt;.
+Easy enough to fix:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;class&lt;/span&gt; &lt;span class="class"&gt;Singer&lt;/span&gt;
+
+  property &lt;span class="symbol"&gt;:band&lt;/span&gt;, &lt;span class="symbol"&gt;:first_name&lt;/span&gt;, &lt;span class="symbol"&gt;:last_name&lt;/span&gt;
+
+  &lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;initialize&lt;/span&gt;(band, first_name, last_name)
+    &lt;span class="instance-variable"&gt;@band&lt;/span&gt; = band
+    &lt;span class="instance-variable"&gt;@first_name&lt;/span&gt; = first_name
+    &lt;span class="instance-variable"&gt;@last_name&lt;/span&gt; = last_name
+  &lt;span class="keyword"&gt;end&lt;/span&gt; 
+
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Now let’s try again. Compiling my Ruby code using Crystal for a third time, I
+get:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ crystal lead_singers.cr
+Error in ./lead_singers.cr:22: instantiating 'Singer:Class#new(String, String, String)'
+
+  Singer.new("The Rolling Stones", "Mick", "Jagger"),
+         ^~~
+
+instantiating 'Singer#initialize(String, String, String)'
+
+in ./lead_singers.cr:6: Can't infer the type of instance variable '@band' of Singer
+
+The type of a instance variable, if not declared explicitly with
+`@band : Type`, is inferred from assignments to it across
+the whole program.
+
+The assignments must look like this:
+
+  1. `@band = 1` (or other literals), inferred to the literal's type
+  2. `@band = Type.new`, type is inferred to be Type
+  3. `@band = Type.method`, where `method` has a return type
+     annotation, type is inferred from it
+  4. `@band = arg`, with 'arg' being a method argument with a
+     type restriction 'Type', type is inferred to be Type
+  5. `@band = arg`, with 'arg' being a method argument with a
+     default value, type is inferred using rules 1, 2 and 3 from it
+  6. `@band = uninitialized Type`, type is inferred to be Type
+  7. `@band = LibSome.func`, and `LibSome` is a `lib`, type
+     is inferred from that fun.
+  8. `LibSome.func(out @band)`, and `LibSome` is a `lib`, type
+     is inferred from that fun argument.
+
+Other assignments have no effect on its type.
+
+Can't infer the type of instance variable '@band' of Singer
+
+    @band = band
+    ^~~~~
+&lt;/pre&gt;
+
+
+&lt;p&gt;Oh my God, I’ve made a mistake so terrible the Crystal compiler has given me an
+error message an entire page long! This is never going to work.  As you might
+guess, I’ve fixed all of the superficial syntax issues. Now my Ruby code is
+essentially Crystal code. This error is telling me I haven’t picked a type for
+one of my instance variables, which I’ll do next.&lt;/p&gt;
+
+&lt;p&gt;But let’s stop for a moment to review what I’ve changed so far:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;First, I replaced single quotes with double quotes for all of my string literals.&lt;/li&gt;
+&lt;li&gt;Then, I changed &lt;code&gt;attr_reader&lt;/code&gt; to &lt;code&gt;property&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;There are a few other superficial differences you’ll run into between Ruby and
+Crystal. Here are a few more I’ve come across:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;include?&lt;/code&gt; is called &lt;code&gt;includes?&lt;/code&gt; in Crystal. This reads better in English, but I
+suppose Crystal looses a bit of that charming Japanese style we’ve come to
+love in Ruby.&lt;/li&gt;
+&lt;li&gt;The &lt;code&gt;Symbol#to_proc&lt;/code&gt; syntax doesn’t work in Crystal, for example &lt;code&gt;map(&amp;amp;:method)&lt;/code&gt;.
+Instead they’ve invented a new syntax for that idiom which doesn’t exist in
+Ruby: &lt;code&gt;map(&amp;amp;.method)&lt;/code&gt;. &lt;a href="https://crystal-lang.org/2013/09/15/to-proc.html"&gt;The Crystal team explains
+why&lt;/a&gt; on their blog.&lt;/li&gt;
+&lt;li&gt;Declaring an empty array &lt;code&gt;[]&lt;/code&gt; or hash &lt;code&gt;{}&lt;/code&gt; requires a type definition, like
+this: &lt;code&gt;[] of Int32&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;The syntax changes I had to deal with are quite small. In fact, it’s amazing
+the two languages are so similar. In just a few minutes I can change my code
+from Ruby, a dynamic language running with an interpreter, to Crystal, a
+statically typed language that compiles to LLVM byte code and later native
+machine language.&lt;/p&gt;
+
+&lt;h2&gt;Think About Which Types to Use&lt;/h2&gt;
+
+&lt;div style="float: right; padding: 0px 0px 50px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/10/7/x-ray2.png"&gt;&lt;br/&gt;
+  &lt;i&gt;Like an X-Ray, Crystal can find problems with&lt;br/&gt; your Ruby code hidden underneath the surface.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Of course, now that I’m using a language with static types I have to pick types
+for my variables. If you&amp;rsquo;ve ever used an older, statically typed language like
+Java or C, you know how tedious and verbose this can be. In fact, avoiding
+static types is why many of us started to use Ruby in the first place.&lt;/p&gt;
+
+&lt;p&gt;But one of Crystal’s strengths is that it can guess which type to use for each
+value in your code based on a series of rules. I don’t have to explicitly write
+the type for every variable, method argument or return value in my code. This
+might even be a preview of &lt;a href="http://confreaks.tv/videos/rubyconf2014-opening-keynote"&gt;how Ruby might work in the
+future&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;However, in some cases Crystal can’t guess which type to use. That’s what
+happened here. Take the time to read through the page-long error message; it’s
+quite helpful. It explains all of the patterns the Crystal compiler looked for
+in my code, &lt;code&gt;@band = 1&lt;/code&gt;, &lt;code&gt;@band = Type.new&lt;/code&gt; etc. But because my assignment &lt;code&gt;@band =
+band&lt;/code&gt; didn’t fall into any of these categories, Crystal couldn’t figure out what
+type of value &lt;code&gt;@band&lt;/code&gt; represents:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+in ./lead_singers.cr:6: Can't infer the type of instance variable '@band' of Singer
+&lt;/pre&gt;
+
+
+&lt;p&gt;To fix this, I’ll just declare the type of my &lt;code&gt;@band&lt;/code&gt; variable right where I
+declare it, along with my two other instance variables:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;class&lt;/span&gt; &lt;span class="class"&gt;Singer&lt;/span&gt;
+
+  property band : &lt;span class="constant"&gt;String&lt;/span&gt;
+  property first_name : &lt;span class="constant"&gt;String&lt;/span&gt;
+  property last_name : &lt;span class="constant"&gt;String&lt;/span&gt;
+    
+  &lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;initialize&lt;/span&gt;(band, first_name, last_name)
+    &lt;span class="instance-variable"&gt;@band&lt;/span&gt; = band 
+    &lt;span class="instance-variable"&gt;@first_name&lt;/span&gt; = first_name
+    &lt;span class="instance-variable"&gt;@last_name&lt;/span&gt; = last_name
+  &lt;span class="keyword"&gt;end&lt;/span&gt;
+
+&lt;span class="keyword"&gt;end&lt;/span&gt; 
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Notice here I use &lt;code&gt;property&lt;/code&gt; three times, specifying each variable’s
+name and type. My three variables, &lt;code&gt;band&lt;/code&gt;, &lt;code&gt;first_name&lt;/code&gt; and &lt;code&gt;last_name&lt;/code&gt; are all
+strings, so I just need to tell Crystal this using a more verbose declaration.&lt;/p&gt;
+
+&lt;p&gt;Now we should be good to go! Let&amp;rsquo;s try compiling again:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ crystal lead_singers.cr         
+Error in ./lead_singers.cr:30: undefined method 'first_name' for Nil (compile-time type
+is (Singer | Nil))
+
+puts "#{singer.first_name} #{singer.last_name}"
+               ^~~~~~~~~~
+
+================================================================================
+
+Nil trace:
+
+  ./lead_singers.cr:29
+
+    singer = lead_singer_for("Doors", lead_singers)
+    ^~~~~~
+
+  ./lead_singers.cr:29
+
+    singer = lead_singer_for("Doors", lead_singers)
+             ^~~~~~~~~~~~~~~
+
+  ./lead_singers.cr:15
+
+    def lead_singer_for(band, singers)
+        ^~~~~~~~~~~~~~~
+
+  ./lead_singers.cr:16
+
+      singers.find{|s| s.band == band}
+              ^~~~
+
+  /Users/pat/bllvm/crystal/src/enumerable.cr:228
+
+      def find(if_none = nil)
+
+
+  /Users/pat/bllvm/crystal/src/enumerable.cr:232
+
+        if_none
+        ^~~~~~~
+
+  /Users/pat/bllvm/crystal/src/enumerable.cr:228
+
+      def find(if_none = nil)
+                         ^
+&lt;/pre&gt;
+
+
+&lt;p&gt;Ugh; more trouble. Another page-long error message. Maybe I should just forget
+all about Crystal and go back to writing Ruby.&lt;/p&gt;
+
+&lt;h2&gt;Understanding a Crystal Nil Trace&lt;/h2&gt;
+
+&lt;p&gt;Instead, I decide to take some time to understand what Crystal is telling me. I
+focus at the beginning of the Crystal error message:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+Error in ./lead_singers.cr:30: undefined method 'first_name' for Nil (compile-time type
+is (Singer | Nil))
+
+puts "#{singer.first_name} #{singer.last_name}"
+               ^~~~~~~~~~
+&lt;/pre&gt;
+
+
+&lt;p&gt;This looks unfamiliar to me, a Ruby developer, at first. The message is similar
+to the error I saw earlier in Ruby when I didn’t check the return value for
+&lt;code&gt;find&lt;/code&gt;. Recall that was “undefined method `first_name' for nil:NilClass
+(NoMethodError)”. Crystal seems to be telling me the same thing: “undefined
+method &amp;lsquo;first_name&amp;rsquo; for Nil.”&lt;/p&gt;
+
+&lt;p&gt;And it is. But instead of giving me a runtime exception, Crystal is giving me a
+compile time error based on types. Ruby didn’t report the problem until I ran
+my Ruby code, when Ruby actually tried to call the &lt;code&gt;first_name&lt;/code&gt; method on the
+&lt;code&gt;NilClass&lt;/code&gt; class. But Crystal’s compiler has found the problem before my code was
+ever run. It knows the &lt;code&gt;Nil&lt;/code&gt; class doesn’t have a &lt;code&gt;first_name&lt;/code&gt; method at compile
+time.&lt;/p&gt;
+
+&lt;p&gt;But why does Crystal think there is a &lt;code&gt;Nil&lt;/code&gt; class in my code? I just told it my
+three instance variables are strings:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+  property band : &lt;span class="constant"&gt;String&lt;/span&gt;
+  property first_name : &lt;span class="constant"&gt;String&lt;/span&gt;
+  property last_name : &lt;span class="constant"&gt;String&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;What the Crystal compiler did is quite interesting! While compiling my code, it
+saw that I use the &lt;code&gt;@band&lt;/code&gt; instance variable in the &lt;code&gt;lead_singer_for&lt;/code&gt; method:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;lead_singer_for&lt;/span&gt;(band, singers)
+  singers.find{|s| s.band == band}
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Internally, the Crystal compiler now has to decide what type &lt;code&gt;lead_singer_for&lt;/code&gt;
+returns. That’s obvious, isn’t it? It should return a &lt;code&gt;Singer&lt;/code&gt;. The call to &lt;code&gt;find&lt;/code&gt;
+returns a &lt;code&gt;Singer&lt;/code&gt; object, the first element of the &lt;code&gt;singers&lt;/code&gt; array which matches
+the band, the element for which the block returns &lt;code&gt;true&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;But what if the band name doesn’t match any singers? What if the block never
+returns &lt;code&gt;true&lt;/code&gt; for any element in the array? As we know from Ruby, in that case
+&lt;code&gt;lead_singer_for&lt;/code&gt; would return &lt;code&gt;nil&lt;/code&gt;. So &lt;code&gt;lead_singer_for&lt;/code&gt; might return &lt;code&gt;nil&lt;/code&gt; or it
+might return a singer.&lt;/p&gt;
+
+&lt;p&gt;Crystal’s type system has a solution for this situation: a &lt;a href="https://crystal-lang.org/2013/09/23/type-inference-part-1.html"&gt;union
+type&lt;/a&gt;.
+Crystal decides &lt;code&gt;lead_singer_for&lt;/code&gt; returns a &lt;code&gt;(Singer | Nil)&lt;/code&gt; type, which it
+mentions in the error message. Now when I use this return value, Crystal’s
+compiler knows to check whether the &lt;code&gt;first_name&lt;/code&gt; and &lt;code&gt;last_name&lt;/code&gt; methods are
+defined for every class in that union type: &lt;code&gt;Singer&lt;/code&gt; and &lt;code&gt;Nil&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The rest of the long error message is known as a “Nil trace.” To help us
+understand what is wrong, Crystal backtracks through the code starting from
+where the missing method was found to where the offending type was introduced.
+You can read the Nil trace above for yourself. It starts with:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+ ./lead_singers.cr:29
+
+    singer = lead_singer_for("Doors", lead_singers)
+    ^~~~~~
+&lt;/pre&gt;
+
+
+&lt;p&gt;And reading down you can see where the &lt;code&gt;Nil&lt;/code&gt; type was actually introduced:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+  /Users/pat/bllvm/crystal/src/enumerable.cr:228
+
+      def find(if_none = nil)
+&lt;/pre&gt;
+
+
+&lt;p&gt;As you can see, the &lt;code&gt;Nil&lt;/code&gt; type is a default value passed to the &lt;code&gt;Enumerable#find&lt;/code&gt;
+method, which I call in &lt;code&gt;lead_singer_for&lt;/code&gt;. Crystal’s standard library is
+entirely implemented using Crystal. This means if I’m curious (and I am) I can
+read how Crystal implements all of the &lt;code&gt;Enumerable&lt;/code&gt; methods. I could even go
+and experiment with the language by modifying them.&lt;/p&gt;
+
+&lt;p&gt;In fact, the Crystal compiler itself is implemented with Crystal! Interested in
+learning about how a real world compiler works but don’t have time to learn C
+or C++? Read the Crystal source code.&lt;/p&gt;
+
+&lt;h2&gt;Think Twice About Which Types to Use&lt;/h2&gt;
+
+&lt;p&gt;Now back to my example. I’m done, right? Recall in my Ruby code I added a check
+for the return value of &lt;code&gt;lead_singer_for&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+singer = lead_singer_for(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Doors&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, lead_singers)
+&lt;span class="keyword"&gt;if&lt;/span&gt; singer
+  puts &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="inline"&gt;&lt;span class="inline-delimiter"&gt;#{&lt;/span&gt;singer.first_name&lt;span class="inline-delimiter"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class="content"&gt; &lt;/span&gt;&lt;span class="inline"&gt;&lt;span class="inline-delimiter"&gt;#{&lt;/span&gt;singer.last_name&lt;span class="inline-delimiter"&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="keyword"&gt;else&lt;/span&gt;
+  puts &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Not found&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;The same fix will work for Crystal. The Crystal compiler is clever enough to
+know that inside the first branch of the if-statement the type of &lt;code&gt;singer&lt;/code&gt; is
+&lt;code&gt;Singer&lt;/code&gt; and not &lt;code&gt;Nil&lt;/code&gt;. And in the second, else branch it is &lt;code&gt;Nil&lt;/code&gt; and not &lt;code&gt;Singer&lt;/code&gt;. It
+splits up the union type again depending on the syntax of my program. Amazing.&lt;/p&gt;
+
+&lt;p&gt;But before I declare victory, this business about the &lt;code&gt;(Singer | Nil)&lt;/code&gt; union type
+has got me thinking… Crystal decided that a &lt;code&gt;nil&lt;/code&gt; value can be introduced by my
+code in a certain scenario. But maybe &lt;code&gt;nil&lt;/code&gt; should be a valid value for one of my
+variables? After all, I’m dealing with rock stars. Sometimes rock stars become
+so famous they decide they don’t need a last name any more. What about lead
+singers like String, Bono or Prince? How would I represent them in my test data
+set?&lt;/p&gt;
+
+&lt;p&gt;The answer is obvious: their singer objects would have a &lt;code&gt;nil&lt;/code&gt; &lt;code&gt;last_name&lt;/code&gt; value. I
+would create them like this:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="constant"&gt;Singer&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;The Police&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Sting&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="predefined-constant"&gt;nil&lt;/span&gt;)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;In Ruby, this would have worked just fine. But Crystal objects:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ crystal lead_singers.cr      
+Error in ./lead_singers.cr:26: instantiating 'Singer:Class#new(String, String, Nil)'
+
+  Singer.new("The Police", "Sting", nil),
+         ^~~
+
+instantiating 'Singer#initialize(String, String, Nil)'
+
+in ./lead_singers.cr:10: instance variable '@last_name' of Singer must be String, not Nil
+
+    @last_name = last_name
+    ^~~~~~~~~~
+&lt;/pre&gt;
+
+
+&lt;p&gt;What do I do now? How can I save a &lt;code&gt;nil&lt;/code&gt; last name in my &lt;code&gt;Singer&lt;/code&gt; class? The
+instance variables are strings and cannot hold &lt;code&gt;nil&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The answer is I picked the wrong type for &lt;code&gt;last_name&lt;/code&gt;. To accommodate
+super-famous singers, I need to use the same union type we saw earlier:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;class&lt;/span&gt; &lt;span class="class"&gt;Singer&lt;/span&gt;
+
+  property band : &lt;span class="constant"&gt;String&lt;/span&gt;
+  property first_name : &lt;span class="constant"&gt;String&lt;/span&gt;
+  property last_name : (&lt;span class="constant"&gt;String&lt;/span&gt; | &lt;span class="constant"&gt;Nil&lt;/span&gt;)
+
+  &lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;initialize&lt;/span&gt;(band, first_name, last_name)
+    &lt;span class="instance-variable"&gt;@band&lt;/span&gt; = band
+    &lt;span class="instance-variable"&gt;@first_name&lt;/span&gt; = first_name
+    &lt;span class="instance-variable"&gt;@last_name&lt;/span&gt; = last_name
+  &lt;span class="keyword"&gt;end&lt;/span&gt; 
+
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Now I can create the Sting object no problem:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="constant"&gt;Singer&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;The Police&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Sting&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="predefined-constant"&gt;nil&lt;/span&gt;)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Finally, we’re ready to compile my Ruby and move on!&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ crystal lead_singers.cr
+Error in ./lead_singers.cr:37: instantiating 'longest_last_name(Array(Singer))'
+
+puts longest_last_name(lead_singers)
+     ^~~~~~~~~~~~~~~~~
+
+in ./lead_singers.cr:20: undefined method 'size' for Nil (compile-time type is (String | Nil))
+
+  singers.map{|s| s.last_name}.max_by{|name| name.size }
+                                                  ^~~~
+
+================================================================================
+
+Nil trace:
+
+  ./lead_singers.cr:20
+
+      singers.map{|s| s.last_name}.max_by{|name| name.size }
+                                           ^~~~
+&lt;/pre&gt;
+
+
+&lt;p&gt;Once again the Crystal compiler has stopped me in my tracks. When will I ever
+get this right? Is this another Ruby vs. Crystal difference? Another subtlety
+of the Crystal type system I need to learn about?&lt;/p&gt;
+
+&lt;h2&gt;Static Types Reveal a Hidden Problem&lt;/h2&gt;
+
+&lt;p&gt;No. Crystal has found a real problem with by Ruby code, a problem I never
+noticed. Because Sting doesn’t have a last name, the &lt;code&gt;longest_last_name&lt;/code&gt; method
+runs into a problem:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;longest_last_name&lt;/span&gt;(singers)
+  singers.map{|s| s.last_name}.max_by{|name| name.size }
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;The first call to &lt;code&gt;map&lt;/code&gt; returns an array of last names, which now will contain
+&lt;code&gt;nil&lt;/code&gt;. Then I pass that array into &lt;code&gt;max_by&lt;/code&gt; which converts the names into
+corresponding name lengths, and then returns the longest name.&lt;/p&gt;
+
+&lt;p&gt;Now that I know where to look, it’s easy to see the problem: &lt;code&gt;max_by&lt;/code&gt; will pass
+&lt;code&gt;nil&lt;/code&gt; to the second block for Sting’s missing last name, and the block will then
+try to call the &lt;code&gt;size&lt;/code&gt; method on &lt;code&gt;nil&lt;/code&gt;. Easy enough to fix:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;longest_last_name&lt;/span&gt;(singers)
+  singers.map{|s| s.last_name}.compact.max_by{|name| name.size }
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Using &lt;code&gt;compact&lt;/code&gt;, I remove the &lt;code&gt;nil&lt;/code&gt; element from the array of names, meaning the
+&lt;code&gt;size&lt;/code&gt; method will never be called on &lt;code&gt;nil&lt;/code&gt;. Of course, now that I’m thinking about
+&lt;code&gt;nil&lt;/code&gt; values and the &lt;code&gt;longest_last_name&lt;/code&gt; method, I realize that maybe all the
+singers are super-famous and have no last names, or possibly there were no
+singers to begin with. I tighten up my code even more:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;longest_last_name&lt;/span&gt;(singers)
+  singers_with_last_names = singers.map{|s| s.last_name}.compact
+  &lt;span class="keyword"&gt;unless&lt;/span&gt; singers_with_last_names.empty?
+    singers_with_last_names.max_by{|name| name.size }
+  &lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+
+last_name = longest_last_name(lead_singers)
+&lt;span class="keyword"&gt;if&lt;/span&gt; last_name
+  puts last_name
+&lt;span class="keyword"&gt;else&lt;/span&gt;
+  puts &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Not found&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Now everything works!&lt;/p&gt;
+
+&lt;p&gt;One interesting footnote here: Ruby allows me to get away without checking for
+an empty array using &lt;code&gt;unless&lt;/code&gt;. In Ruby if I call &lt;code&gt;max_by&lt;/code&gt; on an empty array it
+simply returns &lt;code&gt;nil&lt;/code&gt;, meaning there is no maximum value at all. But Crystal is
+even more strict: It raises an runtime exception &amp;ldquo;Empty enumerable
+(Enumerable::EmptyError)&amp;rdquo;. In a sense this is going a bit overboard, because &lt;code&gt;nil&lt;/code&gt;
+seems to me a valid result in this case. But on the other hand, calling &lt;code&gt;max_by&lt;/code&gt;
+on an empty array might be an indication of other problems in my code. Crystal
+brings that to my attention, but with a runtime exception not a compile error.
+Crystal reports runtime errors for other cases as well, for example looking for
+a value in a hash when the key doesn’t exist:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+hash = { &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;a&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt; =&amp;gt; &lt;span class="integer"&gt;123&lt;/span&gt; } 
+puts hash[&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;b&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;]
+&lt;span class="comment"&gt;# =&amp;gt; Missing hash key: :b (KeyError)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;The Crystal compiler expects a higher level of quality and thoroughness in my
+code than Ruby does, it seems to me.&lt;/p&gt;
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;There are two important concepts I took away from this exercise. First, using
+Ruby we depend on the completeness of our test suite in order to find and avoid
+mistakes. Precisely which values you choose for your test data set is very
+important. If I had thought of using Sting when I originally wrote my tests, I
+would have found the missing last name problem right away.  But I didn’t.&lt;/p&gt;
+
+&lt;p&gt;Second, the most tedious and time consuming part of converting from Ruby to
+Crystal, choosing a type for each value in my code, is of course the most
+valuable step in the process. It wasn’t until I tried using &lt;code&gt;(String | Nil)&lt;/code&gt; for
+the &lt;code&gt;@last_name&lt;/code&gt; variable that the Crystal compiler found the missing last name
+problem for me.&lt;/p&gt;
+
+&lt;p&gt;You still may not be convinced. This was obviously a very contrived example and
+using the Crystal compiler on real world Ruby code won’t be easy. I agree. It
+would be pointless to try to compile a large Rails application using Crystal.&lt;/p&gt;
+
+&lt;p&gt;But look over your code. I would guess there are a few important methods or
+classes which are central to your application’s behavior and logic. Take an
+hour or two and copy and paste those important lines of code into a separate
+file, stub out any dependencies, and run it through the Crystal compiler. Take
+the time to convert your code to use static types. Take the time to think
+carefully about which types of values your code should be able to handle.&lt;/p&gt;
+
+&lt;p&gt;Bring your important Ruby code to the Crystal compiler for a second opinion.
+You might be surprised by what Crystal finds.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Two Dumb Ruby Mistakes</title>
     <link href="http://patshaughnessy.net/2016/4/2/two-dumb-ruby-mistakes" rel="alternate"/>
     <id>http://patshaughnessy.net/2016/4/2/two-dumb-ruby-mistakes</id>
@@ -2946,459 +3704,6 @@ Yukihiro Matsumoto&lt;/p&gt;
 
 &lt;p&gt;&lt;small&gt;*1 Twain, Mark, A Connecticut Yankee in King Arthur’s Court. (Kameyama Nagarjuna translation, Iwasaki Bookstore, 1971)&lt;br/&gt;
 *2 Aoki Minero al., Ruby Hacking Guide. (Impress, 2002)&lt;/small&gt;&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Discovering the Computer Science Behind Postgres Indexes</title>
-    <link href="http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes" rel="alternate"/>
-    <id>http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes</id>
-    <published>2014-11-11T01:00:00Z</published>
-    <updated>2014-11-11T01:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 20px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/11/11/engineering-plans.png"&gt;&lt;br/&gt;
-  &lt;i&gt; Captain Nemo and Professor Aronnax discussing the&lt;br/&gt;engineering and science behind
-  the Nautilus.&lt;/i&gt; &lt;/div&gt;
-
-
-&lt;p&gt;&lt;b&gt; This is the last post in a series based on a
-  presentation I did at the &lt;a href="http://www.baruco.org"&gt;Barcelona</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 20px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/11/11/engineering-plans.png"&gt;&lt;br/&gt;
-  &lt;i&gt; Captain Nemo and Professor Aronnax discussing the&lt;br/&gt;engineering and science behind
-  the Nautilus.&lt;/i&gt; &lt;/div&gt;
-
-
-&lt;p&gt;&lt;b&gt; This is the last post in a series based on a
-  presentation I did at the &lt;a href="http://www.baruco.org"&gt;Barcelona Ruby Conference&lt;/a&gt;
-  called “20,000 Leagues Under ActiveRecord.” (other posts:
-  &lt;a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord"&gt;one&lt;/a&gt;
-  &lt;a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements"&gt;two&lt;/a&gt;
-  &lt;a href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals"&gt;three&lt;/a&gt;
-  and &lt;a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4"&gt;video&lt;/a&gt;).  &lt;/b&gt;&lt;/p&gt;
-
-&lt;p&gt;We all know indexes are one of the most powerful and important features of
-relational database servers. How do you search for a value quickly? Create an
-index. What do you have to remember to do when joining two tables together?
-Create an index. How do you speed up a SQL statement that’s beginning to run
-slowly? Create an index.&lt;/p&gt;
-
-&lt;p&gt;But what are indexes, exactly? And &lt;em&gt;how&lt;/em&gt; do they speed up our database searches?
-To find out, I decided to read the C source code inside the PostgreSQL database
-server, to follow along as it searched an index for a simple string value. I
-expected to find sophisticated algorithms and efficient data structures. And I
-did. Today I’ll show you what indexes look like inside Postgres and explain how
-they work.&lt;/p&gt;
-
-&lt;p&gt;What I didn’t expect to find &amp;ndash; what I discovered for the first time reading the
-Postgres C source code &amp;ndash; was the Computer Science theory behind what it was
-doing. Reading the Postgres source was like going back to school and taking
-that class I never had time for when I was younger. The C comments inside
-Postgres not only explain what Postgres does, but &lt;em&gt;why&lt;/em&gt;.&lt;/p&gt;
-
-&lt;h2&gt;Sequence Scans: A Mindless Search&lt;/h2&gt;
-
-&lt;p&gt;When we left the crew of the Nautilus, they were exhausted and beginning to
-faint: the Postgres sequence scan algorithm was mindlessly looping over all of
-the records in the users table! Recall in &lt;a href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals"&gt;my last
-post&lt;/a&gt;
-we had executed this simple SQL statement to find Captain Nemo:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/select-users.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Postgres first parsed, analyzed and planned the query. Then
-&lt;a href="http://doxygen.postgresql.org/nodeSeqscan_8c.html#af80d84501ff7621d2ef6249b148e7f44"&gt;ExecSeqScan&lt;/a&gt;,
-the C function inside of Postgres that implements the sequence scan (SEQSCAN)
-plan node, quickly found Captain Nemo:&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;But then inexplicably Postgres continued to loop through the entire user table,
-comparing each name to “Captain Nemo,” even though we had already found what we
-were looking for!&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Imagine if our users table had millions of records; this could take a very long
-time. Of course, we could have avoided this by removing the sort and rewriting
-our query to accept the first name, but the deeper problem here is the
-inefficient way Postgres searches for our target string. Using a sequence scan
-to compare every single value in the users table with “Captain Nemo” is slow,
-inefficient and depends on the random order the names appear in the table. What
-are we doing wrong? There must be a better way!&lt;/p&gt;
-
-&lt;p&gt;The answer is simple: We forgot to create an Index. Let’s do that now.&lt;/p&gt;
-
-&lt;h2&gt;Creating an Index&lt;/h2&gt;
-
-&lt;p&gt;Creating an index is straightforward &amp;ndash; we just need to run this command:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/create-index.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;As Ruby developers, of course, we would use the &lt;span class="code"&gt;add_index&lt;/span&gt; ActiveRecord
-migration instead; this would run the same &lt;span class="code"&gt;CREATE INDEX&lt;/span&gt; command behind the
-scenes. When we rerun our select statement, Postgres will create a plan tree as usual &amp;ndash;
-but this time the plan tree will be slightly different:&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/11/11/indexscan-plan.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Notice at the bottom Postgres now uses INDEXSCAN instead of SEQSCAN. Unlike
-SEQSCAN, INDEXSCAN won’t iterate over the entire users table. Instead, it will
-use the index we just created to find and return the Captain Nemo records
-quickly and efficiently.&lt;/p&gt;
-
-&lt;p&gt;Creating an index has solved our performance problem, but it’s also left us with many interesting, unanswered questions:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;What&lt;/em&gt; is a Postgres index, exactly?&lt;/li&gt;
-&lt;li&gt;If I could go inside of a Postgres database and take a close look at an index, &lt;em&gt;what would it look like&lt;/em&gt;?&lt;/li&gt;
-&lt;li&gt;And &lt;em&gt;how&lt;/em&gt; does an index speed up searches?&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;Let’s try to answer these questions by reading the Postgres C source code.&lt;/p&gt;
-
-&lt;h2&gt;What Is a Postgres Index, Exactly?&lt;/h2&gt;
-
-&lt;p&gt;We can get started with a look at the
-&lt;a href="http://www.postgresql.org/docs/9.3/static/sql-createindex.html"&gt;documentation&lt;/a&gt;
-for the CREATE INDEX command.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/documentation.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here you can see all of the options we can use to create an index, such as
-&lt;span class="code"&gt;UNIQUE&lt;/span&gt; and &lt;span class="code"&gt;CONCURRENTLY&lt;/span&gt;. Notice there’s an option called &lt;span class="code"&gt;USING method&lt;/span&gt;. This
-tells Postgres what kind of index we want. Farther down the same page is some
-information about &lt;span class="code"&gt;method&lt;/span&gt;, the argument to the &lt;span class="code"&gt;USING&lt;/span&gt; keyword:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/method.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;It turns out Postgres implements four different types of indexes. You can use
-them for different types of data and in different situations. Because we didn’t
-specify &lt;span class="code"&gt;USING&lt;/span&gt; at all, our &lt;span
-class="code"&gt;index_users_on_name&lt;/span&gt; index is a “btree” (or B-Tree) index,
-the default type.&lt;/p&gt;
-
-&lt;p&gt;This is our first clue: a Postgres index is a B-Tree. But what is a B-Tree?
-Where can we find one? Inside of Postgres, of course! Let’s search the Postgres
-C source code for files containing “btree:”&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/find.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The key result is in bold: “./backend/access/nbtree.” Inside this directory is
-a README file; let’s read it:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/readme.png"/&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 7px 0px 70px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/11/11/atlantis.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Nemo found the lost continent of Atlantis&lt;br/&gt;next to an underwater
-  volcano.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Amazingly, this README file turns out to be an extensive 12 page document! The
-Postgres source code not only contains helpful and interesting C comments, it
-also contains documentation about the theory and implementation of the database
-server. Reading and understanding the code in open source projects can often be
-intimidating and difficult, but not for Postgres. The developers behind
-Postgres have gone to great lengths to help the rest of us understand their
-work.&lt;/p&gt;
-
-&lt;p&gt;The title of the README document, “Btree Indexing,” confirms this directory
-contains the C code that implements Postgres B-Tree indexes. But the first
-sentence is even more interesting: it’s a reference to an academic paper that
-explains what a B-Tree is, and how Postgres indexes work: &lt;a href="http://www.csd.uoc.gr/~hy460/pdf/p650-lehman.pdf"&gt;Efficient Locking for
-Concurrent Operations on B-Trees&lt;/a&gt;, by Lehman and Yao.&lt;/p&gt;
-
-&lt;p&gt;We’ll find our first look at a B-Tree inside this academic paper.&lt;/p&gt;
-
-&lt;h2&gt;What Does a B-Tree Index Look Like?&lt;/h2&gt;
-
-&lt;p&gt;Lehman and Yao’s paper explains an innovation they made to the B-Tree algorithm
-in 1981. I’ll discuss this a bit later. But they start with a simple
-introduction to the B-Tree data structure, which was actually invented 9 years
-earlier in 1972. One of their diagrams shows an example of a simple B-Tree:&lt;/p&gt;
-
-&lt;p&gt;&lt;img class="centered" src="http://patshaughnessy.net/assets/2014/11/11/figure2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The term B-Tree actually stands for “balanced tree.” B-Trees make searching
-easy and fast. For example, if we wanted to search for the value 53 in this
-example, we first start at the root node which contains the value 40:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/node1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;We compare our target value of 53 with the value we find in the tree node. Is
-53 greater than or less than 40? Because 53 is greater than 40 we follow the
-pointer down to the right. If we were searching for 29, we would go down to the
-left. Pointers on the right lead to larger values; pointers on the left to
-smaller ones.&lt;/p&gt;
-
-&lt;p&gt;Following the pointer down the tree to the next child tree node, we encounter a
-node that contains 2 values:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/node2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This time we compare 53 with both 47 and 62, and find that 47 &amp;lt; 53 &amp;lt; 62. Note
-the values in the tree node are sorted, so this will be easy to do. This time
-we follow the center pointer down.&lt;/p&gt;
-
-&lt;p&gt;Now we get to another tree node, this one with 3 values in it:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/node3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Looking through the sorted list of numbers, we find 51 &amp;lt; 53 &amp;lt; 56, and follow
-the second of four pointers down.&lt;/p&gt;
-
-&lt;p&gt;Finally, we come to a leaf node in the tree:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/node4.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;And we’ve found the value 53!&lt;/p&gt;
-
-&lt;p&gt;B-Trees speed up searches because:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;They sort the values (known as &lt;em&gt;keys&lt;/em&gt;) inside of each node.&lt;/li&gt;
-&lt;li&gt;They are &lt;em&gt;balanced&lt;/em&gt;: B-Trees evenly distribute the keys among the nodes,
-minimizing the number of times we have to follow a pointer from one node to
-another. Each pointer leads to a child node that contains more or less the
-same number of keys each other child node does.&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;h2&gt;What Does a Postgres Index Look Like?&lt;/h2&gt;
-
-&lt;p&gt;Lehman and Yao drew this diagram over 30 years ago &amp;ndash; what does it have to do
-with how Postgres works today? Astonishingly, the &lt;span
-class="code"&gt;index_users_on_name&lt;/span&gt; index we created earlier looks very
-similar to Figure 2: We created an index in 2014 that looks just like a diagram
-from 1981!&lt;/p&gt;
-
-&lt;p&gt;When we executed the &lt;span class="code"&gt;CREATE INDEX&lt;/span&gt; command, Postgres
-saved all of the names from our users table into a B-Tree. These became the
-keys of the tree. Here’s what a node inside a Postgres B-Tree index looks like:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data1.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Each entry in the index consists of a C structure called &lt;span class="code"&gt;IndexTupleData&lt;/span&gt;, and is
-followed by a bitmap and a value. Postgres uses the bitmap to record whether
-any of the index attributes in a key are NULL, to save space. The actual values
-in the index appear after the bitmap.&lt;/p&gt;
-
-&lt;p&gt;Let’s take a closer look at the &lt;span class="code"&gt;IndexTupleData&lt;/span&gt;
-structures:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data2.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Above you can see each IndexTupleData structure contains:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;span class="code"&gt;t_tid&lt;/span&gt;: This is a pointer to either another index
-tuple, or to a database record. Note this isn&amp;rsquo;t a C pointer to physical
-memory; instead, it contains numbers Postgres can use to find the referenced
-value among its memory pages.&lt;/li&gt;
-&lt;li&gt;&lt;span class="code"&gt;t_info&lt;/span&gt;: This contains information about the index
-tuple, such as how many values it contains, and whether or not there are null
-values.&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;To understand this better, let’s show a few entries from our &lt;span
-class="code"&gt;index_users_on_name&lt;/span&gt; index:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data3.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Now I’ve replaced “value” with some names from my users table. The upper tree
-node includes the keys “Dr. Edna Kunde” and “Julius Powlowski,” while the lower
-tree node contains “Julius Powlowski” and “Juston Quitzon.” Notice that, unlike
-Lehman and Yao’s diagram, Postgres repeats the parent keys in each child node.
-Here “Julius Powlowski” is a key in the upper node and in the child node. The
-&lt;span class="code"&gt;t_tid&lt;/span&gt; pointer from Julius in the upper node
-references the same Julius name in the lower node.&lt;/p&gt;
-
-&lt;p&gt;To learn more about exactly how Postgres stores key values into a B-Tree node,
-refer to the itup.h C header file:&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;IndexTupleData&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/itup_8h_source.html"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/11/11/itup.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;h2&gt;Finding the B-Tree Node Containing Captain Nemo&lt;/h2&gt;
-
-&lt;p&gt;Now let’s return to our original SELECT statement again:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/select-users.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;How exactly does Postgres search our &lt;span
-class="code"&gt;index_users_on_name&lt;/span&gt; index for “Captain Nemo?” Why is
-using the index faster than the sequence scan we saw in my last post? To find
-out, let’s zoom out a bit and take a look at some of the user names in our
-index:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/root-names1.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This is the root node of the &lt;span class="code"&gt;index_users_on_name&lt;/span&gt;
-B-Tree. I’ve turned the tree on its side so the names would fit. You can see 4
-names and a NULL value. Postgres created this root node when I created
-&lt;span class="code"&gt;index_users_on_name&lt;/span&gt;. Note that, aside from the
-first NULL value which represents the beginning of the index, the other 4 names
-are more or less evenly distributed in alphabetical order.&lt;/p&gt;
-
-&lt;p&gt;Remember that a B-Tree is a balanced tree. In this example, the B-Tree has 5 child nodes:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;the names that appear before Dr. Edna Kunde alphabetically&lt;/li&gt;
-&lt;li&gt;names that appear between Dr. Edna Kunde and Julius Powlowski&lt;/li&gt;
-&lt;li&gt;names that appear between Julius Powlowski and Monte Nicolas&lt;/li&gt;
-&lt;li&gt;etc…&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;Because we’re searching for Captain Nemo, Postgres follows the first, top arrow
-to the right. This is because Captain Nemo comes before Dr. Edna Kunde
-alphabetically:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/root-names2.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;You can see on the right that Postgres has found the B-Tree node that contains
-Captain Nemo. For my test I added 1000 names to the users table; this child
-node in the B-Tree contained about 200 names (240 actually). The B-Tree has
-narrowed down Postgres’s search considerably.&lt;/p&gt;
-
-&lt;p&gt;To learn more about the precise algorithm Postgres uses to search for the
-target B-Tree node among all of the nodes in the tree, read the &lt;span
-class="code"&gt;_bt_search&lt;/span&gt; function.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;_bt_search&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nbtsearch_8c.html#a9053c37f2c25187580f3f690ad41bf01"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/11/11/bt_search.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;h2&gt;Finding Captain Nemo Inside a Single B-Tree Node&lt;/h2&gt;
-
-&lt;p&gt;Now that Postgres has narrowed down the search to a B-Tree node containing
-about 200 names, it still has to find Captain Nemo… how does it do this? Does
-it perform a sequence scan on this shorter list?&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/binary-search1.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;No. To search for a key value inside of a tree node, Postgres switches to use a
-binary search algorithm. It starts by comparing the key that appears at the 50%
-position in the tree node with “Captain Nemo:”&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/binary-search2.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Because Captain Nemo comes after Breana Witting alphabetically, Postgres
-jumps down to the 75% position and performs another comparison:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/binary-search3.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This time Captain Nemo comes before Curtis Wolf, so Postgres jumps back a bit.
-Skipping a few more steps (it actually took Postgres 8 comparisons to find
-Captain Nemo in my example), Postgres eventually finds what we are looking for:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/binary-search4.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;To learn more about exactly how Postgres searches for a value in a single
-B-Tree node, read the &lt;span class="code"&gt;_bt_binsrch&lt;/span&gt; function:&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;_bt_binsrch&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nbtsearch_8c.html#acd3770ac6d3bc26d6f319d3255721280"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2014/11/11/bt_binsrch.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;h2&gt;So Much More to Learn&lt;/h2&gt;
-
-&lt;p&gt;I don’t have space in this blog post to cover many other fascinating details
-about B-Trees, database indexes or Postgres internals… maybe I should write
-&lt;em&gt;Postgres Under a Microscope&lt;/em&gt; :) But for now, here are just a few interesting
-bits of theory you can read about in &lt;a href="http://www.csd.uoc.gr/~hy460/pdf/p650-lehman.pdf"&gt;Efficient Locking for Concurrent
-Operations on B-Trees&lt;/a&gt; or in
-the other academic papers it references.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Inserting into B-Trees: The most beautiful part of the B-Tree algorithm has
-to do with inserting new keys into a tree. Key are inserted in sorted order
-into the proper tree node &amp;ndash; but what happens when there’s no more room for a
-new key? In this situation, Postgres splits the node into two, inserts the
-new key into one of them, and also adds the key from the split point into the
-parent node, along with a pointer to the new child node. Of course, the
-parent node might also have to be split to fit its new key, resulting in a
-complex, recursive operation.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Deleting from B-Trees: The converse operation is also interesting. When
-deleting a key from a node, Postgres will combine sibling nodes together when
-possible, removing a key from their parent. This can also be a recursive
-operation.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;B-Link-Trees: Lehman and Yao’s paper actually discusses an innovation they
-researched related to concurrency and locking when multiple threads are using
-the same B-Tree. Remember, Postgres’s code and algorithms need to be
-multithreaded because many clients could be searching or modifying the same
-index at the same time. By adding another pointer from each B-Tree node to
-the next sibling node &amp;ndash; the so-called “right arrow” &amp;ndash; one thread can search a
-tree even while a second thread is splitting a node without locking the
-entire index:&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2014/11/11/right-arrow.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;Don’t Be Afraid To Explore Beneath The Surface&lt;/h2&gt;
-
-&lt;div style="float: right; padding: 22px 0px 70px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/11/11/at-the-helm.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Captain Nemo at the helm&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Professor Aronnax risked his life and career to find the elusive Nautilus and
-to join Captain Nemo on a long series of amazing underwater adventures. We
-should do the same: Don’t be afraid to dive underwater &amp;ndash; inside and underneath
-the tools, languages and technologies that you use every day. You may know all
-about how to use Postgres, but do you really know how Postgres itself works
-internally? Take a look inside; before you know it, you’ll be on an underwater
-adventure of your own.&lt;/p&gt;
-
-&lt;p&gt;Studying the Computer Science at work behind the scenes of our applications
-isn’t just a matter of having fun, it’s part of being a good developer. As
-software development tools improve year after year, and as building web sites
-and mobile apps becomes easier and easier, we shouldn’t loose sight of the
-Computer Science we depend on. We’re all standing on the shoulders of giants &amp;ndash;
-people like Lehman and Yao, and the open source developers who used their
-theories to build Postgres. Don’t take the tools you use everyday for granted &amp;ndash;
-take a look inside them! You’ll become a wiser developer and you’ll find
-insights and knowledge you could never have imagined before.&lt;/p&gt;
 </content>
   </entry>
 </feed>

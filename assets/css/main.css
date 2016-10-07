@@ -238,6 +238,14 @@ pre {
   overflow: hidden;
 }
 
+pre.console {
+  margin: 20px;
+  font-size: 9pt;
+	width: 90%;
+  background: #EEE;
+	border: 1px solid #AAA;
+}
+
 .overlay {
 	position: absolute;
 	top: 0;
@@ -711,14 +719,8 @@ hr {
   overflow: scroll;
 }
 
-.CodeRay pre {
-  margin: 0px;
-  padding: 0px;
-  background: #fff;
-  border: none;
-  font-family: Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;
-  font-size: 14px;
-  line-height: 18px;
+.CodeRay pre .console {
+  background: #000;
 }
 
 div.CodeRay { }
