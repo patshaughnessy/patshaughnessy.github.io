@@ -42,7 +42,7 @@ time or opportunity for a real code review.&lt;/p&gt;
 &lt;p&gt;Recently I’ve been learning about the &lt;a href="https://crystal-lang.org"&gt;Crystal programming
 language&lt;/a&gt;, a variation on Ruby syntax implemented on
 the &lt;a href="http://llvm.org"&gt;LLVM platform&lt;/a&gt;. What’s interesting about Crystal is that
-is uses static types while at the same time retaining much of Ruby’s original
+it uses static types while at the same time retaining much of Ruby’s original
 elegance and natural feel. The two languages are so similar, in fact, it’s
 possible to use the Crystal compiler to parse your Ruby code after making just
 a few superficial changes. This can be a great way to get helpful feedback on
@@ -651,7 +651,7 @@ of the Crystal type system I need to learn about?&lt;/p&gt;
 
 &lt;h2&gt;Static Types Reveal a Hidden Problem&lt;/h2&gt;
 
-&lt;p&gt;No. Crystal has found a real problem with by Ruby code, a problem I never
+&lt;p&gt;No. Crystal has found a real problem with my Ruby code, a problem I never
 noticed. Because Sting doesn’t have a last name, the &lt;code&gt;longest_last_name&lt;/code&gt; method
 runs into a problem:&lt;/p&gt;
 

@@ -19,7 +19,7 @@ time or opportunity for a real code review.
 Recently I’ve been learning about the [Crystal programming
 language](https://crystal-lang.org), a variation on Ruby syntax implemented on
 the [LLVM platform](http://llvm.org). What’s interesting about Crystal is that
-is uses static types while at the same time retaining much of Ruby’s original
+it uses static types while at the same time retaining much of Ruby’s original
 elegance and natural feel. The two languages are so similar, in fact, it’s
 possible to use the Crystal compiler to parse your Ruby code after making just
 a few superficial changes. This can be a great way to get helpful feedback on
@@ -559,7 +559,7 @@ of the Crystal type system I need to learn about?
 
 ## Static Types Reveal a Hidden Problem
 
-No. Crystal has found a real problem with by Ruby code, a problem I never
+No. Crystal has found a real problem with my Ruby code, a problem I never
 noticed. Because Sting doesn’t have a last name, the `longest_last_name` method
 runs into a problem:
 
