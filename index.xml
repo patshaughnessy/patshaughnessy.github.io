@@ -552,7 +552,7 @@ has got me thinking… Crystal decided that a &lt;code&gt;nil&lt;/code&gt; value
 code in a certain scenario. But maybe &lt;code&gt;nil&lt;/code&gt; should be a valid value for one of my
 variables? After all, I’m dealing with rock stars. Sometimes rock stars become
 so famous they decide they don’t need a last name any more. What about lead
-singers like String, Bono or Prince? How would I represent them in my test data
+singers like Sting, Bono or Prince? How would I represent them in my test data
 set?&lt;/p&gt;
 
 &lt;p&gt;The answer is obvious: their singer objects would have a &lt;code&gt;nil&lt;/code&gt; &lt;code&gt;last_name&lt;/code&gt; value. I

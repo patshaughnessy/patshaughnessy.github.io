@@ -474,7 +474,7 @@ has got me thinking… Crystal decided that a `nil` value can be introduced by m
 code in a certain scenario. But maybe `nil` should be a valid value for one of my
 variables? After all, I’m dealing with rock stars. Sometimes rock stars become
 so famous they decide they don’t need a last name any more. What about lead
-singers like String, Bono or Prince? How would I represent them in my test data
+singers like Sting, Bono or Prince? How would I represent them in my test data
 set?
 
 The answer is obvious: their singer objects would have a `nil` `last_name` value. I
