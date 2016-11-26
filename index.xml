@@ -7,6 +7,480 @@
     <name></name>
   </author>
   <entry>
+    <title>Learning to Read x86 Assembly Language</title>
+    <link href="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language" rel="alternate"/>
+    <id>http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language</id>
+    <published>2016-11-26T01:00:00Z</published>
+    <updated>2016-11-26T01:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: right; padding: 0px 0px 30px 30px; text-align: center; line-height:16px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/11/26/8086.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;A 16-bit Intel 8086 microprocessor from 1978&lt;br/&gt;
+    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:L_intel-c8086.jpg"&gt;RodolfoNeres via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Writing assembly language is </summary>
+    <content type="html">&lt;div style="float: right; padding: 0px 0px 30px 30px; text-align: center; line-height:16px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/11/26/8086.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;A 16-bit Intel 8086 microprocessor from 1978&lt;br/&gt;
+    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:L_intel-c8086.jpg"&gt;RodolfoNeres via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Writing assembly language is something best left for the experts. To write code
+that runs directly on your microprocessor you need to know how memory
+segmentation works, what the intended use of each register is, how codes
+executes in real and protected modes and much, much more. And, of course,
+modern compilers will usually produce faster, more optimized code than you ever
+could, without making any mistakes.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Reading&lt;/em&gt; assembly language, on the other hand, isn’t nearly as difficult and can
+be a useful skill to have: Someday you might need to debug code without having
+the original source. You’ll begin to understand what a microprocessor can and
+can’t do by reading it’s language directly. And you’ll appreciate and
+understand your favorite programming language even more after seeing your own
+code translated into low level machine instructions.&lt;/p&gt;
+
+&lt;p&gt;But most importantly, learning about assembly language can be a lot of fun.&lt;/p&gt;
+
+&lt;h2&gt;Usually Reading Assembly Language Is No Fun At All&lt;/h2&gt;
+
+&lt;p&gt;Unfortunately, most of us only see assembly language after something has gone
+wrong, terribly wrong, when we encounter something like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/segfault.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This is what a segmentation fault looks like in a debugger. The debugger shows
+me assembly language because it doesn’t know what else to show me. A
+“segmentation fault” means one of the assembly language instructions, for
+example the &lt;span class="code"&gt;movb $0x6c, 0x1(%rax)&lt;/span&gt; line above, has
+tried to write to a portion of memory which it is not allowed to.&lt;/p&gt;
+
+&lt;p&gt;It’s no wonder that most of us dislike reading low level code like this. We
+only ever see it when we’re in the midst of debugging something, when the
+language and tools we normally rely on have let us down. We never see assembly
+language under happier circumstances; it is always the bearer of bad news.&lt;/p&gt;
+
+&lt;h2&gt;Converting My Own Code to Assembly Language&lt;/h2&gt;
+
+&lt;p&gt;This week I had some free time and decided to read some assembly language just
+for fun. I wanted to read low level code that was working properly, not code
+that was overwriting some other process&amp;rsquo;s memory. I wanted to see if I could
+understand it like any other programming language. To make things easier, I
+decided to translate some of my own code into assembly language so I could
+focus on the assembly language syntax. It was easier to figure out what the
+instructions meant because I knew what they were doing.&lt;/p&gt;
+
+&lt;p&gt;I’m a Ruby developer, and so I was interested in knowing how my Ruby code would
+look translated into assembly language. Unfortunately, the Ruby interpreter (at
+least the standard “MRI” version of Ruby) never does this. Instead, the Ruby
+interpreter itself is compiled into machine language and runs my code using a
+virtual machine. But I wanted to see what a real machine would do, not a
+virtual one.&lt;/p&gt;
+
+&lt;p&gt;Instead I decided to use &lt;a href="https://crystal-lang.org"&gt;Crystal&lt;/a&gt;, a variation on
+Ruby that uses &lt;a href="http://llvm.org"&gt;LLVM&lt;/a&gt; to compile Ruby to native machine
+language before running it. And because the LLVM system can also produce an
+assembly language version of the code it produces, using Crystal was the
+perfect way for me to see my Ruby code translated so a microprocessor could
+understand it.&lt;/p&gt;
+
+&lt;p&gt;I started by writing an extremely simple program that adds 42 to a given
+integer:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;add_forty_two&lt;/span&gt;(n)
+  n+&lt;span class="integer"&gt;42&lt;/span&gt;  
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+
+puts add_forty_two(&lt;span class="integer"&gt;10&lt;/span&gt;)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;This was both Ruby code:&lt;/p&gt;
+
+&lt;pre&gt;
+$ ruby add_forty_two.rb 
+52
+&lt;/pre&gt;
+
+
+&lt;p&gt;And Crystal code:&lt;/p&gt;
+
+&lt;pre&gt;
+$ crystal add_forty_two.rb
+52
+&lt;/pre&gt;
+
+
+&lt;p&gt;Both produced the same result, of course. But only Crystal could produce a copy
+in assembly language: &lt;/p&gt;
+
+&lt;pre&gt;
+$ crystal build add_forty_two.rb --emit asm
+&lt;/pre&gt;
+
+
+&lt;p&gt;This created a file called add_forty_two.s which contained 10,000s of lines of
+assembly language code. (Most of this was the compiled version of the Crystal
+runtime library.) I opened add_forty_two.s in a text editor and searched for
+“add_forty_two,” the name of my function. First I found the call site, the code
+that calls my add_forty_two function:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;I’ll return to this a bit later. Searching again I found the x86 assembly
+language version of my function:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Next, I deleted all of the assembler directives, such as &lt;span
+class="code"&gt;.globl&lt;/span&gt; and &lt;span class="code"&gt;.cfi_offset.&lt;/span&gt; Someday
+it would be interesting to learn about these, but I wanted to focus on the
+actual machine instructions. And finally I pasted the the remaining code inside
+of my Ruby function.&lt;/p&gt;
+
+&lt;p&gt;Then I saw what my computer actually does when it executes &lt;span
+class="code"&gt;add_forty_two&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code2.png"/&gt;&lt;/p&gt;
+
+&lt;h2&gt;x86 Assembly Language: Almost Easy to Read&lt;/h2&gt;
+
+&lt;p&gt;This code is &lt;em&gt;almost&lt;/em&gt; easy to follow. I can guess what each instruction means:
+push, add, move, etc., but I can’t quite follow what’s going on here. &lt;span
+class="code"&gt;mov&lt;/span&gt; probably means to move, but what is the computer
+moving? And from where to where?&lt;/p&gt;
+
+&lt;div style="float: right; padding: 20px 0px 0px 30px; text-align: center; line-height:16px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2016/11/26/budapest.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;Was x86 assembly language designed in Hungary?&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;The problem is that x86 assembly language was designed by Hungarians. I don’t
+mean that literally; in fact, I have no idea who designed x86 assembly
+language. I mean that x86 code reminds me of the Hungarian language.&lt;/p&gt;
+
+&lt;p&gt;I lived in Budapest for about a year in 1992 and managed to become
+conversational in Hungarian, although I’ve forgotten all of it since. A
+beautiful language, Hungarian is notoriously difficult for foreigners to learn.
+Related only to Finnish and Estonian, its grammar doesn’t resemble Italian,
+French or other romance languages; nor does it resemble Russian or any of the
+other Slavic languages from Eastern Europe.&lt;/p&gt;
+
+&lt;p&gt;The one bit of Hungarian grammar I still remember is that instead of using
+separate words for prepositions, such as inside, outside, etc., you append
+different suffixes to the target word. For example “inside the house” would be
+&lt;em&gt;a házban&lt;/em&gt;. House is &lt;em&gt;ház&lt;/em&gt; while inside is &lt;em&gt;ban&lt;/em&gt;. Similarly “in Budapest” would
+be &lt;em&gt;Budapesten&lt;/em&gt; &amp;ndash; the &lt;em&gt;en&lt;/em&gt; suffix means “in.” x86 assembly language code
+reminds me of Hungarian. You don’t use &lt;span class="code"&gt;mov&lt;/span&gt; to move
+something; you use &lt;span class="code"&gt;movq&lt;/span&gt;. You don’t &lt;span
+class="code"&gt;add&lt;/span&gt; something; you use the &lt;span class="code"&gt;addl&lt;/span&gt;
+instruction.&lt;/p&gt;
+
+&lt;p&gt;It turns out x86 assembly is much simpler than Hungarian; there are only a few
+simple suffixes that refer to the size of the data you are operating on. Here
+are two examples:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/addl1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The &lt;span class="code"&gt;addl&lt;/span&gt; instruction really means “add long,” where
+“long” refers to a 4 byte or 32 bit value. In Crystal, it corresponds to the
+&lt;span class="code"&gt;Int32&lt;/span&gt; type, which is the default integer type and the
+type my &lt;span class="code"&gt;add_forty_two&lt;/span&gt; method uses.&lt;/p&gt;
+
+&lt;p&gt;Here’s another example:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The letter &lt;em&gt;q&lt;/em&gt; refers to a “quad” word, or an 8 byte or 64 bit value. Most x86
+code these days works with 64 bit or 32 bit values, so you’ll most often see
+instructions that end with &lt;em&gt;q&lt;/em&gt; or &lt;em&gt;l&lt;/em&gt;. Other suffixes are &lt;em&gt;w&lt;/em&gt; for word (16 bits
+or 2 bytes) or &lt;em&gt;b&lt;/em&gt; for 1 byte or 8 bits.&lt;/p&gt;
+
+&lt;h2&gt;x86 Registers&lt;/h2&gt;
+
+&lt;p&gt;But what about all of the operands of the instructions? Why do they all have a
+&amp;ldquo;%&amp;rdquo; prefix, such as &lt;span class="code"&gt;%rsp&lt;/span&gt; or &lt;span
+class="code"&gt;%edi&lt;/span&gt;? Reading x86 assembly language also reminds me of
+reading Perl code. Lots of punctuation symbols for no apparent reason.  Similar
+to Perl, x86 assembly language uses &lt;em&gt;sigils&lt;/em&gt; or magical punctuation characters
+to indicate the type of each operand value.&lt;/p&gt;
+
+&lt;p&gt;Here are my two example instructions again:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/addl2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Here the &amp;ldquo;$&amp;rdquo; symbol means the 42 is a literal or “immediate” value. As you
+might guess, this is the line of code that adds 42 to something. But what does
+it add it to? From the &amp;ldquo;%&amp;rdquo; character we can see the x86 code is adding 42 to
+the &lt;span class="code"&gt;edi&lt;/span&gt; register.&lt;/p&gt;
+
+&lt;p&gt;And what is a register? In a nutshell, the microprocessor inside your computer
+uses registers to hold values while your code is running. So the instruction
+above adds 42 to whatever value is contained in the &lt;span
+class="code"&gt;edi&lt;/span&gt; register, and saves it back into &lt;span
+class="code"&gt;edi&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here’s the second example again:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This instruction, &lt;span class="code"&gt;movq&lt;/span&gt;, refers to two registers:
+&lt;span class="code"&gt;rsp&lt;/span&gt; and &lt;span class="code"&gt;rbp&lt;/span&gt;. As you can
+guess, it moves whatever value is found in the &lt;span class="code"&gt;rsp&lt;/span&gt;
+register to the &lt;span class="code"&gt;rbp&lt;/span&gt; register.&lt;/p&gt;
+
+&lt;p&gt;How many registers are there? What are they called? Let’s look at them using
+LLDB:&lt;/p&gt;
+
+&lt;pre&gt;
+(lldb) register read
+General Purpose Registers:
+       rax = 0x0000000100300268
+       rbx = 0x0000000000000000
+       rcx = 0x00007fffd8132201  libsystem_kernel.dylib`__shmsys + 9
+       rdx = 0x0000000000000000
+       rdi = 0x000000000000000a
+       rsi = 0x00007fff5fbff898
+       rbp = 0x00007fff5fbffa30
+       rsp = 0x00007fff5fbff908
+        r8 = 0x0000000100014b60  add`sigfault_handler
+        r9 = 0x0000000100400000
+       r10 = 0x0000000000000000
+       r11 = 0x0000000000000206
+       r12 = 0x0000000000000000
+       r13 = 0x0000000000000000
+       r14 = 0x0000000000000000
+       r15 = 0x0000000000000000
+       rip = 0x0000000100013cd0  add`*add_forty_two&lt;Int32&gt;:Int32
+    rflags = 0x0000000000000202
+        cs = 0x000000000000002b
+        fs = 0x0000000000000000
+        gs = 0x0000000000000000
+&lt;/pre&gt;
+
+
+&lt;p&gt;You can see there are over 20 registers inside my Mac’s Intel CPU, each
+containing a 64 bit or 8 byte value. LLDB shows the values in hexadecimal. I
+don’t have time today to explain what all of these registers are used for, but
+here are a few highlights:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;rax&lt;/span&gt;, &lt;span class="code"&gt;rbx&lt;/span&gt;, &lt;span
+class="code"&gt;rcx&lt;/span&gt; and &lt;span class="code"&gt;rdx&lt;/span&gt; are general purpose
+registers used to hold on to intermediate values loaded from memory or used
+during a calculation of some kind.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;rsp&lt;/span&gt; is the stack pointer, which holds the memory
+location of the top of the stack.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;rbp&lt;/span&gt; is the base pointer, which holds the memory
+location of the base of the current stack frame&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;rip&lt;/span&gt; is the instruction pointer, which holds the
+memory location of the next instruction to execute&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;and &lt;span class="code"&gt;rflags&lt;/span&gt; holds a series of flags, used by
+comparison instructions for example.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;In fact, there are many more registers in a modern x86 microprocessor; LLDB is
+only showing me the most commonly used registers. For a complete explanation,
+the definitive guide to all of this is the &lt;a href="http://www.intel.com/content/www/us/en/processors/architectures-software-developer-manuals.html"&gt;Intel Software Developer’s
+Manual&lt;/a&gt;.
+Fortunately, my function’s assembly language code only uses a few registers. I
+don’t need to understand them all.&lt;/p&gt;
+
+&lt;div style="padding: 30px 0px 30px 0px; text-align: center; line-height:16px"&gt;
+&lt;img src="http://patshaughnessy.net/assets/2016/11/26/registers.svg"/&gt;
+&lt;i&gt;Registers available in the x86 instruction set&lt;br/&gt;
+    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:Table_of_x86_Registers_svg.svg"&gt;Immae via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;But wait a minute. Why does my &lt;span class="code"&gt;addl&lt;/span&gt; instruction refer
+to the &lt;span class="code"&gt;edi&lt;/span&gt; register? This isn’t in the list of
+registers shown by LLDB. Where does this add operation occur? What register
+does it use?&lt;/p&gt;
+
+&lt;p&gt;It’s those Hungarian designers again. It turns out that x86 assembly language
+also decorates the register names to indicate their sizes, similar to what we
+saw above with the instruction name suffixes. But for register names x86 syntax
+uses prefixes, not suffixes. (In C programming &lt;em&gt;Hungarian notation&lt;/em&gt; actually
+refers to the practice of using prefixes on variable names to indicate their
+type.)&lt;/p&gt;
+
+&lt;p&gt;What? This is a crazy! Why would any programming language use prefixes to
+indicate data size in one place, but then use suffixes to indicate the same
+thing somewhere else?  To understand this, you have to remember that assembly
+language syntax wasn’t developed overnight. Instead, it gradually evolved of
+the course of many years. Originally, the registers used simple two letter
+names: &lt;span class="code"&gt;ax&lt;/span&gt;, &lt;span class="code"&gt;bx&lt;/span&gt;, &lt;span
+class="code"&gt;cx&lt;/span&gt;.  &lt;span class="code"&gt;dx&lt;/span&gt;, &lt;span
+class="code"&gt;sp&lt;/span&gt; and &lt;span class="code"&gt;ip&lt;/span&gt;. These were the
+registers on the original 8086 16-bit microprocessor from the 1970s. Later in
+the 1980s when Intel built 32 bit microprocessors, starting with the 80386,
+they renamed (or &lt;em&gt;extended&lt;/em&gt;) the &lt;span class="code"&gt;ax&lt;/span&gt;, &lt;span
+class="code"&gt;bx&lt;/span&gt;, &lt;span class="code"&gt;cx&lt;/span&gt;, etc., registers to become
+&lt;span class="code"&gt;eax&lt;/span&gt;, &lt;span class="code"&gt;ebx&lt;/span&gt;, &lt;span
+class="code"&gt;ecx&lt;/span&gt;, etc. These were later renamed again to &lt;span
+class="code"&gt;rax&lt;/span&gt;, &lt;span class="code"&gt;rbx&lt;/span&gt; etc. for 64-bit
+processors.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/register.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see here, even today x86 assembly code can refer to the same
+register using many different names, for example &lt;span class="code"&gt;al&lt;/span&gt;
+or &lt;span class="code"&gt;ah&lt;/span&gt; for 8-bits, &lt;span class="code"&gt;ax&lt;/span&gt; bit 16
+bits, &lt;span class="code"&gt;eax&lt;/span&gt; for 32 bits and &lt;span
+class="code"&gt;rax&lt;/span&gt; for 64 bits.&lt;/p&gt;
+
+&lt;h2&gt;x86 Assembly Language: Reads Left to Right, Except When It Reads Right to Left&lt;/h2&gt;
+
+&lt;p&gt;Returning to the move instruction from above, how do we know which way the move
+happens?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;That is, does this instruction move data from &lt;span class="code"&gt;rsp&lt;/span&gt; to
+&lt;span class="code"&gt;rbp&lt;/span&gt;? Or from &lt;span class="code"&gt;rbp&lt;/span&gt; to &lt;span
+class="code"&gt;rsp&lt;/span&gt;?  Does it read left to right, or right to left?&lt;/p&gt;
+
+&lt;p&gt;It could be either! It turns out there are two versions of x86
+syntax: &amp;ldquo;AT&amp;amp;T or GNU Assembler (GAS)&amp;rdquo; syntax, which I’ve been using until now,
+and also &amp;ldquo;Intel&amp;rdquo; syntax. GAS reads left to right:&lt;/p&gt;
+
+&lt;div style="padding: 30px 0px 30px 0px; line-height:16px; width: 300px"&gt;
+&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq3.png"/&gt;&lt;br/&gt;
+&lt;center&gt;&lt;i&gt;AT&amp;T/GAS syntax&lt;/i&gt;&lt;/center&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;But equally valid and common is the Intel syntax, which reads right to left:&lt;/p&gt;
+
+&lt;div style="padding: 30px 0px 30px 0px; line-height:16p; width: 300px"&gt;
+&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq4.png"/&gt;&lt;br/&gt;
+&lt;center&gt;&lt;i&gt;Intel syntax&lt;/i&gt;&lt;/center&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;If you see Perl-like sigils (&lt;span class="code"&gt;%rsp&lt;/span&gt; and &lt;span
+class="code"&gt;%rbp&lt;/span&gt; for example) then you’re reading GAS syntax and values
+will move from left to right. If you don’t see any &amp;ldquo;%&amp;rdquo; or &amp;ldquo;$&amp;rdquo; signs, then you
+have Intel syntax and values move right to left. Also notice the Intel syntax
+doesn’t append “q” or “l” on to the instruction names. &lt;a href="http://www.imada.sdu.dk/Courses/DM18/Litteratur/IntelnATT.htm"&gt;This
+article&lt;/a&gt; does a
+great job explaining the differences between the two styles.&lt;/p&gt;
+
+&lt;p&gt;What a train wreck! It’s hard to imagine a more confusing state of affairs. But
+again, remember all of this has evolved over the course of 40 years. It wasn’t
+designed by any single person at any one time. There’s a tremendous amount of
+history behind each x86 assembly language instruction.&lt;/p&gt;
+
+&lt;h2&gt;Executing My Simple Program&lt;/h2&gt;
+
+&lt;p&gt;Now that I understand the basics of x86 assembly language syntax, I’m ready to
+return to my &lt;span class="code"&gt;add_forty_two&lt;/span&gt; code and to try to
+understand how it works. Here it is again:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Reading the 6 instructions inside of &lt;span class="code"&gt;add_forty_two&lt;/span&gt;,
+there are three different operations going on. First, we setup a new stack
+frame for our function:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The stack frame is an area of memory that my code can use to save local
+variable and other information. I won’t spend time on this today because my
+code is so simple it doesn’t use any local variables. The last two instructions
+clean up this stack frame and return to the calling code:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;I won’t cover this today either. In my next article, I’ll go through a slightly
+more complicated example containing local variables and explain how x86
+assembly code accesses them on the stack.&lt;/p&gt;
+
+&lt;p&gt;For today, I want to focus on the two instructions in the middle which actually
+implement &lt;span class="code"&gt;add_forty_two&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code5.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;We’re down to two assembly language instructions, but it’s still far from
+obvious what this code means! The key to understanding these two instructions
+is to realize that the argument to my function, &lt;span class="code"&gt;n&lt;/span&gt;, is
+passed in using a register:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code6.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;We can see this is true by returning to the call site in the &lt;span
+class="code"&gt;add_forty_two.s&lt;/span&gt; file, to the code which calls my function:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Note how the first &lt;span class="code"&gt;movl&lt;/span&gt; instruction copies the value
+10 into the &lt;span class="code"&gt;edi&lt;/span&gt; register (the lower 32 bits of the
+&lt;span class="code"&gt;rdi&lt;/span&gt; register):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code7.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Next the &lt;span class="code"&gt;callq&lt;/span&gt; instruction calls my function with 10
+in &lt;span class="code"&gt;edi&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code8.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;So when the &lt;span class="code"&gt;addl&lt;/span&gt; instruction runs, it will add 42 to
+the argument 10.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code9.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Next, the &lt;span class="code"&gt;movl&lt;/span&gt; instruction runs and copies the result
+52 from &lt;span class="code"&gt;edi&lt;/span&gt; to &lt;span class="code"&gt;eax&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code10.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This, in turn, becomes the return value from my function:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code11.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Again, we can see this is the case by reading the call site code again:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;What happens after &lt;span class="code"&gt;add_forty_two&lt;/span&gt; returns? It moves
+&lt;span class="code"&gt;%eax&lt;/span&gt;, the return value, to &lt;span
+class="code"&gt;%edi&lt;/span&gt; where it becomes the argument to a second function
+call, the call to &lt;span class="code"&gt;puts&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;I’m not sure whether this pattern of using the &lt;span class="code"&gt;%edi&lt;/span&gt;
+and &lt;span class="code"&gt;%eax&lt;/span&gt; registers to hold the function arguments and
+return values is a x86 standard convention. My guess is that instead it’s a
+pattern the LLVM code generator uses. It may be that LLVM only uses this
+technique for a single argument and single return value function like &lt;span
+class="code"&gt;add_forty_two&lt;/span&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Next Time&lt;/h2&gt;
+
+&lt;p&gt;I haven’t done much, but already I’m beginning to understand x86 assembly
+language. Almost unintelligible when I first saw it, now I can start to follow
+what the machine instructions do when my code is executed. The key was learning
+how the instruction and register names change depending on the size of the
+value they operate on.&lt;/p&gt;
+
+&lt;p&gt;There’s much more to learn, of course. In my next article I’ll take a look at
+how an x86 microprocessor uses the stack to save values, and how this maps to
+Ruby using a slightly more complex example. Along the way I’ll learn about a
+few more important syntax rules of x86 assembly language.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Need a Second Opinion on Your Ruby Code? Ask Crystal</title>
     <link href="http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal" rel="alternate"/>
     <id>http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal</id>
@@ -3575,135 +4049,6 @@ challenge.&lt;/p&gt;
 &lt;p&gt;November 2014&lt;br/&gt;
 Koichi Sasada&lt;br/&gt;
 Heroku, Inc.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Matz’s Foreword to Ruby Under a Microscope</title>
-    <link href="http://patshaughnessy.net/2014/12/15/matzs-forward-to-ruby-under-a-microscope" rel="alternate"/>
-    <id>http://patshaughnessy.net/2014/12/15/matzs-forward-to-ruby-under-a-microscope</id>
-    <published>2014-12-15T01:00:00Z</published>
-    <updated>2014-12-15T01:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/12/15/rumja_cover.png"&gt;&lt;br/&gt;
-  &lt;i&gt;&lt;a href="http://shop.ohmsha.co.jp/shopdetail/000000004065/"&gt;A Japanese translation&lt;/a&gt; of Ruby Under a&lt;br/&gt;Microscope was published last month.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Matz wrote a new foreword to &lt;a href="http://patshaughnessy.net/ruby-under-a-micros</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/12/15/rumja_cover.png"&gt;&lt;br/&gt;
-  &lt;i&gt;&lt;a href="http://shop.ohmsha.co.jp/shopdetail/000000004065/"&gt;A Japanese translation&lt;/a&gt; of Ruby Under a&lt;br/&gt;Microscope was published last month.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Matz wrote a new foreword to &lt;a href="http://patshaughnessy.net/ruby-under-a-microscope"&gt;Ruby Under a
-Microscope&lt;/a&gt;, which was
-included in the Japanese version of the book published just last month. Today
-I’d like to share a translation so everyone has a chance to read it. The
-Japanese edition also includes a new appendix written by Koichi Sasada about
-YARV, Ruby’s virtual machine. I’ll post a translation of that tomorrow.&lt;/p&gt;
-
-&lt;p&gt;I love Matz’s sentiment about inspiring someone to work on Ruby… I hope that
-might happen too. Thank you for writing this, Matz! You’ve already inspired so
-many of us for years with your personality, your philosophy and with the
-beautiful programming language you created.&lt;/p&gt;
-
-&lt;p&gt;Japanese-language edition copyright &amp;copy; 2014 by Ohmsha, Ltd. Reproduced with
-permission of the copyright owner.&lt;/p&gt;
-
-&lt;div style="clear: left"&gt;&lt;/div&gt;
-
-
-
-
-&lt;div class="jp"&gt;
-&lt;h2&gt;日本語版序文&lt;/h2&gt;
-&lt;p class="jp"&gt;
-私が小学生のときに読んで記憶に残っている一冊として、マーク・トウェインによる「アーサー王とあった男」&lt;sup&gt;*1&lt;/sup&gt;というSF作品があります。1880年代のアメリカ人がアーサー王時代にタイムスリップしてしまうものの、現代（出版当時）の知識を活用して活躍するというストーリーです。5世紀に電話や自転車、銃などの知識を持ち込めばさぞかし無敵でしょう。しかし、仮に21世紀の我々が5世紀にタイムスリップしたとして、我々の持っている知識をどれだけ活用することができるでしょう。自転車くらいならともかく、何もないところからコンピュータやネットワークを構築することなどできそうもありません。現代のテクノロジーは個人レベルで再現するには高度化しすぎています。普段はなにげなく使っている技術でも中身までは理解していないものです。
-&lt;/p&gt;
-&lt;/div&gt;
-
-
-
-
-&lt;h2&gt;Foreword for Japanese Edition&lt;/h2&gt;
-
-
-&lt;p&gt;The science fiction novel &lt;cite class="book"&gt;A Connecticut Yankee in King Arthur's
-Court&lt;/cite&gt;&lt;sup&gt;*1&lt;/sup&gt; by Mark Twain is one of the books I still remember reading from my
-elementary school days. It is the story of an American living in the 1880s who accidentally
-time travels to King Arthur era England and nonetheless survives, taking
-advantage of his knowledge from the modern (1880) era. Surely you would be very
-powerful in the 5th century if you had knowledge of telephones, bicycles, and
-guns.  But if we time travelled from the 21st century to the 5th century, how
-much of our knowledge could we utilize?  Bicycles are okay, but how about
-computers? It seems almost impossible to build computers and networks from
-scratch ourselves.  Modern technology products are too advanced for individuals
-to reproduce. We don't know how technologies work even when we use them in our
-everyday lives.&lt;/p&gt;
-
-
-
-
-&lt;div class="jp"&gt;
-&lt;p&gt;
-私たちが普段使っているRubyもそのような現代テクノロジーのひとつです。Rubyを便利に使っていても、その中がどうなっていて、どのように実行されているのか、あるいはRubyのような言語をどうすれば再現できるのか正確な知識を持っている人はほとんどいないでしょう。本書はそのような謎に包まれている「Rubyの中身」を明らかにしてくれる一冊です。
-&lt;/p&gt;
-&lt;p&gt;
-本書はRubyのソフトウェア構造から、オブジェクトシステムの構成、性能を向上させるための工夫まで解説されています。さらにCRubyだけでなく、JRubyやRubiniusについてまでカバーしています。このような知識を学べる書籍はなかなかありません。日本には類書として「Rubyソースコード完全解説」&lt;sup&gt;*2&lt;/sup&gt;がありますが、入手困難になって久しいですし、対象のRubyバージョンも1.7と古いので、YARVのような新しい技術については当然解説されていません。このような書物の登場は、Rubyの内部知識の一般化に貢献すると信じます。
-&lt;/p&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Ruby is one such technology. Even though we use it every day, not many of us
-seem to know what it looks like on the inside, how it runs internally, or how
-one could recreate such a programming language. This book sheds light on this and
-reveals the mystery of Ruby internals.&lt;/p&gt;
-
-&lt;p&gt;This book explains the software architecture of Ruby, the structure of its
-object system, and tips for performance improvement. In addition to that, it
-covers not only CRuby but also JRuby and Rubinius as well. I know of few books
-where you can find this type of knowledge. Though we have the &lt;cite
-class="book"&gt;Ruby Hacking Guide&lt;/cite&gt;&lt;sup&gt;*2&lt;/sup&gt; in Japan, it&amp;rsquo;s been
-difficult to obtain a copy for a long time. It explains a version of Ruby as
-old as 1.7 and naturally does not cover newer technologies like YARV. I believe
-RUM will contribute to a wider understanding of Ruby internals.&lt;/p&gt;
-
-&lt;div class="jp"&gt;
-&lt;p&gt;
-本書の知識をもとにして、もしかすると本書の読者のうちの誰か、もしかするとあなたがRubyの開発に関わるようになるかもしれませんし、そうなれば我々は大歓迎します。あるいは、次世代の言語処理系を開発するきっかけになるかもしれません。そのような未来が見たいものです。
-&lt;/p&gt;
-&lt;p&gt;
-&lt;br/&gt;
-2014年10月、松江にて&lt;br/&gt;
-まつもと ゆきひろ
-&lt;/p&gt;
-&lt;br/&gt;
-&lt;hr align="left"/&gt;
-&lt;small&gt;*1 マーク・トウェーン作、亀山龍樹訳「アーサー王とあった男」（岩崎書店、1971）&lt;br/&gt;
-*2 青木峰郎著「Rubyソースコード完全解説」（インプレス、2002）&lt;/small&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;In the future someone inspired by this book may join the development of Ruby.
-It may be you. We will definitely welcome that. Or, he/she may begin creating a
-next generation programming language. I hope to see that happen.&lt;/p&gt;
-
-&lt;p&gt;In Matsue, October 2014&lt;br/&gt;
-Yukihiro Matsumoto&lt;/p&gt;
-
-&lt;br/&gt;
-
-
-&lt;hr align="left"/&gt;
-
-
-&lt;p&gt;&lt;small&gt;*1 Twain, Mark, A Connecticut Yankee in King Arthur’s Court. (Kameyama Nagarjuna translation, Iwasaki Bookstore, 1971)&lt;br/&gt;
-*2 Aoki Minero al., Ruby Hacking Guide. (Impress, 2002)&lt;/small&gt;&lt;/p&gt;
 </content>
   </entry>
 </feed>

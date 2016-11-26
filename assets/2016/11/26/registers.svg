@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" height="1075" width="3055" version="1.1">
+ <g transform="translate(1402,500)">
+  <g fill="#A72929">
+   <rect height="40" width="40" y="0" x="0" />
+   <text font-size="32px" y="30" x="60" font-family="Sans">8-bit register</text>
+  </g>
+  <g fill="#8E6902" transform="translate(0,54)">
+   <rect height="40" width="40" y="0" x="0" />
+   <text font-size="32px" y="30" x="60" font-family="Sans">16-bit register</text>
+  </g>
+  <g fill="#539C0B" transform="translate(328,0)">
+   <rect height="40" width="40" y="0" x="0" />
+   <text font-size="32px" y="30" x="60" font-family="Sans">32-bit register</text>
+  </g>
+  <g fill="#18A43D" transform="translate(328,54)">
+   <rect height="40" width="40" y="0" x="0" />
+   <text font-size="32px" y="30" x="60" font-family="Sans">64-bit register</text>
+  </g>
+  <g fill="#007D7D" transform="translate(656,0)">
+   <rect height="40" width="40" y="0" x="0" />
+   <text font-size="32px" y="30" x="60" font-family="Sans">80-bit register</text>
+  </g>
+  <g fill="#183DA4" transform="translate(656,54)">
+   <rect height="40" width="40" y="0" x="0" />
+   <text font-size="32px" y="30" x="60" font-family="Sans">128-bit register</text>
+  </g>
+  <g fill="#530B9C" transform="translate(984,0)">
+   <rect height="40" width="40" y="0" x="0" />
+   <text font-size="32px" y="30" x="60" font-family="Sans">256-bit register</text>
+  </g>
+  <g fill="#8E0269" transform="translate(984,54)">
+   <rect height="40" width="40" y="0" x="0" />
+   <text font-size="32px" y="30" x="60" font-family="Sans">512-bit register</text>
+  </g>
+ </g>
+ <g transform="translate(2,2)">
+  <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+  <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM0</text>
+  <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+  <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM0</text>
+  <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+  <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM0</text>
+  <g transform="translate(560,0)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM1</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM1</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM1</text>
+  </g>
+  <g transform="translate(0,72)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM2</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM2</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM2</text>
+  </g>
+  <g transform="translate(560,72)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM3</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM3</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM3</text>
+  </g>
+  <g transform="translate(0,144)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM4</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM4</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM4</text>
+  </g>
+  <g transform="translate(560,144)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM5</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM5</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM5</text>
+  </g>
+  <g transform="translate(0,216)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM6</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM6</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM6</text>
+  </g>
+  <g transform="translate(560,216)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM7</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM7</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM7</text>
+  </g>
+  <g transform="translate(0,288)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM8</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM8</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM8</text>
+  </g>
+  <g transform="translate(560,288)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM9</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM9</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM9</text>
+  </g>
+  <g transform="translate(0,360)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM10</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM10</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM10</text>
+  </g>
+  <g transform="translate(560,360)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM11</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM11</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM11</text>
+  </g>
+  <g transform="translate(0,432)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM12</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM12</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM12</text>
+  </g>
+  <g transform="translate(560,432)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM13</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM13</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM13</text>
+  </g>
+  <g transform="translate(0,504)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM14</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM14</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM14</text>
+  </g>
+  <g transform="translate(560,504)">
+   <rect height="64" width="552" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#8E0269">ZMM15</text>
+   <rect height="50" width="325" stroke="#530B9C" y="7" x="220" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="237" font-family="Sans" fill="#530B9C">YMM15</text>
+   <rect height="42" width="141" stroke="#183DA4" y="11" x="400" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="404" font-family="Sans" fill="#183DA4">XMM15</text>
+  </g>
+  <g transform="translate(0,576)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM16</text>
+  </g>
+  <g transform="translate(140,576)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM17</text>
+  </g>
+  <g transform="translate(280,576)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM18</text>
+  </g>
+  <g transform="translate(420,576)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM19</text>
+  </g>
+  <g transform="translate(560,576)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM20</text>
+  </g>
+  <g transform="translate(700,576)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM21</text>
+  </g>
+  <g transform="translate(840,576)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM22</text>
+  </g>
+  <g transform="translate(980,576)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM23</text>
+  </g>
+  <g transform="translate(0,648)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM24</text>
+  </g>
+  <g transform="translate(140,648)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM25</text>
+  </g>
+  <g transform="translate(280,648)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM26</text>
+  </g>
+  <g transform="translate(420,648)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM27</text>
+  </g>
+  <g transform="translate(560,648)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM28</text>
+  </g>
+  <g transform="translate(700,648)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM29</text>
+  </g>
+  <g transform="translate(840,648)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM30</text>
+  </g>
+  <g transform="translate(980,648)">
+   <rect height="64" width="132" stroke="#8E0269" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="30px" y="42" x="17" font-family="Sans" fill="#8E0269">ZMM31</text>
+  </g>
+ </g>
+ <g transform="translate(1148,2)">
+  <rect height="64" width="272" stroke="#007D7D" y="0" x="0" stroke-width="2" fill="none" />
+  <text font-size="40px" y="47" x="17" font-family="Sans" fill="#007D7D">ST(0)</text>
+  <rect height="50" width="128" stroke="#18A43D" y="7" x="137" stroke-width="2" fill="none" />
+  <text font-size="40px" y="47" x="141" font-family="Sans" fill="#18A43D">MM0</text>
+  <g transform="translate(280,0)">
+   <rect height="64" width="272" stroke="#007D7D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#007D7D">ST(1)</text>
+   <rect height="50" width="128" stroke="#18A43D" y="7" x="137" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="141" font-family="Sans" fill="#18A43D">MM1</text>
+  </g>
+  <g transform="translate(0,72)">
+   <rect height="64" width="272" stroke="#007D7D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#007D7D">ST(2)</text>
+   <rect height="50" width="128" stroke="#18A43D" y="7" x="137" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="141" font-family="Sans" fill="#18A43D">MM2</text>
+  </g>
+  <g transform="translate(280,72)">
+   <rect height="64" width="272" stroke="#007D7D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#007D7D">ST(3)</text>
+   <rect height="50" width="128" stroke="#18A43D" y="7" x="137" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="141" font-family="Sans" fill="#18A43D">MM3</text>
+  </g>
+  <g transform="translate(0,144)">
+   <rect height="64" width="272" stroke="#007D7D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#007D7D">ST(4)</text>
+   <rect height="50" width="128" stroke="#18A43D" y="7" x="137" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="141" font-family="Sans" fill="#18A43D">MM4</text>
+  </g>
+  <g transform="translate(280,144)">
+   <rect height="64" width="272" stroke="#007D7D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#007D7D">ST(5)</text>
+   <rect height="50" width="128" stroke="#18A43D" y="7" x="137" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="141" font-family="Sans" fill="#18A43D">MM5</text>
+  </g>
+  <g transform="translate(0,216)">
+   <rect height="64" width="272" stroke="#007D7D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#007D7D">ST(6)</text>
+   <rect height="50" width="128" stroke="#18A43D" y="7" x="137" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="141" font-family="Sans" fill="#18A43D">MM6</text>
+  </g>
+  <g transform="translate(280,216)">
+   <rect height="64" width="272" stroke="#007D7D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="17" font-family="Sans" fill="#007D7D">ST(7)</text>
+   <rect height="50" width="128" stroke="#18A43D" y="7" x="137" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="141" font-family="Sans" fill="#18A43D">MM7</text>
+  </g>
+ </g>
+ <g text-anchor="middle" transform="translate(1148,362)">
+  <g>
+   <rect height="64" width="132" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="66" font-family="Sans" fill="#8E6902">CW</text>
+  </g>
+  <g transform="translate(140,0)">
+   <rect height="64" width="132" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="66" font-family="Sans" fill="#8E6902">FP_IP</text>
+  </g>
+  <g transform="translate(280,0)">
+   <rect height="64" width="132" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="66" font-family="Sans" fill="#8E6902">FP_DP</text>
+  </g>
+  <g transform="translate(420,0)">
+   <rect height="64" width="132" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="66" font-family="Sans" fill="#8E6902">FP_CS</text>
+  </g>
+  <g transform="translate(0,72)">
+   <rect height="64" width="132" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="66" font-family="Sans" fill="#8E6902">SW</text>
+  </g>
+  <g transform="translate(0,144)">
+   <rect height="64" width="132" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="66" font-family="Sans" fill="#8E6902">TW</text>
+  </g>
+  <g transform="translate(0,216)">
+   <rect height="64" width="132" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="66" font-family="Sans" fill="#8E6902">FP_DS</text>
+  </g>
+  <g transform="translate(0,288)">
+   <rect height="64" width="132" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="32px" y="43" x="66" font-family="Sans" fill="#8E6902">FP_OPC</text>
+  </g>
+  <g transform="translate(140,288)">
+   <rect height="64" width="132" stroke="#539C0B" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="66" font-family="Sans" fill="#539C0B">FP_DP</text>
+  </g>
+  <g transform="translate(280,288)">
+   <rect height="64" width="132" stroke="#539C0B" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="66" font-family="Sans" fill="#539C0B">FP_IP</text>
+  </g>
+ </g>
+ <g text-anchor="end" transform="translate(1730,2)">
+  <g>
+   <rect height="64" width="296" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="292" font-family="Sans" fill="#18A43D">RAX</text>
+   <rect height="50" width="200" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="32px" y="43" x="198" font-family="Sans" fill="#539C0B">EAX</text>
+   <rect height="42" width="126" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="32px" y="43" x="132" font-family="Sans" fill="#8E6902">AX</text>
+   <g transform="translate(38,0)">
+    <rect height="34" width="36" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+    <text font-size="20px" y="39" x="45" font-family="Sans" fill="#A72929">AH</text>
+   </g>
+   <rect height="34" width="36" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="20px" y="39" x="45" font-family="Sans" fill="#A72929">AL</text>
+  </g>
+  <g transform="translate(0,72)">
+   <rect height="64" width="296" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="292" font-family="Sans" fill="#18A43D">RBX</text>
+   <rect height="50" width="200" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="32px" y="43" x="198" font-family="Sans" fill="#539C0B">EBX</text>
+   <rect height="42" width="126" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="32px" y="43" x="132" font-family="Sans" fill="#8E6902">BX</text>
+   <g transform="translate(38,0)">
+    <rect height="34" width="36" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+    <text font-size="20px" y="39" x="45" font-family="Sans" fill="#A72929">BH</text>
+   </g>
+   <rect height="34" width="36" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="20px" y="39" x="45" font-family="Sans" fill="#A72929">BL</text>
+  </g>
+  <g transform="translate(0,144)">
+   <rect height="64" width="296" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="292" font-family="Sans" fill="#18A43D">RCX</text>
+   <rect height="50" width="200" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="32px" y="43" x="198" font-family="Sans" fill="#539C0B">ECX</text>
+   <rect height="42" width="126" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="32px" y="43" x="132" font-family="Sans" fill="#8E6902">CX</text>
+   <g transform="translate(38,0)">
+    <rect height="34" width="36" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+    <text font-size="20px" y="39" x="45" font-family="Sans" fill="#A72929">CH</text>
+   </g>
+   <rect height="34" width="36" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="20px" y="39" x="45" font-family="Sans" fill="#A72929">CL</text>
+  </g>
+  <g transform="translate(0,216)">
+   <rect height="64" width="296" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="292" font-family="Sans" fill="#18A43D">RDX</text>
+   <rect height="50" width="200" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="32px" y="43" x="198" font-family="Sans" fill="#539C0B">EDX</text>
+   <rect height="42" width="126" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="32px" y="43" x="132" font-family="Sans" fill="#8E6902">DX</text>
+   <g transform="translate(38,0)">
+    <rect height="34" width="36" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+    <text font-size="20px" y="39" x="45" font-family="Sans" fill="#A72929">DH</text>
+   </g>
+   <rect height="34" width="36" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="20px" y="39" x="45" font-family="Sans" fill="#A72929">DL</text>
+  </g>
+  <g transform="translate(304,0)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="260" font-family="Sans" fill="#18A43D">R8</text>
+   <rect height="50" width="184" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="22" y="39" x="184" font-family="Sans" fill="#539C0B">R8D</text>
+   <rect height="42" width="112" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="20px" y="38" x="118" font-family="Sans" fill="#8E6902">R8W</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="14px" y="36" x="54" font-family="Sans" fill="#A72929">R8B</text>
+  </g>
+  <g transform="translate(304,72)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="260" font-family="Sans" fill="#18A43D">R9</text>
+   <rect height="50" width="184" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="22" y="39" x="184" font-family="Sans" fill="#539C0B">R9D</text>
+   <rect height="42" width="112" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="20px" y="38" x="118" font-family="Sans" fill="#8E6902">R9W</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="14px" y="36" x="54" font-family="Sans" fill="#A72929">R9B</text>
+  </g>
+  <g transform="translate(304,144)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="260" font-family="Sans" fill="#18A43D">R10</text>
+   <rect height="50" width="184" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="22" y="39" x="184" font-family="Sans" fill="#539C0B">R10D</text>
+   <rect height="42" width="112" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="20px" y="38" x="118" font-family="Sans" fill="#8E6902">R10W</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="14px" y="36" x="54" font-family="Sans" fill="#A72929">R10B</text>
+  </g>
+  <g transform="translate(304,216)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="260" font-family="Sans" fill="#18A43D">R11</text>
+   <rect height="50" width="184" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="22" y="39" x="184" font-family="Sans" fill="#539C0B">R11D</text>
+   <rect height="42" width="112" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="20px" y="38" x="118" font-family="Sans" fill="#8E6902">R11W</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="14px" y="36" x="54" font-family="Sans" fill="#A72929">R11B</text>
+  </g>
+  <g transform="translate(576,0)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="260" font-family="Sans" fill="#18A43D">R12</text>
+   <rect height="50" width="184" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="22" y="39" x="184" font-family="Sans" fill="#539C0B">R12D</text>
+   <rect height="42" width="112" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="20px" y="38" x="118" font-family="Sans" fill="#8E6902">R12W</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="14px" y="36" x="54" font-family="Sans" fill="#A72929">R12B</text>
+  </g>
+  <g transform="translate(576,72)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="260" font-family="Sans" fill="#18A43D">R13</text>
+   <rect height="50" width="184" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="22" y="39" x="184" font-family="Sans" fill="#539C0B">R13D</text>
+   <rect height="42" width="112" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="20px" y="38" x="118" font-family="Sans" fill="#8E6902">R13W</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="14px" y="36" x="54" font-family="Sans" fill="#A72929">R13B</text>
+  </g>
+  <g transform="translate(576,144)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="260" font-family="Sans" fill="#18A43D">R14</text>
+   <rect height="50" width="184" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="22" y="39" x="184" font-family="Sans" fill="#539C0B">R14D</text>
+   <rect height="42" width="112" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="20px" y="38" x="118" font-family="Sans" fill="#8E6902">R14W</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="14px" y="36" x="54" font-family="Sans" fill="#A72929">R14B</text>
+  </g>
+  <g transform="translate(576,216)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="260" font-family="Sans" fill="#18A43D">R15</text>
+   <rect height="50" width="184" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="22" y="39" x="184" font-family="Sans" fill="#539C0B">R15D</text>
+   <rect height="42" width="112" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="20px" y="38" x="118" font-family="Sans" fill="#8E6902">R15W</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="14px" y="36" x="54" font-family="Sans" fill="#A72929">R15B</text>
+  </g>
+  <g transform="translate(0,288)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="260" font-family="Sans" fill="#18A43D">RBP</text>
+   <rect height="50" width="176" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="176" font-family="Sans" fill="#539C0B">EBP</text>
+   <rect height="42" width="100" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="34px" y="44" x="104" font-family="Sans" fill="#8E6902">BP</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="22px" y="40" x="54" font-family="Sans" fill="#A72929">BPL</text>
+  </g>
+  <g transform="translate(288,288)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="260" font-family="Sans" fill="#18A43D">RDI</text>
+   <rect height="50" width="176" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="176" font-family="Sans" fill="#539C0B">EDI</text>
+   <rect height="42" width="100" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="34px" y="44" x="104" font-family="Sans" fill="#8E6902">DI</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="22px" y="40" x="54" font-family="Sans" fill="#A72929">DIL</text>
+  </g>
+  <g transform="translate(576,288)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="260" font-family="Sans" fill="#18A43D">RIP</text>
+   <rect height="50" width="176" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="176" font-family="Sans" fill="#539C0B">EIP</text>
+   <rect height="42" width="100" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="34px" y="44" x="104" font-family="Sans" fill="#8E6902">IP</text>
+  </g>
+  <g transform="translate(0,360)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="260" font-family="Sans" fill="#18A43D">RSI</text>
+   <rect height="50" width="176" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="176" font-family="Sans" fill="#539C0B">ESI</text>
+   <rect height="42" width="100" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="34px" y="44" x="104" font-family="Sans" fill="#8E6902">SI</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="22px" y="40" x="54" font-family="Sans" fill="#A72929">SIL</text>
+  </g>
+  <g transform="translate(288,360)">
+   <rect height="64" width="264" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="260" font-family="Sans" fill="#18A43D">RSP</text>
+   <rect height="50" width="176" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+   <text font-size="36px" y="45" x="176" font-family="Sans" fill="#539C0B">ESP</text>
+   <rect height="42" width="100" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+   <text font-size="34px" y="44" x="104" font-family="Sans" fill="#8E6902">SP</text>
+   <rect height="34" width="44" stroke="#A72929" y="15" x="12" stroke-width="2" fill="none" />
+   <text font-size="22px" y="40" x="54" font-family="Sans" fill="#A72929">SPL</text>
+  </g>
+ </g>
+ <g text-anchor="middle" transform="translate(2602,2)">
+  <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+  <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR0</text>
+  <g transform="translate(0,72)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR1</text>
+  </g>
+  <g transform="translate(0,144)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR2</text>
+  </g>
+  <g transform="translate(0,216)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR3</text>
+  </g>
+  <g transform="translate(0,288)">
+   <rect height="64" width="144" stroke="#539C0B" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#539C0B">CR3</text>
+  </g>
+  <g transform="translate(0,360)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">MSW</text>
+  </g>
+  <g transform="translate(152,0)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR4</text>
+  </g>
+  <g transform="translate(152,72)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR5</text>
+  </g>
+  <g transform="translate(152,144)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR6</text>
+  </g>
+  <g transform="translate(152,216)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR7</text>
+  </g>
+  <g transform="translate(152,288)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR8</text>
+  </g>
+  <g transform="translate(152,360)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR9</text>
+  </g>
+  <g transform="translate(152,432)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR10</text>
+  </g>
+  <g transform="translate(152,504)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR11</text>
+  </g>
+  <g transform="translate(152,576)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR12</text>
+  </g>
+  <g transform="translate(152,648)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR13</text>
+  </g>
+  <g transform="translate(152,720)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR14</text>
+  </g>
+  <g transform="translate(152,792)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">CR15</text>
+  </g>
+  <g transform="translate(304,792)">
+   <rect height="64" width="144" stroke="#539C0B" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#539C0B">MXCSR</text>
+  </g>
+ </g>
+ <g text-anchor="middle" transform="translate(2426,650)">
+  <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+  <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR0</text>
+  <g transform="translate(0,72)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR1</text>
+  </g>
+  <g transform="translate(0,144)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR2</text>
+  </g>
+  <g transform="translate(0,216)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR3</text>
+  </g>
+  <g transform="translate(0,288)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR4</text>
+  </g>
+  <g transform="translate(0,360)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR5</text>
+  </g>
+  <g transform="translate(152,0)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR6</text>
+  </g>
+  <g transform="translate(152,72)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR7</text>
+  </g>
+  <g transform="translate(152,144)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR8</text>
+  </g>
+  <g transform="translate(152,216)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR9</text>
+  </g>
+  <g transform="translate(152,288)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR10</text>
+  </g>
+  <g transform="translate(152,360)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR11</text>
+  </g>
+  <g transform="translate(304,288)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR12</text>
+  </g>
+  <g transform="translate(304,360)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR13</text>
+  </g>
+  <g transform="translate(456,288)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR14</text>
+  </g>
+  <g transform="translate(456,360)">
+   <rect height="64" width="144" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="72" font-family="Sans" fill="#18A43D">DR15</text>
+  </g>
+ </g>
+ <g text-anchor="middle" transform="translate(1642,650)">
+  <rect height="64" width="120" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+  <text font-size="40px" y="47" x="60" font-family="Sans" fill="#8E6902">CS</text>
+  <g transform="translate(128,0)">
+   <rect height="64" width="120" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="60" font-family="Sans" fill="#8E6902">SS</text>
+  </g>
+  <g transform="translate(256,0)">
+   <rect height="64" width="120" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="60" font-family="Sans" fill="#8E6902">DS</text>
+  </g>
+  <g transform="translate(0,72)">
+   <rect height="64" width="120" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="60" font-family="Sans" fill="#8E6902">ES</text>
+  </g>
+  <g transform="translate(128,72)">
+   <rect height="64" width="120" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="60" font-family="Sans" fill="#8E6902">FS</text>
+  </g>
+  <g transform="translate(256,72)">
+   <rect height="64" width="120" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="60" font-family="Sans" fill="#8E6902">GS</text>
+  </g>
+ </g>
+ <g text-anchor="middle" transform="translate(2050,650)">
+  <rect height="64" width="168" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+  <text font-size="40px" y="47" x="84" font-family="Sans" fill="#8E6902">GDTR</text>
+  <g transform="translate(176,0)">
+   <rect height="64" width="168" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="84" font-family="Sans" fill="#8E6902">IDTR</text>
+  </g>
+  <g transform="translate(0,72)">
+   <rect height="64" width="168" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="84" font-family="Sans" fill="#8E6902">TR</text>
+  </g>
+  <g transform="translate(176,72)">
+   <rect height="64" width="168" stroke="#8E6902" y="0" x="0" stroke-width="2" fill="none" />
+   <text font-size="40px" y="47" x="84" font-family="Sans" fill="#8E6902">LDTR</text>
+  </g>
+ </g>
+ <g text-anchor="end" transform="translate(2050,818)">
+  <rect height="64" width="344" stroke="#18A43D" y="0" x="0" stroke-width="2" fill="none" />
+  <text font-size="40px" y="47" x="340" font-family="Sans" fill="#18A43D">RFLAGS</text>
+  <rect height="50" width="176" stroke="#539C0B" y="7" x="4" stroke-width="2" fill="none" />
+  <text font-size="20px" y="40" x="176" font-family="Sans" fill="#539C0B">EFLAGS</text>
+  <rect height="42" width="86" stroke="#8E6902" y="11" x="8" stroke-width="2" fill="none" />
+  <text font-size="20px" y="40" x="84" font-family="Sans" fill="#8E6902">FLAGS</text>
+ </g>
+</svg>
