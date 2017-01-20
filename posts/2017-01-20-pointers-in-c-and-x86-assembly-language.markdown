@@ -2,7 +2,7 @@ title: "Pointers in C and x86 Assembly Language"
 date: 2017/1/20
 
 <div style="float: left; padding: 0px 30px 40px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/1/19/ram.jpg"><br/>
+  <img src="http://patshaughnessy.net/assets/2017/1/20/ram.jpg"><br/>
   <i>16GB of DDR random access memory<br/>
   my son used in his new gaming PC
 </i>
@@ -78,7 +78,7 @@ This code is quite literally the script my computer follows: What happens when
 I call `add_forty_two`? How does my computer know what to do? How does it add 42
 to the given argument? It follows the script.
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/the-tempest.png">
+<img src="http://patshaughnessy.net/assets/2017/1/20/the-tempest.png">
 <div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px">
   <i>Trying to read x86 assembly language is a bit like<br/>
 trying to read an old Shakespearean manuscript</i>
@@ -106,7 +106,7 @@ Tempest_, I’m at a loss.
 I need some cliff notes. I need to see this assembly language script translated
 into standard, modern English, a language I understand.
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/the-tempest-cleaned-up.png">
+<img src="http://patshaughnessy.net/assets/2017/1/20/the-tempest-cleaned-up.png">
 <div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px">
   <i>C code is like a modern, cleaned up copy of a Shakespeare<br/>
 play. Equally confusing but somewhat easier to read.</i>
@@ -117,7 +117,7 @@ play. Equally confusing but somewhat easier to read.</i>
 To illustrate what I mean, I’ll rewrite each x86 instruction with the
 equivalent C syntax:
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/transcribe.png">
+<img src="http://patshaughnessy.net/assets/2017/1/20/transcribe.png">
 
 If you’re an experienced C programmer, the pseudocode on the right side should
 be somewhat more readable. You can see how the x86 instructions access memory
@@ -184,7 +184,7 @@ odd things about it. First, I wrote the C array `rbp` using the name of a
 register in my microprocessor. That is, I’m treating the `rbp` register as if it
 were a series of values, an array, and not a single value.
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array1.png" width=432>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array1.png" width=432>
 
 But, in fact, any C programmers reading along might not be surprised by this:
 In C an array is really just a pointer to a block of memory and not a
@@ -196,7 +196,7 @@ untruth](https://blog.feabhas.com/2016/12/a-convenient-untruth).
 The pointer itself is a number indicating where the memory block is located: a
 _memory address_:
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array2.png" width=800>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array2.png" width=800>
 
 In x86 assembly language, the same move instruction appears this way:
 
@@ -208,20 +208,20 @@ To me, the assembly language syntax is inside out: Instead of writing the array
 name followed by the index in brackets, I write the index first, followed by
 the array name in parentheses:
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array3.png" width=432>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array3.png" width=432>
 
 The parentheses indicate the move instruction should consider the value in `rbp`
 to be a memory address, that it should move the value 42 to the memory address
 referenced by `rbp` (or actually to the memory address four bytes before the
 value of `rbp`) and not into `rbp` itself.
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array4.png" width=432>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array4.png" width=432>
 
 As you can see, the other odd thing about this array is that it uses a negative
 index. The `movl` instruction copied 42 to a memory address that appeared before
 the start of the array - this array is not only inside-out, it’s backwards!
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array5.png" width=558>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array5.png" width=558>
 
 In a C program, this would be a recipe for disaster. C programmers normally
 allocate memory for an array, and then access its elements using a positive (or
@@ -255,7 +255,7 @@ segment containing a total of 4\*100=400 bytes.
 Now when I write `rbp[2]` in C I access the element at position 2, or the third
 element:
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array6.png" width=447>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array6.png" width=447>
 
 But notice that because each int element consists of 4 bytes, the memory
 location of `rbp+2` is actually 8 bytes larger than `rbp`. The index 2 is an
@@ -264,7 +264,7 @@ element count: (2 elements) * (4 bytes/element) = 8 bytes.
 x86 assembly language, on the other hand, uses byte indexes. That means to
 access the same element in this array, I would write `8(%rbp)`:
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array7.png" width=698>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array7.png" width=698>
 
 When you look at memory this way, from a detailed, physical point of view, the
 x86 byte count index makes more sense. `8(%rbp)` is the address `rbp` points to,
@@ -314,13 +314,13 @@ Here I wrote the C assignment using explicit pointer syntax: The pointer is the
 dereferencing a pointer: `*rsp` refers to the value stored at the memory location
 `rsp` points to, just as if I had written `rsp[0]`:
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array8.png" width=698>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array8.png" width=698>
 
 Ignoring the minus signs for a moment, the C code `*rsp = rbp` means: “copy the
 value of `rbp` to the memory location whose address is contained in the `rsp`
 register.”
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array9.png" width=698>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array9.png" width=698>
 
 What about the minus signs? C programmers will know these indicate the pointer,
 in this case `rsp`, should be decremented before its value is dereferenced. We
@@ -331,18 +331,18 @@ because `rsp` will continue to point to the top of the stack.
 Imagine the `rsp` pointer starts at `0x00007fff5fbff8f8`. This is the top of the
 stack, initially:
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array10.png" width=698>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array10.png" width=698>
 
 Then we decrement `rsp` so it points to a new top of the stack. The stack grows
 downward in x86 programs. Each time we push a value onto the stack we first
 decrement the stack pointer:
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array11.png" width=698>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array11.png" width=698>
 
 And then the assignment writes the value of `rbp` to the top of the stack, using
 `rsp` after it has been decremented:
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/array12.png" width=698>
+<img src="http://patshaughnessy.net/assets/2017/1/20/array12.png" width=698>
 
 Notice another important detail here: The stack pointer is decremented by 8
 bytes, not 4 bytes as above. This is because the values we push onto the stack
@@ -409,7 +409,7 @@ rip = *rsp++;
 Here the C code copies the value from the memory location referenced by the `rsp`
 pointer and saves it into the `rip` register.
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/pop1.png" width=698>
+<img src="http://patshaughnessy.net/assets/2017/1/20/pop1.png" width=698>
 
 The `rip` register is known as the _instruction pointer_, which contains a very
 special and important value: the memory address of the next instruction my
@@ -428,7 +428,7 @@ stack. And in just the same way `pushq` did, `retq` uses the “q” suffix to
 determine how many bytes to add to the stack pointer after the copy is
 finished.
 
-<img src="http://patshaughnessy.net/assets/2017/1/19/pop2.png" width=698>
+<img src="http://patshaughnessy.net/assets/2017/1/20/pop2.png" width=698>
 
 Now we know where the C `++` post-increment operator’s behavior comes from:
 assembly language. Just as `retq` adds 8 bytes to `rsp`, the C expression `*rsp++`
