@@ -1,7 +1,7 @@
 title: "Pointers in C and x86 Assembly Language"
 date: 2017/1/20
 
-<div style="float: left; padding: 0px 30px 40px 0px; text-align: center; line-height:18px">
+<div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2017/1/20/ram.jpg"><br/>
   <i>16GB of DDR random access memory<br/>
   my son used in his new gaming PC
@@ -48,14 +48,15 @@ def add_forty_two(n)
 end
 </pre>
 
-Once again I’ll use Crystal to compile my Ruby code:
+Once again I’ll use [Crystal](https://crystal-lang.org) to compile my Ruby code:
 
 <pre type="console">
 crystal build add_forty_two.rb --emit asm
 </pre>
 
-Searching through the generated `add_forty_two.s file`, I find “add\_forty\_two,”
-clean it up and paste it back into my Ruby function:
+Searching through the generated `add_forty_two.s file`, I find the
+`add\_forty\_two` function, clean it up and paste its assembly language
+instructions back into my Ruby function:
 
 <pre type="ruby">
 def add_forty_two(n)
@@ -134,9 +135,8 @@ notation means, how they are different and how they are similar.
 
 But while my C pseudocode is syntactically correct, it makes no sense. Negative
 array indices are normally invalid in C, and, of course, a C program would
-never directly reference the registers on the CPU directly like this to begin
+never directly reference registers on the CPU directly like this to begin
 with.
-
 
 In fact, a proper C program to add 42 would resemble the Ruby code I started
 with above:
@@ -186,7 +186,7 @@ were a series of values, an array, and not a single value.
 
 <img src="http://patshaughnessy.net/assets/2017/1/20/array1.png" width=432>
 
-But, in fact, any C programmers reading along might not be surprised by this:
+Any C programmers reading along might not be surprised by this:
 In C an array is really just a pointer to a block of memory and not a
 collection of objects or elements like it would be in Python, Ruby or some
 other high level language. A recent blog article featured on Hacker News
@@ -290,7 +290,7 @@ But in C, I would write
 rbp[-1] = 42;
 </pre>
 
-This means “Set the -2nd element of the array to 42” - much more
+This means “Set the -1st element of the array to 42” - much more
 straightforward (although still a bit weird).
 
 ## Pushing a Value Onto The Stack
