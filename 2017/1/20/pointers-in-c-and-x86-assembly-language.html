@@ -35,19 +35,17 @@
         <article class="post">
   <header>
   <h1>Pointers in C and x86 Assembly Language</h1>
-  
     <div class="metadata">
     <span class="date">January 20th 2017</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
     
       <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Pointers in C and x86 Assembly Language">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
     
     </div>
-  
   </header>
 
   <section class="content">
     <div style="float: left; padding: 0px 30px 40px 0px; text-align: center; line-height:18px">
-  <img src="http://localhost/assets/2017/1/19/ram.jpg"><br/>
+  <img src="http://patshaughnessy.net/assets/2017/1/19/ram.jpg"><br/>
   <i>16GB of DDR random access memory<br/>
   my son used in his new gaming PC
 </i>
@@ -136,7 +134,7 @@ clean it up and paste it back into my Ruby function:</p>
 I call <code>add_forty_two</code>? How does my computer know what to do? How does it add 42
 to the given argument? It follows the script.</p>
 
-<p><img src="http://localhost/assets/2017/1/19/the-tempest.png"></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/the-tempest.png"></p>
 
 <div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px">
   <i>Trying to read x86 assembly language is a bit like<br/>
@@ -170,7 +168,7 @@ Tempest</em>, I’m at a loss.</p>
 <p>I need some cliff notes. I need to see this assembly language script translated
 into standard, modern English, a language I understand.</p>
 
-<p><img src="http://localhost/assets/2017/1/19/the-tempest-cleaned-up.png"></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/the-tempest-cleaned-up.png"></p>
 
 <div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px">
   <i>C code is like a modern, cleaned up copy of a Shakespeare<br/>
@@ -183,7 +181,7 @@ play. Equally confusing but somewhat easier to read.</i>
 <p>To illustrate what I mean, I’ll rewrite each x86 instruction with the
 equivalent C syntax:</p>
 
-<p><img src="http://localhost/assets/2017/1/19/transcribe.png"></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/transcribe.png"></p>
 
 <p>If you’re an experienced C programmer, the pseudocode on the right side should
 be somewhat more readable. You can see how the x86 instructions access memory
@@ -257,7 +255,7 @@ odd things about it. First, I wrote the C array <code>rbp</code> using the name 
 register in my microprocessor. That is, I’m treating the <code>rbp</code> register as if it
 were a series of values, an array, and not a single value.</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array1.png" width=432></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array1.png" width=432></p>
 
 <p>But, in fact, any C programmers reading along might not be surprised by this:
 In C an array is really just a pointer to a block of memory and not a
@@ -269,7 +267,7 @@ untruth</a>.</p>
 <p>The pointer itself is a number indicating where the memory block is located: a
 <em>memory address</em>:</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array2.png" width=800></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array2.png" width=800></p>
 
 <p>In x86 assembly language, the same move instruction appears this way:</p>
 
@@ -285,20 +283,20 @@ movl    <span class="global-variable">$42</span>, <span class="integer">-4</span
 name followed by the index in brackets, I write the index first, followed by
 the array name in parentheses:</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array3.png" width=432></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array3.png" width=432></p>
 
 <p>The parentheses indicate the move instruction should consider the value in <code>rbp</code>
 to be a memory address, that it should move the value 42 to the memory address
 referenced by <code>rbp</code> (or actually to the memory address four bytes before the
 value of <code>rbp</code>) and not into <code>rbp</code> itself.</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array4.png" width=432></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array4.png" width=432></p>
 
 <p>As you can see, the other odd thing about this array is that it uses a negative
 index. The <code>movl</code> instruction copied 42 to a memory address that appeared before
 the start of the array &ndash; this array is not only inside-out, it’s backwards!</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array5.png" width=558></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array5.png" width=558></p>
 
 <p>In a C program, this would be a recipe for disaster. C programmers normally
 allocate memory for an array, and then access its elements using a positive (or
@@ -336,7 +334,7 @@ segment containing a total of 4*100=400 bytes.</p>
 <p>Now when I write <code>rbp[2]</code> in C I access the element at position 2, or the third
 element:</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array6.png" width=447></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array6.png" width=447></p>
 
 <p>But notice that because each int element consists of 4 bytes, the memory
 location of <code>rbp+2</code> is actually 8 bytes larger than <code>rbp</code>. The index 2 is an
@@ -345,7 +343,7 @@ element count: (2 elements) * (4 bytes/element) = 8 bytes.</p>
 <p>x86 assembly language, on the other hand, uses byte indexes. That means to
 access the same element in this array, I would write <code>8(%rbp)</code>:</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array7.png" width=698></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array7.png" width=698></p>
 
 <p>When you look at memory this way, from a detailed, physical point of view, the
 x86 byte count index makes more sense. <code>8(%rbp)</code> is the address <code>rbp</code> points to,
@@ -411,13 +409,13 @@ code makes this a bit easier to follow:</p>
 dereferencing a pointer: <code>*rsp</code> refers to the value stored at the memory location
 <code>rsp</code> points to, just as if I had written <code>rsp[0]</code>:</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array8.png" width=698></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array8.png" width=698></p>
 
 <p>Ignoring the minus signs for a moment, the C code <code>*rsp = rbp</code> means: “copy the
 value of <code>rbp</code> to the memory location whose address is contained in the <code>rsp</code>
 register.”</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array9.png" width=698></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array9.png" width=698></p>
 
 <p>What about the minus signs? C programmers will know these indicate the pointer,
 in this case <code>rsp</code>, should be decremented before its value is dereferenced. We
@@ -428,18 +426,18 @@ because <code>rsp</code> will continue to point to the top of the stack.</p>
 <p>Imagine the <code>rsp</code> pointer starts at <code>0x00007fff5fbff8f8</code>. This is the top of the
 stack, initially:</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array10.png" width=698></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array10.png" width=698></p>
 
 <p>Then we decrement <code>rsp</code> so it points to a new top of the stack. The stack grows
 downward in x86 programs. Each time we push a value onto the stack we first
 decrement the stack pointer:</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array11.png" width=698></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array11.png" width=698></p>
 
 <p>And then the assignment writes the value of <code>rbp</code> to the top of the stack, using
 <code>rsp</code> after it has been decremented:</p>
 
-<p><img src="http://localhost/assets/2017/1/19/array12.png" width=698></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/array12.png" width=698></p>
 
 <p>Notice another important detail here: The stack pointer is decremented by 8
 bytes, not 4 bytes as above. This is because the values we push onto the stack
@@ -526,7 +524,7 @@ rip = *rsp++;
 <p>Here the C code copies the value from the memory location referenced by the <code>rsp</code>
 pointer and saves it into the <code>rip</code> register.</p>
 
-<p><img src="http://localhost/assets/2017/1/19/pop1.png" width=698></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/pop1.png" width=698></p>
 
 <p>The <code>rip</code> register is known as the <em>instruction pointer</em>, which contains a very
 special and important value: the memory address of the next instruction my
@@ -545,7 +543,7 @@ stack. And in just the same way <code>pushq</code> did, <code>retq</code> uses t
 determine how many bytes to add to the stack pointer after the copy is
 finished.</p>
 
-<p><img src="http://localhost/assets/2017/1/19/pop2.png" width=698></p>
+<p><img src="http://patshaughnessy.net/assets/2017/1/19/pop2.png" width=698></p>
 
 <p>Now we know where the C <code>++</code> post-increment operator’s behavior comes from:
 assembly language. Just as <code>retq</code> adds 8 bytes to <code>rsp</code>, the C expression <code>*rsp++</code>
@@ -573,7 +571,6 @@ Should be fun!</p>
 
   </section>
 
-  
     <section class="comments">
       <div id="disqus_thread"><script type='text/javascript'> 
           var disqus_identifier = 'http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language';
@@ -583,9 +580,7 @@ Should be fun!</p>
       <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
       <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
     </section>
-  
 </article>
-
   <script type="text/javascript">
     var disqus_identifier = 'http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language';
     var disqus_shortname = 'patshaughnessy';
@@ -597,7 +592,6 @@ Should be fun!</p>
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
     }());
   </script>
-
 
       </div>
       
@@ -640,16 +634,6 @@ Should be fun!</p>
       <p>Content and UI design &copy; 2016 Pat Shaughnessy</a>
     </div>
   </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
 
 </body>
 </html>
