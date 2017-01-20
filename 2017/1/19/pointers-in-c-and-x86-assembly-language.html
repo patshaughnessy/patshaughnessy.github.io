@@ -1,0 +1,617 @@
+
+<!doctype html>
+<html>
+  <head>
+    <!-- 1140px Grid styles for IE -->
+    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
+    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
+    <link rel="alternate" type="application/atom+xml" title="Pointers in C and x86 Assembly Language - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
+    <title>Pointers in C and x86 Assembly Language - Pat Shaughnessy</title>
+  </head>
+<body>
+  <div id="banner">
+    <div class="row">
+      <div class="onecol"></div>
+      <div class="elevencol last">
+        <a href="/">
+          <span id="title">
+            Pat Shaughnessy
+          </span>
+          <span id="tagline">
+            blogger, rubyist, aspiring author
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div class="row">
+      <div class="onecol"></div>
+      
+        <div class="ninecol white">
+      
+        <article class="post">
+  <header>
+  <h1>Pointers in C and x86 Assembly Language</h1>
+  
+  </header>
+
+  <section class="content">
+    <div style="float: left; padding: 0px 30px 40px 0px; text-align: center; line-height:18px">
+  <img src="http://localhost/assets/2017/1/19/ram.jpg"><br/>
+  <i>16GB of DDR random access memory<br/>
+  my son used in his new gaming PC
+</i>
+</div>
+
+
+<p>Recently I’ve been trying to learn how to read x86 assembly language. In <a href="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language">my
+last
+post</a>,
+I explored basic x86 syntax in a very simple program that used a few registers.
+But in that post I didn’t cover how instructions refer to values located in
+memory and not in a register. To be useful at all, x86 code must load data from
+memory into a register, and eventually save data from a register back into
+memory.</p>
+
+<p>Assembly language instructions access values in memory by considering a
+register’s contents to be a memory address, and then dereferencing it the same
+way you would use a pointer in a C program. In fact, to me C and assembly
+language seem very similar in this way, which I suspect is not a coincidence.</p>
+
+<p>Today I’ll read and try to understand a very simple x86 assembly language
+program that reads from and writes to memory. To make the x86 instructions a
+bit easier to follow, I’ll first rewrite them using C pointer syntax. If you’re
+an experienced C programmer, this will make the x86 code easy to read. Or if
+you’re not familiar with C, this is your chance to learn both C and x86 pointer
+syntax at the same time.</p>
+
+<h2>Writing A Program That Accesses Memory</h2>
+
+<p>But first, we need an example program that accesses memory. Where can I find
+one? Do I need to find some low level code from a device driver or operating
+system kernel? No, of course not! Every program you or I have ever written
+accesses memory. All I need to do is translate one of them into x86 assembly
+language.</p>
+
+<p>I’ll use my Ruby example from last time, but with a new line of code that saves
+the constant value 42 into a local variable. After I compile it I’ll able able
+to look for the number 42 in the assembly language code:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="keyword">def</span> <span class="function">add_forty_two</span>(n)
+  a = <span class="integer">42</span>
+  n+a 
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<p>Once again I’ll use Crystal to compile my Ruby code:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+crystal build add_forty_two.rb --emit asm
+</pre></div>
+</div>
+
+
+
+<p>Searching through the generated <code>add_forty_two.s file</code>, I find “add_forty_two,”
+clean it up and paste it back into my Ruby function:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="keyword">def</span> <span class="function">add_forty_two</span>(n)
+
+  pushq   %rbp  
+  movq    %rsp, %rbp
+  movl    %edi, <span class="integer">-8</span>(%rbp)
+  movl    <span class="global-variable">$42</span>, <span class="integer">-4</span>(%rbp)
+  movl    <span class="integer">-8</span>(%rbp), %eax
+  addl    <span class="integer">-4</span>(%rbp), %eax
+  popq    %rbp  
+  retq  
+
+<span class="keyword">end</span>
+</pre></div>
+</div>
+
+
+
+<h2>Assembly Language: The Script Your Computer Follows</h2>
+
+<p>This code is quite literally the script my computer follows: What happens when
+I call <code>add_forty_two</code>? How does my computer know what to do? How does it add 42
+to the given argument? It follows the script.</p>
+
+<p><img src="http://localhost/assets/2017/1/19/the-tempest.png"></p>
+
+<div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px">
+  <i>Trying to read x86 assembly language is a bit like<br/>
+trying to read an old Shakespearean manuscript</i>
+</div>
+
+
+<p>The problem is this script contains Old English words I don’t understand &ndash; and
+the words I do know are spelled differently. I can almost understand what this
+line of code means:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+movl    <span class="global-variable">$42</span>, <span class="integer">-4</span>(%rbp)
+</pre></div>
+</div>
+
+
+
+<p>…but not quite. I can guess by reading my original Ruby code it’s probably
+saving 42 in the local variable <code>a</code>. In my last post I learned that the “l”
+suffix in movl means the instruction will move a long, or 32 bit value, from
+one place to another. I also learned last time that the “$” prefix means the
+number 42 is a constant.</p>
+
+<p>But where is <code>a</code> located? And what does <code>-4(%rbp)</code> mean? The surrounding
+instructions are worse; they use similar syntax but there are no clues as to
+what they are doing. Like a frustrated high school student trying to read <em>The
+Tempest</em>, I’m at a loss.</p>
+
+<p>I need some cliff notes. I need to see this assembly language script translated
+into standard, modern English, a language I understand.</p>
+
+<p><img src="http://localhost/assets/2017/1/19/the-tempest-cleaned-up.png"></p>
+
+<div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px">
+  <i>C code is like a modern, cleaned up copy of a Shakespeare<br/>
+play. Equally confusing but somewhat easier to read.</i>
+</div>
+
+
+<h2>Transcribing x86 Assembly Language into C</h2>
+
+<p>To illustrate what I mean, I’ll rewrite each x86 instruction with the
+equivalent C syntax:</p>
+
+<p><img src="http://localhost/assets/2017/1/19/transcribe.png"></p>
+
+<p>If you’re an experienced C programmer, the pseudocode on the right side should
+be somewhat more readable. You can see how the x86 instructions access memory
+by interpreting register values as memory addresses, and how instructions can
+also pre-decrement or post-increment these addresses. We’ve translated
+something completely unfamiliar into a format that is somewhat easier to
+follow.</p>
+
+<p>If you’re not familiar with C, then skip down to the next section, where I’ll
+explain what three of these instructions do. You’ll learn what the x86 and C
+notation means, how they are different and how they are similar.</p>
+
+<h2>C: A Mix of High And Low Level Notation</h2>
+
+<p>But while my C pseudocode is syntactically correct, it makes no sense. Negative
+array indices are normally invalid in C, and, of course, a C program would
+never directly reference the registers on the CPU directly like this to begin
+with.</p>
+
+<p>In fact, a proper C program to add 42 would resemble the Ruby code I started
+with above:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="preprocessor">#include</span> <span class="include">&lt;stdio.h&gt;</span>
+
+<span class="predefined-type">unsigned</span> <span class="predefined-type">int</span> add_forty_two(n)
+{
+  <span class="predefined-type">unsigned</span> <span class="predefined-type">int</span> a = <span class="integer">42</span>; 
+  <span class="keyword">return</span> a+n;
+}
+
+printf(<span class="string"><span class="delimiter">&quot;</span><span class="content">50 + 42 is %d</span><span class="delimiter">&quot;</span></span>, add_forty_two(<span class="integer">50</span>));
+</pre></div>
+</div>
+
+
+
+<p>My point today is that C mixes high and low level language notation. The
+underlying features and capabilities of my x86 microprocessor leak through into
+C programming syntax. Writing in C, I can create functions, variables and
+return values like a high level language, but I can also drop down to the level
+my microprocessor operates at, accessing memory directly using pointers.</p>
+
+<p>And knowing how to use C pointers, I’m one step closer to understanding x86
+assembly language. As we’ll see next, there are a few important differences
+between C and x86 notation which I need to understand carefully. But these are
+superficial. It turns out that simply by learning C I’ve also learned a lot
+about what my computer’s microprocessor is capable of.</p>
+
+<p>In a future article I’ll try to figure out <em>why</em> the x86 instructions above do
+what they do &ndash; how my compiler assigns local variables to locations on the
+stack, and what the stack is. But for today, let’s focus on the meaning of the
+x86 and C pointer notation.</p>
+
+<h2>A Backwards, Inside Out Array</h2>
+
+<p>Let’s start with the move instruction that copies 42 into a certain memory
+address. Here’s the C translation:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+rbp[<span class="integer">-1</span>] = <span class="integer">42</span>;
+</pre></div>
+</div>
+
+
+
+<p>This line of code looks simple enough, but actually there are a couple of very
+odd things about it. First, I wrote the C array <code>rbp</code> using the name of a
+register in my microprocessor. That is, I’m treating the <code>rbp</code> register as if it
+were a series of values, an array, and not a single value.</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array1.png" width=432></p>
+
+<p>But, in fact, any C programmers reading along might not be surprised by this:
+In C an array is really just a pointer to a block of memory and not a
+collection of objects or elements like it would be in Python, Ruby or some
+other high level language. A recent blog article featured on Hacker News
+discusses what arrays really are in C: <a href="https://blog.feabhas.com/2016/12/a-convenient-untruth">A convenient
+untruth</a>.</p>
+
+<p>The pointer itself is a number indicating where the memory block is located: a
+<em>memory address</em>:</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array2.png" width=800></p>
+
+<p>In x86 assembly language, the same move instruction appears this way:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+movl    <span class="global-variable">$42</span>, <span class="integer">-4</span>(%rbp)
+</pre></div>
+</div>
+
+
+
+<p>To me, the assembly language syntax is inside out: Instead of writing the array
+name followed by the index in brackets, I write the index first, followed by
+the array name in parentheses:</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array3.png" width=432></p>
+
+<p>The parentheses indicate the move instruction should consider the value in <code>rbp</code>
+to be a memory address, that it should move the value 42 to the memory address
+referenced by <code>rbp</code> (or actually to the memory address four bytes before the
+value of <code>rbp</code>) and not into <code>rbp</code> itself.</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array4.png" width=432></p>
+
+<p>As you can see, the other odd thing about this array is that it uses a negative
+index. The <code>movl</code> instruction copied 42 to a memory address that appeared before
+the start of the array &ndash; this array is not only inside-out, it’s backwards!</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array5.png" width=558></p>
+
+<p>In a C program, this would be a recipe for disaster. C programmers normally
+allocate memory for an array, and then access its elements using a positive (or
+zero) index value. Writing to a memory location using a negative index would
+overwrite memory located outside of the array, potentially causing a
+segmentation fault to occur immediately, or more likely causing my code to
+crash or misbehave later when it accessed this overwritten memory value.</p>
+
+<h2>x86 Array Indices</h2>
+
+<p>Reading the code above, you probably also noticed I wrote the C array using an
+index of -1, while the original x86 move instruction used -4. Why are these
+different? Why did I change the index values when I transcribed the assembly
+language into C?</p>
+
+<p>The reason is that x86 assembly language instructions always use byte counts,
+while C arrays use an element count index instead. To understand what I mean,
+let’s write a C declaration for this imaginary array before using it:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="predefined-type">unsigned</span> <span class="predefined-type">int</span> rbp[<span class="integer">100</span>];
+rbp[<span class="integer">2</span>] = <span class="integer">42</span>;
+</pre></div>
+</div>
+
+
+
+<p>Because C is a statically typed language, I have to declare the type of the
+array elements when I declare the array. In this example, <code>unsigned int</code> is
+equivalent to a 32-bit or 4 byte value, the same operand size used by the <code>movl</code>
+instruction. So here I’ve declared <code>rbp</code> as an array of 100 ints, using a memory
+segment containing a total of 4*100=400 bytes.</p>
+
+<p>Now when I write <code>rbp[2]</code> in C I access the element at position 2, or the third
+element:</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array6.png" width=447></p>
+
+<p>But notice that because each int element consists of 4 bytes, the memory
+location of <code>rbp+2</code> is actually 8 bytes larger than <code>rbp</code>. The index 2 is an
+element count: (2 elements) * (4 bytes/element) = 8 bytes.</p>
+
+<p>x86 assembly language, on the other hand, uses byte indexes. That means to
+access the same element in this array, I would write <code>8(%rbp)</code>:</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array7.png" width=698></p>
+
+<p>When you look at memory this way, from a detailed, physical point of view, the
+x86 byte count index makes more sense. <code>8(%rbp)</code> is the address <code>rbp</code> points to,
+plus 8 bytes. But this isn’t very convenient: Think of all the code you’ve
+written that uses arrays and their elements. Normally you don’t want to think
+about how many bytes each element uses in memory, and exactly how many bytes
+from the start of the array an element is located at. The C style of using an
+element count index makes much more sense.</p>
+
+<p>In the backwards array from my example program, the <code>movl</code> instruction was
+written as:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+movl    <span class="global-variable">$42</span>, <span class="integer">-4</span>(%rbp)
+</pre></div>
+</div>
+
+
+
+<p>This means “move the 4 byte long value 42 to a memory location 4 bytes before
+the address found in the <code>rbp</code> register.”</p>
+
+<p>But in C, I would write</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+rbp[<span class="integer">-1</span>] = <span class="integer">42</span>;
+</pre></div>
+</div>
+
+
+
+<p>This means “Set the -2nd element of the array to 42” &ndash; much more
+straightforward (although still a bit weird).</p>
+
+<h2>Pushing a Value Onto The Stack</h2>
+
+<p>Next let’s take a look at the first x86 instruction in my program:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+pushq   %rbp  
+</pre></div>
+</div>
+
+
+
+<p>This instruction, <code>pushq</code>, pushes a new value onto the top of the stack. Think of
+the stack as just a special array of values in memory. Reading the equivalent C
+code makes this a bit easier to follow:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+*--rsp = rbp;
+</pre></div>
+</div>
+
+
+
+<p>Here I wrote the C assignment using explicit pointer syntax: The pointer is the
+<code>rsp</code> or <em>stack pointer</em> register. The asterisk prefix is C notation for
+dereferencing a pointer: <code>*rsp</code> refers to the value stored at the memory location
+<code>rsp</code> points to, just as if I had written <code>rsp[0]</code>:</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array8.png" width=698></p>
+
+<p>Ignoring the minus signs for a moment, the C code <code>*rsp = rbp</code> means: “copy the
+value of <code>rbp</code> to the memory location whose address is contained in the <code>rsp</code>
+register.”</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array9.png" width=698></p>
+
+<p>What about the minus signs? C programmers will know these indicate the pointer,
+in this case <code>rsp</code>, should be decremented before its value is dereferenced. We
+write the minus signs before the pointer because the decrement operation
+happens before the pointer’s value is used. This is useful in this scenario
+because <code>rsp</code> will continue to point to the top of the stack.</p>
+
+<p>Imagine the <code>rsp</code> pointer starts at <code>0x00007fff5fbff8f8</code>. This is the top of the
+stack, initially:</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array10.png" width=698></p>
+
+<p>Then we decrement <code>rsp</code> so it points to a new top of the stack. The stack grows
+downward in x86 programs. Each time we push a value onto the stack we first
+decrement the stack pointer:</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array11.png" width=698></p>
+
+<p>And then the assignment writes the value of <code>rbp</code> to the top of the stack, using
+<code>rsp</code> after it has been decremented:</p>
+
+<p><img src="http://localhost/assets/2017/1/19/array12.png" width=698></p>
+
+<p>Notice another important detail here: The stack pointer is decremented by 8
+bytes, not 4 bytes as above. This is because the values we push onto the stack
+in this example are pointers, or 8 byte values. We’ll see why in a moment.</p>
+
+<p>What about the x86 notation? Pushing a value onto the stack is such a common
+operation x86 microprocessors have a special instruction for it: <code>push</code>.</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+pushq   %rbp  
+</pre></div>
+</div>
+
+
+
+<p>Just like with <code>movl</code>, the “q” suffix indicates how large the operand is, the
+size of the value that <code>push</code> copies to the stack. In this case “q” indicates the
+value is a 64 bit or 8 byte value. That’s why each value on the stack in the
+diagram above takes 8 bytes. If my program had used the <code>pushl</code> instruction, then
+it would have decremented the stack by only 4 bytes (a “long” instead of a
+“quad” value).</p>
+
+<p>This behavior of automatically adjusting the amount of decrement according to
+the operand size is a convenient feature of x86 microprocessors. And it’s also
+the origin of the C language <code>--</code> and <code>++</code> operators. To see what I mean, take a
+second look at the equivalent C assignment code:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+*--rsp = rbp;
+</pre></div>
+</div>
+
+
+
+<p>What does the <code>--</code> pre-decrement operator subtract from the pointer <code>rsp</code>? The
+answer is one element. If we imagine I declared <code>rsp</code> a pointer to an 8 byte long
+value:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+unsigned long *rsp;
+*--rsp = rbp;
+</pre></div>
+</div>
+
+
+
+<p>…then decrementing <code>rsp</code> will subtract 8 bytes, enough for one unsigned long
+value to fit. The <code>--</code> operator uses the size of the pointer’s referenced type to
+determine what value to subtract. And just like the <code>pushq</code> x86 instruction, the
+C <code>--</code> operator subtracts before the assignment occurs.</p>
+
+<p>Why does the C <code>--</code> operator function this way? Because the x86 assembly language
+functions in the same way. Because my computer’s microprocessor works that way.
+We’re seeing another example of how C’s behavior reflects the behavior and
+capability of my computer’s microprocessor.</p>
+
+<h2>Popping a Value Off The Stack</h2>
+
+<p>Here’s the last instruction in my example program:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+retq  
+</pre></div>
+</div>
+
+
+
+<p>This instruction, &ldquo;return,&rdquo; means the microprocessor should return to the
+calling function and continue execution from there. How does it work? Once
+again, let’s refer to the equivalent C assignment function to learn more:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+rip = *rsp++;
+</pre></div>
+</div>
+
+
+
+<p>Here the C code copies the value from the memory location referenced by the <code>rsp</code>
+pointer and saves it into the <code>rip</code> register.</p>
+
+<p><img src="http://localhost/assets/2017/1/19/pop1.png" width=698></p>
+
+<p>The <code>rip</code> register is known as the <em>instruction pointer</em>, which contains a very
+special and important value: the memory address of the next instruction my
+microprocessor should execute. This instruction copies an older value of <code>rip</code>
+from the stack, and saves it into the <code>rip</code> register again.</p>
+
+<p>Each time my program calls a function, the assembly language code saves the
+current value of <code>rip</code> on the stack and then sets <code>rip</code> to a new value: the
+location of the called function. When that function is finished, my program
+then retrieves the old value of <code>rip</code> from the stack, continuing execute from
+where it left off at the call site.</p>
+
+<p>After copying the old value of <code>rip</code> from the stack, my program has to increment
+the <code>rsp</code> pointer in order to keep the <code>rsp</code> register pointing to the top of the
+stack. And in just the same way <code>pushq</code> did, <code>retq</code> uses the “q” suffix to
+determine how many bytes to add to the stack pointer after the copy is
+finished.</p>
+
+<p><img src="http://localhost/assets/2017/1/19/pop2.png" width=698></p>
+
+<p>Now we know where the C <code>++</code> post-increment operator’s behavior comes from:
+assembly language. Just as <code>retq</code> adds 8 bytes to <code>rsp</code>, the C expression <code>*rsp++</code>
+adds the size of 1 element to <code>rsp</code> based on the type of the pointer’s referenced
+type:</p>
+
+<div class="CodeRay">
+  <div class="code"><pre>
+<span class="predefined-type">unsigned</span> <span class="predefined-type">long</span> *rsp;
+rip = *rsp++;
+</pre></div>
+</div>
+
+
+
+<h2>Next Time</h2>
+
+<p>When I have time I&rsquo;d like to write one more post about x86 syntax. Now that
+I’ve learned what register prefixes and instruction suffixes mean in x86 code,
+and how to write instructions that use register values as memory addresses, I’m
+finally ready to read and understand a simple assembly language program. In my
+next point I’ll look at how my Crystal and C compilers assign memory addresses
+on the stack for local variables, and why they use a stack in the first place.
+Should be fun!</p>
+
+  </section>
+
+  
+</article>
+
+
+      </div>
+      
+        <div class="twocol last" id="right">
+          <div id="sidebar">
+            <img src="/assets/images/pat.jpg"/>
+            <div class="header">Subscribe</a></div>
+            <div class="links">
+              <ul>
+                <li>
+                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
+                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
+                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
+                </li>
+              </ul>
+            </div>
+            <div class="header">Buy my book</div>
+            <div class="links">
+              <ul>
+                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
+                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
+              </ul>
+            </div>
+            
+            <div class="header">Popular</div>
+            <div class="links">
+              <ul>
+                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
+                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
+                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
+                <li><a href="/2014/10/13/following-a-select-statement-through-postgres-internals">Following a Select Statement Through Postgres Internals</a></li>
+              </ul>
+            </div>
+            <div class="header"><a href="/">More...</a></div>
+          </div>
+        </div>
+      
+    <div class="row" id="copyright">
+      <p>Content and UI design &copy; 2016 Pat Shaughnessy</a>
+    </div>
+  </div>
+
+</body>
+</html>
+

@@ -7,11 +7,556 @@
     <name></name>
   </author>
   <entry>
+    <title>Pointers in C and x86 Assembly Language</title>
+    <link href="http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language" rel="alternate"/>
+    <id>http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language</id>
+    <published>2017-01-20T04:00:00Z</published>
+    <updated>2017-01-20T04:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 0px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://localhost/assets/2017/1/19/ram.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;16GB of DDR random access memory&lt;br/&gt;
+  my son used in his new gaming PC
+&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Recently I’ve been trying to learn how to read x86 assembly language. In &lt;a href="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-lang</summary>
+    <content type="html">&lt;div style="float: left; padding: 0px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://localhost/assets/2017/1/19/ram.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;16GB of DDR random access memory&lt;br/&gt;
+  my son used in his new gaming PC
+&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Recently I’ve been trying to learn how to read x86 assembly language. In &lt;a href="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language"&gt;my
+last
+post&lt;/a&gt;,
+I explored basic x86 syntax in a very simple program that used a few registers.
+But in that post I didn’t cover how instructions refer to values located in
+memory and not in a register. To be useful at all, x86 code must load data from
+memory into a register, and eventually save data from a register back into
+memory.&lt;/p&gt;
+
+&lt;p&gt;Assembly language instructions access values in memory by considering a
+register’s contents to be a memory address, and then dereferencing it the same
+way you would use a pointer in a C program. In fact, to me C and assembly
+language seem very similar in this way, which I suspect is not a coincidence.&lt;/p&gt;
+
+&lt;p&gt;Today I’ll read and try to understand a very simple x86 assembly language
+program that reads from and writes to memory. To make the x86 instructions a
+bit easier to follow, I’ll first rewrite them using C pointer syntax. If you’re
+an experienced C programmer, this will make the x86 code easy to read. Or if
+you’re not familiar with C, this is your chance to learn both C and x86 pointer
+syntax at the same time.&lt;/p&gt;
+
+&lt;h2&gt;Writing A Program That Accesses Memory&lt;/h2&gt;
+
+&lt;p&gt;But first, we need an example program that accesses memory. Where can I find
+one? Do I need to find some low level code from a device driver or operating
+system kernel? No, of course not! Every program you or I have ever written
+accesses memory. All I need to do is translate one of them into x86 assembly
+language.&lt;/p&gt;
+
+&lt;p&gt;I’ll use my Ruby example from last time, but with a new line of code that saves
+the constant value 42 into a local variable. After I compile it I’ll able able
+to look for the number 42 in the assembly language code:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;add_forty_two&lt;/span&gt;(n)
+  a = &lt;span class="integer"&gt;42&lt;/span&gt;
+  n+a 
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Once again I’ll use Crystal to compile my Ruby code:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+crystal build add_forty_two.rb --emit asm
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Searching through the generated &lt;code&gt;add_forty_two.s file&lt;/code&gt;, I find “add_forty_two,”
+clean it up and paste it back into my Ruby function:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;add_forty_two&lt;/span&gt;(n)
+
+  pushq   %rbp  
+  movq    %rsp, %rbp
+  movl    %edi, &lt;span class="integer"&gt;-8&lt;/span&gt;(%rbp)
+  movl    &lt;span class="global-variable"&gt;$42&lt;/span&gt;, &lt;span class="integer"&gt;-4&lt;/span&gt;(%rbp)
+  movl    &lt;span class="integer"&gt;-8&lt;/span&gt;(%rbp), %eax
+  addl    &lt;span class="integer"&gt;-4&lt;/span&gt;(%rbp), %eax
+  popq    %rbp  
+  retq  
+
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;h2&gt;Assembly Language: The Script Your Computer Follows&lt;/h2&gt;
+
+&lt;p&gt;This code is quite literally the script my computer follows: What happens when
+I call &lt;code&gt;add_forty_two&lt;/code&gt;? How does my computer know what to do? How does it add 42
+to the given argument? It follows the script.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/the-tempest.png"&gt;&lt;/p&gt;
+
+&lt;div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px"&gt;
+  &lt;i&gt;Trying to read x86 assembly language is a bit like&lt;br/&gt;
+trying to read an old Shakespearean manuscript&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;The problem is this script contains Old English words I don’t understand &amp;ndash; and
+the words I do know are spelled differently. I can almost understand what this
+line of code means:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+movl    &lt;span class="global-variable"&gt;$42&lt;/span&gt;, &lt;span class="integer"&gt;-4&lt;/span&gt;(%rbp)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;…but not quite. I can guess by reading my original Ruby code it’s probably
+saving 42 in the local variable &lt;code&gt;a&lt;/code&gt;. In my last post I learned that the “l”
+suffix in movl means the instruction will move a long, or 32 bit value, from
+one place to another. I also learned last time that the “$” prefix means the
+number 42 is a constant.&lt;/p&gt;
+
+&lt;p&gt;But where is &lt;code&gt;a&lt;/code&gt; located? And what does &lt;code&gt;-4(%rbp)&lt;/code&gt; mean? The surrounding
+instructions are worse; they use similar syntax but there are no clues as to
+what they are doing. Like a frustrated high school student trying to read &lt;em&gt;The
+Tempest&lt;/em&gt;, I’m at a loss.&lt;/p&gt;
+
+&lt;p&gt;I need some cliff notes. I need to see this assembly language script translated
+into standard, modern English, a language I understand.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/the-tempest-cleaned-up.png"&gt;&lt;/p&gt;
+
+&lt;div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px"&gt;
+  &lt;i&gt;C code is like a modern, cleaned up copy of a Shakespeare&lt;br/&gt;
+play. Equally confusing but somewhat easier to read.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;h2&gt;Transcribing x86 Assembly Language into C&lt;/h2&gt;
+
+&lt;p&gt;To illustrate what I mean, I’ll rewrite each x86 instruction with the
+equivalent C syntax:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/transcribe.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;If you’re an experienced C programmer, the pseudocode on the right side should
+be somewhat more readable. You can see how the x86 instructions access memory
+by interpreting register values as memory addresses, and how instructions can
+also pre-decrement or post-increment these addresses. We’ve translated
+something completely unfamiliar into a format that is somewhat easier to
+follow.&lt;/p&gt;
+
+&lt;p&gt;If you’re not familiar with C, then skip down to the next section, where I’ll
+explain what three of these instructions do. You’ll learn what the x86 and C
+notation means, how they are different and how they are similar.&lt;/p&gt;
+
+&lt;h2&gt;C: A Mix of High And Low Level Notation&lt;/h2&gt;
+
+&lt;p&gt;But while my C pseudocode is syntactically correct, it makes no sense. Negative
+array indices are normally invalid in C, and, of course, a C program would
+never directly reference the registers on the CPU directly like this to begin
+with.&lt;/p&gt;
+
+&lt;p&gt;In fact, a proper C program to add 42 would resemble the Ruby code I started
+with above:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="preprocessor"&gt;#include&lt;/span&gt; &lt;span class="include"&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;
+
+&lt;span class="predefined-type"&gt;unsigned&lt;/span&gt; &lt;span class="predefined-type"&gt;int&lt;/span&gt; add_forty_two(n)
+{
+  &lt;span class="predefined-type"&gt;unsigned&lt;/span&gt; &lt;span class="predefined-type"&gt;int&lt;/span&gt; a = &lt;span class="integer"&gt;42&lt;/span&gt;; 
+  &lt;span class="keyword"&gt;return&lt;/span&gt; a+n;
+}
+
+printf(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;50 + 42 is %d&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, add_forty_two(&lt;span class="integer"&gt;50&lt;/span&gt;));
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;My point today is that C mixes high and low level language notation. The
+underlying features and capabilities of my x86 microprocessor leak through into
+C programming syntax. Writing in C, I can create functions, variables and
+return values like a high level language, but I can also drop down to the level
+my microprocessor operates at, accessing memory directly using pointers.&lt;/p&gt;
+
+&lt;p&gt;And knowing how to use C pointers, I’m one step closer to understanding x86
+assembly language. As we’ll see next, there are a few important differences
+between C and x86 notation which I need to understand carefully. But these are
+superficial. It turns out that simply by learning C I’ve also learned a lot
+about what my computer’s microprocessor is capable of.&lt;/p&gt;
+
+&lt;p&gt;In a future article I’ll try to figure out &lt;em&gt;why&lt;/em&gt; the x86 instructions above do
+what they do &amp;ndash; how my compiler assigns local variables to locations on the
+stack, and what the stack is. But for today, let’s focus on the meaning of the
+x86 and C pointer notation.&lt;/p&gt;
+
+&lt;h2&gt;A Backwards, Inside Out Array&lt;/h2&gt;
+
+&lt;p&gt;Let’s start with the move instruction that copies 42 into a certain memory
+address. Here’s the C translation:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+rbp[&lt;span class="integer"&gt;-1&lt;/span&gt;] = &lt;span class="integer"&gt;42&lt;/span&gt;;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;This line of code looks simple enough, but actually there are a couple of very
+odd things about it. First, I wrote the C array &lt;code&gt;rbp&lt;/code&gt; using the name of a
+register in my microprocessor. That is, I’m treating the &lt;code&gt;rbp&lt;/code&gt; register as if it
+were a series of values, an array, and not a single value.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array1.png" width=432&gt;&lt;/p&gt;
+
+&lt;p&gt;But, in fact, any C programmers reading along might not be surprised by this:
+In C an array is really just a pointer to a block of memory and not a
+collection of objects or elements like it would be in Python, Ruby or some
+other high level language. A recent blog article featured on Hacker News
+discusses what arrays really are in C: &lt;a href="https://blog.feabhas.com/2016/12/a-convenient-untruth"&gt;A convenient
+untruth&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The pointer itself is a number indicating where the memory block is located: a
+&lt;em&gt;memory address&lt;/em&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array2.png" width=800&gt;&lt;/p&gt;
+
+&lt;p&gt;In x86 assembly language, the same move instruction appears this way:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+movl    &lt;span class="global-variable"&gt;$42&lt;/span&gt;, &lt;span class="integer"&gt;-4&lt;/span&gt;(%rbp)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;To me, the assembly language syntax is inside out: Instead of writing the array
+name followed by the index in brackets, I write the index first, followed by
+the array name in parentheses:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array3.png" width=432&gt;&lt;/p&gt;
+
+&lt;p&gt;The parentheses indicate the move instruction should consider the value in &lt;code&gt;rbp&lt;/code&gt;
+to be a memory address, that it should move the value 42 to the memory address
+referenced by &lt;code&gt;rbp&lt;/code&gt; (or actually to the memory address four bytes before the
+value of &lt;code&gt;rbp&lt;/code&gt;) and not into &lt;code&gt;rbp&lt;/code&gt; itself.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array4.png" width=432&gt;&lt;/p&gt;
+
+&lt;p&gt;As you can see, the other odd thing about this array is that it uses a negative
+index. The &lt;code&gt;movl&lt;/code&gt; instruction copied 42 to a memory address that appeared before
+the start of the array &amp;ndash; this array is not only inside-out, it’s backwards!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array5.png" width=558&gt;&lt;/p&gt;
+
+&lt;p&gt;In a C program, this would be a recipe for disaster. C programmers normally
+allocate memory for an array, and then access its elements using a positive (or
+zero) index value. Writing to a memory location using a negative index would
+overwrite memory located outside of the array, potentially causing a
+segmentation fault to occur immediately, or more likely causing my code to
+crash or misbehave later when it accessed this overwritten memory value.&lt;/p&gt;
+
+&lt;h2&gt;x86 Array Indices&lt;/h2&gt;
+
+&lt;p&gt;Reading the code above, you probably also noticed I wrote the C array using an
+index of -1, while the original x86 move instruction used -4. Why are these
+different? Why did I change the index values when I transcribed the assembly
+language into C?&lt;/p&gt;
+
+&lt;p&gt;The reason is that x86 assembly language instructions always use byte counts,
+while C arrays use an element count index instead. To understand what I mean,
+let’s write a C declaration for this imaginary array before using it:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="predefined-type"&gt;unsigned&lt;/span&gt; &lt;span class="predefined-type"&gt;int&lt;/span&gt; rbp[&lt;span class="integer"&gt;100&lt;/span&gt;];
+rbp[&lt;span class="integer"&gt;2&lt;/span&gt;] = &lt;span class="integer"&gt;42&lt;/span&gt;;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Because C is a statically typed language, I have to declare the type of the
+array elements when I declare the array. In this example, &lt;code&gt;unsigned int&lt;/code&gt; is
+equivalent to a 32-bit or 4 byte value, the same operand size used by the &lt;code&gt;movl&lt;/code&gt;
+instruction. So here I’ve declared &lt;code&gt;rbp&lt;/code&gt; as an array of 100 ints, using a memory
+segment containing a total of 4*100=400 bytes.&lt;/p&gt;
+
+&lt;p&gt;Now when I write &lt;code&gt;rbp[2]&lt;/code&gt; in C I access the element at position 2, or the third
+element:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array6.png" width=447&gt;&lt;/p&gt;
+
+&lt;p&gt;But notice that because each int element consists of 4 bytes, the memory
+location of &lt;code&gt;rbp+2&lt;/code&gt; is actually 8 bytes larger than &lt;code&gt;rbp&lt;/code&gt;. The index 2 is an
+element count: (2 elements) * (4 bytes/element) = 8 bytes.&lt;/p&gt;
+
+&lt;p&gt;x86 assembly language, on the other hand, uses byte indexes. That means to
+access the same element in this array, I would write &lt;code&gt;8(%rbp)&lt;/code&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array7.png" width=698&gt;&lt;/p&gt;
+
+&lt;p&gt;When you look at memory this way, from a detailed, physical point of view, the
+x86 byte count index makes more sense. &lt;code&gt;8(%rbp)&lt;/code&gt; is the address &lt;code&gt;rbp&lt;/code&gt; points to,
+plus 8 bytes. But this isn’t very convenient: Think of all the code you’ve
+written that uses arrays and their elements. Normally you don’t want to think
+about how many bytes each element uses in memory, and exactly how many bytes
+from the start of the array an element is located at. The C style of using an
+element count index makes much more sense.&lt;/p&gt;
+
+&lt;p&gt;In the backwards array from my example program, the &lt;code&gt;movl&lt;/code&gt; instruction was
+written as:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+movl    &lt;span class="global-variable"&gt;$42&lt;/span&gt;, &lt;span class="integer"&gt;-4&lt;/span&gt;(%rbp)
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;This means “move the 4 byte long value 42 to a memory location 4 bytes before
+the address found in the &lt;code&gt;rbp&lt;/code&gt; register.”&lt;/p&gt;
+
+&lt;p&gt;But in C, I would write&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+rbp[&lt;span class="integer"&gt;-1&lt;/span&gt;] = &lt;span class="integer"&gt;42&lt;/span&gt;;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;This means “Set the -2nd element of the array to 42” &amp;ndash; much more
+straightforward (although still a bit weird).&lt;/p&gt;
+
+&lt;h2&gt;Pushing a Value Onto The Stack&lt;/h2&gt;
+
+&lt;p&gt;Next let’s take a look at the first x86 instruction in my program:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+pushq   %rbp  
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;This instruction, &lt;code&gt;pushq&lt;/code&gt;, pushes a new value onto the top of the stack. Think of
+the stack as just a special array of values in memory. Reading the equivalent C
+code makes this a bit easier to follow:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+*--rsp = rbp;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Here I wrote the C assignment using explicit pointer syntax: The pointer is the
+&lt;code&gt;rsp&lt;/code&gt; or &lt;em&gt;stack pointer&lt;/em&gt; register. The asterisk prefix is C notation for
+dereferencing a pointer: &lt;code&gt;*rsp&lt;/code&gt; refers to the value stored at the memory location
+&lt;code&gt;rsp&lt;/code&gt; points to, just as if I had written &lt;code&gt;rsp[0]&lt;/code&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array8.png" width=698&gt;&lt;/p&gt;
+
+&lt;p&gt;Ignoring the minus signs for a moment, the C code &lt;code&gt;*rsp = rbp&lt;/code&gt; means: “copy the
+value of &lt;code&gt;rbp&lt;/code&gt; to the memory location whose address is contained in the &lt;code&gt;rsp&lt;/code&gt;
+register.”&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array9.png" width=698&gt;&lt;/p&gt;
+
+&lt;p&gt;What about the minus signs? C programmers will know these indicate the pointer,
+in this case &lt;code&gt;rsp&lt;/code&gt;, should be decremented before its value is dereferenced. We
+write the minus signs before the pointer because the decrement operation
+happens before the pointer’s value is used. This is useful in this scenario
+because &lt;code&gt;rsp&lt;/code&gt; will continue to point to the top of the stack.&lt;/p&gt;
+
+&lt;p&gt;Imagine the &lt;code&gt;rsp&lt;/code&gt; pointer starts at &lt;code&gt;0x00007fff5fbff8f8&lt;/code&gt;. This is the top of the
+stack, initially:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array10.png" width=698&gt;&lt;/p&gt;
+
+&lt;p&gt;Then we decrement &lt;code&gt;rsp&lt;/code&gt; so it points to a new top of the stack. The stack grows
+downward in x86 programs. Each time we push a value onto the stack we first
+decrement the stack pointer:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array11.png" width=698&gt;&lt;/p&gt;
+
+&lt;p&gt;And then the assignment writes the value of &lt;code&gt;rbp&lt;/code&gt; to the top of the stack, using
+&lt;code&gt;rsp&lt;/code&gt; after it has been decremented:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array12.png" width=698&gt;&lt;/p&gt;
+
+&lt;p&gt;Notice another important detail here: The stack pointer is decremented by 8
+bytes, not 4 bytes as above. This is because the values we push onto the stack
+in this example are pointers, or 8 byte values. We’ll see why in a moment.&lt;/p&gt;
+
+&lt;p&gt;What about the x86 notation? Pushing a value onto the stack is such a common
+operation x86 microprocessors have a special instruction for it: &lt;code&gt;push&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+pushq   %rbp  
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Just like with &lt;code&gt;movl&lt;/code&gt;, the “q” suffix indicates how large the operand is, the
+size of the value that &lt;code&gt;push&lt;/code&gt; copies to the stack. In this case “q” indicates the
+value is a 64 bit or 8 byte value. That’s why each value on the stack in the
+diagram above takes 8 bytes. If my program had used the &lt;code&gt;pushl&lt;/code&gt; instruction, then
+it would have decremented the stack by only 4 bytes (a “long” instead of a
+“quad” value).&lt;/p&gt;
+
+&lt;p&gt;This behavior of automatically adjusting the amount of decrement according to
+the operand size is a convenient feature of x86 microprocessors. And it’s also
+the origin of the C language &lt;code&gt;--&lt;/code&gt; and &lt;code&gt;++&lt;/code&gt; operators. To see what I mean, take a
+second look at the equivalent C assignment code:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+*--rsp = rbp;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;What does the &lt;code&gt;--&lt;/code&gt; pre-decrement operator subtract from the pointer &lt;code&gt;rsp&lt;/code&gt;? The
+answer is one element. If we imagine I declared &lt;code&gt;rsp&lt;/code&gt; a pointer to an 8 byte long
+value:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+unsigned long *rsp;
+*--rsp = rbp;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;…then decrementing &lt;code&gt;rsp&lt;/code&gt; will subtract 8 bytes, enough for one unsigned long
+value to fit. The &lt;code&gt;--&lt;/code&gt; operator uses the size of the pointer’s referenced type to
+determine what value to subtract. And just like the &lt;code&gt;pushq&lt;/code&gt; x86 instruction, the
+C &lt;code&gt;--&lt;/code&gt; operator subtracts before the assignment occurs.&lt;/p&gt;
+
+&lt;p&gt;Why does the C &lt;code&gt;--&lt;/code&gt; operator function this way? Because the x86 assembly language
+functions in the same way. Because my computer’s microprocessor works that way.
+We’re seeing another example of how C’s behavior reflects the behavior and
+capability of my computer’s microprocessor.&lt;/p&gt;
+
+&lt;h2&gt;Popping a Value Off The Stack&lt;/h2&gt;
+
+&lt;p&gt;Here’s the last instruction in my example program:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+retq  
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;This instruction, &amp;ldquo;return,&amp;rdquo; means the microprocessor should return to the
+calling function and continue execution from there. How does it work? Once
+again, let’s refer to the equivalent C assignment function to learn more:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+rip = *rsp++;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;Here the C code copies the value from the memory location referenced by the &lt;code&gt;rsp&lt;/code&gt;
+pointer and saves it into the &lt;code&gt;rip&lt;/code&gt; register.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/pop1.png" width=698&gt;&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;rip&lt;/code&gt; register is known as the &lt;em&gt;instruction pointer&lt;/em&gt;, which contains a very
+special and important value: the memory address of the next instruction my
+microprocessor should execute. This instruction copies an older value of &lt;code&gt;rip&lt;/code&gt;
+from the stack, and saves it into the &lt;code&gt;rip&lt;/code&gt; register again.&lt;/p&gt;
+
+&lt;p&gt;Each time my program calls a function, the assembly language code saves the
+current value of &lt;code&gt;rip&lt;/code&gt; on the stack and then sets &lt;code&gt;rip&lt;/code&gt; to a new value: the
+location of the called function. When that function is finished, my program
+then retrieves the old value of &lt;code&gt;rip&lt;/code&gt; from the stack, continuing execute from
+where it left off at the call site.&lt;/p&gt;
+
+&lt;p&gt;After copying the old value of &lt;code&gt;rip&lt;/code&gt; from the stack, my program has to increment
+the &lt;code&gt;rsp&lt;/code&gt; pointer in order to keep the &lt;code&gt;rsp&lt;/code&gt; register pointing to the top of the
+stack. And in just the same way &lt;code&gt;pushq&lt;/code&gt; did, &lt;code&gt;retq&lt;/code&gt; uses the “q” suffix to
+determine how many bytes to add to the stack pointer after the copy is
+finished.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/pop2.png" width=698&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we know where the C &lt;code&gt;++&lt;/code&gt; post-increment operator’s behavior comes from:
+assembly language. Just as &lt;code&gt;retq&lt;/code&gt; adds 8 bytes to &lt;code&gt;rsp&lt;/code&gt;, the C expression &lt;code&gt;*rsp++&lt;/code&gt;
+adds the size of 1 element to &lt;code&gt;rsp&lt;/code&gt; based on the type of the pointer’s referenced
+type:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+&lt;span class="predefined-type"&gt;unsigned&lt;/span&gt; &lt;span class="predefined-type"&gt;long&lt;/span&gt; *rsp;
+rip = *rsp++;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;h2&gt;Next Time&lt;/h2&gt;
+
+&lt;p&gt;When I have time I&amp;rsquo;d like to write one more post about x86 syntax. Now that
+I’ve learned what register prefixes and instruction suffixes mean in x86 code,
+and how to write instructions that use register values as memory addresses, I’m
+finally ready to read and understand a simple assembly language program. In my
+next point I’ll look at how my Crystal and C compilers assign memory addresses
+on the stack for local variables, and why they use a stack in the first place.
+Should be fun!&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Learning to Read x86 Assembly Language</title>
     <link href="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language" rel="alternate"/>
     <id>http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language</id>
-    <published>2016-11-26T01:00:00Z</published>
-    <updated>2016-11-26T01:00:00Z</updated>
+    <published>2016-11-26T04:00:00Z</published>
+    <updated>2016-11-26T04:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -484,8 +1029,8 @@ few more important syntax rules of x86 assembly language.&lt;/p&gt;
     <title>Need a Second Opinion on Your Ruby Code? Ask Crystal</title>
     <link href="http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal" rel="alternate"/>
     <id>http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal</id>
-    <published>2016-10-07T00:00:00Z</published>
-    <updated>2016-10-07T00:00:00Z</updated>
+    <published>2016-10-07T03:00:00Z</published>
+    <updated>2016-10-07T03:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1242,8 +1787,8 @@ You might be surprised by what Crystal finds.&lt;/p&gt;
     <title>Two Dumb Ruby Mistakes</title>
     <link href="http://patshaughnessy.net/2016/4/2/two-dumb-ruby-mistakes" rel="alternate"/>
     <id>http://patshaughnessy.net/2016/4/2/two-dumb-ruby-mistakes</id>
-    <published>2016-04-02T00:00:00Z</published>
-    <updated>2016-04-02T00:00:00Z</updated>
+    <published>2016-04-02T03:00:00Z</published>
+    <updated>2016-04-02T03:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1651,8 +2196,8 @@ catch me every time I fall.&lt;/p&gt;
     <title>Is Your Postgres Query Starved for Memory?</title>
     <link href="http://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory" rel="alternate"/>
     <id>http://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory</id>
-    <published>2016-01-22T01:00:00Z</published>
-    <updated>2016-01-22T01:00:00Z</updated>
+    <published>2016-01-22T04:00:00Z</published>
+    <updated>2016-01-22T04:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -1974,8 +2519,8 @@ starved!&lt;/p&gt;
     <title>A Look at How Postgres Executes a Tiny Join</title>
     <link href="http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join</id>
-    <published>2015-11-24T01:00:00Z</published>
-    <updated>2015-11-24T01:00:00Z</updated>
+    <published>2015-11-24T04:00:00Z</published>
+    <updated>2015-11-24T04:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2497,8 +3042,8 @@ has done over the years!&lt;/p&gt;
     <title>What Do Perl and Go Have in Common?</title>
     <link href="http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common</id>
-    <published>2015-09-25T00:00:00Z</published>
-    <updated>2015-09-25T00:00:00Z</updated>
+    <published>2015-09-25T03:00:00Z</published>
+    <updated>2015-09-25T03:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -2771,8 +3316,8 @@ words in simple, or even beautiful, ways.&lt;/p&gt;
     <title>Don’t Let Your Data Out of the Database</title>
     <link href="http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database</id>
-    <published>2015-06-18T00:00:00Z</published>
-    <updated>2015-06-18T00:00:00Z</updated>
+    <published>2015-06-18T03:00:00Z</published>
+    <updated>2015-06-18T03:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -3193,8 +3738,8 @@ the values your application really needs.&lt;/p&gt;
     <title>Mark Methods Private When You Don’t Test Them</title>
     <link href="http://patshaughnessy.net/2015/2/16/mark-methods-private-when-you-dont-test-them" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/2/16/mark-methods-private-when-you-dont-test-them</id>
-    <published>2015-02-16T01:00:00Z</published>
-    <updated>2015-02-16T01:00:00Z</updated>
+    <published>2015-02-16T04:00:00Z</published>
+    <updated>2015-02-16T04:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -3525,8 +4070,8 @@ test suite.&lt;/p&gt;
     <title>Using Rake to Generate a Blog</title>
     <link href="http://patshaughnessy.net/2015/1/8/using-rake-to-generate-a-blog" rel="alternate"/>
     <id>http://patshaughnessy.net/2015/1/8/using-rake-to-generate-a-blog</id>
-    <published>2015-01-08T01:00:00Z</published>
-    <updated>2015-01-08T01:00:00Z</updated>
+    <published>2015-01-08T04:00:00Z</published>
+    <updated>2015-01-08T04:00:00Z</updated>
     <category>ruby</category>
     <author>
       <name></name>
@@ -3777,278 +4322,6 @@ please take the time to watch the &lt;a href="http://www.confreaks.com/videos/98
 of Ruby’s most powerful tools &amp;ndash; and you’ll be able spend some time with Jim.
 Jim’s bright personality and sense of humor can live on in our memory, at
 least.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Koichi Sasada Encourages Us To Contribute To Ruby</title>
-    <link href="http://patshaughnessy.net/2014/12/17/koichi-sasada-encourages-us-to-contribute-to-ruby" rel="alternate"/>
-    <id>http://patshaughnessy.net/2014/12/17/koichi-sasada-encourages-us-to-contribute-to-ruby</id>
-    <published>2014-12-17T01:00:00Z</published>
-    <updated>2014-12-17T01:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div class="epigraph"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/12/17/microscope.png"&gt;
-  &lt;div class="epigraph-text"&gt;Ruby処理系開発コミュニティは、&lt;br/&gt;あなたの挑戦を歓迎する。&lt;/div&gt;
-  &lt;div class="epigraph-caption"&gt;
-  The Ruby core community welcomes your challenge.
-  &lt;/div&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Today I’m happy to post an English translation of a new appendix to &lt;a href="http://patshaughnessy.net/ruby-under-a-microscope"&gt;Ru</summary>
-    <content type="html">&lt;div class="epigraph"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/12/17/microscope.png"&gt;
-  &lt;div class="epigraph-text"&gt;Ruby処理系開発コミュニティは、&lt;br/&gt;あなたの挑戦を歓迎する。&lt;/div&gt;
-  &lt;div class="epigraph-caption"&gt;
-  The Ruby core community welcomes your challenge.
-  &lt;/div&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Today I’m happy to post an English translation of a new appendix to &lt;a href="http://patshaughnessy.net/ruby-under-a-microscope"&gt;Ruby Under a
-Microscope&lt;/a&gt; written by
-Koichi Sasada (&lt;a href="https://twitter.com/_ko1"&gt;@_ko1&lt;/a&gt;), included in the Japanese
-edition last month. As you probably know, Koichi is the developer behind the
-virtual machine used by Ruby since Ruby 1.9 was released, known as “YARV.” He
-writes about the early days of YARV (apparently he wrote the first version
-during a single vacation week!) as well as some interesting aspects of its
-technical design.&lt;/p&gt;
-
-&lt;p&gt;But what struck me the most about this essay &amp;ndash; what I found encouraging and
-inspiring &amp;ndash; was the story about how Koichi first became involved in Ruby
-core development. He writes about how certain Ruby meetups and book
-clubs created an environment that enabled him to learn and innovate. This
-environment lead directly to the development of YARV, which enables all our
-Ruby programs to run faster today.&lt;/p&gt;
-
-&lt;p&gt;He concludes with a message for all of us: We should follow in his footsteps
-and not be afraid to contribute to Ruby, to create “yet another Ruby
-implementation.” Thinking about his story, to do this maybe we need to seek out
-&amp;ndash; or to create &amp;ndash; the right learning environment, like the one Koichi found in
-Japan 10 years ago. Thanks for writing this, Koichi! I’m happy and proud that
-RUM now concludes with this message.&lt;/p&gt;
-
-&lt;p&gt;Japanese-language edition copyright &amp;copy; 2014 by Ohmsha, Ltd. Reproduced with
-permission of the copyright owner.&lt;/p&gt;
-
-&lt;div style="clear: left"&gt;&lt;/div&gt;
-
-
-
-
-&lt;div class="appendix"&gt;A&lt;/div&gt;
-
-
-&lt;div class="appendix-title"&gt;さらにそのほかの&lt;br/&gt;Ruby仮想マシン&lt;/div&gt;
-
-
-&lt;br/&gt;
-
-
-&lt;div class="appendix-translation"&gt;
-Yet More Ruby Virtual Machines
-&lt;/div&gt;
-
-
-
-
-&lt;div class="jp"&gt;
-&lt;p&gt;今回、私（笹田）がYARV：Yet Another RubyVMの開発者であるという縁で、本書の付録にYARVについて寄稿する機会を得た。本書では、多くのページを割いてYARVの中身を解説していただいている。しかも、原著は英語の著作であるので、世界中で読まれていることになる。ソフトウェア開発者として、たいへん光栄であると共に、読みながら実装の非効率な部分などを見つけてしまい、恥ずかしい思いもある。本稿では、YARVについて少し補足する。&lt;/p&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;I (Koichi Sasada) am thankful to have a chance to write about YARV in this
-appendix as a developer of YARV: Yet Another Ruby VM. Many pages of this book
-describe the internals of YARV. Furthermore, the original edition is written in
-English and has been read by people all over the world. I am greatly honored by
-that as a software developer, although it humbles me to have found several
-inefficiencies in YARV’s implementation while reading the book. In this appendix,
-I will give some supplemental information and background on the design and
-implementation of YARV.&lt;/p&gt;
-
-&lt;div class="jp"&gt;
-&lt;h2&gt;YARV: Yet Another RubyVM&lt;/h2&gt;
-&lt;p&gt;YARVは、2004年の正月に、その当時より興味のあったRuby向け仮想マシンとして開発に着手し、簡単なものを1週間程度で開発した。おそらく、暇だったのだと思う。最初のアナウンスメール（[ruby-dev:22494]）を見ると、フィボナッチ数を求めるプログラムは動いていたようである。&lt;/p&gt;
-&lt;p&gt;開発当初、YARVはRuby 1.8向けの拡張ライブラリとして実装していた。つまり、実行エンジンをすべて差し替えるのではなく、Ruby 1.8処理系から、指定したRubyプログラムをYARV上で実行する、という構造としていた。Ruby 1.8処理系の上に、もう1つRuby処理系を重ねていたことになる。この構造により、十分に安定しているRuby 1.8処理系を用いて、YARVの試験を比較的容易に行うことができた。また、GCやC APIなどの関数といった基盤コードをそのまま利用することもできた。そして、開発が進んだ後、スレッドなどをサポートするため、一気にRuby 1.8処理系のコア部分を取り除き、YARVに置き換えた。しかし、GCなどの基盤コードはその後も流用を続けた。当初より、Rubyインタプリタ（MRI/CRuby）はC言語と親和性の高い処理系として知られているが、YARVもその特長を受け継いでいる。そして、置き換えたものがRuby 1.9としてリリースされ、2014年現在も、RubyVMとして利用されている。&lt;/p&gt;
-&lt;p&gt;よく、YARV：Yet Another RubyVMは、公式に取り込まれたので、Yet Anotherな処理系ではないのではないか、という指摘を受けるが、なんとなく語呂が良いので利用を続けている。ただし、ファイル名やクラス名には利用しないようにしている。開発当時、Ruby向け仮想マシンは、既にいくつか提案されていた。特に、Rubyの生みの親であるまつもと氏によるRiteVM、そしてByteCodeRubyというプロジェクトが知られていたと思う。そのため、“Yet Another”という名前を付けた。もちろん、yaccに代表されるように、この業界では“Yet Another”なものが多く利用されることも多かったため、同じようにYARVも多く利用されるよう、願をかけたということもある。ちなみに、RiteVMは、まつもと氏が鋭意開発しているmrubyの仮想マシンの名前となっている。&lt;/p&gt;
-&lt;/div&gt;
-
-
-&lt;h2&gt;YARV: Yet Another RubyVM&lt;/h2&gt;
-
-&lt;p&gt;I started the development of YARV during the New Year&amp;rsquo;s holiday in 2004. I had
-already been interested in a virtual machine for Ruby at that time. I built a
-simple prototype within about a week. I must have had plenty of time to kill
-back then. According to the first announcement ([ruby-dev:22494]), it was
-capable of running a program to calculate Fibonacci numbers.&lt;/p&gt;
-
-&lt;p&gt;In its early stages of development, I implemented YARV as an extension library
-for Ruby 1.8. Instead of replacing the whole runtime engine, I designed it to
-be used by Ruby 1.8 as a VM to run specific programs. In other words, it was
-another Ruby implementation on top of the Ruby 1.8 implementation. This
-architecture allowed us to test YARV with relative ease using Ruby 1.8, which
-was sufficiently stable. We could continue using the base mechanisms of Ruby
-1.8, such as GC, C APIs and so on. After finishing a substantial part of the
-development, the Ruby 1.8 core was removed and replaced with YARV all at once,
-in order to support features such as threads. However, we kept using
-infrastructure code, such as GC, after that. The Ruby interpreter (MRI/CRuby)
-is known to have an affinity to the C programming language. YARV inherits that
-characteristic as well. Then a new version of Ruby containing YARV at its core
-was released as Ruby 1.9. As of this writing in 2014, YARV has been used as the
-Ruby VM since then.&lt;/p&gt;
-
-&lt;p&gt;People often point out that YARV is not &amp;ldquo;Yet Another&amp;rdquo; anymore, because it is
-the official VM now. Though we still use the name because it somehow sounds
-familiar, we make it a rule not to use &amp;ldquo;YARV&amp;rdquo; in file names or class names. When
-I started working on YARV, there had already been several proposals for the
-development of new virtual machines for Ruby. RiteVM by Matz, the creator of
-Ruby, and ByteCodeRuby were the most well known projects then, as far as I can
-remember. That lead me to prefix the name of our VM with “Yet Another.” Of
-course, I named it so hoping it would become popular. There are many examples
-of software programs that have “Yet Another” in their names and nevertheless became
-popular: for example yacc. By the way, RiteVM is now the name of the mruby VM
-which Matz is actively developing.&lt;/p&gt;
-
-&lt;div class="jp"&gt;
-&lt;h2&gt;YARVの設計方針&lt;/h2&gt;
-&lt;p&gt;YARVは当時の最新版であるRuby 1.8の仕様を踏襲するのではなく、その次の版である、Ruby 1.9の仕様を実装することとした。当時はRuby 1.9の仕様をどうするか議論していた。YARVではそのRuby 1.9の仕様のもとで開発を進めることにした。別の戦略として、Ruby 1.8に完全互換の仮想マシンを開発することで、多くの人に、即座に利用してもらうこともできた。しかし、いくつかのRuby 1.8の仕様がYARVで用いているスタックマシンでは実現困難であろうと思われたため、新しい仕様をベースに実装しつつ、困難な仕様は仕様変更できないか、交渉しながら開発を進めることとした。この戦略により、Ruby 1.9を実現するRubyインタプリタのひとつとなることができた。後に公式処理系としてマージされた理由のひとつだろうと思う。&lt;/p&gt;
-&lt;p&gt;YARVの詳細設計は本書で解説しているとおりである。ただし、本書で説明している設計に辿り着くまでには紆余曲折があった。特に思い浮かぶのは仮想マシンのスタックの構造である。本書では、2重スタックマシンと表現されているが、当初は1つのスタックしか用いていなかった。仮想ではない現実のプロセッサでは、1つのスタックの上に、計算領域と関数呼び出しフレーム構造を交互に確保する。YARVも当初はそのような構造であったが、あまりに複雑となってしまい、性能を犠牲にしても、2つのスタックを用いて管理しよう、という結論に至った。ブロックをクロージャとして取り出す仕組みを実装するとき、特に操作が複雑となったためである。幸いにして本書ではこのあたりの説明をうまく回避しており、読者がこのような複雑さに悩まなくて済むようになっている。ただ、一番難しく、苦労した部分でもあるため、機会があれば解説してみたい。ちなみに、2つのスタックを持つ、ということは、スタックオーバーフローのチェックコストも2倍になる、ということである。そこで、2つのスタックを、1つのメモリブロックで下端から上へ伸ばすスタック、上端から下へ伸ばすスタックとして実装した。この工夫により、2つのスタックのスタックオーバフローのチェックは、2つのスタックポインタの位置関係を1度確認するだけでよく、若干軽量にすることができた。&lt;/p&gt;
-&lt;/div&gt;
-
-
-&lt;h2&gt;Design Principles of YARV&lt;/h2&gt;
-
-&lt;p&gt;We chose to implement YARV for the Ruby 1.9 specification, instead of 1.8. At
-the time, Ruby 1.9 was the next version, and we were discussing its
-specification. We targeted YARV at that specification. We also had the option
-of implementing it for Ruby 1.8, thereby supporting a large number of users
-instantly. But some of the Ruby 1.8 features seemed difficult to implement with
-the stack machine which YARV is based on. So I decided to implement my VM for
-the newer spec, while negotiating with Ruby developers to change the parts of
-the specification that were hard to implement. This strategy worked well, and
-YARV became one of the interpreters to run Ruby 1.9. I think that was one of
-the reasons that it was finally merged in as an official VM.&lt;/p&gt;
-
-&lt;p&gt;This book correctly explains YARV’s design details. I would, however, like to add
-that it was not so straightforward to get to the current design. One of the
-things I remember is the stack structure of the virtual machine. The book
-describes YARV as a &amp;ldquo;double stack machine,&amp;rdquo; but it was using only one stack at
-first.  Actual microprocessors allocate a calculation area and a function call
-frame one after another on a single stack. YARV used a similar architecture at
-first, but it became too complicated. Later I concluded that it should have two
-stacks, even if I had to give up some efficiency. YARV’s operation became too
-complex especially when implementing the extraction of a block as a closure.
-Because this book cleverly avoids such hairy details, readers fortunately do
-not have to confront this sort of complexity. I hope, though, I have chance to
-explain that, because it was one of the most difficult parts to implement. By
-the way, having two stacks means that the cost of checking for stack overflows
-also doubles. So I implemented them both in the same memory block: one going
-from bottom to top and the other going from top to bottom.  This trick somewhat
-reduced the cost of checking for stack overflows, because we only have to check
-the positions of two stack pointers once.&lt;/p&gt;
-
-&lt;div class="jp"&gt;
-&lt;h2&gt;YARVの開発までの経緯&lt;/h2&gt;
-&lt;p&gt;開発に至った経緯についても触れておく。もともと、私は言語処理系の実装に興味があったため、Javaの仮想マシンを2つほど開発したことがあった。そのため、オブジェクト指向言語処理系に必要となる仮想マシンに必要な要件を、既にいくつか知っていた。そのころ、「計算機プログラムの構造と解釈」、通称SICPの読書会が山下伸夫氏により定期的に開催されており、これに参加することで、Schemeの言語処理系についての知見を得ることができた。本書の第8章で紹介されているように、RubyのブロックはLispの関数にあたるものであったため、この知見は重要なものであった。&lt;/p&gt;
-&lt;p&gt;2002年12月に青木峰郎氏による、Rubyのソースコードを逐一解説するという異色の書、「Rubyソースコード完全解説」、通称RHGが発売された。そして、高橋征義氏によりRHG読書会が企画され、月1度程度の頻度で開催された。参加者で本書を読み上げていく、というスタイルであったが、不明点は著者である青木氏を含めた参加者で議論できたため、Ruby処理系の詳細を知ることができた。余談だが、SICP読書会、およびRHG読書会は、当時山下氏が勤めていた、新宿にある株式会社タイムインターメディアの会議室で行われていた。私は、これらの読書会に参加するために、月に数回、タイムインターメディアに通っていたことになる。このような大切な機会を与えてくれた諸氏に深く感謝したい。&lt;/p&gt;
-&lt;p&gt;RHGによってRuby処理系の構造を学べば、Rubyプログラムを実行する心臓部となる評価器が、Java仮想マシンなどに比べ、あまりに非効率であることは明らかであった。そのため、Rubyの文法を適切に、高速に評価する仮想マシンはどのようなものであるか、ということに興味を持ち、検討を続けた。そして、正月休みの機会に一気に書き上げた。その頃は、まさかRuby 1.9の一部としてリリースされることになるとは思わなかった。最初の動機が性能向上であったため、最初から性能のことを強く意識したソースコードであった。今思えば、早すぎる最適化といえると思う。&lt;/p&gt;
-&lt;/div&gt;
-
-
-&lt;h2&gt;YARV Development Prehistory&lt;/h2&gt;
-
-&lt;p&gt;I&amp;rsquo;d like to describe the history of how I came to develop YARV. Because earlier
-I had been interested in programming language processors, I had the experience
-of implementing two Java virtual machines. That gave me some knowledge of what
-was required to implement virtual machines intended for object-oriented
-programming languages. At the time, Mr.  Nobuo Yamashita was periodically
-holding meetups to read the book &lt;i&gt;The Structure and Interpretation of
-Computer Programs&lt;/i&gt; (or SICP). Attending them, I acquired knowledge and
-insight about implementations of Scheme. This insight was important since
-Ruby&amp;rsquo;s block design was based on Lisp functions, as Chapter 8 of this book
-points out.&lt;/p&gt;
-
-&lt;p&gt;It was December 2002 when &lt;i&gt;Ruby Source Code Kanzen Kaisetsu&lt;/i&gt; (the &lt;i&gt;Ruby
-Hacking Guide&lt;/i&gt;, or RHG), by Mr. Minero Aoki was published, which is a unique
-book that explains the entire Ruby source code. Mr. Masayoshi Takahashi held
-meetings to read RHG about once a month. We took turns in a reading group, but
-because the author Aoki-san himself was one of the members the other members
-could talk with him in person when they had questions. In this way, we learned
-the implementation details of Ruby very well. Let me add that both of these
-meetups are held in the meeting rooms at Time Intermedia, Ltd., where Mr.
-Yamashita was working then. I attended the meetups frequently: several times a
-month. I wish to express my deep gratitude to the people who provided such an
-environment for learning.&lt;/p&gt;
-
-&lt;p&gt;After reading RHG and learning more about the structure of Ruby’s
-implementation, it became clear to me that the evaluation module Ruby used to
-run programs &amp;ndash; the heart of the Ruby interpreter &amp;ndash; was not efficient enough. I
-kept on studying and thinking about the ideal design of a virtual machine to run
-Ruby programs precisely and efficiently, which I finally implemented all at
-once during that New Year&amp;rsquo;s holiday. I didn’t foresee that it would be released
-as a part of Ruby 1.9. My first motivation was performance improvement &amp;ndash; my
-source code surely reflected that. In hindsight, it was such an early
-optimization.&lt;/p&gt;
-
-&lt;div class="jp"&gt;
-&lt;h2&gt;さらにそのほかのRuby仮想マシン&lt;/h2&gt;
-&lt;p&gt;本書では、YARVの構造を既知のものとして紹介しており、もしかしたら、このように実装するのが正しいRuby処理系だ、とも読めるかもしれない。しかし、本稿で紹介したとおり、YARVをはじめ、Ruby処理系は人間が試行錯誤しながら、なんとか作り上げてきたソフトウェアにすぎない。本書はRuby 2.0をベースに紹介しているが、Ruby 2.1では、さらに品質を向上するためにさまざまな修正を行った。そして、これからリリースする予定であるRuby 2.2を、より良いものにするため、改善を続けている。&lt;/p&gt;
-&lt;p&gt;たとえば、キーワード引数の改善である。本書の第4章では、キーワード引数の実装方法について紹介している。簡単に要約すると、呼び出しにおいて、キーワード引数として渡した名前と値の対を、1つのHashオブジェクトとしてまとめ、通常の引数として渡す。受け側はそのHashオブジェクトから必要な値を読み出すコードをコンパイル時に暗黙に展開する。さて、キーワード引数はRuby 2.0から導入された新機能なので、利用頻度が低いようであり、問題になっていないが、この実装は非効率である。メソッド呼び出しごとにHashオブジェクトが生成されることになり、Hashオブジェクト生成、およびGCのコストがかかる。また、暗黙に展開されるHashオブジェクトの読み込みも、複数のメソッド呼び出しを含むため、遅い。&lt;/p&gt;
-&lt;p&gt;この問題を改善するため、Ruby 2.2から、可能な限りHashオブジェクトを生成しないようにキーワード引数を実装し直した。その代わり、コンパイル時にキーワード引数の名前をまとめておき、呼び出し側では値のみ渡すことにした。そして、受け側では渡された値と、コンパイル時に作成した名前を用いて対を復元するようにした。この工夫によりキーワード引数を用いるメソッド呼び出しを、場合によっては10倍以上高速化することができた。今後も、実行速度を含む、Ruby処理系の品質向上を続けていきたい。&lt;/p&gt;
-&lt;/div&gt;
-
-
-&lt;h2&gt;Yet More Ruby Virtual Machines&lt;/h2&gt;
-
-&lt;p&gt;This book explains the current architecture of YARV, which you might conclude
-is the correct way of implementing Ruby. But, as I have explained in this
-appendix so far, all of Ruby’s implementations, including YARV, are not much
-different from any other software application: they are all developed through
-trial and error by humans. While this book covers Ruby 2.0, we have already
-made various improvements for Ruby 2.1. And we are working on even more
-improvements that will make the forthcoming Ruby 2.2 even better.&lt;/p&gt;
-
-&lt;p&gt;For example, keyword arguments will be more efficient. Chapter 4 explains the
-implementation of keyword arguments. Quickly summarizing: Ruby first passes a
-hash object containing keyword name and value pairs as a normal argument. Then,
-at compile time, the receiver implicitly expands code that reads the values
-from the argument hash. Users don’t seem to be complaining about its
-performance for now. I assume keyword arguments are not widely used, because it
-is a new feature introduced in Ruby 2.0. But this implementation is not
-efficient. Hash objects are created every time, incurring object creation and
-GC costs. Also, reading from Hash objects using the implicitly expanded code is
-slow, because it involves multiple method calls.&lt;/p&gt;
-
-&lt;p&gt;In order to address this problem, we are reimplementing how Ruby 2.2 handles
-keyword arguments to avoid creating Hash objects as much as possible.
-Meanwhile, we are implementing a new design that will collect the names of
-keyword arguments at compile time, so that caller need only pass the values at
-runtime. The callee will then recombine the values with the names collected
-by the compiler. This design change will allow Ruby to process keyword
-arguments 10 times faster. I would like to keep on improving the quality of
-Ruby&amp;rsquo;s implementation, including runtime efficiency.&lt;/p&gt;
-
-&lt;div class="jp"&gt;
-&lt;p&gt;もし、本書によってYARV、そしてRuby処理系に興味を持ち、改良方法を思いついたら、ぜひ「さらにそのほかのRuby処理系」として実装し、試してほしい。Ruby処理系開発コミュニティは、あなたの挑戦を歓迎する。
-&lt;br/&gt;
-&lt;br/&gt;
-2014年11月&lt;br/&gt;
-笹田耕一&lt;br/&gt;
-Heroku, Inc.
-&lt;/div&gt;
-
-
-&lt;p&gt;If you become interested in YARV and Ruby implementations after reading this
-book, if you have ideas for improving them, I encourage you to develop your own
-“Yet Another Ruby Implementation.” The Ruby core community will welcome your
-challenge.&lt;/p&gt;
-
-&lt;p&gt;November 2014&lt;br/&gt;
-Koichi Sasada&lt;br/&gt;
-Heroku, Inc.&lt;/p&gt;
 </content>
   </entry>
 </feed>
