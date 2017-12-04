@@ -3,7 +3,7 @@ date: 2012/12/13
 tag: Interviews
 
 This appeared [on
-RubySource.com](http://rubysource.com/an-interview-with-jim-weirich/) last
+RubySource.com](http://www.sitepoint.com/an-interview-with-jim-weirich/) last
 week; just getting around to posting a link to the interview here also....
 
 <p></p>
@@ -35,4 +35,4 @@ public speaking. We also had a chance to talk about how he got started as a
 computer programmer, why he learned Ruby, functional programming, Ruby’s
 threading model and also his new
 [RSpec-Given](https://github.com/jimweirich/rspec-given) framework. I’ve typed
-in the interesting parts of our conversation and [posted them on RubySource.com](http://rubysource.com/an-interview-with-jim-weirich).
+in the interesting parts of our conversation and [posted them on RubySource.com](http://www.sitepoint.com/an-interview-with-jim-weirich).

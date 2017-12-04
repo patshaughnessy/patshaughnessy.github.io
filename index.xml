@@ -16,17 +16,17 @@
     <author>
       <name></name>
     </author>
-    <summary type="html">&lt;div style="float: left; padding: 0px 30px 40px 0px; text-align: center; line-height:18px"&gt;
-  &lt;img src="http://localhost/assets/2017/1/19/ram.jpg"&gt;&lt;br/&gt;
+    <summary type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/1/20/ram.jpg"&gt;&lt;br/&gt;
   &lt;i&gt;16GB of DDR random access memory&lt;br/&gt;
   my son used in his new gaming PC
 &lt;/i&gt;
 &lt;/div&gt;
 
 
-&lt;p&gt;Recently I’ve been trying to learn how to read x86 assembly language. In &lt;a href="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-lang</summary>
-    <content type="html">&lt;div style="float: left; padding: 0px 30px 40px 0px; text-align: center; line-height:18px"&gt;
-  &lt;img src="http://localhost/assets/2017/1/19/ram.jpg"&gt;&lt;br/&gt;
+&lt;p&gt;Recently I’ve been trying to learn how to read x86 assembly language. In &lt;a href="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-asse</summary>
+    <content type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/1/20/ram.jpg"&gt;&lt;br/&gt;
   &lt;i&gt;16GB of DDR random access memory&lt;br/&gt;
   my son used in his new gaming PC
 &lt;/i&gt;
@@ -77,7 +77,7 @@ to look for the number 42 in the assembly language code:&lt;/p&gt;
 
 
 
-&lt;p&gt;Once again I’ll use Crystal to compile my Ruby code:&lt;/p&gt;
+&lt;p&gt;Once again I’ll use &lt;a href="https://crystal-lang.org"&gt;Crystal&lt;/a&gt; to compile my Ruby code:&lt;/p&gt;
 
 &lt;div class="CodeRay"&gt;
   &lt;div class="code"&gt;&lt;pre&gt;
@@ -87,8 +87,9 @@ crystal build add_forty_two.rb --emit asm
 
 
 
-&lt;p&gt;Searching through the generated &lt;code&gt;add_forty_two.s file&lt;/code&gt;, I find “add_forty_two,”
-clean it up and paste it back into my Ruby function:&lt;/p&gt;
+&lt;p&gt;Searching through the generated &lt;code&gt;add_forty_two.s file&lt;/code&gt;, I find the
+&lt;code&gt;add\_forty\_two&lt;/code&gt; function, clean it up and paste its assembly language
+instructions back into my Ruby function:&lt;/p&gt;
 
 &lt;div class="CodeRay"&gt;
   &lt;div class="code"&gt;&lt;pre&gt;
@@ -115,7 +116,7 @@ clean it up and paste it back into my Ruby function:&lt;/p&gt;
 I call &lt;code&gt;add_forty_two&lt;/code&gt;? How does my computer know what to do? How does it add 42
 to the given argument? It follows the script.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/the-tempest.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/the-tempest.png"&gt;&lt;/p&gt;
 
 &lt;div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px"&gt;
   &lt;i&gt;Trying to read x86 assembly language is a bit like&lt;br/&gt;
@@ -149,7 +150,7 @@ Tempest&lt;/em&gt;, I’m at a loss.&lt;/p&gt;
 &lt;p&gt;I need some cliff notes. I need to see this assembly language script translated
 into standard, modern English, a language I understand.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/the-tempest-cleaned-up.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/the-tempest-cleaned-up.png"&gt;&lt;/p&gt;
 
 &lt;div style="padding: 0px 30px 30px 0px; text-align: center; line-height:18px"&gt;
   &lt;i&gt;C code is like a modern, cleaned up copy of a Shakespeare&lt;br/&gt;
@@ -162,7 +163,7 @@ play. Equally confusing but somewhat easier to read.&lt;/i&gt;
 &lt;p&gt;To illustrate what I mean, I’ll rewrite each x86 instruction with the
 equivalent C syntax:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/transcribe.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/transcribe.png"&gt;&lt;/p&gt;
 
 &lt;p&gt;If you’re an experienced C programmer, the pseudocode on the right side should
 be somewhat more readable. You can see how the x86 instructions access memory
@@ -179,7 +180,7 @@ notation means, how they are different and how they are similar.&lt;/p&gt;
 
 &lt;p&gt;But while my C pseudocode is syntactically correct, it makes no sense. Negative
 array indices are normally invalid in C, and, of course, a C program would
-never directly reference the registers on the CPU directly like this to begin
+never directly reference registers on the CPU directly like this to begin
 with.&lt;/p&gt;
 
 &lt;p&gt;In fact, a proper C program to add 42 would resemble the Ruby code I started
@@ -236,9 +237,9 @@ odd things about it. First, I wrote the C array &lt;code&gt;rbp&lt;/code&gt; usi
 register in my microprocessor. That is, I’m treating the &lt;code&gt;rbp&lt;/code&gt; register as if it
 were a series of values, an array, and not a single value.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array1.png" width=432&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array1.png" width=432&gt;&lt;/p&gt;
 
-&lt;p&gt;But, in fact, any C programmers reading along might not be surprised by this:
+&lt;p&gt;Any C programmers reading along might not be surprised by this:
 In C an array is really just a pointer to a block of memory and not a
 collection of objects or elements like it would be in Python, Ruby or some
 other high level language. A recent blog article featured on Hacker News
@@ -248,7 +249,7 @@ untruth&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The pointer itself is a number indicating where the memory block is located: a
 &lt;em&gt;memory address&lt;/em&gt;:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array2.png" width=800&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array2.png" width=800&gt;&lt;/p&gt;
 
 &lt;p&gt;In x86 assembly language, the same move instruction appears this way:&lt;/p&gt;
 
@@ -264,20 +265,20 @@ movl    &lt;span class="global-variable"&gt;$42&lt;/span&gt;, &lt;span class="in
 name followed by the index in brackets, I write the index first, followed by
 the array name in parentheses:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array3.png" width=432&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array3.png" width=432&gt;&lt;/p&gt;
 
 &lt;p&gt;The parentheses indicate the move instruction should consider the value in &lt;code&gt;rbp&lt;/code&gt;
 to be a memory address, that it should move the value 42 to the memory address
 referenced by &lt;code&gt;rbp&lt;/code&gt; (or actually to the memory address four bytes before the
 value of &lt;code&gt;rbp&lt;/code&gt;) and not into &lt;code&gt;rbp&lt;/code&gt; itself.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array4.png" width=432&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array4.png" width=432&gt;&lt;/p&gt;
 
 &lt;p&gt;As you can see, the other odd thing about this array is that it uses a negative
 index. The &lt;code&gt;movl&lt;/code&gt; instruction copied 42 to a memory address that appeared before
 the start of the array &amp;ndash; this array is not only inside-out, it’s backwards!&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array5.png" width=558&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array5.png" width=558&gt;&lt;/p&gt;
 
 &lt;p&gt;In a C program, this would be a recipe for disaster. C programmers normally
 allocate memory for an array, and then access its elements using a positive (or
@@ -315,7 +316,7 @@ segment containing a total of 4*100=400 bytes.&lt;/p&gt;
 &lt;p&gt;Now when I write &lt;code&gt;rbp[2]&lt;/code&gt; in C I access the element at position 2, or the third
 element:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array6.png" width=447&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array6.png" width=447&gt;&lt;/p&gt;
 
 &lt;p&gt;But notice that because each int element consists of 4 bytes, the memory
 location of &lt;code&gt;rbp+2&lt;/code&gt; is actually 8 bytes larger than &lt;code&gt;rbp&lt;/code&gt;. The index 2 is an
@@ -324,7 +325,7 @@ element count: (2 elements) * (4 bytes/element) = 8 bytes.&lt;/p&gt;
 &lt;p&gt;x86 assembly language, on the other hand, uses byte indexes. That means to
 access the same element in this array, I would write &lt;code&gt;8(%rbp)&lt;/code&gt;:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array7.png" width=698&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array7.png" width=698&gt;&lt;/p&gt;
 
 &lt;p&gt;When you look at memory this way, from a detailed, physical point of view, the
 x86 byte count index makes more sense. &lt;code&gt;8(%rbp)&lt;/code&gt; is the address &lt;code&gt;rbp&lt;/code&gt; points to,
@@ -358,7 +359,7 @@ rbp[&lt;span class="integer"&gt;-1&lt;/span&gt;] = &lt;span class="integer"&gt;4
 
 
 
-&lt;p&gt;This means “Set the -2nd element of the array to 42” &amp;ndash; much more
+&lt;p&gt;This means “Set the -1st element of the array to 42” &amp;ndash; much more
 straightforward (although still a bit weird).&lt;/p&gt;
 
 &lt;h2&gt;Pushing a Value Onto The Stack&lt;/h2&gt;
@@ -390,13 +391,13 @@ code makes this a bit easier to follow:&lt;/p&gt;
 dereferencing a pointer: &lt;code&gt;*rsp&lt;/code&gt; refers to the value stored at the memory location
 &lt;code&gt;rsp&lt;/code&gt; points to, just as if I had written &lt;code&gt;rsp[0]&lt;/code&gt;:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array8.png" width=698&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array8.png" width=698&gt;&lt;/p&gt;
 
 &lt;p&gt;Ignoring the minus signs for a moment, the C code &lt;code&gt;*rsp = rbp&lt;/code&gt; means: “copy the
 value of &lt;code&gt;rbp&lt;/code&gt; to the memory location whose address is contained in the &lt;code&gt;rsp&lt;/code&gt;
 register.”&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array9.png" width=698&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array9.png" width=698&gt;&lt;/p&gt;
 
 &lt;p&gt;What about the minus signs? C programmers will know these indicate the pointer,
 in this case &lt;code&gt;rsp&lt;/code&gt;, should be decremented before its value is dereferenced. We
@@ -407,18 +408,18 @@ because &lt;code&gt;rsp&lt;/code&gt; will continue to point to the top of the st
 &lt;p&gt;Imagine the &lt;code&gt;rsp&lt;/code&gt; pointer starts at &lt;code&gt;0x00007fff5fbff8f8&lt;/code&gt;. This is the top of the
 stack, initially:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array10.png" width=698&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array10.png" width=698&gt;&lt;/p&gt;
 
 &lt;p&gt;Then we decrement &lt;code&gt;rsp&lt;/code&gt; so it points to a new top of the stack. The stack grows
 downward in x86 programs. Each time we push a value onto the stack we first
 decrement the stack pointer:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array11.png" width=698&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array11.png" width=698&gt;&lt;/p&gt;
 
 &lt;p&gt;And then the assignment writes the value of &lt;code&gt;rbp&lt;/code&gt; to the top of the stack, using
 &lt;code&gt;rsp&lt;/code&gt; after it has been decremented:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/array12.png" width=698&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/array12.png" width=698&gt;&lt;/p&gt;
 
 &lt;p&gt;Notice another important detail here: The stack pointer is decremented by 8
 bytes, not 4 bytes as above. This is because the values we push onto the stack
@@ -505,7 +506,7 @@ rip = *rsp++;
 &lt;p&gt;Here the C code copies the value from the memory location referenced by the &lt;code&gt;rsp&lt;/code&gt;
 pointer and saves it into the &lt;code&gt;rip&lt;/code&gt; register.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/pop1.png" width=698&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/pop1.png" width=698&gt;&lt;/p&gt;
 
 &lt;p&gt;The &lt;code&gt;rip&lt;/code&gt; register is known as the &lt;em&gt;instruction pointer&lt;/em&gt;, which contains a very
 special and important value: the memory address of the next instruction my
@@ -524,7 +525,7 @@ stack. And in just the same way &lt;code&gt;pushq&lt;/code&gt; did, &lt;code&gt;
 determine how many bytes to add to the stack pointer after the copy is
 finished.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src="http://localhost/assets/2017/1/19/pop2.png" width=698&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/1/20/pop2.png" width=698&gt;&lt;/p&gt;
 
 &lt;p&gt;Now we know where the C &lt;code&gt;++&lt;/code&gt; post-increment operator’s behavior comes from:
 assembly language. Just as &lt;code&gt;retq&lt;/code&gt; adds 8 bytes to &lt;code&gt;rsp&lt;/code&gt;, the C expression &lt;code&gt;*rsp++&lt;/code&gt;
