@@ -1,10 +1,11 @@
-ruby '2.2.2'
+ruby '2.3.0'
 
 source 'https://rubygems.org'
 
 gem "builder"
 gem "rdiscount", '1.6.8'
 gem "coderay"
+gem "rb-readline"
 
 group :development, :test do
   gem 'm', github: "unmanbearpig/m"

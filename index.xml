@@ -7,6 +7,287 @@
     <name></name>
   </author>
   <entry>
+    <title>Trying to Represent a Tree Structure Using Postgres</title>
+    <link href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres" rel="alternate"/>
+    <id>http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres</id>
+    <published>2017-12-11T04:00:00Z</published>
+    <updated>2017-12-11T04:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/11/tree1.jpg"&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Suppose you had a hierarchical data structure in your application &amp;ndash; how would
+you save it in a database? How would you represent a complex tree structure
+using flat rows and columns?&lt;/p&gt;
+
+&lt;p&gt;There are a few different, equal</summary>
+    <content type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/11/tree1.jpg"&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Suppose you had a hierarchical data structure in your application &amp;ndash; how would
+you save it in a database? How would you represent a complex tree structure
+using flat rows and columns?&lt;/p&gt;
+
+&lt;p&gt;There are a few different, equally valid options. In this series of blog posts,
+I’ll take a close look at one option that Postgres provides, the &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE
+extension&lt;/a&gt;. If you
+install and enable LTREE on your Postgres server, it will add powerful SQL
+operators and functions that support tree operations.&lt;/p&gt;
+
+&lt;p&gt;But what are these new SQL operators, and how do you use them? And how does
+LTREE actually work? What Computer Science does it use behind the scenes to
+enable fast tree operations?&lt;/p&gt;
+
+&lt;p&gt;This week I’ll publish a series of blog posts on the Postgres LTREE extension.
+I&amp;rsquo;ll get started today by trying to insert a tree structure into a Postgres
+table using standard SQL, and during the rest of the week I&amp;rsquo;ll take a close
+look at LTREE: how to install it, how to use it, and how it works.&lt;/p&gt;
+
+&lt;div style="clear: both"&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;An Example Tree&lt;/h2&gt;
+
+&lt;p&gt;My actual data set was more complicated, of course, but for the sake of example
+let’s suppose I needed to save this tree in a Postgres table:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;There are many different tree-like data structures in Computer Science, but
+this is probably the simplest: no cycles, no ordering of child nodes, and all
+the child nodes are accessible moving down from a single root. Should be easy,
+right?&lt;/p&gt;
+
+&lt;p&gt;At first, I thought it would be. I started by creating a table with a
+&lt;span class="code"&gt;parent_id&lt;/span&gt; foreign key column, like this:&lt;/p&gt;
+
+&lt;pre&gt;
+create table tree(
+    id serial primary key,
+    letter char,
+    parent_id integer references tree (id)
+);
+&lt;/pre&gt;
+
+
+&lt;p&gt;The idea was that each row in my table represented a single node or element of
+the tree, and would identify its parent using the &lt;span class="code"&gt;parent_id&lt;/span&gt; column. My single
+root node, &lt;span class="code"&gt;A&lt;/span&gt;, had no parent so I saved it first with
+a &lt;span class="code"&gt;NULL&lt;/span&gt; parent id:&lt;/p&gt;
+
+&lt;pre&gt;
+insert into tree (letter, parent_id) values ('A', null);
+
+select * from tree;
+
+id  | letter | parent_id 
+----+--------+-----------
+1   | A      |          
+(1 row)
+&lt;/pre&gt;
+
+
+&lt;p&gt;And then I inserted each of its child nodes like this:&lt;/p&gt;
+
+&lt;pre&gt;
+insert into tree (letter, parent_id) values ('B', 1);
+insert into tree (letter, parent_id) values ('C', 1);
+
+select * from tree;
+
+id  | letter | parent_id 
+----+--------+-----------
+1   | A      |          
+2   | B      |         1
+3   | C      |         1
+(3 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;Because &lt;span class="code"&gt;A&lt;/span&gt; has &lt;span class="code"&gt;id&lt;/span&gt;=1, I set
+&lt;span class="code"&gt;parent_id&lt;/span&gt;=1 for &lt;span class="code"&gt;B&lt;/span&gt; and
+&lt;span class="code"&gt;C&lt;/span&gt;. This is a simple example of the &lt;em&gt;adjacency list&lt;/em&gt;
+algorithm: each row contains a list of its neighbors or adjacent rows. In this
+case I was only recording each row’s parent. And the table is &lt;em&gt;self-referencing&lt;/em&gt;
+because it contains a foreign key (&lt;span class="code"&gt;parent_id&lt;/span&gt;)
+referencing another column in the same table.&lt;/p&gt;
+
+&lt;p&gt;I continued to fill out my tree structure with a few more insert statements:&lt;/p&gt;
+
+&lt;pre&gt;
+insert into tree (letter, parent_id) values ('D', 3);
+insert into tree (letter, parent_id) values ('E', 3);
+insert into tree (letter, parent_id) values ('F', 3);
+insert into tree (letter, parent_id) values ('G', 2);
+
+select * from tree;
+
+id  | letter | parent_id 
+----+--------+-----------
+1   | A      |          
+2   | B      |         1
+3   | C      |         1
+4   | D      |         3
+5   | E      |         3
+6   | F      |         3
+7   | G      |         2
+(7 rows)
+&lt;/pre&gt;
+
+
+&lt;h2&gt;Did My Postgres Tree Work?&lt;/h2&gt;
+
+&lt;p&gt;At first glance, my data structure worked well. I could easily find the parent
+of &lt;span class="code"&gt;E&lt;/span&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+select parent_id from tree where letter = 'E'
+
+parent_id 
+-----------
+3
+(1 row)
+
+select letter from tree where id = 3
+
+letter 
+--------
+C
+(1 row)
+&lt;/pre&gt;
+
+
+&lt;p&gt;And the children of &lt;span class="code"&gt;C&lt;/span&gt; like this:&lt;/p&gt;
+
+&lt;pre&gt;
+select letter from tree where parent_id = 3
+
+letter 
+--------
+D
+E
+F
+(3 rows)
+&lt;/pre&gt;
+
+
+&lt;h2&gt;Recursive Tree Operations&lt;/h2&gt;
+
+&lt;p&gt;And it was also very easy to count how many children each node had, for example
+this SQL statement returns the number of children under &lt;span class="code"&gt;A&lt;/span&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where parent_id = 1;
+
+count 
+-------
+2
+(1 row)
+&lt;/pre&gt;
+
+
+&lt;p&gt;But what if I needed to know how many children &lt;span class="code"&gt;A&lt;/span&gt; had,
+recursively? That is, what if I needed to count its children, grandchildren,
+great-grandchildren, etc.?&lt;/p&gt;
+
+&lt;p&gt;Well, first I would have to find the direct children of &lt;span class="code"&gt;A&lt;/span&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+select id from tree where parent_id = 1;
+
+id 
+----
+2
+3
+(2 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;Then to find the grandchildren I would need to query for the children of the
+children, inserting the id values from the previous statement:&lt;/p&gt;
+
+&lt;pre&gt;
+select id from tree where parent_id in (2, 3);
+
+id 
+----
+4
+5
+6
+7
+(4 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;And then I would add the child count with the grandchild count: 2 + 4 = 6.&lt;/p&gt;
+
+&lt;p&gt;My example tree ends here, so I’m done. But this doesn’t scale; suppose my tree
+had 10, 20 or 100 levels in it. I would have to execute repeated select
+statements, stepping down each level of the tree structure under the parent
+node:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where parent_id in (GREAT-GRANDCHILD-IDS);
+select count(*) from tree where parent_id in (GREAT-GREAT-GRANDCHILD-IDS);
+select count(*) from tree where parent_id in (GREAT-GREAT-GREAT-GRANDCHILD-IDS);
+&lt;/pre&gt;
+
+
+&lt;p&gt;etc.&lt;/p&gt;
+
+&lt;p&gt;In other words, I need to execute &lt;em&gt;n&lt;/em&gt;-1 SQL statements, where &lt;em&gt;n&lt;/em&gt; is the number of
+levels in the tree under the parent node, each time inserting all of the ids
+returned by the previous query. And to find the total count I would have to sum
+the number of ids returned by each query along the way. Certainly not an
+efficient algorithm!&lt;/p&gt;
+
+&lt;h2&gt;There must be a better way&lt;/h2&gt;
+
+&lt;p&gt;My &lt;span class="code"&gt;parent_id&lt;/span&gt; foreign key worked well for very simple
+tree operations, but not for more complex tasks, such as recursively counting
+nodes. If I setup my database schema differently, in a more thoughtful and
+complex way, can I avoid the repeated SQL calls?&lt;/p&gt;
+
+&lt;p&gt;Yes! There are a variety of options. One common solution is to use a &lt;a href="https://en.wikipedia.org/wiki/Nested_set_model"&gt;nested set&lt;/a&gt;
+approach. In this design, each row contains a description of the set of other
+nodes that appear under it in the tree by saving the maximum and minimum id
+values of that subset of rows, the “nested set.” Using this scheme, querying
+children and grandchildren recursively becomes very easy. The drawback is that
+I would have to recalculate these values up and down the tree each time a new
+row was added.&lt;/p&gt;
+
+&lt;p&gt;Another solution, &lt;em&gt;path enumeration&lt;/em&gt;, involves using a column to save the path or
+position of each node in the tree. This can be a powerful solution, but
+recursive queries and other tree operations require special support to parse
+and manipulate these paths.&lt;/p&gt;
+
+&lt;p&gt;A completely different approach would be to use a &lt;a href="https://en.wikipedia.org/wiki/Graph_database"&gt;graph-oriented
+database&lt;/a&gt;, such as
+&lt;a href="https://neo4j.com"&gt;Neo4J&lt;/a&gt;. These are database servers designed entirely around
+this problem: saving hierarchical data, or more generally networks of related
+data values.&lt;/p&gt;
+
+&lt;p&gt;But I didn’t want to leave Postgres behind: I already had a working, well
+tested application. Why start over from scratch just because I added a single
+tree structure to my app? Why add new infrastructure and complexity to my
+overall system to support a single new data structure?&lt;/p&gt;
+
+&lt;p&gt;It turns out I didn’t have to: Postgres itself supports one of the two tree
+algorithms I mentioned above: path enumeration. Bundled inside of the Postgres
+source tree is an “extension,” an optional piece of C code you need compile,
+install and enable, that supports tree SQL operations using path enumeration.
+In my next post, I’ll show you how to install and use the &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE Postgres
+extension&lt;/a&gt;.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Pointers in C and x86 Assembly Language</title>
     <link href="http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language" rel="alternate"/>
     <id>http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language</id>
@@ -4065,264 +4346,6 @@ developers don’t. It should be private. Marking it private reminds me that it
 is being tested indirectly, that I didn’t just forget to write a test for it.
 Marking it private tells other developers about what I’ve learned from my own
 test suite.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Using Rake to Generate a Blog</title>
-    <link href="http://patshaughnessy.net/2015/1/8/using-rake-to-generate-a-blog" rel="alternate"/>
-    <id>http://patshaughnessy.net/2015/1/8/using-rake-to-generate-a-blog</id>
-    <published>2015-01-08T04:00:00Z</published>
-    <updated>2015-01-08T04:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/1/8/power-rake.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Jim Weirich showing a real power rake at &lt;a href="http://www.confreaks.com/videos/988-goruco2012-power-rake"&gt;GORUCO 2012&lt;/a&gt;&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Last year I needed to replace the software I use to serve this web site.
-Instead of just using &lt;a href="h</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/1/8/power-rake.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Jim Weirich showing a real power rake at &lt;a href="http://www.confreaks.com/videos/988-goruco2012-power-rake"&gt;GORUCO 2012&lt;/a&gt;&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Last year I needed to replace the software I use to serve this web site.
-Instead of just using &lt;a href="https://github.com/jekyll/jekyll"&gt;Jekyll&lt;/a&gt;,
-&lt;a href="https://middlemanapp.com"&gt;Middleman&lt;/a&gt;, &lt;a href="http://nanoc.ws"&gt;Nanoc&lt;/a&gt; or one of the
-&lt;a href="https://www.ruby-toolbox.com/categories/static_website_generation"&gt;many other available
-options&lt;/a&gt;, I
-decided to implement my own &lt;a href="https://github.com/patshaughnessy/patshaughnessy.github.io"&gt;custom blog
-software&lt;/a&gt;. After a
-fair amount of work, I was able to implement a static blog site generator using
-only &lt;a href="https://github.com/jimweirich/rake"&gt;Rake&lt;/a&gt; and a handful of simple Ruby classes. Although it took a bit longer,
-it was a lot of fun and I learned a few tricks which I’d like to pass along
-today.&lt;/p&gt;
-
-&lt;p&gt;I first got the idea of using Rake as a static site generator from a
-presentation called &lt;a href="http://www.confreaks.com/videos/988-goruco2012-power-rake"&gt;Power Rake&lt;/a&gt;,
-given by the late Jim Weirich at GORUCO 2012. This was one of the first Ruby
-conferences I had ever attended, and was also the first time I had ever seen
-Jim speak in public. It still stands out in my memory as one of the best
-conference presentations I&amp;rsquo;ve ever seen. Funny, engaging, interesting, but most
-of all &lt;em&gt;genuine&lt;/em&gt;, Jim had me and the rest of the audience enthralled as he talked
-about &lt;a href="https://github.com/jimweirich/rake"&gt;Rake&lt;/a&gt;, his Ruby reinterpretation of
-the old C make utility from the 1970s.&lt;/p&gt;
-
-&lt;p&gt;The key idea behind using Rake to generate a static site is to generate and
-manipulate files using Rake file tasks. What are file tasks? How are they
-different from standard Rake tasks? To find out watch Jim’s presentation, or
-read &lt;a href="http://devblog.avdi.org/2014/04/21/rake-part-1-basics/."&gt;an excellent series of articles and
-screencasts&lt;/a&gt; by Avdi
-Grimm. Today I’ll explain how I used Rake to create this blog. But first, let’s review
-what a blog really is.&lt;/p&gt;
-
-&lt;h2&gt;A Blog or a Static Web Site?&lt;/h2&gt;
-
-&lt;p&gt;Most of the blogs in the world consist of a few dynamically generated web pages
-served by either &lt;a href="http://wordpress.com"&gt;wordpress.com&lt;/a&gt; or
-&lt;a href="http://blogger.com"&gt;blogger.com&lt;/a&gt;. To be honest, I should just use one of these
-two free services for my site as well. However, I have a few years worth of
-markdown files that contain all of my old content which would be a hassle to
-import into whatever format Wordpress or Google uses. Plus using these sites
-would be no fun at all; instead, I was looking for an excuse to write some Ruby
-code and to learn more about Rake.&lt;/p&gt;
-
-&lt;p&gt;What I really needed was an automated process for converting my markdown source
-files into a series of static HTML files that were navigable using URL patterns that
-readers expect. That is, I wanted a Rake task that would do this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/convert-file.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the top is one of my markdown files; on the bottom is the HTML version. I
-needed a way to generate the bottom file from the top one. I needed to write a Rake
-task that would iterate over all of the markdown files in the “posts” directory,
-and generate the corresponding HTML files in the proper target directory.  The
-markdown file name (“posts/2014-10-13-…”) was a naming convention I used to stay
-organized. However, the name and path of the HTML file was what readers would see
-in the post’s URL online &amp;ndash; for example:
-&lt;a href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals"&gt;http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals&lt;/a&gt;.
-This was a problem well suited to Rake file tasks, because they allow you to
-create a series of dependencies between source and target files.&lt;/p&gt;
-
-&lt;p&gt;But before I was ready to use file tasks, I needed to use a few tricks to make
-those tasks easier to write.&lt;/p&gt;
-
-&lt;h2&gt;Iterating Over Files Using Rake::FileList&lt;/h2&gt;
-
-&lt;p&gt;Ruby objects are easier to work with than text files are, so the first thing I
-decided to do was to write a Ruby class that represented one of my markdown
-files. I called it &lt;span class="code"&gt;Post&lt;/span&gt; because each markdown file represented a single blog
-post.&lt;/p&gt;
-
-&lt;p&gt;Next, I needed to create a post object for each of the files in the posts
-directory, by listing the files and iterating over them. It turns out Rake
-provides a very simple way to do this: the &lt;span class="code"&gt;Rake::FileList&lt;/span&gt; class. To quote &lt;a href="http://ruby-doc.org/stdlib-2.2.0/libdoc/rake/rdoc/Rake/FileList.html"&gt;the
-documentation&lt;/a&gt;:&lt;/p&gt;
-
-&lt;br/&gt;
-
-
-
-
-&lt;blockquote&gt;
-A FileList is essentially an array with a few helper methods defined to make file manipulation a bit easier.
-&lt;/blockquote&gt;
-
-
-&lt;p&gt;I like things that are easier. Here’s how I used &lt;span class="code"&gt;FileList&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/mapping-posts.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the left are my markdown files with the corresponding post objects on the right. My
-code above first created a &lt;span class="code"&gt;FileList&lt;/span&gt;, using the &lt;span class="code"&gt;posts/*.markdown&lt;/span&gt; pattern. You
-can think of the &lt;span class="code"&gt;FileList&lt;/span&gt; as an array of files that match the given pattern.
-Once I had this array, I &lt;em&gt;mapped&lt;/em&gt; the array to a second array of ruby objects using
-&lt;span class="code"&gt;Enumerable#map&lt;/span&gt;.&lt;/p&gt;
-
-&lt;h2&gt;Blog Post Routing&lt;/h2&gt;
-
-&lt;p&gt;Now that I had a &lt;span class="code"&gt;Post&lt;/span&gt; object for each source markdown file, I could add methods
-to the &lt;span class="code"&gt;Post&lt;/span&gt; class to make manipulating the markdown files easier. Most
-importantly, what I needed to know for each markdown file is where its HTML
-should go in the generated site. That is, I needed to know the URL of the post:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/post-url.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This did the trick. The &lt;span class="code"&gt;date&lt;/span&gt; and &lt;span class="code"&gt;title&lt;/span&gt; methods parsed some metadata values I
-saved in the markdown file along with the text. The &lt;span class="code"&gt;url&lt;/span&gt; method returned a string using
-the year/month/day pattern most people are familiar with. The &lt;span class="code"&gt;slugize&lt;/span&gt; method
-removed characters from the title that weren’t compatible with URL strings. As I
-explained earlier, the URL is also the file system path for each post’s HTML
-file: The single line of code above mapped the posts to an array of strings, each
-one the path to an HTML file, the URL of that post appended with a file
-extension.&lt;/p&gt;
-
-&lt;h2&gt;Grouping Two Arrays Together&lt;/h2&gt;
-
-&lt;p&gt;Now I had two arrays: &lt;span class="code"&gt;Post&lt;/span&gt; objects and HTML file paths. I was almost ready to
-write a Rake file task that would convert the posts into HTML files. But, as
-you&amp;rsquo;ll see in a minute, writing a file task requires two files: a source file
-and a target file. Somehow I needed to convert these two separate arrays into a
-single array of pairs, like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/zipping.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;As you can see, Ruby’s &lt;span class="code"&gt;Enumerable#zip&lt;/span&gt; method was
-perfect solution. It yielded object pairs, one object taken from the receiver
-(&lt;span class="code"&gt;html_files&lt;/span&gt;) and the other object taken from the
-argument (&lt;span class="code"&gt;posts&lt;/span&gt;). If you pass in 2, 3 or more
-arguments, it will yield triplets, quadruplets or n-tuples to the block
-instead. I first learned about &lt;span class="code"&gt;zip&lt;/span&gt; from Jim Weirich’s
-2012 Power Rake presentation; he used it in his static web site example in a
-very similar way.  Of course, you can use &lt;span class="code"&gt;zip&lt;/span&gt; to
-process multiple arrays for any purpose. It’s one of Ruby’s most beautiful
-features I think.&lt;/p&gt;
-
-&lt;h2&gt;Writing Rake File Tasks&lt;/h2&gt;
-
-&lt;p&gt;As you probably know, a standard Rake task runs when you execute the task
-directly, or when you run another task that depends on it. A file task,
-however, will only execute the Ruby code inside the block if:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;The source file is newer than the target file, or&lt;/li&gt;
-&lt;li&gt;The target file doesn’t exist at all.&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;This behavior is ideal for generating a static web site, or for any other job
-that requires generating a file from another file. Rake will build the target
-file for the first time if it doesn’t exist, or update it if the source file
-has changed.&lt;/p&gt;
-
-&lt;p&gt;Now that I had pairs of HTML paths and &lt;span class="code"&gt;Post&lt;/span&gt; objects,
-it was easy for me to write a file task using one of these pairs. Here’s what I
-came up with:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/file-task.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;By calling &lt;span class="code"&gt;file&lt;/span&gt; inside of the &lt;span class="code"&gt;zip&lt;/span&gt; block, I created a file task for each one
-of the paths in &lt;span class="code"&gt;html_files&lt;/span&gt;. Now if I created a single, standard Rake task that
-depended on the array of html file paths, I could test whether any or all of the
-HTML files needed to be generated:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/rake-posts.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Now I could generate all of my blog posts with one command: &lt;span class="code"&gt;rake posts&lt;/span&gt;!&lt;/p&gt;
-
-&lt;h2&gt;Rendering Each Post Using ERB&lt;/h2&gt;
-
-&lt;p&gt;What did the code inside the file task do? It generated the HTML file for a
-single post using &lt;span class="code"&gt;ERB&lt;/span&gt;, using a method I wrote called &lt;span class="code"&gt;Layout#render&lt;/span&gt;. If you’re
-interested, here’s the &lt;span class="code"&gt;Layout&lt;/span&gt; class (&lt;a href="https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/lib/layout.rb"&gt;github&lt;/a&gt;):&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/layout.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;I won’t explain this line by line, but there were a couple of interesting tricks
-here also. First, the &lt;span class="code"&gt;contents&lt;/span&gt; method used nested calls to
-ERB to render a page layout surrounding the post, along
-with the article text itself. This required I call &lt;span
-class="code"&gt;yield&lt;/span&gt; somewhere inside my &lt;span class="code"&gt;layout.erb&lt;/span&gt; file in just the same
-way I would in &lt;span class="code"&gt;application.html.erb&lt;/span&gt; for a Rails app.&lt;/p&gt;
-
-&lt;p&gt;The complex line of code at the bottom that uses &lt;span class="code"&gt;instance_eval&lt;/span&gt; and
-&lt;span class="code"&gt;binding&lt;/span&gt; seems impossible to understand at first. But actually it’s fairly
-standard boilerplate Ruby metaprogramming code that evaluates the ERB template
-in the context of the &lt;span class="code"&gt;page&lt;/span&gt; object and the current method.&lt;/p&gt;
-
-&lt;p&gt;Let’s take a closer look at this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/metaprogramming.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the left I show the the &lt;span class="code"&gt;page&lt;/span&gt; object, an instance of the &lt;span class="code"&gt;Post&lt;/span&gt; class, in the
-center the code running the ERB transformation, and on the right the Ruby call
-stack.&lt;/p&gt;
-
-&lt;p&gt;The arrow from ERB going to the left represents the use of &lt;span class="code"&gt;instance_eval&lt;/span&gt;. This
-method, built into the Ruby language, resets the &lt;span class="code"&gt;self&lt;/span&gt; pointer to the
-receiver or the &lt;span class="code"&gt;page&lt;/span&gt; object in this example. This allows the ERB code to access
-the instance variables of the &lt;span class="code"&gt;page&lt;/span&gt; object and the methods of the &lt;span class="code"&gt;Post&lt;/span&gt; class.&lt;/p&gt;
-
-&lt;p&gt;The arrow from ERB going to the right, in turn, represents the call to &lt;span class="code"&gt;binding&lt;/span&gt;.
-The &lt;span class="code"&gt;binding&lt;/span&gt; method, also part of the Ruby core language, refers to the
-current Ruby stack frame allowing the ERB code to access all of the local
-variables present there, such as &lt;span class="code"&gt;recent_posts&lt;/span&gt;.&lt;/p&gt;
-
-&lt;h2&gt;My Rakefile&lt;/h2&gt;
-
-&lt;p&gt;Of course, I’m glossing over some other important details here, such as
-generating the index or home page, the RSS feed and a few other things. For
-reference, here’s my entire Rakefile (&lt;a href="https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/Rakefile"&gt;github&lt;/a&gt;):&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/1/8/rakefile.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;You can see the call to &lt;span class="code"&gt;Layout#render&lt;/span&gt; and the &lt;span class="code"&gt;rake :posts&lt;/span&gt; task I described
-above. Here are some other coding details, if you’re interested:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;After creating the &lt;span class="code"&gt;posts&lt;/span&gt; array, I sort it by date, reversed.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;I generate the home page using another file task: &lt;span class="code"&gt;index.html&lt;/span&gt;, and a &lt;span class="code"&gt;HomePage&lt;/span&gt; class.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;I generate the RSS in a similar way using a third file task: &lt;span class="code"&gt;index.xml&lt;/span&gt;, and a &lt;span class="code"&gt;Feed&lt;/span&gt; class.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;h2&gt;Ideas, Not Code&lt;/h2&gt;
-
-&lt;p&gt;If you’re interested in using this code for your own site, it’s on &lt;a href="https://github.com/patshaughnessy/patshaughnessy.github.io"&gt;github&lt;/a&gt;.
-However, I wouldn’t recommended using it: It’s always a better idea to use a
-well tested, robust free service such as wordpress.com or Jekyll.&lt;/p&gt;
-
-&lt;p&gt;Instead of using this code, use the ideas behind it! Take the time to use
-&lt;span class="code"&gt;Rake::FileList&lt;/span&gt; and Rake file tasks in whatever application you’re working on. And
-please take the time to watch the &lt;a href="http://www.confreaks.com/videos/988-goruco2012-power-rake"&gt;PowerRake presentation&lt;/a&gt;. You’ll learn more about one
-of Ruby’s most powerful tools &amp;ndash; and you’ll be able spend some time with Jim.
-Jim’s bright personality and sense of humor can live on in our memory, at
-least.&lt;/p&gt;
 </content>
   </entry>
 </feed>
