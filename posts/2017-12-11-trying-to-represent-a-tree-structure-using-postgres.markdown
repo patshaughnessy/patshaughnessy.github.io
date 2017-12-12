@@ -19,10 +19,15 @@ But what are these new SQL operators, and how do you use them? And how does
 LTREE actually work? What Computer Science does it use behind the scenes to
 enable fast tree operations?
 
-This week I’ll publish a series of blog posts on the Postgres LTREE extension.
-I'll get started today by trying to insert a tree structure into a Postgres
-table using standard SQL, and during the rest of the week I'll take a close
-look at LTREE: how to install it, how to use it, and how it works.
+This week I’ll publish a series
+([one](http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres),
+[two](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
+three, four and five) of blog posts on the Postgres LTREE extension.  I'll get
+started today by trying to insert a tree structure into a Postgres table using
+standard SQL, and during the rest of the week I'll take a close look at LTREE:
+[how to install
+it](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
+how to use it, and how it works.
 
 <div style="clear: both"></div>
 
@@ -211,6 +216,11 @@ returned by the previous query. And to find the total count I would have to sum
 the number of ids returned by each query along the way. Certainly not an
 efficient algorithm!
 
+**Update:** As Mengchen Yu pointed out in the comments, I'll need to execute
+one last additional SQL statement that returns an emtpy set of children ids, in
+order to detect my tree has no further levels. So the total number of SQL
+statements would be _n_, not _n_-1.
+
 ## There must be a better way
 
 My <span class="code">parent\_id</span> foreign key worked well for very simple
@@ -246,5 +256,7 @@ It turns out I didn’t have to: Postgres itself supports one of the two tree
 algorithms I mentioned above: path enumeration. Bundled inside of the Postgres
 source tree is an “extension,” an optional piece of C code you need compile,
 install and enable, that supports tree SQL operations using path enumeration.
-In my next post, I’ll show you how to install and use the [LTREE Postgres
+In my [next
+post](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
+I’ll show you how to install and use the [LTREE Postgres
 extension](https://www.postgresql.org/docs/current/static/ltree.html).

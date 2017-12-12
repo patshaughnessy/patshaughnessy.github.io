@@ -7,6 +7,159 @@
     <name></name>
   </author>
   <entry>
+    <title>Installing the Postgres LTREE Extension</title>
+    <link href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension" rel="alternate"/>
+    <id>http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension</id>
+    <published>2017-12-12T04:00:00Z</published>
+    <updated>2017-12-12T04:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/12/tree2.jpg"&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Hidden inside of your Postgres server is code that provides special SQL
+operators and functions designed to support tree operations. It’s called the
+&lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE exten</summary>
+    <content type="html">&lt;div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/12/tree2.jpg"&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Hidden inside of your Postgres server is code that provides special SQL
+operators and functions designed to support tree operations. It’s called the
+&lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE extension&lt;/a&gt;.
+I’m guessing this stands for &lt;em&gt;left-tree&lt;/em&gt;. In my next post, I’ll write about
+some of these functions and operators: what they do and how to use them.&lt;/p&gt;
+
+&lt;p&gt;But first, where is the LTREE extension? How can you install and start using it? Read on to
+find out.&lt;/p&gt;
+
+&lt;h2&gt;Testing Whether the LTREE Extension is Installed&lt;/h2&gt;
+
+&lt;p&gt;Depending on where you downloaded Postgres from and how you installed it, you
+may have already installed LTREE with Postgres. To find out, execute this SQL
+statement:&lt;/p&gt;
+
+&lt;pre&gt;
+=&gt; create extension ltree;
+CREATE EXTENSION
+&lt;/pre&gt;
+
+
+&lt;p&gt;If you see the “CREATE EXTENSION” message like this, then you’re all set! LTREE
+was already installed and you just enabled it. Skip to my next post to find out
+what it can do and how to use it.&lt;/p&gt;
+
+&lt;p&gt;Or if you see:&lt;/p&gt;
+
+&lt;pre&gt;
+=&gt; create extension ltree;
+ERROR:  extension "ltree" already exists
+&lt;/pre&gt;
+
+
+&lt;p&gt;…then your Postgres server already had LTREE enabled.&lt;/p&gt;
+
+&lt;p&gt;FYI The &lt;span class="code"&gt;pg_available_extensions&lt;/span&gt; table will show you
+all the Postgres extensions that are available and installed in your server:&lt;/p&gt;
+
+&lt;pre&gt;
+select * from pg_available_extensions;
+
+  name   | default_version | installed_version |                     comment
+---------+-----------------+-------------------+-------------------------------------------------
+ ltree   | 1.1             | 1.1               | data type for hierarchical tree-like structures
+ plpgsql | 1.0             | 1.0               | PL/pgSQL procedural language
+(2 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;As you can see, “ltree” already appears in my server’s list. The value “1.1”
+for &lt;span class="code"&gt;installed_version&lt;/span&gt; indicates that I’ve already
+enabled it too. This would have been blank before running the &lt;span
+class="code"&gt;create extension ltree&lt;/span&gt; command above.&lt;/p&gt;
+
+&lt;p&gt;I originally installed a local copy of Postgres on my Mac using Homebrew, and I
+was happy to find that the Homebrew Postgres formula does include steps to
+build and install LTREE, after building the rest of the Postgres server. But I
+still needed to enable it using &lt;span class="code"&gt;create extension&lt;/span&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Using LTREE on a Shared Postgres Server&lt;/h2&gt;
+
+&lt;p&gt;Running the &lt;span class="code"&gt;create extension ltree&lt;/span&gt; command may fail
+with this error message:&lt;/p&gt;
+
+&lt;pre&gt;
+=&gt; create extension ltree;
+ERROR:  permission denied to create extension "ltree"
+HINT:  Must be superuser to create this extension.
+&lt;/pre&gt;
+
+
+&lt;p&gt;Enabling Postgres extensions requires super user access. If you’re using a
+shared Postgres server and don’t have super-user access, you’ll need to find
+someone who does. Or you may just need to login to Postgres using the proper
+Postgres user account.&lt;/p&gt;
+
+&lt;h2&gt;How to Install the LTREE Extension&lt;/h2&gt;
+
+&lt;p&gt;Running the &lt;span class="code"&gt;create extension&lt;/span&gt; command may also fail
+with this error message:&lt;/p&gt;
+
+&lt;pre&gt;
+=&gt; create extension ltree;
+ERROR:  could not open extension control file "/usr/local/pgsql/share/extension/ltree.control": No such file or directory
+&lt;/pre&gt;
+
+
+&lt;p&gt;This error means the LTREE code isn’t even installed on your Postgres server.
+If you’re running on Linux and installed Postgres using a package manager, you
+may have to install a second package called “postgresql-contrib.”&lt;/p&gt;
+
+&lt;p&gt;If you installed Postgres from source yourself, then you will see this error
+message because the Postgres Makefile doesn’t compile and install LTREE by
+default. Don’t worry! It turns out the Postgres source tree already contains
+the code for LTREE and many other extensions in a subdirectory called
+“contrib.”&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/12/ltree-source.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;Compile it as follows:&lt;/p&gt;
+
+&lt;pre&gt;
+$ cd /path/to/postgres-9.6.5/contrib/ltree
+$ make
+
+gcc -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -Wno-unused-command-line-argument -O2  -DLOWER_NODE -I. -I. -I../../src/include   -c -o ltree_io.o ltree_io.c
+
+etc…
+
+$ sudo make install
+
+/bin/sh ../../config/install-sh -c -d '/usr/local/pgsql/lib'
+/bin/sh ../../config/install-sh -c -d '/usr/local/pgsql/share/extension'
+/bin/sh ../../config/install-sh -c -d '/usr/local/pgsql/share/extension'
+/usr/bin/install -c -m 755  ltree.so '/usr/local/pgsql/lib/ltree.so'
+/usr/bin/install -c -m 644 ./ltree.control '/usr/local/pgsql/share/extension/'
+/usr/bin/install -c -m 644 ./ltree--1.1.sql ./ltree--1.0--1.1.sql ./ltree--unpackaged--1.0.sql  ‘/usr/local/pgsql/share/extension/'
+&lt;/pre&gt;
+
+
+&lt;p&gt;You can see above the install step copied the ltree.so library into my Postgres
+server’s lib directory: /usr/local/pgsql/lib, and ran a couple other commands
+as well. Now I can run the &lt;span class="code"&gt;create extension ltree&lt;/span&gt;
+command as shown above. I don’t even need to restart Postgres; it will find and
+load ltree.so automatically.&lt;/p&gt;
+
+&lt;p&gt;Now that you have LTREE installed and enabled, you can read my next post to
+learn how to use it.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Trying to Represent a Tree Structure Using Postgres</title>
     <link href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres" rel="alternate"/>
     <id>http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres</id>
@@ -45,10 +198,15 @@ operators and functions that support tree operations.&lt;/p&gt;
 LTREE actually work? What Computer Science does it use behind the scenes to
 enable fast tree operations?&lt;/p&gt;
 
-&lt;p&gt;This week I’ll publish a series of blog posts on the Postgres LTREE extension.
-I&amp;rsquo;ll get started today by trying to insert a tree structure into a Postgres
-table using standard SQL, and during the rest of the week I&amp;rsquo;ll take a close
-look at LTREE: how to install it, how to use it, and how it works.&lt;/p&gt;
+&lt;p&gt;This week I’ll publish a series
+(&lt;a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres"&gt;one&lt;/a&gt;,
+&lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;two&lt;/a&gt;,
+three, four and five) of blog posts on the Postgres LTREE extension.  I&amp;rsquo;ll get
+started today by trying to insert a tree structure into a Postgres table using
+standard SQL, and during the rest of the week I&amp;rsquo;ll take a close look at LTREE:
+&lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;how to install
+it&lt;/a&gt;,
+how to use it, and how it works.&lt;/p&gt;
 
 &lt;div style="clear: both"&gt;&lt;/div&gt;
 
@@ -248,6 +406,11 @@ returned by the previous query. And to find the total count I would have to sum
 the number of ids returned by each query along the way. Certainly not an
 efficient algorithm!&lt;/p&gt;
 
+&lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; As Mengchen Yu pointed out in the comments, I&amp;rsquo;ll need to execute
+one last additional SQL statement that returns an emtpy set of children ids, in
+order to detect my tree has no further levels. So the total number of SQL
+statements would be &lt;em&gt;n&lt;/em&gt;, not &lt;em&gt;n&lt;/em&gt;-1.&lt;/p&gt;
+
 &lt;h2&gt;There must be a better way&lt;/h2&gt;
 
 &lt;p&gt;My &lt;span class="code"&gt;parent_id&lt;/span&gt; foreign key worked well for very simple
@@ -283,7 +446,9 @@ overall system to support a single new data structure?&lt;/p&gt;
 algorithms I mentioned above: path enumeration. Bundled inside of the Postgres
 source tree is an “extension,” an optional piece of C code you need compile,
 install and enable, that supports tree SQL operations using path enumeration.
-In my next post, I’ll show you how to install and use the &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE Postgres
+In my &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;next
+post&lt;/a&gt;,
+I’ll show you how to install and use the &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE Postgres
 extension&lt;/a&gt;.&lt;/p&gt;
 </content>
   </entry>
@@ -4014,338 +4179,6 @@ right inside the database.&lt;/p&gt;
 
 &lt;p&gt;Don’t let your data out of the database until you need to… until you have just
 the values your application really needs.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Mark Methods Private When You Don’t Test Them</title>
-    <link href="http://patshaughnessy.net/2015/2/16/mark-methods-private-when-you-dont-test-them" rel="alternate"/>
-    <id>http://patshaughnessy.net/2015/2/16/mark-methods-private-when-you-dont-test-them</id>
-    <published>2015-02-16T04:00:00Z</published>
-    <updated>2015-02-16T04:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/2/16/plaza-de-la-merced.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;My father in law once lived in same building where Picasso&lt;br/&gt;was born, near the Plaza de la Merced in Málaga, Spain.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;In Ruby and many other languages, you write private methods to implement
-internal logic you don’t want</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/2/16/plaza-de-la-merced.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;My father in law once lived in same building where Picasso&lt;br/&gt;was born, near the Plaza de la Merced in Málaga, Spain.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;In Ruby and many other languages, you write private methods to implement
-internal logic you don’t want to expose. You want the freedom to rename,
-repurpose or even delete them without worrying about impacting anything else.
-The &lt;span class="code"&gt;private&lt;/span&gt; keyword signals other developers: Don’t rely on this; don’t call
-it; it might change. This is especially important when writing framework or
-library code that many other developers will use.&lt;/p&gt;
-
-&lt;p&gt;But which methods should you make private? Sometimes this is obvious; sometimes
-it isn’t. A good rule of thumb to use is: If you’re not testing a method, it
-should be private.&lt;/p&gt;
-
-&lt;br/&gt;
-
-
-&lt;br/&gt;
-
-
-&lt;p&gt;But wait a minute! Aren’t we supposed to test everything? Isn’t 100% code
-coverage the nirvana every Ruby developer seeks? Let me clarify. You should
-mark methods private when you test them indirectly by calling the other, public
-methods in the same class. Use the &lt;span class="code"&gt;private&lt;/span&gt; keyword to help organize your code,
-to remind yourself what you still need to test, and what you don’t.&lt;/p&gt;
-
-&lt;h2&gt;Three Paintings&lt;/h2&gt;
-
-&lt;p&gt;A simple example will make this clear. Suppose I have a class that describes a
-painting:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="constant"&gt;Painting&lt;/span&gt; = &lt;span class="constant"&gt;Struct&lt;/span&gt;.new(&lt;span class="symbol"&gt;:name&lt;/span&gt;, &lt;span class="symbol"&gt;:year&lt;/span&gt;)
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Now I can create a list of three paintings in a &lt;span
-class="code"&gt;Minitest::Spec&lt;/span&gt; file like this:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-let(&lt;span class="symbol"&gt;:one&lt;/span&gt;) { &lt;span class="constant"&gt;Painting&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Spanish Couple In Front Of Inn&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="integer"&gt;1900&lt;/span&gt;) }
-let(&lt;span class="symbol"&gt;:two&lt;/span&gt;) { &lt;span class="constant"&gt;Painting&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Guernica&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="integer"&gt;1937&lt;/span&gt;) }
-let(&lt;span class="symbol"&gt;:three&lt;/span&gt;) { &lt;span class="constant"&gt;Painting&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Petite Fleurs&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;, &lt;span class="integer"&gt;1958&lt;/span&gt;) }
-let(&lt;span class="symbol"&gt;:paintings&lt;/span&gt;) { [one, two, three] }
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Suppose my first requirement is to return the first painting from the list.
-Simple enough:&lt;/p&gt;
-
-&lt;div class="CodeRay" style="display: inline-block; width: 200px;"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;first&lt;/span&gt;(list)
-  list.first
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;div class="CodeRay" style="display: inline-block;"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;should return the first element&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt; &lt;span class="keyword"&gt;do&lt;/span&gt;
-  first(paintings).must_equal one
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;I just call &lt;span class="code"&gt;Array#first&lt;/span&gt; and I’m done. Returning the
-rest of the list is slightly more interesting:&lt;/p&gt;
-
-&lt;div class="CodeRay" style="display: inline-block; width: 200px;"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;rest&lt;/span&gt;(list)
-  _, *rest = list
-  rest
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;div class="CodeRay" style="display: inline-block"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;returns the rest of the elements&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt; &lt;span class="keyword"&gt;do&lt;/span&gt;
-  rest(paintings).must_equal [two, three]
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Using &lt;a href="http://devblog.avdi.org/2010/01/31/first-and-rest-in-ruby/"&gt;a trick I learned from
-Avdi&lt;/a&gt;, &lt;span
-class="code"&gt;rest&lt;/span&gt; always returns an array even if the input list was
-empty or had only one element. So far, so good. I’ve written two methods and
-two tests:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/2/16/two-tests.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;A New Requirement&lt;/h2&gt;
-
-&lt;p&gt;Now suppose my business requirement changes slightly and I instead need to
-return the first painting sorted alphabetically by name. Once again, it’s not
-hard to do.&lt;/p&gt;
-
-&lt;div class="CodeRay" style="display: inline-block; width: 300px;"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;first&lt;/span&gt;(list)
-  list.sort &lt;span class="keyword"&gt;do&lt;/span&gt; |p1, p2|
-    p1.name &amp;lt;=&amp;gt; p2.name
-  &lt;span class="keyword"&gt;end&lt;/span&gt;.first
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;div class="CodeRay" style="display: inline-block"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;should return the first element&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt; &lt;span class="keyword"&gt;do&lt;/span&gt;
-  first(paintings).name.must_equal &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Guernica&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;And I need &lt;span class="code"&gt;rest&lt;/span&gt; to use the same sort order, so I repeat the call to &lt;span class="code"&gt;sort&lt;/span&gt;:&lt;/p&gt;
-
-&lt;div class="CodeRay" style="display: inline-block; width: 300px;"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;rest&lt;/span&gt;(list)
-  _, *rest = list.sort &lt;span class="keyword"&gt;do&lt;/span&gt; |p1, p2|
-    p1.name &amp;lt;=&amp;gt; p2.name
-  &lt;span class="keyword"&gt;end&lt;/span&gt; 
-  rest
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;div class="CodeRay" style="display: inline-block"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;returns the rest of the elements&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt; &lt;span class="keyword"&gt;do&lt;/span&gt;
-  rest(paintings).map(&amp;amp;&lt;span class="symbol"&gt;:name&lt;/span&gt;).must_equal [
-    &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Petite Fleurs&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;,
-    &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Spanish Couple In Front Of Inn&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-  ]
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;I’ve implemented new behavior, but still have two methods and two tests:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/2/16/two-tests.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;Extracting a Method&lt;/h2&gt;
-
-&lt;p&gt;Because both of my methods are covered by tests, I’m free to refactor them. I
-decide to extract a new method, &lt;span class="code"&gt;sorted_by_name&lt;/span&gt;:&lt;/p&gt;
-
-&lt;div class="CodeRay" style="display: inline-block; width: 300px;"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;first&lt;/span&gt;(list)
-  sorted_by_name(list).first
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;rest&lt;/span&gt;(list)
-  _, *rest = sorted_by_name(list)
-  rest
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-
-
-
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;sorted_by_name&lt;/span&gt;(list)
-  list.sort &lt;span class="keyword"&gt;do&lt;/span&gt; |p1, p2|
-    p1.name &amp;lt;=&amp;gt; p2.name
-  &lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-
-
-&lt;div class="CodeRay" style="display: inline-block; width: 400px;"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;returns the element with the first name&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt; &lt;span class="keyword"&gt;do&lt;/span&gt;
-  first(paintings).name.must_equal &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Guernica&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;returns the rest after the first name&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt; &lt;span class="keyword"&gt;do&lt;/span&gt;
-  rest(paintings).map(&amp;amp;&lt;span class="symbol"&gt;:name&lt;/span&gt;).must_equal [
-    &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Petite Fleurs&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;,
-    &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Spanish Couple In Front Of Inn&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-  ]
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-
-
-
-
-
-
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Here I’ve simply moved the call to sort into a utility method called
-&lt;span class="code"&gt;sorted_by_name&lt;/span&gt;. Now &lt;span class="code"&gt;first&lt;/span&gt;
-and &lt;span class="code"&gt;rest&lt;/span&gt; both call &lt;span
-class="code"&gt;sorted_by_name&lt;/span&gt;, making the code a bit clearer and DRY-er. But
-now I have three methods and only two tests:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/2/16/two-tests-three-methods.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;Mark Methods Private When You Don’t Test Them&lt;/h2&gt;
-
-&lt;p&gt;Notice I didn’t bother writing a test for &lt;span class="code"&gt;sorted_by_name&lt;/span&gt;. I know it works
-because my other tests still pass. The existing tests are sufficient; I am
-testing &lt;span class="code"&gt;sorted_by_name&lt;/span&gt; indirectly. Because I extracted &lt;span class="code"&gt;sorted_by_name&lt;/span&gt; from
-&lt;span class="code"&gt;first&lt;/span&gt; and &lt;span class="code"&gt;rest&lt;/span&gt;, because I
-refactored my code without adding any new behavior, no new test were required.&lt;/p&gt;
-
-&lt;p&gt;In this scenario, take the time to mark the new, untested method as private:&lt;/p&gt;
-
-&lt;div class="CodeRay" style="display: inline-block; width: 300px;"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;first&lt;/span&gt;(list)
-  sorted_by_name(list).first
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;rest&lt;/span&gt;(list)
-  _, *rest = sorted_by_name(list)
-  rest
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-
-
-private
-
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;sorted_by_name&lt;/span&gt;(list)
-  list.sort &lt;span class="keyword"&gt;do&lt;/span&gt; |p1, p2|
-    p1.name &amp;lt;=&amp;gt; p2.name
-  &lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-
-
-&lt;div class="CodeRay" style="display: inline-block; width: 400px;"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;returns the element with the first name&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt; &lt;span class="keyword"&gt;do&lt;/span&gt;
-  first(paintings).name.must_equal &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Guernica&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-it &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;returns the rest after the first name&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt; &lt;span class="keyword"&gt;do&lt;/span&gt;
-  rest(paintings).map(&amp;amp;&lt;span class="symbol"&gt;:name&lt;/span&gt;).must_equal [
-    &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Petite Fleurs&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;,
-    &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;Spanish Couple In Front Of Inn&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-  ]
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-
-
-
-
-
-
-
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;The &lt;span class="code"&gt;private&lt;/span&gt; keyword here reminds me I’ve already tested &lt;span
-class="code"&gt;sorted_by_name&lt;/span&gt;, that I don’t need to write new tests for
-it. Now &lt;span class="code"&gt;private&lt;/span&gt; is helping me organize my code; it’s helping me remember
-which methods I don’t need to test… and which methods are missing important
-tests.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/2/16/two-tests-three-methods-private.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;If my tests don’t need to know about &lt;span class="code"&gt;sorted_by_name&lt;/span&gt;, then certainly other
-developers don’t. It should be private. Marking it private reminds me that it
-is being tested indirectly, that I didn’t just forget to write a test for it.
-Marking it private tells other developers about what I’ve learned from my own
-test suite.&lt;/p&gt;
 </content>
   </entry>
 </feed>
