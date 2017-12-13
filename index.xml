@@ -7,6 +7,271 @@
     <name></name>
   </author>
   <entry>
+    <title>Saving a Tree in Postgres Using LTREE</title>
+    <link href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree" rel="alternate"/>
+    <id>http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree</id>
+    <published>2017-12-13T04:00:00Z</published>
+    <updated>2017-12-13T04:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/13/tree3.jpg"&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;In &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;my last
+post&lt;/a&gt;,
+I showed you how to install and enable a Postgres extension called
+&lt;a href="https://www.postgresql.org/docs/current/stat</summary>
+    <content type="html">&lt;div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/13/tree3.jpg"&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;In &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;my last
+post&lt;/a&gt;,
+I showed you how to install and enable a Postgres extension called
+&lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE&lt;/a&gt;. LTREE
+allows me to save, query on and manipulate trees or hierarchical data
+structures using a relational database table. As we’ll see, using LTREE I can
+count leaves, cut off branches, and climb up and down trees easily &amp;ndash; all using
+SQL right inside my application’s existing Postgres database!&lt;/p&gt;
+
+&lt;p&gt;But trees are natural, haphazard, branching structures with countless leaves,
+while database tables are man-made rectangles full of numbers and text. How can
+I possibly save a beautiful tree structure into an ugly, boring database table?&lt;/p&gt;
+
+&lt;h2&gt;Path Enumeration&lt;/h2&gt;
+
+&lt;p&gt;Let’s return to the example tree from the &lt;a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres"&gt;first
+post&lt;/a&gt;
+in this series:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;The LTREE extension uses the &lt;em&gt;path enumeration&lt;/em&gt; algorithm, which calls for each
+node in the tree to record the path from the root you would have to follow to
+reach that node.&lt;/p&gt;
+
+&lt;p&gt;For example, to find &lt;span class="code"&gt;G&lt;/span&gt; starting from &lt;span
+class="code"&gt;A&lt;/span&gt;, the root, I would move down to &lt;span
+class="code"&gt;B&lt;/span&gt;, and then down again to &lt;span class="code"&gt;G&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/13/tree-path1.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;So the path to &lt;span class="code"&gt;G&lt;/span&gt; is:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/13/path1.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;Here’s another example:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/13/tree-path2.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;This time I’ve traced a path from &lt;span class="code"&gt;A&lt;/span&gt; to &lt;span
+class="code"&gt;D&lt;/span&gt;, via &lt;span class="code"&gt;C&lt;/span&gt;. So the path of &lt;span
+class="code"&gt;D&lt;/span&gt; is:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/13/path2.png"&gt;&lt;/p&gt;
+
+&lt;h2&gt;Saving Tree Paths Using LTREE&lt;/h2&gt;
+
+&lt;p&gt;To use LTREE, I need to create a column to hold these paths. For my example
+tree, I’ll use the same table I did before, but instead of the &lt;span
+class="code"&gt;parent_id&lt;/span&gt; column I’ll use a &lt;span class="code"&gt;path&lt;/span&gt;
+column:&lt;/p&gt;
+
+&lt;pre&gt;
+create table tree(
+    id serial primary key,
+    letter char,
+    path ltree
+);
+create index tree_path_idx on tree using gist (path);
+&lt;/pre&gt;
+
+
+&lt;p&gt;I chose the name &lt;span class="code"&gt;path&lt;/span&gt;; I could have picked any name
+here. However, notice the &lt;span class="code"&gt;path&lt;/span&gt; column uses a Postgres
+data type called &lt;span class="code"&gt;ltree&lt;/span&gt; &amp;ndash; the LTREE extension provides
+this special new type.  And also notice I created a special &lt;span
+class="code"&gt;gist&lt;/span&gt; index on the &lt;span class="code"&gt;path&lt;/span&gt; column;
+more on this later!&lt;/p&gt;
+
+&lt;p&gt;Next, I save the path of each tree node into the &lt;span class="code"&gt;path&lt;/span&gt;
+column, encoded as a series of strings joined together by periods. For example
+to save the path of &lt;span class="code"&gt;G&lt;/span&gt; into my table I use this insert
+statement:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/13/insert1.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;And to save the path to node D I write:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/13/insert2.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;Following this pattern, I can save my entire tree using these insert
+statements, one for each node in my tree:&lt;/p&gt;
+
+&lt;pre&gt;
+insert into tree (letter, path) values ('A', 'A');
+insert into tree (letter, path) values ('B', 'A.B');
+insert into tree (letter, path) values ('C', 'A.C');
+insert into tree (letter, path) values ('D', 'A.C.D');
+insert into tree (letter, path) values ('E', 'A.C.E');
+insert into tree (letter, path) values ('F', 'A.C.F');
+insert into tree (letter, path) values ('G', 'A.B.G');
+&lt;/pre&gt;
+
+
+&lt;p&gt;The root node, &lt;span class="code"&gt;A&lt;/span&gt;, contains the simplest path &lt;span
+class="code"&gt;A&lt;/span&gt;. Its two child nodes, &lt;span class="code"&gt;B&lt;/span&gt; and
+&lt;span class="code"&gt;C&lt;/span&gt;, use paths &lt;span class="code"&gt;A.B&lt;/span&gt; and &lt;span
+class="code"&gt;A.C&lt;/span&gt;; the child nodes under &lt;span class="code"&gt;C&lt;/span&gt; use
+paths &lt;span class="code"&gt;A.C.D&lt;/span&gt;, &lt;span class="code"&gt;A.C.E&lt;/span&gt;, etc.
+You get the idea.&lt;/p&gt;
+
+&lt;h2&gt;The Ancestor Operator: @&gt;&lt;/h2&gt;
+
+&lt;p&gt;Now for the fun part: LTREE provides a series of new SQL operators that allow
+me to query and manipulate tree data structures. The most powerful of these is
+&lt;span class="code"&gt;@&gt;&lt;/span&gt;, the “ancestor” operator. It tests whether one path is an ancestor of
+another.&lt;/p&gt;
+
+&lt;p&gt;Returning to my question from &lt;a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres"&gt;the first post in this
+series&lt;/a&gt;,
+what if I needed to know how many children &lt;span class="code"&gt;A&lt;/span&gt; had,
+recursively? That is, what if I needed to count its children, grandchildren,
+great-grandchildren, etc.? Earlier we saw that using a &lt;span
+class="code"&gt;parent_id&lt;/span&gt; column this would require an ever increasing
+number of SQL statements:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where parent_id = ID;
+select count(*) from tree where parent_id in (CHILD IDs);
+select count(*) from tree where parent_id in (GRANDCHILD IDs);
+select count(*) from tree where parent_id in (GREAT-GRANDCHILD IDs);
+select count(*) from tree where parent_id in (GREAT_GREAT-GRANDCHILD IDs);
+
+etc.
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;span class="code"&gt;@&gt;&lt;/span&gt; solves this problem for us. I can now recursively
+count the total number of nodes under any given parent like this:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where PARENT-PATH @&gt; path;
+&lt;/pre&gt;
+
+
+&lt;p&gt;In my example, this SQL would return the number of nodes, recursively, under
+the root node &lt;span class="code"&gt;A&lt;/span&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where 'A' @&gt; path;
+count 
+-------
+7
+(1 row)
+&lt;/pre&gt;
+
+
+&lt;p&gt;LTREE counts the parent node itself, so the total count is 7, not 6. That is,
+&lt;span class="code"&gt;A @&gt; A&lt;/span&gt; evaluates to true. Another example; this
+returns the count of tree nodes under and including &lt;span class="code"&gt;C&lt;/span&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where ‘A.C' @&gt; path;
+count 
+-------
+4
+(1 row)
+&lt;/pre&gt;
+
+
+&lt;p&gt;Or I could have written these predicates in the opposite order using &lt;span
+class="code"&gt;&amp;lt;@&lt;/span&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where path &lt;@ 'A';
+select count(*) from tree where path &lt;@ 'A.C';
+&lt;/pre&gt;
+
+
+&lt;p&gt;As you can see, the &lt;span class="code"&gt;&amp;lt;@&lt;/span&gt; and &lt;span
+class="code"&gt;@&gt;&lt;/span&gt; operators treat the &lt;span class="code"&gt;path&lt;/span&gt;
+column, the column I defined with the &lt;span class="code"&gt;ltree&lt;/span&gt; data
+type, as simple strings. But there’s some magic going on here: The path values
+are not simple strings. Although I typed them in as strings, &lt;span
+class="code"&gt;&amp;lt;@&lt;/span&gt; and &lt;span class="code"&gt;@&gt;&lt;/span&gt; efficiently determine
+whether or not one path is an ancestor of another.&lt;/p&gt;
+
+&lt;p&gt;And the &lt;span class="code"&gt;@&gt;&lt;/span&gt; ancestor operator is just one way of using
+&lt;span class="code"&gt;ltree&lt;/span&gt; columns; the LTREE extension provides a long list of powerful
+operators and functions!  For a complete list, see
+&lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;https://www.postgresql.org/docs/current/static/ltree.html&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;In my next post, I’ll explore more of these functions and show you how to
+perform some tree operations that I’ve found useful.&lt;/p&gt;
+
+&lt;h2&gt;Maybe You’re Not Impressed&lt;/h2&gt;
+
+&lt;p&gt;However, thinking about the path strings for a moment, it’s fairly obvious
+whether one path is an ancestor of another. For example, it’s clear that &lt;span class="code"&gt;A&lt;/span&gt; and
+A.C are ancestors of A.C.D, while A.B is not. In fact, it looks like all the &lt;span class="code"&gt;@&gt;&lt;/span&gt;
+operator does it check whether the string on the left (the ancestor) is a
+prefix or leading substring inside the string on the right (the descendant).&lt;/p&gt;
+
+&lt;p&gt;In fact, you might not be very impressed by LTREE, so far. The &lt;span class="code"&gt;@&gt;&lt;/span&gt; operator
+seems like a fancy way of performing a simple string operation. I could have
+written SQL code to determine that A is an ancestor of A.C.D myself. I probably
+would have used one of Postgres’s &lt;a href="https://www.postgresql.org/docs/current/static/functions-string.html"&gt;many string
+functions&lt;/a&gt;
+to achieve this, maybe something like this:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where strpos(path::varchar, 'A') = 1
+&lt;/pre&gt;
+
+
+&lt;p&gt;Postgres would calculate the answer for my 7-node example tree very quickly.
+But to calculate this count, internally Postgres would have to iterate over all
+the records in my table (this is called a &lt;em&gt;full table scan&lt;/em&gt; or &lt;em&gt;sequence scan&lt;/em&gt; in
+DB jargon) and calculate the &lt;span class="code"&gt;strpos&lt;/span&gt; function on each
+row. If my tree had thousands or millions of rows, then this SQL statement
+would take a long time to finish.&lt;/p&gt;
+
+&lt;h2&gt;Enabling the Real Magic: Using a GiST Index with LTREE&lt;/h2&gt;
+
+&lt;p&gt;The power of the &lt;span class="code"&gt;@&gt;&lt;/span&gt; operator is that it allows
+Postgres to search &lt;em&gt;efficiently&lt;/em&gt; across an entire tree using an index. Saying
+this in a more technical way: The &lt;span class="code"&gt;@&gt;&lt;/span&gt; operator
+integrates with Postgres’s GiST index API to find and match descendant nodes.
+To take advantage of this technology, be sure to create a GiST index on your
+&lt;span class="code"&gt;ltree&lt;/span&gt; column, for example like this:&lt;/p&gt;
+
+&lt;pre&gt;
+create index tree_path_idx on tree using gist (path);
+&lt;/pre&gt;
+
+
+&lt;p&gt;What is a “GiST” index? How does it help LTREE find and count tree nodes
+efficiently? Read the last post in this series to find out. There I describe
+the Generalized Search Index (GiST) project, explore the Computer Science
+behind GiST and look at how LTREE uses GiST to make fast tree operations inside
+of Postgres possible.&lt;/p&gt;
+
+&lt;h2&gt;What’s Next?&lt;/h2&gt;
+
+&lt;p&gt;But before we dive into LTREE’s internal implementation, first we should see
+what else LTREE can do. So far I’ve shown you how to count descendant tree
+nodes. Tomorrow in my next post, Manipulating Trees Using SQL and the Postgres
+LTREE Extension, I’ll show you how to use other LTREE’s operators and functions
+to work with tree data.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Installing the Postgres LTREE Extension</title>
     <link href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension" rel="alternate"/>
     <id>http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension</id>
@@ -32,8 +297,10 @@ operators and functions designed to support tree operations. It’s called the
 &lt;p&gt;Hidden inside of your Postgres server is code that provides special SQL
 operators and functions designed to support tree operations. It’s called the
 &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE extension&lt;/a&gt;.
-I’m guessing this stands for &lt;em&gt;left-tree&lt;/em&gt;. In my next post, I’ll write about
-some of these functions and operators: what they do and how to use them.&lt;/p&gt;
+I’m guessing this stands for &lt;em&gt;left-tree&lt;/em&gt;. In &lt;a href="http://localhost/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;my next
+post&lt;/a&gt;, I’ll
+write about some of these functions and operators: what they do and how to use
+them.&lt;/p&gt;
 
 &lt;p&gt;But first, where is the LTREE extension? How can you install and start using it? Read on to
 find out.&lt;/p&gt;
@@ -155,8 +422,9 @@ as well. Now I can run the &lt;span class="code"&gt;create extension ltree&lt;/s
 command as shown above. I don’t even need to restart Postgres; it will find and
 load ltree.so automatically.&lt;/p&gt;
 
-&lt;p&gt;Now that you have LTREE installed and enabled, you can read my next post to
-learn how to use it.&lt;/p&gt;
+&lt;p&gt;Now that you have LTREE installed and enabled, you can read &lt;a href="http://localhost/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;my next
+post&lt;/a&gt;, I’ll
+to learn how to use it.&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -201,12 +469,15 @@ enable fast tree operations?&lt;/p&gt;
 &lt;p&gt;This week I’ll publish a series
 (&lt;a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres"&gt;one&lt;/a&gt;,
 &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;two&lt;/a&gt;,
-three, four and five) of blog posts on the Postgres LTREE extension.  I&amp;rsquo;ll get
-started today by trying to insert a tree structure into a Postgres table using
-standard SQL, and during the rest of the week I&amp;rsquo;ll take a close look at LTREE:
-&lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;how to install
+&lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;three&lt;/a&gt;,
+four and five) of blog posts on the Postgres LTREE extension.  I&amp;rsquo;ll get started
+today by trying to insert a tree structure into a Postgres table using standard
+SQL, and during the rest of the week I&amp;rsquo;ll take a close look at LTREE: &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;how to
+install
 it&lt;/a&gt;,
-how to use it, and how it works.&lt;/p&gt;
+&lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;how to use
+it&lt;/a&gt;,
+and how it works.&lt;/p&gt;
 
 &lt;div style="clear: both"&gt;&lt;/div&gt;
 
@@ -3757,428 +4028,6 @@ keywords and syntax that allow you to express your ideas in a natural,
 straightforward manner. The only purpose of a language, whether a human
 language or programming language, is to express our abstract thoughts using
 words in simple, or even beautiful, ways.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Don’t Let Your Data Out of the Database</title>
-    <link href="http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database" rel="alternate"/>
-    <id>http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database</id>
-    <published>2015-06-18T03:00:00Z</published>
-    <updated>2015-06-18T03:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/6/18/escape.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Don’t let your data escape from your database&lt;br/&gt;
-  and cause unintended performance mistakes.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Keep your data in the database, not for security reasons but to avoid
-performance mistakes. Often the best way to speed up your applicati</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/6/18/escape.png"&gt;&lt;br/&gt;
-  &lt;i&gt;Don’t let your data escape from your database&lt;br/&gt;
-  and cause unintended performance mistakes.&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Keep your data in the database, not for security reasons but to avoid
-performance mistakes. Often the best way to speed up your application is to let
-your database server do what it was designed to do: operate on data.&lt;/p&gt;
-
-&lt;p&gt;Most modern programming languages and frameworks hide databases behind an
-elegant, beautiful layer of abstraction. Developers today don’t need to write
-or even understand Structured Query Language (SQL), the native language of
-database servers. We view SQL as a low-level, technical relic of 1970s Computer
-Science, best left behind in academic journals and college classrooms.&lt;/p&gt;
-
-&lt;p&gt;However, not learning and thoroughly understanding SQL would be a tremendous
-mistake. In fact, many data related performance problems are a result of using
-a high level language, such as Ruby or Python, to work with data instead of
-SQL. Keep your data where it belongs… in the database. Use your database server
-to operate on your data in place, and then fetch the result your application
-actually needs.&lt;/p&gt;
-
-&lt;p&gt;Let me show you what I mean with a simple example.&lt;/p&gt;
-
-&lt;div style="clear: both"&gt;&lt;/div&gt;
-
-
-&lt;h2&gt;Posts and Comments&lt;/h2&gt;
-
-&lt;p&gt;Suppose I have data in a one-many relationship: one post has many comments.
-Using ActiveRecord, the popular Ruby ORM, I implement a one-many association by
-writing:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;class&lt;/span&gt; &lt;span class="class"&gt;Post&lt;/span&gt; &amp;lt; &lt;span class="constant"&gt;ActiveRecord&lt;/span&gt;::&lt;span class="constant"&gt;Base&lt;/span&gt;
-  has_many &lt;span class="symbol"&gt;:comments&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-&lt;span class="keyword"&gt;class&lt;/span&gt; &lt;span class="class"&gt;Comment&lt;/span&gt; &amp;lt; &lt;span class="constant"&gt;ActiveRecord&lt;/span&gt;::&lt;span class="constant"&gt;Base&lt;/span&gt;
-  belongs_to &lt;span class="symbol"&gt;:post&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Ruby’s powerful dynamic behavior allows me to query the comments for a given
-post in a very natural, human way:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-post = &lt;span class="constant"&gt;Post&lt;/span&gt;.find(&lt;span class="integer"&gt;1&lt;/span&gt;)
-post.comments
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;But remember ActiveRecord isn’t a magic framework. It doesn’t have a secret
-connection to the tables in my database. It has to speak to the database server
-like everyone else, using the server’s language: SQL. Reading my log file, I
-can see how ActiveRecord translates &lt;span class="code"&gt;post.comments&lt;/span&gt; into SQL:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="class"&gt;select&lt;/span&gt; comments.* &lt;span class="keyword"&gt;from&lt;/span&gt; comments &lt;span class="keyword"&gt;where&lt;/span&gt; comments.post_id = &lt;span class="integer"&gt;1&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;After executing this SQL statement, ActiveRecord converts the result set into
-an array of Ruby objects which I can then use in my code. For example, if I
-want the latest comment for a post I can write:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;class&lt;/span&gt; &lt;span class="class"&gt;Post&lt;/span&gt;
-  &lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;latest_comment&lt;/span&gt;
-    comments.max {|a, b| a.updated_at &amp;lt;=&amp;gt; b.updated_at }
-  &lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Here I ask Ruby to sort the comment objects and return the latest one, the
-comment with the maximum &lt;span class="code"&gt;updated_at&lt;/span&gt; value. Now I can
-find the person who wrote the latest comment for a post just by writing:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-post.latest_comment.author
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-
-
-&lt;div style="float: right; padding: 7px 0px 50px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/6/18/open-cell.jpg"&gt;&lt;br/&gt;
-&lt;/div&gt;
-
-
-&lt;h2&gt;Where Is My Data?&lt;/h2&gt;
-
-&lt;p&gt;The problem with this approach is that it doesn’t scale. Suppose this post has
-hundreds or even thousands of comments; in this case, ActiveRecord will convert
-them all into Ruby objects just so I can iterate through them in the
-&lt;span class="code"&gt;latest_comment&lt;/span&gt; method.&lt;/p&gt;
-
-&lt;p&gt;My mistake was to let my data out of the database. Instead, I should have asked
-the database do the work for me.&lt;/p&gt;
-
-&lt;p&gt;Let’s take a closer look at how &lt;span class="code"&gt;latest_comment&lt;/span&gt; works:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/6/18/filter-sort.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the right, I start with all of the comments in the database, tens of
-thousands of them let’s say. Next, I need to search for the comments associated
-with my post, filtering on the &lt;span class="code"&gt;post_id&lt;/span&gt; column. This
-yields a subset, hundreds of comments for example. Finally, I sort these
-filtered comments and take the last one, yielding the latest one on the left.&lt;/p&gt;
-
-&lt;p&gt;The problem with my Ruby solution is that I perform the filtering in the
-database, but the sorting in Ruby. In between, the entire subset of comments
-for a post have to be transmitted from the database server to my Ruby
-application server:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/6/18/ruby-sort.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;To transmit all of these records, the database needs to serialize them to some
-binary format, which my Ruby code (or my DB driver actually) later needs to
-unpack. Finally, ActiveRecord has to convert this binary data into Ruby
-objects.&lt;/p&gt;
-
-&lt;p&gt;This process takes time; in particular, creating hundreds or thousands of Ruby
-objects involves allocating a series of memory structures and placing them into
-a large array. Using a process called “garbage collection,” Ruby might even
-have to find and recycle older unused Ruby objects to hold the comments, which
-would take even more time.&lt;/p&gt;
-
-&lt;h2&gt;Databases Are Faster Than You Are&lt;/h2&gt;
-
-&lt;p&gt;The solution is obvious: perform the search inside the database and only return
-the latest comment. But how do I ask my database server to search for the
-latest comment? By using ActiveRecord methods such as &lt;span class="code"&gt;where&lt;/span&gt;,
-&lt;span class="code"&gt;order&lt;/span&gt; and &lt;span class="code"&gt;first&lt;/span&gt; to describe
-what I want, instead of writing my own code in Ruby. This line will do the
-trick:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-post.comments.order(&lt;span class="key"&gt;updated_at&lt;/span&gt;: &lt;span class="symbol"&gt;:desc&lt;/span&gt;).first
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;ActiveRecord translates this into SQL code as follows:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="class"&gt;select&lt;/span&gt; comments.* &lt;span class="keyword"&gt;from&lt;/span&gt; comments
-&lt;span class="keyword"&gt;where&lt;/span&gt; comments.post_id = &lt;span class="integer"&gt;1&lt;/span&gt;
-&lt;span class="keyword"&gt;order&lt;/span&gt; &lt;span class="keyword"&gt;by&lt;/span&gt; comments.updated_at &lt;span class="directive"&gt;desc&lt;/span&gt; limit &lt;span class="integer"&gt;1&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;This will run much faster than my previous solution, because my database only
-transmits one comment record over the network to my Ruby server: the latest
-one. And Ruby only creates one Ruby object, for the latest comment:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/6/18/db-sort.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Now highly optimized C code, running on the same server that holds the comments
-table data, filters the comments by post, and sorts the matches by timestamp.
-This code has been used and tested by millions of developers around the world
-for years; don’t try to reinvent the wheel by rewriting the sort yourself using
-Ruby.&lt;/p&gt;
-
-&lt;h2&gt;Caching the Latest Comment&lt;/h2&gt;
-
-&lt;p&gt;Suppose in my user interface I always show the author of the latest comment
-next to each post. Now to display my page, I need to perform this comment
-search over and over again for every post. One way to avoid the comment query
-altogether would be to cache the latest comment’s author right inside the posts
-table. That way I’ll get the latest comment’s author automatically when I load
-the posts. No need for repeated searches, or any queries on the comments table
-at all!&lt;/p&gt;
-
-&lt;p&gt;In practice, if I’ve remembered to create indexes on the &lt;span
-class="code"&gt;post_id&lt;/span&gt; and &lt;span class="code"&gt;updated_at&lt;/span&gt; columns,
-the comment search SQL above will run very quickly, even if I execute it many
-times. I could even load the latest comments for all the posts using single SQL
-query, but for the sake of argument today, let’s explore a caching solution anyway.&lt;/p&gt;
-
-&lt;p&gt;Again ActiveRecord makes this easy. All I need to do is write a migration like
-this:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;class&lt;/span&gt; &lt;span class="class"&gt;AddLatestCommentAuthorToPosts&lt;/span&gt; &amp;lt; &lt;span class="constant"&gt;ActiveRecord&lt;/span&gt;::&lt;span class="constant"&gt;Migration&lt;/span&gt;
-  &lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;change&lt;/span&gt;
-    add_column &lt;span class="symbol"&gt;:posts&lt;/span&gt;, &lt;span class="symbol"&gt;:latest_comment_author&lt;/span&gt;, &lt;span class="symbol"&gt;:string&lt;/span&gt;
-  &lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Now I just need to be sure to update the post each time a user writes a new
-comment:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-post.update_attribute(&lt;span class="symbol"&gt;:latest_comment_author&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;span class="content"&gt;user name&lt;/span&gt;&lt;span class="delimiter"&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;)
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;h2&gt;Data Migration Using Ruby&lt;/h2&gt;
-
-&lt;p&gt;Of course, I forgot something important. Using &lt;span
-class="code"&gt;update_attribute&lt;/span&gt; I save the author for any new comments,
-but what about all of the existing comments? How do I set this column’s initial
-value for all the comments already in my database?&lt;/p&gt;
-
-&lt;p&gt;Simple enough: I just add a method to my migration that calls &lt;span class="code"&gt;update_attribute&lt;/span&gt;.
-Here’s how to do it:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;class&lt;/span&gt; &lt;span class="class"&gt;AddLatestCommentAuthorToPosts&lt;/span&gt; &amp;lt; &lt;span class="constant"&gt;ActiveRecord&lt;/span&gt;::&lt;span class="constant"&gt;Migration&lt;/span&gt;
-  &lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;change&lt;/span&gt;
-    add_column &lt;span class="symbol"&gt;:posts&lt;/span&gt;, &lt;span class="symbol"&gt;:latest_comment_author&lt;/span&gt;, &lt;span class="symbol"&gt;:string&lt;/span&gt;
-    populate_latest_comment_authors
-  &lt;span class="keyword"&gt;end&lt;/span&gt;
-
-  &lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;populate_latest_comment_authors&lt;/span&gt;
-   &lt;span class="constant"&gt;Post&lt;/span&gt;.all.each &lt;span class="keyword"&gt;do&lt;/span&gt; |post|
-      latest_author = post.comments.order(&lt;span class="key"&gt;updated_at&lt;/span&gt;: &lt;span class="symbol"&gt;:desc&lt;/span&gt;).first.author
-      post.update_attribute(&lt;span class="symbol"&gt;:latest_comment_author&lt;/span&gt;, latest_author)
-    &lt;span class="keyword"&gt;end&lt;/span&gt;
-  &lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Because you write migrations in Ruby, ActiveRecord makes it simple to perform
-complex transformations in a simple, elegant way. Using Ruby I get all the
-posts, iterate over each one, lookup the latest comment for that post, and
-update the latest comment author field.&lt;/p&gt;
-
-&lt;p&gt;But I’ve made the same performance mistake as before! Looking at my Rails log
-after running this migration, I find a series of repeated SQL statements:&lt;/p&gt;
-
-&lt;pre&gt;
-SELECT  "comments".* FROM "comments"  WHERE "comments"."post_id" = $1  ORDER BY "comments"."updated_at" DESC LIMIT 1  [["post_id", 2]]
-UPDATE "posts" SET "latest_comment_author" = $1, "updated_at" = $2 WHERE "posts"."id" = 2  [["latest_comment_author", "Harry"], ["updated_at", "2015-06-17 13:58:42.512160"]]
-SELECT  "comments".* FROM "comments"  WHERE "comments"."post_id" = $1  ORDER BY "comments"."updated_at" DESC LIMIT 1  [["post_id", 3]]
-UPDATE "posts" SET "latest_comment_author" = $1, "updated_at" = $2 WHERE "posts"."id" = 3  [["latest_comment_author", "Harry"], ["updated_at", "2015-06-17 13:58:42.514676"]]
-SELECT  "comments".* FROM "comments"  WHERE "comments"."post_id" = $1  ORDER BY "comments"."updated_at" DESC LIMIT 1  [["post_id", 1]]
-UPDATE "posts" SET "latest_comment_author" = $1, "updated_at" = $2 WHERE "posts"."id" = 1  [["latest_comment_author", "Harry"], ["updated_at", "2015-06-17 13:58:42.516071"]]
-&lt;/pre&gt;
-
-
-&lt;p&gt;Again, I’ve let my data out of the database. By loading all of the posts using
-&lt;span class="code"&gt;Post.all&lt;/span&gt;, and iterating over them using &lt;span
-class="code"&gt;each&lt;/span&gt;, I’ve triggered this series of repeated SQL commands.
-Now I’m transmitting all of the post data, and then more data back and forth
-for each post between my database and my Ruby application:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/6/18/ruby-iterate.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Just like my previous code, this migration will perform poorly. If I have just
-a few posts it probably doesn’t matter. But imagine if there are thousands or
-even 100,000s of post records: This migration might take minutes or even hours
-to complete! My database server and Ruby need to serialize, transmit and
-deserialize data for each one of these SQL commands.&lt;/p&gt;
-
-&lt;p&gt;There must be a better way.&lt;/p&gt;
-
-&lt;h2&gt;Data Migration Using SQL&lt;/h2&gt;
-
-&lt;p&gt;The solution is the same as before: Don’t let your data out of the database.
-Instead of writing Ruby code to update each post record, ask the database
-server to do it. My database server already has all my post data in an
-optimized format, likely loaded into memory. It can iterate over the posts and
-update them very quickly.&lt;/p&gt;
-
-&lt;div style="float: right; padding: 17px 0px 10px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/6/18/prison.jpg"&gt;&lt;br/&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;But how? How do I ask the database server to update all the posts? I need to
-speak the database’s language: SQL. By writing SQL directly, I can be sure the
-database is doing exactly what I want, that it’s using the most efficient
-algorithm possible. I can be sure my database and I understand each other.&lt;/p&gt;
-
-&lt;p&gt;Here’s one way to update all the posts using SQL:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="class"&gt;update&lt;/span&gt; posts &lt;span class="class"&gt;set&lt;/span&gt; latest_comment_author = (
-  &lt;span class="class"&gt;select&lt;/span&gt; author &lt;span class="keyword"&gt;from&lt;/span&gt; comments
-  &lt;span class="keyword"&gt;where&lt;/span&gt; comments.post_id = posts.id
-  &lt;span class="keyword"&gt;order&lt;/span&gt; &lt;span class="keyword"&gt;by&lt;/span&gt; comments.updated_at &lt;span class="directive"&gt;desc&lt;/span&gt;
-  limit &lt;span class="integer"&gt;1&lt;/span&gt;
-)
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;This tiny SQL program actually uses SQL commands similar to the what I found
-repeated in my log file. But there’s an important difference: This SQL code
-doesn’t refer to hard coded post id values, such as 1 or 2. Here I’ve updated
-all of the posts with a single command!&lt;/p&gt;
-
-&lt;p&gt;How does this work? Let’s take a look:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/6/18/db-iterate.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Using a SQL migration, my Ruby code sends a single SQL command to the database
-server, which is transmitted over the network to the database. Then, on the
-right, my database server performs the same iteration over the posts table,
-selecting the latest comment for each one.&lt;/p&gt;
-
-&lt;p&gt;This looks similar, but there’s a crucial difference: The iteration happens
-entirely inside the database server. No data needs to be packed, transmitted to
-the Ruby server and unpacked again. In fact, the C code performing the repeated
-&lt;span class="code"&gt;SELECT&lt;/span&gt; statements has been compiled to native machine
-language and will run very quickly. Once it fetches the latest comment, it can
-directly update each post because the posts table is stored nearby on the same
-server’s hard drive, or even in memory.&lt;/p&gt;
-
-&lt;h2&gt;Why Does the SQL Code Iterate?&lt;/h2&gt;
-
-&lt;p&gt;You might wonder why I drew an iteration inside the database server above.
-After all, I sent the database a simple command containing 1 &lt;span
-class="code"&gt;UPDATE&lt;/span&gt; statement and 1 &lt;span class="code"&gt;SELECT&lt;/span&gt;
-statement. Why does my database need to execute the select over and over again?&lt;/p&gt;
-
-&lt;p&gt;The reason why is that my SQL code uses a &lt;a href="https://en.wikipedia.org/wiki/Correlated_subquery"&gt;correlated
-subquery&lt;/a&gt;, because the inner
-&lt;span class="code"&gt;SELECT&lt;/span&gt; uses a value from the outer query. Here’s the
-SQL again:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/6/18/correlated-subquery.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Notice the inner &lt;span class="code"&gt;SELECT&lt;/span&gt; statement refers to &lt;span
-class="code"&gt;posts.id&lt;/span&gt;, a value from the surrounding &lt;span
-class="code"&gt;UPDATE&lt;/span&gt; statement.  This requires the database server to
-iterate over all of the posts, executing the inner select for each row. I’ll
-leave it as an exercise for the reader to rewrite this using an &lt;span
-class="code"&gt;UPDATE-FROM&lt;/span&gt; statement, a &lt;span class="code"&gt;JOIN&lt;/span&gt; or
-even Postgres window functions, which would avoid the repeated &lt;span
-class="code"&gt;SELECT&lt;/span&gt;s.&lt;/p&gt;
-
-&lt;p&gt;However, remember if there are indexes on the columns in the comments table,
-the iteration selecting the latest comment for each post will be very fast. It
-will certainly be thousands of times faster than sending repeated &lt;span
-class="code"&gt;SELECT&lt;/span&gt; and &lt;span class="code"&gt;UPDATE&lt;/span&gt; SQL statements
-from your Ruby server over the network.&lt;/p&gt;
-
-&lt;h2&gt;Do You Need to Learn SQL?&lt;/h2&gt;
-
-&lt;p&gt;In reality I could have written this data migration using Ruby code.
-ActiveRecord provides a rich set of methods, even allowing for sophisticated
-queries employing subselects. And in the rare case when
-ActiveRecord can’t generate the SQL I need, I can always resort to using the
-underlying &lt;a href="https://github.com/rails/arel"&gt;Arel&lt;/a&gt; Ruby library. In practice,
-it’s rare that you will actually need to write SQL code inside a Rails
-application.&lt;/p&gt;
-
-&lt;p&gt;Then why learn SQL? You should learn SQL because it will give you tremendous
-insight into how database servers actually work. You’ll learn what database
-servers can really do, and what they can’t. You won’t try to reinvent the wheel
-when you already have a server that uses algorithms more powerful and
-sophisticated that any you could write.&lt;/p&gt;
-
-&lt;p&gt;Use the database server for what it was designed to do: to solve your data
-problems. Whether you write SQL directly or use a tool like ActiveRecord to
-generate SQL automatically, perform the search, sort, or calculation you need
-right inside the database.&lt;/p&gt;
-
-&lt;p&gt;Don’t let your data out of the database until you need to… until you have just
-the values your application really needs.&lt;/p&gt;
 </content>
   </entry>
 </feed>

@@ -8,8 +8,10 @@ date: 2017/12/12
 Hidden inside of your Postgres server is code that provides special SQL
 operators and functions designed to support tree operations. It’s called the
 [LTREE extension](https://www.postgresql.org/docs/current/static/ltree.html).
-I’m guessing this stands for _left-tree_. In my next post, I’ll write about
-some of these functions and operators: what they do and how to use them.
+I’m guessing this stands for _left-tree_. In [my next
+post](http://localhost/2017/12/13/saving-a-tree-in-postgres-using-ltree), I’ll
+write about some of these functions and operators: what they do and how to use
+them.
 
 But first, where is the LTREE extension? How can you install and start using it? Read on to
 find out.
@@ -125,5 +127,6 @@ as well. Now I can run the <span class="code">create extension ltree</span>
 command as shown above. I don’t even need to restart Postgres; it will find and
 load ltree.so automatically.
 
-Now that you have LTREE installed and enabled, you can read my next post to
-learn how to use it.
+Now that you have LTREE installed and enabled, you can read [my next
+post](http://localhost/2017/12/13/saving-a-tree-in-postgres-using-ltree), I’ll
+to learn how to use it.
