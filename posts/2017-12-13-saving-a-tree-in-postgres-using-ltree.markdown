@@ -10,7 +10,7 @@ post](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extensi
 I showed you how to install and enable a Postgres extension called
 [LTREE](https://www.postgresql.org/docs/current/static/ltree.html). LTREE
 allows me to save, query on and manipulate trees or hierarchical data
-structures using a relational database table. As we’ll see, using LTREE I can
+structures using a relational database table. [As we’ll see](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension), using LTREE I can
 count leaves, cut off branches, and climb up and down trees easily - all using
 SQL right inside my application’s existing Postgres database!
 
@@ -180,7 +180,7 @@ And the <span class="code">@></span> ancestor operator is just one way of using
 operators and functions!  For a complete list, see
 [https://www.postgresql.org/docs/current/static/ltree.html](https://www.postgresql.org/docs/current/static/ltree.html).
 
-In my next post, I’ll explore more of these functions and show you how to
+In [my next post](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension), I’ll explore more of these functions and show you how to
 perform some tree operations that I’ve found useful.
 
 ## Maybe You’re Not Impressed
@@ -232,8 +232,10 @@ of Postgres possible.
 
 But before we dive into LTREE’s internal implementation, first we should see
 what else LTREE can do. So far I’ve shown you how to count descendant tree
-nodes. Tomorrow in my next post, Manipulating Trees Using SQL and the Postgres
-LTREE Extension, I’ll show you how to use other LTREE’s operators and functions
-to work with tree data.
+nodes. Tomorrow in my next post, [Manipulating Trees Using SQL and the Postgres
+LTREE
+Extension](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension),
+I’ll show you how to use other LTREE’s operators and functions to work with
+tree data.
 
 

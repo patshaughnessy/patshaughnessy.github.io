@@ -7,6 +7,412 @@
     <name></name>
   </author>
   <entry>
+    <title>Manipulating Trees Using SQL and the Postgres LTREE Extension</title>
+    <link href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension" rel="alternate"/>
+    <id>http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension</id>
+    <published>2017-12-14T04:00:00Z</published>
+    <updated>2017-12-14T04:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/14/tree4.jpg"&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;&lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;Yesterday&lt;/a&gt;,
+I used the &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE&lt;/a&gt;
+extension to save a tree data structure</summary>
+    <content type="html">&lt;div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/14/tree4.jpg"&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;&lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;Yesterday&lt;/a&gt;,
+I used the &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE&lt;/a&gt;
+extension to save a tree data structure in a Postgres table. After saving the
+tree, I used the &lt;span class="code"&gt;@&gt;&lt;/span&gt; or ancestor operator to count the
+number of descendant nodes on a given branch.&lt;/p&gt;
+
+&lt;p&gt;But that’s not all LTREE can do. Today I’ll show you how to delete, move and
+copy branches from one place to another in your tree, using &lt;span
+class="code"&gt;@&gt;&lt;/span&gt; in combination with other LTREE functions. After that,
+in my last post in this series, I’ll look at how LTREE works under the hood, at
+the Computer Science that makes all of this possible.&lt;/p&gt;
+
+&lt;h2&gt;My Example Tree Again&lt;/h2&gt;
+
+&lt;p&gt;Here’s the tree I’ve been working with during the last few blog posts:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png"&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;In my last
+post&lt;/a&gt;,
+I saved this tree in my database using a series of insert statements:&lt;/p&gt;
+
+&lt;pre&gt;
+insert into tree (letter, path) values ('A', 'A');
+insert into tree (letter, path) values ('B', 'A.B');
+insert into tree (letter, path) values ('C', 'A.C');
+insert into tree (letter, path) values ('D', 'A.C.D');
+insert into tree (letter, path) values ('E', 'A.C.E');
+insert into tree (letter, path) values ('F', 'A.C.F');
+insert into tree (letter, path) values ('G', 'A.B.G');
+&lt;/pre&gt;
+
+
+&lt;p&gt;And we saw how easy it is to count the number of tree nodes in a given branch
+using the &lt;span class="code"&gt;@&gt;&lt;/span&gt; operator:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where 'A.C' @&gt; path;
+&lt;/pre&gt;
+
+
+&lt;h2&gt;Cutting Off a Branch&lt;/h2&gt;
+
+&lt;p&gt;But suppose I wanted to remove these nodes from the tree entirely; that is,
+suppose I wanted to “cut off this branch” of the tree, so to speak:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/14/cut-branch.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;How can I do this? Simple! I just use a SQL delete statement:&lt;/p&gt;
+
+&lt;pre&gt;
+delete from tree where 'A.C' @&gt; path;
+&lt;/pre&gt;
+
+
+&lt;p&gt;As you can see, I can use &lt;span class="code"&gt;@&gt;&lt;/span&gt; equally well in delete
+statements as in select statements.&lt;/p&gt;
+
+&lt;h2&gt;Replanting a Branch as a New Tree&lt;/h2&gt;
+
+&lt;p&gt;Now suppose I want to keep this branch, and save it as a separate tree in my
+table. That is, I want two trees: the original &lt;span class="code"&gt;A&lt;/span&gt; tree
+and a new tree consisting of the &lt;span class="code"&gt;C&lt;/span&gt; branch “replanted”
+as a new root:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Thinking about this for a moment, moving some nodes from one location to
+another in my tree means I’ll need to update their path values somehow in my
+table. That is, I’ll need to use an update statement and not a select or delete
+statement.  But how? Writing an update statement is easy enough, but how do I
+know what the new path of each tree node will be? Let’s take &lt;span
+class="code"&gt;C&lt;/span&gt; as an example. Because &lt;span class="code"&gt;C&lt;/span&gt; will
+become the root node of my new tree, I want to change its path from &lt;span
+class="code"&gt;A.C&lt;/span&gt; to just &lt;span class="code"&gt;C&lt;/span&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+update tree set path = 'C' where path = 'A.C';
+&lt;/pre&gt;
+
+
+&lt;p&gt;And I will want to update &lt;span class="code"&gt;D&lt;/span&gt;, one of &lt;span
+class="code"&gt;C&lt;/span&gt;’s children, in a similar way:&lt;/p&gt;
+
+&lt;pre&gt;
+update tree set path = 'C.D' where path = 'A.C.D';
+&lt;/pre&gt;
+
+
+&lt;p&gt;I could write a separate update statement for each node, just 4 SQL statements
+for my example. But imagine I had 100s or 1000s of nodes in my tree. Updating
+the records one SQL statement at a time would require repeated network
+connections from my application to Postgres, slowing down the overall operation
+tremendously.&lt;/p&gt;
+
+&lt;p&gt;Instead, I need to update the path of &lt;span class="code"&gt;C&lt;/span&gt; and each of
+its descendants all in a single operation. But how can I do this? Two LTREE
+functions, &lt;span class="code"&gt;NLEVEL()&lt;/span&gt; and &lt;span
+class="code"&gt;SUBPATH()&lt;/span&gt;, can help.&lt;/p&gt;
+
+&lt;h2&gt;The NLEVEL Function&lt;/h2&gt;
+
+&lt;p&gt;First, &lt;span class="code"&gt;NLEVEL&lt;/span&gt;. As you might guess, this returns the
+number of levels in a given path string:&lt;/p&gt;
+
+&lt;pre&gt;
+select letter, path, nlevel(path) from tree;
+
+letter | path  | nlevel 
+-------+-------+--------
+A      | A     |      1
+B      | A.B   |      2
+C      | A.C   |      2
+D      | A.C.D |      3
+E      | A.C.E |      3
+F      | A.C.F |      3
+G      | A.B.G |      3
+(7 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;Looking at this, it’s easy to understand what the function returns: For a root
+node like &lt;span class="code"&gt;A&lt;/span&gt;, &lt;span class="code"&gt;NLEVEL&lt;/span&gt; returns
+1. For &lt;span class="code"&gt;A&lt;/span&gt;’s child nodes, &lt;span class="code"&gt;A.B&lt;/span&gt;
+and &lt;span class="code"&gt;A.C&lt;/span&gt;, &lt;span class="code"&gt;NLEVEL&lt;/span&gt; returns 2,
+and for the grandchild nodes it returns 3. It simply counts the number of
+levels in each path string; internally, it parses the path string for period
+characters.&lt;/p&gt;
+
+&lt;p&gt;Before we continue, consider one subtle but important point. Notice that I was
+able to calculate &lt;span class="code"&gt;NLEVEL&lt;/span&gt; on &lt;em&gt;all of the records&lt;/em&gt; in
+the tree table with a single SQL statement! Postgres applied the function to
+all of the matching paths for me. The power of LTREE’s functions is that they
+seamlessly integrate with SQL, harnessing and extending the power of Postgres.&lt;/p&gt;
+
+&lt;h2&gt;The SUBPATH Function&lt;/h2&gt;
+
+&lt;p&gt;LTREE provides another new SQL function that will also help us write a general
+tree path formula: &lt;span class="code"&gt;SUBPATH&lt;/span&gt;. As you might guess, this
+returns a selected substring from a given path. Let’s try running it on my
+example tree:&lt;/p&gt;
+
+&lt;pre&gt;
+select letter, subpath(path, 1) from tree;
+ERROR:  invalid positions
+STATEMENT:  select letter, subpath(path, 1) from tree;
+&lt;/pre&gt;
+
+
+&lt;p&gt;Oops &amp;ndash; I’ve done something wrong here. Calling &lt;span class="code"&gt;SUBPATH(path,
+1)&lt;/span&gt; returns the portion of the path starting with offset 1. Not a
+character offset, but a &lt;em&gt;path offset&lt;/em&gt;. So &lt;span class="code"&gt;SUBPATH(path,
+1)&lt;/span&gt; drops the first level of the path, &lt;span class="code"&gt;A&lt;/span&gt; in my
+tree, and returns the remaining portion of each path starting from the second
+path element. Internally, LTREE parses the periods for me, drops the requested
+number of path levels and removes the extra leading period.&lt;/p&gt;
+
+&lt;p&gt;In the statement above, the error was caused by the root node in the tree:
+&lt;span class="code"&gt;A&lt;/span&gt;.  This path has only one level, and so LTREE
+returns an error in this case.&lt;/p&gt;
+
+&lt;p&gt;Let’s try using &lt;span class="code"&gt;SUBPATH&lt;/span&gt; only on the &lt;span
+class="code"&gt;C&lt;/span&gt; branch, the branch we want to move:&lt;/p&gt;
+
+&lt;pre&gt;
+select letter, subpath(path, 1) from tree where path &lt;@ 'A.C';
+letter | subpath 
+-------+---------
+C      | C
+D      | C.D
+E      | C.E
+F      | C.F
+(4 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;Now I get only four records in the result, one for &lt;span class="code"&gt;C&lt;/span&gt;
+and one for each node that appears under &lt;span class="code"&gt;C&lt;/span&gt;. And you
+can see the &lt;span class="code"&gt;subpath&lt;/span&gt; column contains the portion of
+the path that appears after &lt;span class="code"&gt;A&lt;/span&gt;, for each of these 4
+records.&lt;/p&gt;
+
+&lt;p&gt;And again, notice that I was able to execute the &lt;span
+class="code"&gt;SUBPATH&lt;/span&gt; function on all 4 tree records I wanted to, in a
+single operation. This time, the &lt;span class="code"&gt;SUBPATH&lt;/span&gt; function
+worked in concert with the &lt;span class="code"&gt;&amp;lt;@&lt;/span&gt; operator. LTREE has
+made the SQL language I already know how to use even more powerful.&lt;/p&gt;
+
+&lt;h2&gt;Moving Tree Nodes Using One UPDATE Statement&lt;/h2&gt;
+
+&lt;p&gt;Now let’s return to the question of moving a branch into a new tree. As this
+diagram shows, I want to delete &lt;span class="code"&gt;C&lt;/span&gt; and its children
+from the &lt;span class="code"&gt;A&lt;/span&gt; tree, and move them to a new location:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Earlier I considered moving the nodes using a single update statement for each:&lt;/p&gt;
+
+&lt;pre&gt;
+update tree set path = 'C' where path = 'A.C';
+update tree set path = 'C.D' where path = 'A.C.D';
+update tree set path = 'C.E' where path = 'A.C.E';
+update tree set path = 'C.F' where path = 'A.C.F';
+&lt;/pre&gt;
+
+
+&lt;p&gt;Now that I know about &lt;span class="code"&gt;SUBPATH&lt;/span&gt;, it’s easy to write a
+single SQL update statement that will move all 4 nodes in the &lt;span
+class="code"&gt;C&lt;/span&gt; branch in one operation:&lt;/p&gt;
+
+&lt;pre&gt;
+update tree set path = subpath(path, 1) where path &lt;@ 'A.C';
+&lt;/pre&gt;
+
+
+&lt;p&gt;I use &lt;span class="code"&gt;where path &amp;lt;@ &amp;apos;A.C'&lt;/span&gt; to scope the update to the
+&lt;span class="code"&gt;C&lt;/span&gt; branch, and I use &lt;span class="code"&gt;subpath(path,
+1)&lt;/span&gt; to remove the &lt;span class="code"&gt;A&lt;/span&gt; root element from the path
+of &lt;span class="code"&gt;C&lt;/span&gt; and each of its descendants.&lt;/p&gt;
+
+&lt;p&gt;I can generalize this a bit more using the &lt;span class="code"&gt;NLEVEL&lt;/span&gt;
+function also:&lt;/p&gt;
+
+&lt;pre&gt;
+update tree set path = subpath(path, nlevel('A.C')-1) where path &lt;@ 'A.C';
+&lt;/pre&gt;
+
+
+&lt;p&gt;This follows because &lt;span class="code"&gt;nlevel(&amp;apos;A.C') = 2&lt;/span&gt;, and
+therefore, &lt;span class="code"&gt;nlevel(&amp;apos;A.C')-1&lt;/span&gt; returns the same formula
+we had above. Replacing &lt;span class="code"&gt;A.C&lt;/span&gt; with “BRANCH_PATH” I
+arrive at a general formula for “replanting” a branch as a new tree using a
+single SQL statement:&lt;/p&gt;
+
+&lt;pre&gt;
+update tree set path = subpath(path, nlevel(BRANCH_PATH)-1) where path &lt;@ BRANCH_PATH
+&lt;/pre&gt;
+
+
+&lt;p&gt;…assuming &lt;span class="code"&gt;nlevel(BRANCH_PATH) &gt; 1&lt;/span&gt;, that is assuming
+the branch we want to replant isn’t already a root.&lt;/p&gt;
+
+&lt;h2&gt;The || Concatenation Operator&lt;/h2&gt;
+
+&lt;p&gt;This seems somewhat useful, but what if I want to move a branch from one
+location in my tree to some other location, not necessary to the root? This is
+a more general problem. For example, suppose I want to move the &lt;span
+class="code"&gt;C&lt;/span&gt; branch under &lt;span class="code"&gt;G&lt;/span&gt;, like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/14/moving.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;To write a formula for this transformation using SQL, we need to use one more
+important LTREE operator: the &lt;span class="code"&gt;||&lt;/span&gt; or concatenation
+operator. Let’s try it out with an example first:&lt;/p&gt;
+
+&lt;pre&gt;
+select 'A.B.G' || path as concatenated from tree;
+concatenated 
+--------------
+A.B.G.A
+A.B.G.A.B
+A.B.G.A.C
+A.B.G.A.C.D
+A.B.G.A.C.E
+A.B.G.A.C.F
+A.B.G.A.B.G
+(7 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;You can see LTREE has automatically added &lt;span class="code"&gt;A.B.G&lt;/span&gt; along
+with a period separator to each path in my table. And it has done this for all
+the paths in my table in a single operation.&lt;/p&gt;
+
+&lt;h2&gt;Moving a Branch&lt;/h2&gt;
+
+&lt;p&gt;Now using &lt;span class="code"&gt;||&lt;/span&gt; I can write a single SQL statement to
+move a tree branch from one location to another. First, of course, I need to
+scope the SQL operation to the target branch using the ancestor operator:&lt;/p&gt;
+
+&lt;pre&gt;
+select 'A.B.G' || path as concatenated from tree where path &lt;@ 'A.C';
+concatenated 
+---------------
+A.B.G.A.C
+A.B.G.A.C.D
+A.B.G.A.C.E
+A.B.G.A.C.F
+(4 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;I get the same results as above, but now only for the tree nodes I want to
+move.&lt;/p&gt;
+
+&lt;p&gt;But my next problem is the new paths above start with &lt;span
+class="code"&gt;A.B.G.A.C&lt;/span&gt;…. Instead, I want them to be &lt;span
+class="code"&gt;A.B.G.C&lt;/span&gt;…. I need to remove that extra &lt;span
+class="code"&gt;A&lt;/span&gt; character from the new paths, using the &lt;span
+class="code"&gt;SUBPATH&lt;/span&gt; operator:&lt;/p&gt;
+
+&lt;pre&gt;
+select 'A.B.G' || subpath(path, 1) as concatenated from tree where path &lt;@ 'A.C';
+concatenated 
+--------------
+A.B.G.C
+A.B.G.C.D
+A.B.G.C.E
+A.B.G.C.F
+(4 rows)
+&lt;/pre&gt;
+
+
+&lt;p&gt;And finally, converting this into an update statement:&lt;/p&gt;
+
+&lt;pre&gt;
+update tree set path = 'A.B.G' || subpath(path, 1) where path &lt;@ 'A.C'
+&lt;/pre&gt;
+
+
+&lt;p&gt;…I have the single SQL statement I need!&lt;/p&gt;
+
+&lt;p&gt;And generalizing this, we arrive at a SQL formula you could use in your own
+Postgres database:&lt;/p&gt;
+
+&lt;pre&gt;
+update tree set path = DESTINATION_PATH || subpath(path, nlevel(SOURCE_PATH)-1)
+where path &lt;@ SOURCE_PATH;
+&lt;/pre&gt;
+
+
+&lt;h2&gt;Copying a Branch&lt;/h2&gt;
+
+&lt;p&gt;One last puzzle: How can I copy a tree branch instead of moving it? I just use
+an insert SQL statement instead of update. Simple, right?&lt;/p&gt;
+
+&lt;p&gt;But how, exactly? I need to insert multiple rows, one record for each node in
+the branch I copy. Again, I could write a series of insert statements like
+this:&lt;/p&gt;
+
+&lt;pre&gt;
+insert into tree (letter, path) values ('C', 'A.B.G.C');
+insert into tree (letter, path) values ('D', 'A.B.G.C.D');
+insert into tree (letter, path) values ('E', 'A.B.G.C.E');
+insert into tree (letter, path) values ('F', 'A.B.G.C.F');
+&lt;/pre&gt;
+
+
+&lt;p&gt;But using LTREE functions and operators, I can achieve this using a single SQL
+statement! I just have to write SQL that will insert the result of a select,
+like this:&lt;/p&gt;
+
+&lt;pre&gt;
+insert into tree (letter, path) (
+    select letter, 'A.B.G' || subpath(path, 1) from tree where 'A.C' @&gt; path
+)
+&lt;/pre&gt;
+
+
+&lt;p&gt;Executing this, Postgres will first find all the nodes inside the branch I want
+to copy, and recalculate their paths. Then it will insert that result set into
+the tree as a copy, leaving my original branch unchanged!&lt;/p&gt;
+
+&lt;p&gt;By writing this tree-related logic using LTREE operators in SQL, I ask Postgres
+to do all of the hard work of manipulating and copying the path strings for me.
+I don’t have to write application code to keep track of these strings, and no
+data needs to be transmitted back and forth between my application server and
+the database server.&lt;/p&gt;
+
+&lt;h2&gt;What’s Next? LTREE Internals&lt;/h2&gt;
+
+&lt;p&gt;In my last post about LTREE, I’ll look closely at how it works internally. It’s
+easy enough to imagine how simple functions like &lt;span
+class="code"&gt;NLEVEL&lt;/span&gt;, || or &lt;span class="code"&gt;SUBPATH&lt;/span&gt; work.
+That’s not the interesting part for me. These functions are shorthand for
+fairly simple string operations.&lt;/p&gt;
+
+&lt;p&gt;The special sauce that makes LTREE such a powerful tool is that it integrates
+with Postgres GiST indexes. By using an index, Postgres can execute any of the
+SQL expressions I wrote above equally fast on 7000 records as it would on 7!
+How? The only way to find out is by Looking Inside Postgres at a GiST Index.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Saving a Tree in Postgres Using LTREE</title>
     <link href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree" rel="alternate"/>
     <id>http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree</id>
@@ -35,7 +441,7 @@ post&lt;/a&gt;,
 I showed you how to install and enable a Postgres extension called
 &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE&lt;/a&gt;. LTREE
 allows me to save, query on and manipulate trees or hierarchical data
-structures using a relational database table. As we’ll see, using LTREE I can
+structures using a relational database table. &lt;a href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension"&gt;As we’ll see&lt;/a&gt;, using LTREE I can
 count leaves, cut off branches, and climb up and down trees easily &amp;ndash; all using
 SQL right inside my application’s existing Postgres database!&lt;/p&gt;
 
@@ -212,7 +618,7 @@ whether or not one path is an ancestor of another.&lt;/p&gt;
 operators and functions!  For a complete list, see
 &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;https://www.postgresql.org/docs/current/static/ltree.html&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;In my next post, I’ll explore more of these functions and show you how to
+&lt;p&gt;In &lt;a href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension"&gt;my next post&lt;/a&gt;, I’ll explore more of these functions and show you how to
 perform some tree operations that I’ve found useful.&lt;/p&gt;
 
 &lt;h2&gt;Maybe You’re Not Impressed&lt;/h2&gt;
@@ -266,9 +672,11 @@ of Postgres possible.&lt;/p&gt;
 
 &lt;p&gt;But before we dive into LTREE’s internal implementation, first we should see
 what else LTREE can do. So far I’ve shown you how to count descendant tree
-nodes. Tomorrow in my next post, Manipulating Trees Using SQL and the Postgres
-LTREE Extension, I’ll show you how to use other LTREE’s operators and functions
-to work with tree data.&lt;/p&gt;
+nodes. Tomorrow in my next post, &lt;a href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension"&gt;Manipulating Trees Using SQL and the Postgres
+LTREE
+Extension&lt;/a&gt;,
+I’ll show you how to use other LTREE’s operators and functions to work with
+tree data.&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -470,7 +878,7 @@ enable fast tree operations?&lt;/p&gt;
 (&lt;a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres"&gt;one&lt;/a&gt;,
 &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;two&lt;/a&gt;,
 &lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;three&lt;/a&gt;,
-four and five) of blog posts on the Postgres LTREE extension.  I&amp;rsquo;ll get started
+&lt;a href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension"&gt;four&lt;/a&gt; and five) of blog posts on the Postgres LTREE extension.  I&amp;rsquo;ll get started
 today by trying to insert a tree structure into a Postgres table using standard
 SQL, and during the rest of the week I&amp;rsquo;ll take a close look at LTREE: &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;how to
 install
@@ -3754,280 +4162,6 @@ values.&lt;/p&gt;
 &lt;p&gt;Postgres does some amazing things internally to speed up your queries; it’s
 time to shed some light on the great work the Postgres open source community
 has done over the years!&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>What Do Perl and Go Have in Common?</title>
-    <link href="http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common" rel="alternate"/>
-    <id>http://patshaughnessy.net/2015/9/25/what-do-perl-and-go-have-in-common</id>
-    <published>2015-09-25T03:00:00Z</published>
-    <updated>2015-09-25T03:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;p&gt;&lt;strong&gt;TL/DR:&lt;/strong&gt; &lt;em&gt;Both Perl and Go only partially implement object oriented
-programming, in a confusing way. Using either language you can create
-structures equivalent to objects but without using keywords such as &lt;span
-class="code"&gt;class&lt;/span&gt; or &lt;span class="code"&gt;new&lt;/span&gt;.  Converting a Go
-function into a method by adding a receiver reminds me of &amp;ldquo;blessing&amp;rdquo; a Perl has</summary>
-    <content type="html">&lt;p&gt;&lt;strong&gt;TL/DR:&lt;/strong&gt; &lt;em&gt;Both Perl and Go only partially implement object oriented
-programming, in a confusing way. Using either language you can create
-structures equivalent to objects but without using keywords such as &lt;span
-class="code"&gt;class&lt;/span&gt; or &lt;span class="code"&gt;new&lt;/span&gt;.  Converting a Go
-function into a method by adding a receiver reminds me of &amp;ldquo;blessing&amp;rdquo; a Perl hash
-reference.&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;It’s hard to imagine two programming languages that are more different. Larry
-Wall created Perl  almost 30 years ago in 1987. Google introduced Go much more
-recently in 2009. Perl is a dynamic, interpreted language while Go uses a
-compiler and static types. Perl syntax is quirky, fun and sometimes bizarre,
-while Go syntax is clean and simple, almost boring at times.&lt;/p&gt;
-
-&lt;p&gt;This year, coincidentally, I tried to learn both Perl and Go around the same
-time. Oddly, I found something in common between these two dramatically
-different languages. They both allow you to create objects and to write
-methods, but without supporting &lt;span class="code"&gt;class&lt;/span&gt;, &lt;span
-class="code"&gt;new&lt;/span&gt; or other keywords found in traditional object oriented
-languages like Smalltalk, Java, Ruby or Python.  Both languages leave the door
-partially open to object oriented design, but don’t provide the syntax or
-features you expect and need for using objects and classes.&lt;/p&gt;
-
-&lt;h2&gt;Writing a Perl Function&lt;/h2&gt;
-
-&lt;p&gt;Let’s suppose I want to calculate the density of Jupiter, based on its mass and
-diameter. Using Perl, I could write:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl1.png"/&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 25px 8px 0px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/9/25/vw.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;
-  Writing Perl feels like riding a vintage VW bus. Things don’t&lt;br/&gt;
-  work the way you expect, but you can always feel the love.
-&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;As you can see, Perl’s syntax is somewhat odd: The &lt;span class="code"&gt;my&lt;/span&gt;
-keyword indicates each variable belongs to the local lexical scope. The &lt;span
-class="code"&gt;shift&lt;/span&gt; keywords pull the mass and radius values from an
-array of values Perl implicitly passes to every function &amp;ndash; Perl functions
-always take a single array argument! And you have to prefix all of the
-identifiers with either a &lt;span class="code"&gt;$,&lt;/span&gt; &lt;span
-class="code"&gt;@&lt;/span&gt; or &lt;span class="code"&gt;%&lt;/span&gt; character to indicate
-whether it is a scalar (simple value), an array or a hash. Sometimes in more
-complex Perl code you have to combine these prefixes together in cryptic
-patterns, such as &lt;span class="code"&gt;@$var&lt;/span&gt;, or &lt;span
-class="code"&gt;%$var&lt;/span&gt;. Thankfully in this simple function I just use
-numeric values, so &lt;span class="code"&gt;$&lt;/span&gt; is sufficient.&lt;/p&gt;
-
-&lt;p&gt;To me, Perl feels like an old-fashioned, awkward version of Ruby. And this
-makes some sense. Perl was to some extent the model for both Ruby and Python,
-which were created just a few years after Perl in the early 1990s. Ruby and
-Python smoothed out the rough edges of Perl’s syntax (along with adding proper
-support for objects among other things).&lt;/p&gt;
-
-&lt;h2&gt;Creating a Perl Object&lt;/h2&gt;
-
-&lt;p&gt;Now I decide to use an object oriented style instead. I want a Jupiter object
-which has mass and radius attributes, and I’d like the density function to be a
-method, like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;In other words, I’d like to think of &lt;span class="code"&gt;$jupiter&lt;/span&gt; as an
-instance of the Planet class.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/jupiter-class.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;By writing a &lt;span class="code"&gt;Planet&lt;/span&gt; class, I group together data
-values that describe each planet (mass and radius) with the functions that use
-those values (density).  Object oriented languages refer to the data values as
-&lt;em&gt;instance variables&lt;/em&gt;, and the functions as &lt;em&gt;methods&lt;/em&gt;. By creating a class, I now
-have a natural place to gather functions and attributes related to planets.&lt;/p&gt;
-
-&lt;p&gt;The problem is that Perl isn’t an object oriented language. There’s no way to
-declare a class, define methods or create objects which are instances of that
-class. However, a few years after Perl was invented, in the mid 1990s, Larry
-Wall and the Perl team introduced some support for object oriented programming
-concepts in Perl 5. They converted Perl into an object oriented language after
-the fact &amp;ndash; at least a partially object oriented language.&lt;/p&gt;
-
-&lt;p&gt;To create a Perl class, I first group my planet functions together using the Perl &lt;span class="code"&gt;package&lt;/span&gt; keyword. In this example I have only one:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This gives me a place to put all of the methods of the &lt;span
-class="code"&gt;Planet&lt;/span&gt; class &amp;ndash; the &lt;span class="code"&gt;package&lt;/span&gt;
-keyword plays the same role the &lt;span class="code"&gt;class&lt;/span&gt; keyword would
-in Java or Ruby, to some extent. Also notice that I’ve rewritten my function to
-use object oriented syntax.  Instead of obtaining the mass and radius from the
-parameters array, I get a single parameter which I call &lt;span
-class="code"&gt;$self&lt;/span&gt;. Then I use &lt;span class="code"&gt;$self&lt;/span&gt; as a hash
-reference to get the mass and radius values, for example: &lt;span
-class="code"&gt;$self-&gt;{&amp;lsquo;mass&amp;rsquo;}&lt;/span&gt;. This is object oriented code. I’ve created
-a class and added a method to it.&lt;/p&gt;
-
-&lt;p&gt;However, let’s think about this for another moment:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/words1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Notice there’s a difference between what I want to say, and the words I have to
-use to say it. The Perl language doesn’t include the &lt;span
-class="code"&gt;class&lt;/span&gt; keyword; instead, I need to use &lt;span
-class="code"&gt;package&lt;/span&gt;. We’ll see this again in a moment.&lt;/p&gt;
-
-&lt;p&gt;To create an instance of my new &lt;span class="code"&gt;Planet&lt;/span&gt; class, an
-object, I need to create a hash (technically a reference to a hash) and then
-“bless” it:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl4.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This creates a connection between the hash (the object) and the package that
-contains the methods I want to use (the class). Now I can use syntax such as
-&lt;span class="code"&gt;$jupiter-&gt;density()&lt;/span&gt;. I’ve done it! I’ve created an object using Perl.&lt;/p&gt;
-
-&lt;p&gt;However, once again the language doesn’t supply the words I want to use to
-express the idea I’m thinking of:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/words2.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;Expressing Object Oriented Concepts Using Perl&lt;/h2&gt;
-
-&lt;p&gt;Here’s the complete, object oriented version of my example:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/perl5.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;To me, the Perl code I wrote above seems very confusing. But it’s not Perl’s
-strange, old-fashioned syntax that confuses me. After a while, all the &lt;span
-class="code"&gt;$&lt;/span&gt; symbols and the use of &lt;span class="code"&gt;shift&lt;/span&gt;
-start to make sense. Writing Perl code is a bit like writing Ruby code while on
-drugs &amp;ndash; I start with Ruby and just keep adding &lt;span class="code"&gt;$&lt;/span&gt; and
-semicolon characters until it works.&lt;/p&gt;
-
-&lt;p&gt;The real problem in this example is that Perl allows me to create objects and
-classes, but doesn’t refer to them as objects or classes. Instead, I have
-“blessed references” and “packages.” Perl allows me to get the object oriented
-behavior I want, but doesn’t let me use the words I want to use to describe
-what I’m doing. Perl’s partial support of object oriented programming is
-confusing at best.&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Note: Perl 6, under development for the last fifteen years and still not
-released, is planning to introduce more explicit support for objects using the
-&lt;span class="code"&gt;class&lt;/span&gt; and &lt;span class="code"&gt;new&lt;/span&gt; keywords.&lt;/em&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 25px 8px 0px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/9/25/driverless-car.png"&gt;&lt;br/&gt;
-  &lt;i&gt;
-Writing Go code feels like riding in a Google driverless car:&lt;br/&gt;
-the compiler and &lt;span class="code"&gt;gofmt&lt;/span&gt; tool are in complete control.
-  &lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;h2&gt;Creating a Go Object&lt;/h2&gt;
-
-&lt;p&gt;Perl was invented many years ago. Now let’s try using a modern, new programming
-language to write the same example: Go. Along the way I’ll compare the Go
-version with the Perl code I wrote above.&lt;/p&gt;
-
-&lt;p&gt;Earlier using Perl I had to use the &lt;span class="code"&gt;package&lt;/span&gt; keyword
-to define a place to put my class’s methods. In Go, I define a group of
-methods in a different way: by associating them with a type. Therefore, I’ll
-start my Go code by creating a &lt;span class="code"&gt;Planet&lt;/span&gt; type:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/go1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The two versions look very different. In Go I define a static type that always
-consists of mass and radius values, while in Perl I dynamically create a hash
-that might contain any values.&lt;/p&gt;
-
-&lt;p&gt;Once again, however, I’m forced to think about my code one way and write it
-another:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/words3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;What Go and Perl really have in common is this: Neither language contains the
-words and syntax I really would like to use to express the object oriented
-concepts I’m trying to use.&lt;/p&gt;
-
-&lt;p&gt;So far I’ve created a type, a static collection of values. Let’s take the next
-step and convert that into a class:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/go2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;In Go I don’t need to connect my instance data with the class; the mass and
-radius values are already contained inside the &lt;span class="code"&gt;Planet&lt;/span&gt;
-struct type. Instead, I need to create a connection between the method and the
-class. I do this by typing in a receiver for the Density function, &lt;span
-class="code"&gt;func (p Planet) Density()&lt;/span&gt;, converting it into a method of
-the Planet type.&lt;/p&gt;
-
-&lt;p&gt;In Perl I “bless” a hash by connecting it to a group of functions in a package.
-A blessed hash is an object in Perl. In Go I “bless” a function by connecting
-it to a type containing instance data. A blessed function combined with a type
-is a class in Go. The two languages both use special syntax tricks to allow for
-object oriented programming, but they make the connection between instance
-variables and methods from opposite directions.&lt;/p&gt;
-
-&lt;p&gt;Once again, however, there’s an impedance mismatch between the concepts I’m
-imagining and the words I have to use to to express them:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/words4.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Go doesn’t provide me with the vocabulary I want to use. I want to type &lt;span
-class="code"&gt;class&lt;/span&gt;, but Go only allows me to use &lt;span class="code"&gt;type
-struct&lt;/span&gt;. And because there’s no &lt;span class="code"&gt;class&lt;/span&gt; keyword,
-my blessed function, my method, could be anywhere and not necessary right next
-to my type definition.&lt;/p&gt;
-
-&lt;h2&gt;Expressing Object Oriented Concepts Using Go&lt;/h2&gt;
-
-&lt;p&gt;Here’s the complete, object oriented version of my example in Go:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/9/25/go3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;I find this Go code just as confusing and misleading as the Perl version above,
-and for the same reason. Both Perl and Go take the first step towards object
-oriented programming, but stop short of providing a complete solution. Instead
-of objects, Go gives us C-style static structures which can have methods
-associated with them. And Go doesn’t provide classes at all: There’s no natural
-place to gather all of the methods belonging to a given type.&lt;/p&gt;
-
-&lt;p&gt;We can guess that Perl 5 didn’t introduce proper support for object oriented
-programming either because it was too difficult to add it to an existing
-language, or for backward compatibility reasons. But the &lt;a href="http://commandcenter.blogspot.com/2012/06/less-is-exponentially-more.html"&gt;designers of Go
-decided from the very
-beginning&lt;/a&gt;
-not to support classes or objects. Then, why support methods at all? Why allow
-developers to create object-like structures, but with a confusing syntax? Or
-why not go all the way and introduce the &lt;span class="code"&gt;class&lt;/span&gt;
-keyword to properly support object structures?&lt;/p&gt;
-
-&lt;div style="float: right; padding: 25px 8px 0px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/9/25/jupiter.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;
-The density of Jupiter is 1,326 kg/m&lt;sup&gt;3&lt;/sup&gt;, only &lt;br/&gt;
-1/4th the density of Earth. (source: &lt;a
-href="http://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html"&gt;NASA&lt;/a&gt;).
-&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Go’s tepid, partial support for object oriented programming reminds me of Perl.
-Writing a Go function and making it special &amp;ndash; “blessing” it &amp;ndash; by assigning it a
-receiver reminds me of how I would bless a hash in a Perl program. Perhaps
-Google used Perl as design inspiration for Go; perhaps they wanted to include a
-small bit of Perl’s quirky, bizarre but lovable behavior in Go.&lt;/p&gt;
-
-&lt;p&gt;Regardless, don’t stretch your programming language by using it in ways it
-wasn’t intended to be used. And certainly don’t change your ideas and solutions
-to fit any given programming language. Choose the programming language that has
-keywords and syntax that allow you to express your ideas in a natural,
-straightforward manner. The only purpose of a language, whether a human
-language or programming language, is to express our abstract thoughts using
-words in simple, or even beautiful, ways.&lt;/p&gt;
 </content>
   </entry>
 </feed>
