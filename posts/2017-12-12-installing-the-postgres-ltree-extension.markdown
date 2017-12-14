@@ -9,7 +9,7 @@ Hidden inside of your Postgres server is code that provides special SQL
 operators and functions designed to support tree operations. It’s called the
 [LTREE extension](https://www.postgresql.org/docs/current/static/ltree.html).
 I’m guessing this stands for _left-tree_. In [my next
-post](http://localhost/2017/12/13/saving-a-tree-in-postgres-using-ltree), I’ll
+post](http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree), I’ll
 write about some of these functions and operators: what they do and how to use
 them.
 
@@ -128,5 +128,5 @@ command as shown above. I don’t even need to restart Postgres; it will find an
 load ltree.so automatically.
 
 Now that you have LTREE installed and enabled, you can read [my next
-post](http://localhost/2017/12/13/saving-a-tree-in-postgres-using-ltree), I’ll
+post](http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree), I’ll
 to learn how to use it.

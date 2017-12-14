@@ -705,7 +705,7 @@ operators and functions designed to support tree operations. It’s called the
 &lt;p&gt;Hidden inside of your Postgres server is code that provides special SQL
 operators and functions designed to support tree operations. It’s called the
 &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE extension&lt;/a&gt;.
-I’m guessing this stands for &lt;em&gt;left-tree&lt;/em&gt;. In &lt;a href="http://localhost/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;my next
+I’m guessing this stands for &lt;em&gt;left-tree&lt;/em&gt;. In &lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;my next
 post&lt;/a&gt;, I’ll
 write about some of these functions and operators: what they do and how to use
 them.&lt;/p&gt;
@@ -830,7 +830,7 @@ as well. Now I can run the &lt;span class="code"&gt;create extension ltree&lt;/s
 command as shown above. I don’t even need to restart Postgres; it will find and
 load ltree.so automatically.&lt;/p&gt;
 
-&lt;p&gt;Now that you have LTREE installed and enabled, you can read &lt;a href="http://localhost/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;my next
+&lt;p&gt;Now that you have LTREE installed and enabled, you can read &lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;my next
 post&lt;/a&gt;, I’ll
 to learn how to use it.&lt;/p&gt;
 </content>
