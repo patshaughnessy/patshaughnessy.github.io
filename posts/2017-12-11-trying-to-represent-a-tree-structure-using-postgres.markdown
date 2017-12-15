@@ -1,6 +1,6 @@
 title: "Trying to Represent a Tree Structure Using Postgres"
 date: 2017/12/11
-tag: The Postgres LTREE Extension
+tag: the Postgres LTREE Extension
 
 <div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2017/12/11/tree1.jpg">

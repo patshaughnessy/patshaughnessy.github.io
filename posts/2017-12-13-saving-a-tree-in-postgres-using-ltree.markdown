@@ -1,6 +1,6 @@
 title: "Saving a Tree in Postgres Using LTREE"
 date: 2017/12/13
-tag: The Postgres LTREE Extension
+tag: the Postgres LTREE Extension
 
 <div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2017/12/13/tree3.jpg">
