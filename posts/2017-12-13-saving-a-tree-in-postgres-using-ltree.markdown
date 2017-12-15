@@ -223,10 +223,11 @@ create index tree_path_idx on tree using gist (path);
 </pre>
 
 What is a “GiST” index? How does it help LTREE find and count tree nodes
-efficiently? Read the last post in this series to find out. There I describe
-the Generalized Search Index (GiST) project, explore the Computer Science
-behind GiST and look at how LTREE uses GiST to make fast tree operations inside
-of Postgres possible.
+efficiently? Read the [last post in this
+series](http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index)
+to find out. There I describe the Generalized Search Index (GiST) project,
+explore the Computer Science behind GiST and look at how LTREE uses GiST to
+make fast tree operations inside of Postgres possible.
 
 ## What’s Next?
 

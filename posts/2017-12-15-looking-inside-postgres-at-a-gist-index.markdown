@@ -244,19 +244,20 @@ algorithm.
 
 I can use these custom functions on my own data simply by creating a GiST
 index. Returning to my LTREE example, I’ll drop my B-Tree index and create a
-GiST index instead
+GiST index instead:
 
 <pre>
 drop index tree_path_idx;
 create index tree_path_idx on tree using gist (path);
 </pre>
 
-Notice the <span class="code">using gist</span> keywords in the create index
-command. That’s all it takes; Postgres automatically finds, loads and uses the
-<span class="code">ltree_union</span>, <span
-class="code">ltree_picksplit</span> etc., functions and uses them to whenever I
-insert a new value into the table. (It will also insert all existing records
-into the index immediately.) Of course, earlier I installed the LTREE extension
+Notice the <span class="code">using gist</span> keywords in the <span
+class="code">create index</span> command. That’s all it takes; Postgres
+automatically finds, loads and uses the <span class="code">ltree_union</span>,
+<span class="code">ltree_picksplit</span> etc., functions whenever I insert a
+new value into the table. (It will also insert all existing records into the
+index immediately.) Of course, earlier I [installed the LTREE
+extension](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension)
 also.
 
 Let’s see how this works - suppose I add a few random tree records to my empty
@@ -278,7 +279,7 @@ index and insert my five records:
 If I search now using the ancestor operator:
 
 <pre>
-select count(*) from tree where path <@ ‘A.B.T’
+select count(*) from tree where path <@ 'A.B.T'
 </pre>
 
 …Postgres will simply iterate over the records in the same order I inserted
@@ -386,35 +387,35 @@ large multi-level tree.
 ## Searching a GiST Index
 
 After creating this GiST index tree, searching for a value is straightforward.
-Postgres uses the ltree_consistent function. As an example, let’s repeat the
-same SQL query from above:
+Postgres uses the <span class="code">ltree_consistent</span> function. As an
+example, let’s repeat the same SQL query from above:
 
 <pre>
 select count(*) from tree where path <@ 'A.B.T'
 </pre>
 
 To execute this using the GiST index, Postgres iterates over the union values
-in the root memory segment and calls the ltree_consistent function for each
-one:
+in the root memory segment and calls the <span
+class="code">ltree_consistent</span> function for each one:
 
 <img src="http://patshaughnessy.net/assets/2017/12/15/consistent.png"/>
 
-Now Postgres passes each union value to ltree_consistent to calculate the <span
-class="code">p <@ q</span> formula. The code inside of <span
-class="code">ltree_consistent</span> then returns: <span
-class="code">MAYBE</span> if <span class="code">q > left</span>, and <span
-class="code">q < right</span>. Otherwise it returns <span
-class="code">NO</span>.
+Now Postgres passes each union value to <span
+class="code">ltree_consistent</span> to calculate the <span class="code">p <@
+q</span> formula. The code inside of <span class="code">ltree_consistent</span>
+then returns "MAYBE" if <span class="code">q >
+left</span>, and <span class="code">q < right</span>. Otherwise it returns
+"NO."
 
 <img src="http://patshaughnessy.net/assets/2017/12/15/gist10.png"/>
 
 In this example you can see <span class="code">ltree_consistent</span> finds
 that the query <span class="code">A.B.T</span>, or <span class="code">q</span>,
-maybe is located inside the second child memory segment, but not the first one.
+_maybe_ is located inside the second child memory segment, but not the first one.
 
 For the first child union structure, <span class="code">ltree_consistent</span>
 finds <span class="code">q > A</span> true but <span class="code">q <
-A.B.M<span class="code"> false. Therefore <span
+A.B.M</span> false. Therefore <span
 class="code">ltree_consistent</span> knows there can be no matches in the top
 child segment, so it skips down to the second union structure.
 
@@ -433,7 +434,7 @@ Imagine my table contained a million rows: Searches using the GiST index will
 still be fast because the GiST tree limits the scope of the search. Instead of
 executing <span class="code">p <@ q</span> on every one of the million rows,
 Postgres only needs to run <span class="code">p <@ q</span> a handful of times,
-on a few union records and on the child segments of the tree that contains
+on a few union records and on the child segments of the tree that contain
 values that might match.
 
 <div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px">
@@ -444,9 +445,9 @@ at Moscow State University</i>
 
 ## Send Them a Postcard
 
-Oleg Bartunov and Teodor Sigaev, the authors of the LTREE extension, explained
-its usage and the algorithms I detailed above here on their
-[web page](http://www.sai.msu.su/~megera/postgres/gist/ltree/). They included more
+Oleg Bartunov and Teodor Sigaev, the authors of the LTREE extension, explain
+its usage and the algorithms I detailed above here on their [web
+page](http://www.sai.msu.su/~megera/postgres/gist/ltree/). They included more
 examples of SQL searches on tree data, including some which use the <span
 class="code">LTREE[]</span> data type I didn’t have time to cover in these blog
 posts.

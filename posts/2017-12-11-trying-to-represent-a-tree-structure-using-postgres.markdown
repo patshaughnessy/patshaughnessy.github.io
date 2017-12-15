@@ -22,14 +22,16 @@ This week I’ll publish a series
 ([one](http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres),
 [two](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
 [three](http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
-[four](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension) and five) of blog posts on the Postgres LTREE extension.  I'll get started
-today by trying to insert a tree structure into a Postgres table using standard
-SQL, and during the rest of the week I'll take a close look at LTREE: [how to
-install
+[four](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension)
+and
+[five](http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index))
+of blog posts on the Postgres LTREE extension.  I'll get started today by
+trying to insert a tree structure into a Postgres table using standard SQL, and
+during the rest of the week I'll take a close look at LTREE: [how to install
 it](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
 [how to use
 it](http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
-and how it works.
+and [how it works](http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index).
 
 <div style="clear: both"></div>
 

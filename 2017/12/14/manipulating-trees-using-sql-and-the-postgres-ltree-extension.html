@@ -60,8 +60,10 @@ number of descendant nodes on a given branch.</p>
 <p>But that’s not all LTREE can do. Today I’ll show you how to delete, move and
 copy branches from one place to another in your tree, using <span
 class="code">@></span> in combination with other LTREE functions. After that,
-in my last post in this series, I’ll look at how LTREE works under the hood, at
-the Computer Science that makes all of this possible.</p>
+in <a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">my last post in this
+series</a>,
+I’ll look at how LTREE works under the hood, at the Computer Science that makes
+all of this possible.</p>
 
 <h2>My Example Tree Again</h2>
 
@@ -431,7 +433,8 @@ fairly simple string operations.</p>
 <p>The special sauce that makes LTREE such a powerful tool is that it integrates
 with Postgres GiST indexes. By using an index, Postgres can execute any of the
 SQL expressions I wrote above equally fast on 7000 records as it would on 7!
-How? The only way to find out is by Looking Inside Postgres at a GiST Index.</p>
+How? The only way to find out is by <a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">Looking Inside Postgres at a GiST
+Index</a>.</p>
 
   </section>
 

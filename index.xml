@@ -278,7 +278,7 @@ algorithm.&lt;/p&gt;
 
 &lt;p&gt;I can use these custom functions on my own data simply by creating a GiST
 index. Returning to my LTREE example, I’ll drop my B-Tree index and create a
-GiST index instead&lt;/p&gt;
+GiST index instead:&lt;/p&gt;
 
 &lt;pre&gt;
 drop index tree_path_idx;
@@ -286,12 +286,13 @@ create index tree_path_idx on tree using gist (path);
 &lt;/pre&gt;
 
 
-&lt;p&gt;Notice the &lt;span class="code"&gt;using gist&lt;/span&gt; keywords in the create index
-command. That’s all it takes; Postgres automatically finds, loads and uses the
-&lt;span class="code"&gt;ltree_union&lt;/span&gt;, &lt;span
-class="code"&gt;ltree_picksplit&lt;/span&gt; etc., functions and uses them to whenever I
-insert a new value into the table. (It will also insert all existing records
-into the index immediately.) Of course, earlier I installed the LTREE extension
+&lt;p&gt;Notice the &lt;span class="code"&gt;using gist&lt;/span&gt; keywords in the &lt;span
+class="code"&gt;create index&lt;/span&gt; command. That’s all it takes; Postgres
+automatically finds, loads and uses the &lt;span class="code"&gt;ltree_union&lt;/span&gt;,
+&lt;span class="code"&gt;ltree_picksplit&lt;/span&gt; etc., functions whenever I insert a
+new value into the table. (It will also insert all existing records into the
+index immediately.) Of course, earlier I &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;installed the LTREE
+extension&lt;/a&gt;
 also.&lt;/p&gt;
 
 &lt;p&gt;Let’s see how this works &amp;ndash; suppose I add a few random tree records to my empty
@@ -314,7 +315,7 @@ index and insert my five records:&lt;/p&gt;
 &lt;p&gt;If I search now using the ancestor operator:&lt;/p&gt;
 
 &lt;pre&gt;
-select count(*) from tree where path &lt;@ ‘A.B.T’
+select count(*) from tree where path &lt;@ 'A.B.T'
 &lt;/pre&gt;
 
 
@@ -425,8 +426,8 @@ large multi-level tree.&lt;/p&gt;
 &lt;h2&gt;Searching a GiST Index&lt;/h2&gt;
 
 &lt;p&gt;After creating this GiST index tree, searching for a value is straightforward.
-Postgres uses the ltree_consistent function. As an example, let’s repeat the
-same SQL query from above:&lt;/p&gt;
+Postgres uses the &lt;span class="code"&gt;ltree_consistent&lt;/span&gt; function. As an
+example, let’s repeat the same SQL query from above:&lt;/p&gt;
 
 &lt;pre&gt;
 select count(*) from tree where path &lt;@ 'A.B.T'
@@ -434,27 +435,27 @@ select count(*) from tree where path &lt;@ 'A.B.T'
 
 
 &lt;p&gt;To execute this using the GiST index, Postgres iterates over the union values
-in the root memory segment and calls the ltree_consistent function for each
-one:&lt;/p&gt;
+in the root memory segment and calls the &lt;span
+class="code"&gt;ltree_consistent&lt;/span&gt; function for each one:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/consistent.png"/&gt;&lt;/p&gt;
 
-&lt;p&gt;Now Postgres passes each union value to ltree_consistent to calculate the &lt;span
-class="code"&gt;p &amp;lt;@ q&lt;/span&gt; formula. The code inside of &lt;span
-class="code"&gt;ltree_consistent&lt;/span&gt; then returns: &lt;span
-class="code"&gt;MAYBE&lt;/span&gt; if &lt;span class="code"&gt;q &gt; left&lt;/span&gt;, and &lt;span
-class="code"&gt;q &amp;lt; right&lt;/span&gt;. Otherwise it returns &lt;span
-class="code"&gt;NO&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Now Postgres passes each union value to &lt;span
+class="code"&gt;ltree_consistent&lt;/span&gt; to calculate the &lt;span class="code"&gt;p &amp;lt;@
+q&lt;/span&gt; formula. The code inside of &lt;span class="code"&gt;ltree_consistent&lt;/span&gt;
+then returns &amp;ldquo;MAYBE&amp;rdquo; if &lt;span class="code"&gt;q &gt;
+left&lt;/span&gt;, and &lt;span class="code"&gt;q &amp;lt; right&lt;/span&gt;. Otherwise it returns
+&amp;ldquo;NO.&amp;rdquo;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist10.png"/&gt;&lt;/p&gt;
 
 &lt;p&gt;In this example you can see &lt;span class="code"&gt;ltree_consistent&lt;/span&gt; finds
 that the query &lt;span class="code"&gt;A.B.T&lt;/span&gt;, or &lt;span class="code"&gt;q&lt;/span&gt;,
-maybe is located inside the second child memory segment, but not the first one.&lt;/p&gt;
+&lt;em&gt;maybe&lt;/em&gt; is located inside the second child memory segment, but not the first one.&lt;/p&gt;
 
 &lt;p&gt;For the first child union structure, &lt;span class="code"&gt;ltree_consistent&lt;/span&gt;
 finds &lt;span class="code"&gt;q &gt; A&lt;/span&gt; true but &lt;span class="code"&gt;q &amp;lt;
-A.B.M&lt;span class="code"&gt; false. Therefore &lt;span
+A.B.M&lt;/span&gt; false. Therefore &lt;span
 class="code"&gt;ltree_consistent&lt;/span&gt; knows there can be no matches in the top
 child segment, so it skips down to the second union structure.&lt;/p&gt;
 
@@ -473,7 +474,7 @@ class="code"&gt;p &amp;lt;@ A.B.T&lt;/span&gt;.&lt;/p&gt;
 still be fast because the GiST tree limits the scope of the search. Instead of
 executing &lt;span class="code"&gt;p &amp;lt;@ q&lt;/span&gt; on every one of the million rows,
 Postgres only needs to run &lt;span class="code"&gt;p &amp;lt;@ q&lt;/span&gt; a handful of times,
-on a few union records and on the child segments of the tree that contains
+on a few union records and on the child segments of the tree that contain
 values that might match.&lt;/p&gt;
 
 &lt;div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px"&gt;
@@ -485,9 +486,9 @@ at Moscow State University&lt;/i&gt;
 
 &lt;h2&gt;Send Them a Postcard&lt;/h2&gt;
 
-&lt;p&gt;Oleg Bartunov and Teodor Sigaev, the authors of the LTREE extension, explained
-its usage and the algorithms I detailed above here on their
-&lt;a href="http://www.sai.msu.su/~megera/postgres/gist/ltree/"&gt;web page&lt;/a&gt;. They included more
+&lt;p&gt;Oleg Bartunov and Teodor Sigaev, the authors of the LTREE extension, explain
+its usage and the algorithms I detailed above here on their &lt;a href="http://www.sai.msu.su/~megera/postgres/gist/ltree/"&gt;web
+page&lt;/a&gt;. They included more
 examples of SQL searches on tree data, including some which use the &lt;span
 class="code"&gt;LTREE[]&lt;/span&gt; data type I didn’t have time to cover in these blog
 posts.&lt;/p&gt;
@@ -532,8 +533,10 @@ number of descendant nodes on a given branch.&lt;/p&gt;
 &lt;p&gt;But that’s not all LTREE can do. Today I’ll show you how to delete, move and
 copy branches from one place to another in your tree, using &lt;span
 class="code"&gt;@&gt;&lt;/span&gt; in combination with other LTREE functions. After that,
-in my last post in this series, I’ll look at how LTREE works under the hood, at
-the Computer Science that makes all of this possible.&lt;/p&gt;
+in &lt;a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index"&gt;my last post in this
+series&lt;/a&gt;,
+I’ll look at how LTREE works under the hood, at the Computer Science that makes
+all of this possible.&lt;/p&gt;
 
 &lt;h2&gt;My Example Tree Again&lt;/h2&gt;
 
@@ -903,7 +906,8 @@ fairly simple string operations.&lt;/p&gt;
 &lt;p&gt;The special sauce that makes LTREE such a powerful tool is that it integrates
 with Postgres GiST indexes. By using an index, Postgres can execute any of the
 SQL expressions I wrote above equally fast on 7000 records as it would on 7!
-How? The only way to find out is by Looking Inside Postgres at a GiST Index.&lt;/p&gt;
+How? The only way to find out is by &lt;a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index"&gt;Looking Inside Postgres at a GiST
+Index&lt;/a&gt;.&lt;/p&gt;
 </content>
   </entry>
   <entry>
@@ -1157,10 +1161,11 @@ create index tree_path_idx on tree using gist (path);
 
 
 &lt;p&gt;What is a “GiST” index? How does it help LTREE find and count tree nodes
-efficiently? Read the last post in this series to find out. There I describe
-the Generalized Search Index (GiST) project, explore the Computer Science
-behind GiST and look at how LTREE uses GiST to make fast tree operations inside
-of Postgres possible.&lt;/p&gt;
+efficiently? Read the &lt;a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index"&gt;last post in this
+series&lt;/a&gt;
+to find out. There I describe the Generalized Search Index (GiST) project,
+explore the Computer Science behind GiST and look at how LTREE uses GiST to
+make fast tree operations inside of Postgres possible.&lt;/p&gt;
 
 &lt;h2&gt;What’s Next?&lt;/h2&gt;
 
@@ -1371,14 +1376,16 @@ enable fast tree operations?&lt;/p&gt;
 (&lt;a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres"&gt;one&lt;/a&gt;,
 &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;two&lt;/a&gt;,
 &lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;three&lt;/a&gt;,
-&lt;a href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension"&gt;four&lt;/a&gt; and five) of blog posts on the Postgres LTREE extension.  I&amp;rsquo;ll get started
-today by trying to insert a tree structure into a Postgres table using standard
-SQL, and during the rest of the week I&amp;rsquo;ll take a close look at LTREE: &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;how to
-install
+&lt;a href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension"&gt;four&lt;/a&gt;
+and
+&lt;a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index"&gt;five&lt;/a&gt;)
+of blog posts on the Postgres LTREE extension.  I&amp;rsquo;ll get started today by
+trying to insert a tree structure into a Postgres table using standard SQL, and
+during the rest of the week I&amp;rsquo;ll take a close look at LTREE: &lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;how to install
 it&lt;/a&gt;,
 &lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;how to use
 it&lt;/a&gt;,
-and how it works.&lt;/p&gt;
+and &lt;a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index"&gt;how it works&lt;/a&gt;.&lt;/p&gt;
 
 &lt;div style="clear: both"&gt;&lt;/div&gt;
 
