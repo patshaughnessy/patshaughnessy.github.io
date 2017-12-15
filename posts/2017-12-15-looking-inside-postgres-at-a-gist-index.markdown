@@ -1,5 +1,6 @@
 title: "Looking Inside Postgres at a GiST Index"
 date: 2017/12/15
+tag: The Postgres LTREE Extension
 
 <div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2017/12/15/tree5.jpg"><br/>

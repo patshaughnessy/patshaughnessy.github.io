@@ -1,5 +1,6 @@
 title: "Installing the Postgres LTREE Extension"
 date: 2017/12/12
+tag: The Postgres LTREE Extension
 
 <div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2017/12/12/tree2.jpg">
