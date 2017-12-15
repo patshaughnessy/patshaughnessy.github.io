@@ -7,6 +7,500 @@
     <name></name>
   </author>
   <entry>
+    <title>Looking Inside Postgres at a GiST Index</title>
+    <link href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index" rel="alternate"/>
+    <id>http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index</id>
+    <published>2017-12-15T04:00:00Z</published>
+    <updated>2017-12-15T04:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/15/tree5.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt; What do Postgres GiST indexes look like? How are&lt;br/&gt;
+  they similar or different from standard Postgres indexes?&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;In the last few posts in this series
+(&lt;a href="http://patshaughnessy.net/2017/12/11/trying-to-repres</summary>
+    <content type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/15/tree5.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt; What do Postgres GiST indexes look like? How are&lt;br/&gt;
+  they similar or different from standard Postgres indexes?&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;In the last few posts in this series
+(&lt;a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres"&gt;one&lt;/a&gt;,
+&lt;a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension"&gt;two&lt;/a&gt;,
+&lt;a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree"&gt;three&lt;/a&gt;
+and
+&lt;a href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension"&gt;four&lt;/a&gt;)
+I showed you how to save hierarchical data in a flat database table using the
+Postgres &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE
+extension&lt;/a&gt;. I
+explained that you represent tree nodes using path strings and how to search
+your tree data using special SQL operators LTREE provides.&lt;/p&gt;
+
+&lt;p&gt;But the real value of LTREE isn’t the operators and functions it gives you &amp;ndash;
+internally these boil down to fairly simple string operations. Instead, what
+makes LTREE useful is that it integrates these new operators with Postgres’s
+indexing code, which allows you to search for and find matching tree paths
+&lt;em&gt;quickly&lt;/em&gt;. To achieve this, LTREE takes advantage of the &lt;a href="http://gist.cs.berkeley.edu"&gt;Generalized Search Tree
+(GiST) project&lt;/a&gt;, an API that allows C developers
+to extend Postgres’s indexing system.&lt;/p&gt;
+
+&lt;p&gt;But what does the GiST API do? And what does it mean to extend Postgres’s
+indexing system, exactly? Read on to find out!&lt;/p&gt;
+
+&lt;h2&gt;Searching Without an Index&lt;/h2&gt;
+
+&lt;p&gt;Here again is the tree table I used as an example in the earlier posts in this
+series:&lt;/p&gt;
+
+&lt;pre&gt;
+create table tree(
+    id serial primary key,
+    letter char,
+    path ltree
+);
+&lt;/pre&gt;
+
+
+&lt;p&gt;Note the path column uses the custom &lt;span class="code"&gt;ltree&lt;/span&gt; data type
+the LTREE extension provides. If you missed the previous posts, &lt;span
+class="code"&gt;ltree&lt;/span&gt; columns represent hierarchical data by joining
+strings together with periods, e.g.  “A.B.C.D” or “Europe.Estonia.Tallinn.”&lt;/p&gt;
+
+&lt;p&gt;Earlier, I used a simple tree with only 7 nodes as an example. SQL operations
+on a small table like this will always be fast. Today I’d like to imagine a
+much larger tree to explore the benefits indexes can provide; suppose instead I
+have a tree containing hundreds or thousands of records in the &lt;span
+class="code"&gt;path&lt;/span&gt; column:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/table.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now suppose I search for a single tree node using a select statement:&lt;/p&gt;
+
+&lt;pre&gt;
+select letter from tree where path = 'A.B.T.V'
+&lt;/pre&gt;
+
+
+&lt;p&gt;Without an index on this table, Postgres has to resort to a &lt;em&gt;sequence scan&lt;/em&gt;,
+which is a technical way of saying that Postgres has to iterate over all of the
+records in the table:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/table2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;For each and every record in the table, Postgres executes a comparison &lt;span
+class="code"&gt;p == q&lt;/span&gt; where &lt;span class="code"&gt;p&lt;/span&gt; is the value of
+the path column for each record in the table, and &lt;span class="code"&gt;q&lt;/span&gt;
+is the query, or the value I’m searching for, &lt;span class="code"&gt;A.B.V.T&lt;/span&gt;
+in this example. This loop can be very slow if there are many records. Postgres
+has to check all of them, because they can appear in any order and there’s no
+way to know how many matches there might be in the data ahead of time.&lt;/p&gt;
+
+&lt;h2&gt;Searching With a B-Tree Index&lt;/h2&gt;
+
+&lt;p&gt;Of course, there’s a simple solution to this problem; I just need to create an
+index on the path column:&lt;/p&gt;
+
+&lt;pre&gt;
+create index tree_path_idx on tree (path);
+&lt;/pre&gt;
+
+
+&lt;p&gt;As you probably know, executing a search using an index is much faster. If you
+see a performance problem with a SQL statement in your application, the first
+thing you should check for is a missing index. But why? Why does creating an
+index speed up searches, exactly? The reason is that an index is a sorted copy
+of the target column’s data:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/index1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;By sorting the values ahead of time, Postgres can search through them much more
+quickly. It uses a binary search algorithm:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/index2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Postgres starts by checking the value in the middle of the index. If the stored
+value (&lt;span class="code"&gt;p&lt;/span&gt;) is too large and is greater than the query
+(&lt;span class="code"&gt;q&lt;/span&gt;), if &lt;span class="code"&gt;p &gt; q&lt;/span&gt;, it moves up
+and checks the value at the 25% position. If the value is too small, if &lt;span
+class="code"&gt;p &amp;lt; q&lt;/span&gt;, it moves down and checks the value at the 75%
+position. Repeatedly dividing the index into smaller and smaller pieces,
+Postgres only needs to search a few times before it finds the matching record
+or records.&lt;/p&gt;
+
+&lt;p&gt;However, for large tables with thousands or millions of rows Postgres can’t
+save all of the sorted data values in a single memory segment. Instead,
+Postgres indexes (and indexes inside of any relational database system) save
+values in a &lt;em&gt;binary or balanced tree&lt;/em&gt; (B-Tree):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/index3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now my values are saved in a series of different memory segments arranged in a
+tree structure. Dividing the index up into pieces allows Postgres to manage
+memory properly while saving possibly millions of values in the index. Note
+this isn’t the tree from my LTREE dataset; B-Trees are internal Postgres data
+structures I don’t have access to. To learn more about the Computer Science
+behind this read my 2014 article &lt;a href="http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes"&gt;Discovering the Computer Science Behind
+Postgres
+Indexes&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now Postgres uses repeated binary searches, one for each memory segment in the
+B-Tree, to find a value:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/index4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Each value in the parent or root segment is really a pointer to a child
+segment. Postgres first searches the root segment using a binary search to find
+the right pointer, and then jumps down to the child segment to find the actual
+matching records using another binary search. The algorithm is recursive: The
+B-Tree could contain many levels in which case the child segments would contain
+pointers to grandchild segments, etc.&lt;/p&gt;
+
+&lt;h2&gt;What’s the Problem with Standard Postgres Indexes?&lt;/h2&gt;
+
+&lt;p&gt;But there’s a serious problem here I’ve overlooked so far. Postgres’s index
+search code only supports certain operators. Above I was searching using this
+select statement:&lt;/p&gt;
+
+&lt;pre&gt;
+select letter from tree where path = 'A.B.T.V'
+&lt;/pre&gt;
+
+
+&lt;p&gt;I was looking for records that were equal to my query: &lt;span class="code"&gt;p ==
+q&lt;/span&gt;. Using a B-Tree index I could also have searched for records greater
+than or less than my query: &lt;span class="code"&gt;p &amp;lt; q&lt;/span&gt; or &lt;span
+class="code"&gt;p &gt; q&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;But what if I want to use the custom LTREE &lt;span class="code"&gt;&amp;lt;@&lt;/span&gt;
+(ancestor) operator? What if I want to execute this select statement?&lt;/p&gt;
+
+&lt;pre&gt;
+select letter from tree where path &lt;@ 'A.B.V'
+&lt;/pre&gt;
+
+
+&lt;p&gt;As we saw in the previous posts in this series, this search will return all of
+the LTREE records that appear somewhere on the branch under &lt;span
+class="code"&gt;A.B.V&lt;/span&gt;, that are descendants of the &lt;span
+class="code"&gt;A.B.V&lt;/span&gt; tree node.&lt;/p&gt;
+
+&lt;p&gt;A standard Postgres index doesn’t work here. To execute this search efficiently
+using an index, Postgres needs to execute this comparison as it walks the
+B-Tree: &lt;span class="code"&gt;p &amp;lt;@ q&lt;/span&gt;. But the standard Postgres index
+search code doesn’t support &lt;span class="code"&gt;p &amp;lt;@ q&lt;/span&gt;. Instead, if I
+execute this search Postgres resorts to a slow sequence scan again, even if I
+create an index on the &lt;span class="code"&gt;ltree&lt;/span&gt; column.&lt;/p&gt;
+
+&lt;p&gt;To search tree data efficiently, we need a Postgres index that will perform
+&lt;span class="code"&gt;p &amp;lt;@ q&lt;/span&gt; comparisons equally well as &lt;span
+class="code"&gt;p == q&lt;/span&gt; and &lt;span class="code"&gt;p &amp;lt; q&lt;/span&gt; comparisons. We
+need a GiST index!&lt;/p&gt;
+
+&lt;h2&gt;The Generalized Search Tree (GiST) project&lt;/h2&gt;
+
+&lt;div style="float: right; padding: 8px 0px 0px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/15/berkeley.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;The Generalized Search Tree (GiST) project, like&lt;br/&gt;
+Postgres itself, started at UC Berkeley.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Almost 20 years ago, an open source project at UC Berkeley solved this precise
+problem. The &lt;a href="http://gist.cs.berkeley.edu"&gt;Generalized Search Tree (GiST)
+project&lt;/a&gt; added an API to Postgres allowing C
+developers to extend the set of data types that can be used in a Postgres
+index.&lt;/p&gt;
+
+&lt;p&gt;Quoting from the project’s web page:&lt;/p&gt;
+
+&lt;blockquote&gt;
+In the beginning there was the B-tree. All database search trees since the
+B-tree have been variations on its theme. Recognizing this, we have developed a
+new kind of index called a Generalized Search Tree (GiST), which provides the
+functionality of all these trees in a single package. The GiST is an extensible
+data structure, which allows users to develop indices over any kind of data,
+supporting any lookup over that data.
+&lt;/blockquote&gt;
+
+
+&lt;p&gt;GiST achieves this by adding an API to Postgres’s index system anyone can implement for their specific data type. GiST implements the general indexing and searching code, but calls out to custom code at four key moments in the indexing process. Quoting from the project’s web page again, here’s a quick explanation of the 4 methods in the GiST API:&lt;/p&gt;
+
+&lt;div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist.png"/&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;GiST indexes use a tree structure similar to the B-Tree we saw above. But
+Postgres doesn’t create the GiST index tree structure by itself; Postgres works
+with implementations of the GiST &lt;span class="code"&gt;Union&lt;/span&gt;, &lt;span
+class="code"&gt;Penalty&lt;/span&gt; and &lt;span class="code"&gt;PickSplit&lt;/span&gt; API
+functions described above. And when you execute a SQL statement that searches
+for a value in a GiST index, Postgres uses the &lt;span
+class="code"&gt;Consistent&lt;/span&gt; function to find the target values.&lt;/p&gt;
+
+&lt;p&gt;The key here is the implementor of the GiST API can decide what type of data to
+index and how to arrange those data values in the GiST tree. Postgres doesn’t
+care what the data values are or how the tree looks. Postgres simply calls
+&lt;span class="code"&gt;Consistent&lt;/span&gt; any time it needs to search for a value
+and lets the GiST API implementor find the value.&lt;/p&gt;
+
+&lt;p&gt;An example would help understand this, and we have an example GiST API
+implementation: The LTREE extension!&lt;/p&gt;
+
+&lt;h2&gt;Implementing the GiST API for Tree Paths&lt;/h2&gt;
+
+&lt;div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/15/moscow-state.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;The LTREE Postgres extension was developed at Moscow State&lt;br/&gt;
+University by Oleg Bartunov and Teodor Sigaev.&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Starting in around 2001, two students at Moscow State University found the API
+from the GiST project and decided to use it to build indexing support for tree
+data. Oleg Bartunov and Teodor Sigaev, in effect, wrote a “Tree Paths
+Consistent” function, a “Tree Path Union” function, etc. The C code that
+implements this API is the LTREE extension. You can find these functions,
+&lt;span class="code"&gt;ltree_consistent&lt;/span&gt; and &lt;span
+class="code"&gt;ltree_union&lt;/span&gt;, among other functions, in a file called
+ltree_gist.c, located in the contrib/ltree directory in the Postgres source
+code. They also implemented the &lt;span class="code"&gt;Penalty&lt;/span&gt;, &lt;span
+class="code"&gt;PickSplit&lt;/span&gt; and various other functions related to the GiST
+algorithm.&lt;/p&gt;
+
+&lt;p&gt;I can use these custom functions on my own data simply by creating a GiST
+index. Returning to my LTREE example, I’ll drop my B-Tree index and create a
+GiST index instead&lt;/p&gt;
+
+&lt;pre&gt;
+drop index tree_path_idx;
+create index tree_path_idx on tree using gist (path);
+&lt;/pre&gt;
+
+
+&lt;p&gt;Notice the &lt;span class="code"&gt;using gist&lt;/span&gt; keywords in the create index
+command. That’s all it takes; Postgres automatically finds, loads and uses the
+&lt;span class="code"&gt;ltree_union&lt;/span&gt;, &lt;span
+class="code"&gt;ltree_picksplit&lt;/span&gt; etc., functions and uses them to whenever I
+insert a new value into the table. (It will also insert all existing records
+into the index immediately.) Of course, earlier I installed the LTREE extension
+also.&lt;/p&gt;
+
+&lt;p&gt;Let’s see how this works &amp;ndash; suppose I add a few random tree records to my empty
+tree table after creating the index:&lt;/p&gt;
+
+&lt;pre&gt;
+insert into tree (letter, path) values ('A', 'A.B.G.A');
+insert into tree (letter, path) values ('E', 'A.B.T.E');
+insert into tree (letter, path) values ('M', 'A.B.R.M');
+insert into tree (letter, path) values ('F', 'A.B.E.F');
+insert into tree (letter, path) values ('P', 'A.B.R.P');
+&lt;/pre&gt;
+
+
+&lt;p&gt;To get things started, Postgres will allocate a new memory segment for the GiST
+index and insert my five records:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;If I search now using the ancestor operator:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where path &lt;@ ‘A.B.T’
+&lt;/pre&gt;
+
+
+&lt;p&gt;…Postgres will simply iterate over the records in the same order I inserted
+then, and call the &lt;span class="code"&gt;ltree_consistent&lt;/span&gt; function for each
+one. Here again is what the GiST API calls for the Consistent function to do:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/consistent.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In this case Postgres will compare &lt;span class="code"&gt;p &amp;lt;@ A.B.T&lt;/span&gt; for
+each of these five records:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Because the values of &lt;span class="code"&gt;p&lt;/span&gt;, the tree page keys, are
+simple path strings, &lt;span class="code"&gt;ltree_consistent&lt;/span&gt; directly
+compares them with &lt;/span&gt;A.B.T&lt;/span&gt; and determines immediately whether each
+value is a descendent tree node of &lt;span class="code"&gt;A.B.T&lt;/span&gt; or not.
+Right now the GiST index hasn’t provided much value; Postgres has to iterate
+over all the values, just like a sequence scan.&lt;/p&gt;
+
+&lt;p&gt;Now suppose I start to add more and more records to my table. Postgres can fit
+up to 136 LTREE records into the root GiST memory segment, and index scans
+function the same way as a sequence scan by checking all the values.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;But if I insert one more record, the 137th record doesn’t fit. At this point
+Postgres has to do something different:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now Postgres “splits” the memory segment to make room for more values. It
+creates two new child memory segments and pointers to them from the parent or
+root segment.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist5.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;What does Postgres do next? What does it place into each child segment?
+Postgres leaves this decision to the GiST API, to the LTREE extension, by
+calling the the &lt;span class="code"&gt;ltree_picksplit&lt;/span&gt; function. Here again
+is the API spec for &lt;span class="code"&gt;PickSplit&lt;/span&gt;:&lt;/p&gt;
+
+&lt;div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+&lt;img src="http://patshaughnessy.net/assets/2017/12/15/pick-split.png"/&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;span class="code"&gt;ltree_picksplit&lt;/span&gt; function &amp;ndash; the LTREE
+implementation of the GiST API &amp;ndash; sorts the tree paths alphabetically and copies
+each half into one of the two new child segments. Note that GiST indexes don’t
+normally sort their contents; however, GiST indexes created specifically by the
+LTREE extension do because of the way &lt;span class="code"&gt;ltree_picksplit&lt;/span&gt;
+works. We’ll see why it sorts the data in a moment.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist6.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now Postgres has to decide what to leave in the root segment. To do this, it
+calls the Union GiST API:&lt;/p&gt;
+
+&lt;div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+&lt;img src="http://patshaughnessy.net/assets/2017/12/15/union.png"/&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;In this example, each of the child segments is a set S. And the &lt;span
+class="code"&gt;ltree_union&lt;/span&gt; function has to return a “union” value for each
+child segment that describes somehow what values are present in that segment:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist7.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Oleg and Teodor decided this union value should be a pair of left/right values
+indicating the minimum and maximum tree branches inside of which all of the
+values fit alphabetically. This is why the &lt;span
+class="code"&gt;ltree_picksplit&lt;/span&gt; function sorted the values. For example,
+because the first child segment contains the sorted values from &lt;span
+class="code"&gt;A.B.C.B&lt;/span&gt; through &lt;span class="code"&gt;A.B.M.Z&lt;/span&gt;, the
+left/right union becomes &lt;span class="code"&gt;A&lt;/span&gt; and &lt;span
+class="code"&gt;A.B.M&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist8.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Note &lt;span class="code"&gt;A.B.M&lt;/span&gt; is sufficient here to form a union value
+excluding &lt;span class="code"&gt;A.B.N.X&lt;/span&gt; and all the following values; LTREE
+doesn’t need to save &lt;span class="code"&gt;A.B.M.Z&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;Similarly, the left/right union for the second child segment becomes &lt;span
+class="code"&gt;A.B.N/A.B.X&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist9.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This is what a GiST index looks like. Or, what an LTREE GiST index looks like,
+specifically. The power of the GiST API is that anyone can use it to create a
+Postgres index for any type of data. Postgres will always use the same pattern:
+The parent index page contains a set of union values, each of which somehow
+describe the contents of each child index page.&lt;/p&gt;
+
+&lt;p&gt;For LTREE GiST indexes, Postgres saves left/right value pairs to describe the
+union of values that appear in each child index segment. For other types of
+GiST indexes, the union values could be anything. For example, a GiST index
+could store geographical information like latitude/longitude coordinates, or
+colors, or any sort of data at all. What’s important is that each union value
+describe the set of possible values that can appear under a certain branch of
+the index. And like B-Trees, this union value/child page pattern is recursive:
+A GiST index could hold millions of values in a tree with many pages saved in a
+large multi-level tree.&lt;/p&gt;
+
+&lt;h2&gt;Searching a GiST Index&lt;/h2&gt;
+
+&lt;p&gt;After creating this GiST index tree, searching for a value is straightforward.
+Postgres uses the ltree_consistent function. As an example, let’s repeat the
+same SQL query from above:&lt;/p&gt;
+
+&lt;pre&gt;
+select count(*) from tree where path &lt;@ 'A.B.T'
+&lt;/pre&gt;
+
+
+&lt;p&gt;To execute this using the GiST index, Postgres iterates over the union values
+in the root memory segment and calls the ltree_consistent function for each
+one:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/consistent.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Now Postgres passes each union value to ltree_consistent to calculate the &lt;span
+class="code"&gt;p &amp;lt;@ q&lt;/span&gt; formula. The code inside of &lt;span
+class="code"&gt;ltree_consistent&lt;/span&gt; then returns: &lt;span
+class="code"&gt;MAYBE&lt;/span&gt; if &lt;span class="code"&gt;q &gt; left&lt;/span&gt;, and &lt;span
+class="code"&gt;q &amp;lt; right&lt;/span&gt;. Otherwise it returns &lt;span
+class="code"&gt;NO&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist10.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In this example you can see &lt;span class="code"&gt;ltree_consistent&lt;/span&gt; finds
+that the query &lt;span class="code"&gt;A.B.T&lt;/span&gt;, or &lt;span class="code"&gt;q&lt;/span&gt;,
+maybe is located inside the second child memory segment, but not the first one.&lt;/p&gt;
+
+&lt;p&gt;For the first child union structure, &lt;span class="code"&gt;ltree_consistent&lt;/span&gt;
+finds &lt;span class="code"&gt;q &gt; A&lt;/span&gt; true but &lt;span class="code"&gt;q &amp;lt;
+A.B.M&lt;span class="code"&gt; false. Therefore &lt;span
+class="code"&gt;ltree_consistent&lt;/span&gt; knows there can be no matches in the top
+child segment, so it skips down to the second union structure.&lt;/p&gt;
+
+&lt;p&gt;For the second child union structure, &lt;span class="code"&gt;ltree_consistent&lt;/span&gt; finds both &lt;span class="code"&gt;q &gt; A.B.N&lt;/span&gt;
+true and &lt;span class="code"&gt;q &amp;lt; A.B.X&lt;/span&gt; true. Therefore it returns &lt;span
+class="code"&gt;MAYBE&lt;/span&gt;, meaning the search continues in the lower child
+segment:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/gist11.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Note Postgres never had to search the first child segment: The tree structure
+limits the comparisons necessary to just the values that might match &lt;span
+class="code"&gt;p &amp;lt;@ A.B.T&lt;/span&gt;.&lt;/p&gt;
+
+&lt;p&gt;Imagine my table contained a million rows: Searches using the GiST index will
+still be fast because the GiST tree limits the scope of the search. Instead of
+executing &lt;span class="code"&gt;p &amp;lt;@ q&lt;/span&gt; on every one of the million rows,
+Postgres only needs to run &lt;span class="code"&gt;p &amp;lt;@ q&lt;/span&gt; a handful of times,
+on a few union records and on the child segments of the tree that contains
+values that might match.&lt;/p&gt;
+
+&lt;div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2017/12/15/sternberg.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;The Sternberg Astronomical Institute
+at Moscow State University&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;h2&gt;Send Them a Postcard&lt;/h2&gt;
+
+&lt;p&gt;Oleg Bartunov and Teodor Sigaev, the authors of the LTREE extension, explained
+its usage and the algorithms I detailed above here on their
+&lt;a href="http://www.sai.msu.su/~megera/postgres/gist/ltree/"&gt;web page&lt;/a&gt;. They included more
+examples of SQL searches on tree data, including some which use the &lt;span
+class="code"&gt;LTREE[]&lt;/span&gt; data type I didn’t have time to cover in these blog
+posts.&lt;/p&gt;
+
+&lt;p&gt;But most importantly, they included this note at the bottom:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2017/12/15/postcard.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Do you save tree data in Postgres? Does your app take advantage of the LTREE
+extension? If so, you should send Oleg and Teodor a postcard! I just did.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Manipulating Trees Using SQL and the Postgres LTREE Extension</title>
     <link href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension" rel="alternate"/>
     <id>http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension</id>
@@ -865,8 +1359,7 @@ you save it in a database? How would you represent a complex tree structure
 using flat rows and columns?&lt;/p&gt;
 
 &lt;p&gt;There are a few different, equally valid options. In this series of blog posts,
-I’ll take a close look at one option that Postgres provides, the &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE
-extension&lt;/a&gt;. If you
+I’ll take a close look at one option that Postgres provides, the &lt;a href="https://www.postgresql.org/docs/current/static/ltree.html"&gt;LTREE extension&lt;/a&gt;. If you
 install and enable LTREE on your Postgres server, it will add powerful SQL
 operators and functions that support tree operations.&lt;/p&gt;
 
@@ -3639,529 +4132,6 @@ production, look for memory intensive SQL statements. Measure the SQL queries
 your application actually executes. Take their blood pressure using the &lt;span
 class="code"&gt;EXPLAIN ANALYZE&lt;/span&gt; command; you might find they are memory
 starved!&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>A Look at How Postgres Executes a Tiny Join</title>
-    <link href="http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join" rel="alternate"/>
-    <id>http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join</id>
-    <published>2015-11-24T04:00:00Z</published>
-    <updated>2015-11-24T04:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/11/24/lecture-hall.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;
-  Reading the Postgres source code is like attending a free&lt;br/&gt; Computer Science lecture, complete with working examples.
-  &lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Aside from saving and retrieving data, the primary feature of a relational
-database is the ability </summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 0px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2015/11/24/lecture-hall.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;
-  Reading the Postgres source code is like attending a free&lt;br/&gt; Computer Science lecture, complete with working examples.
-  &lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Aside from saving and retrieving data, the primary feature of a relational
-database is the ability to execute join queries, to &lt;em&gt;relate&lt;/em&gt; data in one table
-with data from another. While many developers are turning to NoSQL solutions,
-joining one set of data values with another remains one of our most common and
-important use cases while writing server code.&lt;/p&gt;
-
-&lt;p&gt;But what does the word “join” actually mean? And what really happens when I
-execute a join query?  Too often we take our tools for granted, without really
-understanding what they are doing. This month I decided to look at the source
-code for &lt;a href="http://www.postgresql.org"&gt;PostgreSQL&lt;/a&gt;, a popular open source
-database server, to see how it implements join queries.&lt;/p&gt;
-
-&lt;p&gt;Reading and experimenting with the Postgres source code turned out to be a
-great learning experience. Today I’d like to report my observations; I&amp;rsquo;ll
-show you exactly how Postgres executed a tiny join consisting of just a few
-records, using the &lt;em&gt;hash join&lt;/em&gt; algorithm. In future articles I’ll show you some
-interesting optimizations Postgres uses for larger joins, and other computer
-science algorithms at work inside of Postgres.&lt;/p&gt;
-
-&lt;h2&gt;What is a Join?&lt;/h2&gt;
-
-&lt;p&gt;But before we get to the Postgres source code, let’s start by reviewing what
-join queries are. Here&amp;rsquo;s an introduction from &lt;a href="http://www.postgresql.org/docs/current/static/tutorial-join.html"&gt;the excellent Postgres
-documentation&lt;/a&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/postgres-join-tutorial.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The Postgres docs then explain how to use joins: inner vs. outer joins, joining
-a table with itself, etc. But I’m intrigued by the highlighted disclaimer.
-What is that “more efficient manner?” And how could Postgres possibly get away
-with not “actually comparing each possible pair of rows?”&lt;/p&gt;
-
-&lt;h2&gt;A Tiny Join&lt;/h2&gt;
-
-&lt;p&gt;As an example today let’s work with two tables: &lt;em&gt;publications&lt;/em&gt;, which contains
-three ground breaking computer science journal articles I never read in
-college, and &lt;em&gt;authors&lt;/em&gt;, which records where each author worked.&lt;/p&gt;
-
-&lt;pre&gt;
-&gt; select * from publications;
-
-                         title                          |   author   | year 
---------------------------------------------------------+------------+------
- A Relational Model of Data for Large Shared Data Banks | Edgar Codd | 1970
- Relational Completeness of Data Base Sublanguages      | Edgar Codd | 1972
- The Transaction Concept: Virtues and Limitations       | Jim Gray   | 1981
-(3 rows)
-
-&gt; select * from authors;
-
-    name    |         company         
-------------+-------------------------
- Edgar Codd | IBM Research Laboratory
- Jim Gray   | Tandem Computers
-(2 rows)
-&lt;/pre&gt;
-
-
-&lt;p&gt;Today’s goal is to understand exactly what happens when Postgres joins one table with the other:&lt;/p&gt;
-
-&lt;pre&gt;
-&gt; select title, company from publications, authors where author = name;
-
-                         title                          |         company         
---------------------------------------------------------+-------------------------
- Relational Completeness of Data Base Sublanguages      | IBM Research Laboratory
- A Relational Model of Data for Large Shared Data Banks | IBM Research Laboratory
- The Transaction Concept: Virtues and Limitations       | Tandem Computers
-(3 rows)
-&lt;/pre&gt;
-
-
-&lt;h2&gt;A Conceptual Model for Joining Two Tables&lt;/h2&gt;
-
-&lt;p&gt;Before we look at the algorithm Postgres actually uses, let’s review what join
-queries do conceptually. Above the documentation stated that Postgres
-implements joins by “comparing each possible pair of rows,” and then selecting
-“the pairs of rows where these values match.”&lt;/p&gt;
-
-&lt;p&gt;Reading this I imagine Postgres takes each publication and loops over all of
-the authors, looking for that publication’s author:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;In blue on the left are the publications, and I show the author records on the
-right in green. This process of iterating over the rows in the authors table is
-known as a scan in the Postgres source code. We are scanning over all of the
-authors for the first publication, trying to find matching names.&lt;/p&gt;
-
-&lt;p&gt;What do we do with each publication-author pair? We have to evaluate the &lt;span
-class="code"&gt;WHERE&lt;/span&gt; clause from my example SQL statement:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/where1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Do the names match? Yes. This pair should be included in the result set. What
-about the second pair?&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/where2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Do these names match? This time they don’t &amp;ndash; this pair of rows should be
-filtered out.&lt;/p&gt;
-
-&lt;p&gt;Once we have a matching pair of rows, we copy just the selected columns into a
-new, joined record and return that to the client:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/select1.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;A Nested Loop&lt;/h2&gt;
-
-&lt;p&gt;What’s wrong with this conceptual model? It seems like a very simple,
-straightforward way of obtaining the values we need. If we proceed to scan
-through the rest of the publications, it produces the same result that Postgres
-does, although in a different order. (We’ll see why the order changes later.)&lt;/p&gt;
-
-&lt;p&gt;The problem is that it’s very inefficient. First we scan over all of the
-authors for the first row in the publications table:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan1b.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;And then we repeat the same scan of the authors table for the second
-publication:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;And again for the third row. To find all of the matching pairs, in fact, we
-need to loop over all the authors for each publication:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;For my tiny query this isn’t a problem. There are 3*2 or 6 combinations of
-rows; comparing names 6 times would only take a few microseconds on a modern
-computer. However, as the number of rows increases in either table, the total
-number of comparisons will explode. If we have 1000 publications and 1000
-authors, suddenly we would have to compare name strings 1000*1000 or 1 million
-times! Computer scientists describe this algorithm as O(n&lt;sup&gt;2&lt;/sup&gt;).&lt;/p&gt;
-
-&lt;p&gt;But do we really need to search the entire authors table for each publication?
-“Edgar Codd” appears in the publications table twice &amp;ndash; why do we need to scan
-the authors table for the same name more than once? After we find Edgar the
-first time, there should be some way of recording where he was so we can find
-him again. And even if there were no repeated author names in publications, it
-still seems wasteful to loop over the authors table over and over again. There
-must be some way of avoiding all of these repeated scans.&lt;/p&gt;
-
-&lt;p&gt;And there is; we can use a &lt;em&gt;hash table&lt;/em&gt;.&lt;/p&gt;
-
-&lt;h2&gt;Avoiding Repeated Scans&lt;/h2&gt;
-
-&lt;p&gt;The problem with our naive algorithm, the conceptual model from the Postgres
-documentation, is that we loop over the authors table over and over again. To
-avoid those repeated loops, imagine if we scanned the authors only once and
-then saved them in some kind of data structure:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/bag1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Now that we have the author records, what do we need to do with them? Well, we
-have to scan the publications, obtain each publication’s author, and find the
-matching author records, if any. In other words, we need to be able to quickly
-and easily find the author record with a given name:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/bag2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;You’ve probably seen this data structure before; in fact, it might be something
-you use everyday in your own code. If you’re a Rubyist like me, you call this a
-&lt;em&gt;hash&lt;/em&gt;. If you prefer Python it’s a &lt;em&gt;dictionary&lt;/em&gt;, or in Clojure it’s &lt;em&gt;hash map&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;With all the authors organized by their names, we can scan over the
-publications and quickly find out if there’s a matching author record:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/bag3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;But what are hash tables, exactly? And how do they work? If only we could go
-back in time and sneak back into our college Computer Science classroom again.
-But if you installed Postgres from source, using Homebrew or with some Linux
-package manager, you already have an open source, world class implementation of
-the hash table algorithm right on your computer! To learn more about it
-all we have to do is read the Postgres source code.&lt;/p&gt;
-
-&lt;h2&gt;Calculating Hashes&lt;/h2&gt;
-
-&lt;p&gt;It turns out that for this query Postgres actually hashes the publications and
-then iterates over the authors. Before starting to execute a query, Postgres
-first parses the SQL we give it and generates a “query plan.” Probably because
-the publications table is larger (I’m not sure), Postgres’s query planner
-decides to save the publications, not the authors, in the hash table.&lt;/p&gt;
-
-&lt;p&gt;To do this, Postgres has to scan the publications just as we did above:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan4.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;And for each publication, Postgres selects just two of the three columns:
-author and title. Postgres refers to the query plan and finds out it will need
-the author for the &lt;span class="code"&gt;WHERE&lt;/span&gt; join condition, and the
-title for the final &lt;span class="code"&gt;SELECT&lt;/span&gt; returning the result set.
-It leaves the year values behind.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/project1.png"/&gt;&lt;/p&gt;
-
-&lt;div style="float: right; padding: 7px 0px 20px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2014/9/23/codd.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;Edgar Codd&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;This process of selecting the desired attributes from the matching pair is
-known in the Postgres C source code as a &lt;em&gt;projection&lt;/em&gt;. We “project” a few values
-from one set of columns to another. (The term &lt;em&gt;project&lt;/em&gt; is actually much older
-even than Postgres; Edgar Codd first used it in this context in &lt;a href="https://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf"&gt;A Relational
-Model of Data for Large Shared Data
-Banks&lt;/a&gt; back in 1970.)&lt;/p&gt;
-
-&lt;p&gt;Next Postgres calculates a &lt;em&gt;hash&lt;/em&gt; based on the author string. A hash is some
-integer value that can be calculated quickly in a repeatable, reproducible way.
-For the same author string, e.g. “Edgar Codd,” Postgres always calculates the
-same hash number. As we’ll see in a moment, Postgres uses the hash value to
-decide where to save the author name in the hash table.&lt;/p&gt;
-
-&lt;p&gt;You can find Postgres’s hash algorithm in a C file called hashfunc.c. Even if
-you’re not a C developer, there are extensive code comments explaining what’s
-going on, along with a link to &lt;a href="http://burtleburtle.net/bob/hash/doobs.html"&gt;an article written by Bob
-Jenkins&lt;/a&gt;, who developed the
-algorithm in 1997.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;hash_any&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/hashfunc_8c.html#a364b7d134ec3c770a3b40abf15b05d37"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2015/11/24/hash_any.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;p&gt;In my example, Postgres passes “Edgar Codd,” the string value in the author
-column in the first publication record, to &lt;span class="code"&gt;hash_any&lt;/span&gt;.
-The complex bitwise calculations in &lt;span class="code"&gt;hash_any&lt;/span&gt; step
-over the characters in Edgar’s name and return this hash value:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/hash1.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;Using a Bitmask to Choose a Hash Bucket&lt;/h2&gt;
-
-&lt;p&gt;Now that it has a hash, what does Postgres do with it? You can see a clue above
-in the C comments:&lt;/p&gt;
-
-&lt;blockquote&gt;
-The best hash table sizes are powers of 2.  There is no need to do mod a prime
-(mod is sooo slow!). If you need less than 32 bits, use a bitmask.
-&lt;/blockquote&gt;
-
-
-&lt;p&gt;A hash table consists of an array of “buckets,” which are a series of pointers
-to linked lists. Initially Postgres creates an empty array of bucket pointers
-just before starting to scan the publications:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/buckets1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;As you can guess, Postgres saves each publication in one of the buckets in the
-hash table, based on the calculated hash value. Later when it scans over the
-authors, it will be able to find the publications again quickly by
-recalculating the same hash values. Instead of scanning over all of the
-publications again, Postgres can just look up each publication’s author using
-the hash. The hash is a record of where each publication is saved in the hash
-table.&lt;/p&gt;
-
-&lt;p&gt;However, if two publications turn out to have the same author, as we have in
-our example, then Postgres will have to save them both in the same bucket. This
-is why each bucket is a linked list; each bucket has to save more than one
-publication.&lt;/p&gt;
-
-&lt;p&gt;Because our example has three publications, does Postgres use a hash table with
-three buckets? Or with two buckets, because of the repeated author value? No.
-It actually uses 1024 buckets! Why 1024? For two reasons: First, Postgres was
-designed to query large amounts of data. Its hash join algorithm was optimized
-to handle extremely large data sets, containing millions of records or even
-more. A table containing three records is truly tiny! Postgres doesn’t bother
-with small hash tables and uses a minimum size of 1024.&lt;/p&gt;
-
-&lt;p&gt;And why a power of two? This makes it easier to decide which bucket to use for
-a given hash. Instead of trying to return hash values that match the number of
-buckets, it’s easier and faster to always returns very large values. What
-Postgres does instead is distribute the large hash values evenly over the number
-of buckets it does have. By choosing a power of two for the bucket array size,
-Postgres can use a fast bitwise operation to decide which bucket to save each
-publication in, like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/hash2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Above you can see how Postgres decides where to put “Edgar Codd” in the hash
-table: It subtracts one from the number of buckets: 1024-1 = 1023. Written in
-binary this is 1111111111. Then using your microprocessor’s binary computing
-circuits, Postgres quickly masks out the left bits, and keeps just the 10 least
-significant or rightmost bits. This yields 0000001111 binary, or the number 15.
-Using this fast calculation, Postgres decides to save Edgar in bucket #15:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/buckets2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Postgres also saves the title string, because it will need it later to produce
-the final result set. Along with the two strings, Postgres saves the hash value
-and a “next” pointer that will form the linked list.&lt;/p&gt;
-
-&lt;h2&gt;Building the Rest of the Hash Table&lt;/h2&gt;
-
-&lt;p&gt;Postgres now continues to scan over the publications, arriving at the second
-publication.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan5.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;We have Edgar again! Clearly he was a central figure behind database theory.
-Calculating the hash again for the same string will always return the same
-value: 2130627599, yielding bucket #15 a second time. We know the Edgar Codd
-records will always appear in bucket 15.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/buckets3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Also notice that Postgres saves each new publication at the head of the linked
-list &amp;ndash; this means we have the second Edgar publication first on the left, and
-Edgar’s first publication second on the right. As we’ll see next, this yields
-the reverse order of Edgar’s records we saw above in the conceptual algorithm.&lt;/p&gt;
-
-&lt;p&gt;Finally Postgres continues scanning and saves the third publication in the hash
-table; this time Postgres calculates a hash for “Jim Gray:”&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/hash3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;You can see this time the 10 rightmost bits of 3344886182 evaluate to 422. So
-Postgres saves Jim in bucket #422. Drawing the bucket array more to scale it
-might look something like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/buckets4.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;Scanning Buckets&lt;/h2&gt;
-
-&lt;p&gt;After saving all the publications in the hash table, Postgres can now scan over
-the authors table:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan6.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Now finding the matching publication is simple. Instead of scanning over all
-the publications, Postgres simply calls the hash function again on the name
-string from the authors table, and repeats the bitmask operation. Because the
-first author record is Edgar, Postgres knows the matching publications will be
-in bucket #15.&lt;/p&gt;
-
-&lt;p&gt;In our tiny example, the only records in bucket 15 will be for Edgar Codd. But
-remember in a large SQL query there might be millions of publications. It’s
-possible that publications with different authors might appear in this bucket.
-This would happen because either:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;The hash function returned the same hash number for two different author
-strings. This is possible but unlikely. In Computer Science this would be known
-as a &lt;em&gt;hash collision&lt;/em&gt;.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;The 10 least significant bits of the hash were the same. For millions of
-publications this would happen frequently. However, as the number of records in
-the join increases Postgres uses more and more bits in the bitmask. 1024 (10
-bits) was the minimum number it uses for our tiny query. Still, hash table
-buckets in practice will contain multiple key values.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;Therefore, Postgres has to check each author in the matching bucket to be sure
-that it’s a match. This process is known as &lt;em&gt;scanning the bucket&lt;/em&gt;. To do this,
-Postgres first checks the hash values:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan-buckets1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This is a simple numerical comparison and so is quite fast. And if the hashes
-are the same, Postgres checks the actual strings just in case the hash function
-did return the same hash for different strings:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/scan-buckets2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Because the author names match, Postgres can finally perform the join!  To do
-this, it projects the columns that our query selects into a single joined
-record, in the desired order:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/select2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This becomes the first record in our result set.&lt;/p&gt;
-
-&lt;h2&gt;Returning Multiple Records: The Hash Join State Machine&lt;/h2&gt;
-
-&lt;p&gt;One of the most beautiful and important aspects of the Postgres implementation
-is the way it orchestrates building up and searching the hash table in the
-midst of a larger enclosing SQL expression. To see this for yourself, take a
-look at the hash join implementation, in nodeHashJoin.c.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;ExecHashJoin&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nodeHashjoin_8c.html#a538698b031186193de7da58537820e61"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2015/11/24/ExecHashJoin.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;p&gt;Postgres calls &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; once for each record in the join result set. For
-our example with 3 result records Postgres calls &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; three times.
-&lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; keeps track of how many times it has been called, and what it
-needs to do next, using a state machine.&lt;/p&gt;
-
-&lt;p&gt;The best way to understand how this state machine works, and how it fits into
-the larger structure of Postgres’s architecture, is to imagine that we asked
-for one record at a time. For example, imagine that we select just a single
-record from the join:&lt;/p&gt;
-
-&lt;pre&gt;
-select title, company from publications, authors where author = name limit 1
-&lt;/pre&gt;
-
-
-&lt;p&gt;By appending &lt;span class="code"&gt;limit 1&lt;/span&gt; we tell Postgres to stop after 1
-record. For this query, to return just one record, &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; will use the
-following states in its state machine:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/states1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here’s what &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt; does to obtain the first joined record:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;HJ_BUILD_HASHTABLE&lt;/span&gt;: This code builds the hash table by scanning over all
-the publications records, as we saw above. Postgres calls publications the
-“inner relation.”&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;HJ_NEED_NEW_OUTER&lt;/span&gt;: This code starts scanning the “outer relation” or the
-authors table in this example, and returns a single record.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;HJ_SCAN_BUCKET&lt;/span&gt;: This code takes one outer relation record (an author) and
-looks for the matching inner relation records in the hash table (publications).&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;Now imagine that I ask Postgres for two records, by using limit 2:&lt;/p&gt;
-
-&lt;pre&gt;
-select title, company from publications, authors where author = name limit 2
-&lt;/pre&gt;
-
-
-&lt;p&gt;The second time Postgres calls &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt;, it only
-executes &lt;span class="code"&gt;HJ_NEED_NEW_OUTER&lt;/span&gt; and &lt;span
-class="code"&gt;HJ_SCAN_BUCKET&lt;/span&gt; &amp;ndash; it already created the hash table the
-first time it was called:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2015/11/24/states2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Postgres pays the large price of scanning the entire inner relation and
-building the hash table as soon as you ask for one record. Returning the second
-and all subsequent records is much faster because Postgres already has the hash
-table.&lt;/p&gt;
-
-&lt;p&gt;If you read the C code you’ll see some interesting optimizations. For example,
-Postgres actually scans the outer relation first to get a single record, just
-in case it might be empty. (This is what the C comment above refers to.)
-There’s no need to build a hash table if we’re not going to look up any values!
-Also, the &lt;span class="code"&gt;HJ_FILL_INNER&lt;/span&gt; and &lt;span
-class="code"&gt;HJ_FILL_OUTER&lt;/span&gt; states handle executing right
-or left outer joins respectively. &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt;
-implements these as well.&lt;/p&gt;
-
-&lt;p&gt;By using a state machine like this Postgres can execute this join inside the
-context of a large, complex SQL statement. It could be that we are joining
-together result sets from complex inner SQL clauses, or that the result set
-from this join becomes part of a larger expression. The state inside of &lt;span
-class="code"&gt;ExecHashJoin&lt;/span&gt; allows Postgres to keep track of what is was
-doing &amp;ndash; and of what it needs to do next &amp;ndash; in the appropriate place on the
-execution stack.&lt;/p&gt;
-
-&lt;h2&gt;What’s Next?&lt;/h2&gt;
-
-&lt;p&gt;The last state value handled by &lt;span class="code"&gt;ExecHashJoin&lt;/span&gt;,
-HJ_NEED_NEW_BATCH, handles the case where the hash table doesn’t fit into
-the server’s memory. In this case, Postgres will create a series of hash tables
-and save some of them out to disk in “batch files.” This algorithm is what the term
-&lt;a href="https://en.wikipedia.org/wiki/Hash_join"&gt;Hybrid Hashjoin&lt;/a&gt; refers to.&lt;/p&gt;
-
-&lt;p&gt;When I have time, I’d love to write about how Postgres handles a large join
-instead of a tiny one: How do batch files work? What configuration settings
-have an effect on batch files and join performance? And there’s also an
-interesting optimization Postgres uses for frequently occurring join key
-values.&lt;/p&gt;
-
-&lt;p&gt;Postgres does some amazing things internally to speed up your queries; it’s
-time to shed some light on the great work the Postgres open source community
-has done over the years!&lt;/p&gt;
 </content>
   </entry>
 </feed>

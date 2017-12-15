@@ -10,8 +10,7 @@ you save it in a database? How would you represent a complex tree structure
 using flat rows and columns?
 
 There are a few different, equally valid options. In this series of blog posts,
-I’ll take a close look at one option that Postgres provides, the [LTREE
-extension](https://www.postgresql.org/docs/current/static/ltree.html). If you
+I’ll take a close look at one option that Postgres provides, the [LTREE extension](https://www.postgresql.org/docs/current/static/ltree.html). If you
 install and enable LTREE on your Postgres server, it will add powerful SQL
 operators and functions that support tree operations.
 
