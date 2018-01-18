@@ -7,6 +7,385 @@
     <name></name>
   </author>
   <entry>
+    <title>Learning Rust: If Let vs. Match</title>
+    <link href="http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match" rel="alternate"/>
+    <id>http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match</id>
+    <published>2018-01-18T04:00:00Z</published>
+    <updated>2018-01-18T04:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2018/1/18/dictionary.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;Human languages have similar words with different&lt;br/&gt; shades of meaning. Some computer languages do too.&lt;br/&gt;
+  &lt;small&gt;(from: &lt;a href="https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG"&gt;Wikimedia Commons&lt;/</summary>
+    <content type="html">&lt;div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2018/1/18/dictionary.jpg"&gt;&lt;br/&gt;
+  &lt;i&gt;Human languages have similar words with different&lt;br/&gt; shades of meaning. Some computer languages do too.&lt;br/&gt;
+  &lt;small&gt;(from: &lt;a href="https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG"&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
+&lt;/div&gt;
+
+
+&lt;p&gt;This year I’ve decided to try to learn &lt;a href="https://www.rust-lang.org"&gt;Rust&lt;/a&gt;. I’m
+fascinated by its ownership model for memory management; I’m curious what the
+claims about safety are all about; and, I love how it incorporates ideas from
+the functional programming world. But I haven’t gotten to all of that yet &amp;ndash; I’m
+just getting started learning the basic syntax.&lt;/p&gt;
+
+&lt;p&gt;Learning a computer language is just like learning a human language. You have
+to try to read and write it everyday, even if just for a few minutes. You need
+to get to know some native speakers. And there’s no way around it: You need to
+learn the basic vocabulary of the language, word by word. To make things worse,
+our human languages usually have several  words that mean the same thing. Which
+one should I use? Sometime only a native speaker will really know.&lt;/p&gt;
+
+&lt;p&gt;This week I was reading about &lt;span class="code"&gt;if let&lt;/span&gt; and &lt;span
+class="code"&gt;match&lt;/span&gt; in &lt;a href="https://doc.rust-lang.org/book/second-edition/ch06-03-if-let.html"&gt;The Rust Programming
+Book&lt;/a&gt;
+(TRPL). I read that &lt;span class="code"&gt;if let&lt;/span&gt; is really syntactic sugar
+for &lt;span class="code"&gt;match&lt;/span&gt;:&lt;/p&gt;
+
+&lt;div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px"&gt;
+&lt;img width="500" src="http://patshaughnessy.net/assets/2018/1/18/trpl-quote.png"/&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;This intrigued me. The phrase “syntactic sugar” implies the two code snippets
+don’t only produce the same results, it means the compiler generates exactly
+the same code in each case.&lt;/p&gt;
+
+&lt;p&gt;Does the Rust compiler really generate exactly the same code for &lt;span
+class="code"&gt;if let&lt;/span&gt; as it does for &lt;span class="code"&gt;match&lt;/span&gt;? Read
+on to find out. Today I’ll start with a quick review of the syntax and meaning
+of &lt;span class="code"&gt;if let&lt;/span&gt; and &lt;span class="code"&gt;match&lt;/span&gt;. Then
+I’ll take a look at how Rust compiles &lt;span class="code"&gt;if let&lt;/span&gt; and
+&lt;span class="code"&gt;match&lt;/span&gt;, at what code it produces.&lt;/p&gt;
+
+&lt;h2&gt;If Let Compares a Pattern with a Value&lt;/h2&gt;
+
+&lt;p&gt;The idea behind &lt;span class="code"&gt;if let&lt;/span&gt; is that it compares a pattern
+with a value:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/1/18/pattern-value.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In this example &lt;span class="code"&gt;if let&lt;/span&gt; compares the pattern &lt;span
+class="code"&gt;Some(3)&lt;/span&gt; with the value &lt;span
+class="code"&gt;some_u8_value&lt;/span&gt;. If there’s a match, &lt;span class="code"&gt;if
+let&lt;/span&gt; executes the &lt;span class="code"&gt;println!&lt;/span&gt; code inside the
+block.&lt;/p&gt;
+
+&lt;h2&gt;If Let Also Assigns Values&lt;/h2&gt;
+
+&lt;p&gt;&lt;span class="code"&gt;if let&lt;/span&gt; assigns a value at the same time, when the
+pattern matches the value. This is the idea behind including the &lt;span class="code"&gt;let&lt;/span&gt; keyword
+after &lt;span class="code"&gt;if&lt;/span&gt;. This is more apparent if I rewrite the example using a variable &lt;span class="code"&gt;i&lt;/span&gt;
+instead of 3. I&amp;rsquo;ll also add a main function so I can execute the code:&lt;/p&gt;
+
+&lt;pre&gt;
+fn main() {
+  let some_u8_value = Some(3u8);
+  if let Some(i) = some_u8_value {
+     println!("assigned {} to i", i);
+  }
+}
+&lt;/pre&gt;
+
+
+&lt;p&gt;When I saved this in a file called if-let.rs and ran it, I got:&lt;/p&gt;
+
+&lt;pre&gt;
+$ rustc if-let.rs
+$ ./main
+Assigned 3 to i
+&lt;/pre&gt;
+
+
+&lt;p&gt;&lt;span class="code"&gt;if let&lt;/span&gt; “unwrapped” the option structure, and assigned
+the value 3 to the identifier &lt;span class="code"&gt;i&lt;/span&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Match: If Let’s Big Brother&lt;/h2&gt;
+
+&lt;p&gt;As TRPL explains, I could also have written this using the &lt;span
+class="code"&gt;match&lt;/span&gt; keyword, as follows:&lt;/p&gt;
+
+&lt;pre&gt;
+fn main() {
+    let some_u8_value = Some(3u8);
+    match some_u8_value {
+        Some(i) =&gt; println!("Matched: {}", i),
+        None =&gt; (),
+    }
+}
+&lt;/pre&gt;
+
+
+&lt;p&gt;To write this all I had to do was move things around a bit in my &lt;span
+class="code"&gt;if let&lt;/span&gt; code snippet from above:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/1/18/if-let-match.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Because there was no else clause for the &lt;span class="code"&gt;if let&lt;/span&gt;
+statement, I used &lt;span class="code"&gt;None =&gt; ()&lt;/span&gt; in match.&lt;/p&gt;
+
+&lt;p&gt;Saving this code in match.rs and running it I got the same result:&lt;/p&gt;
+
+&lt;pre&gt;
+$ rustc match.rs
+$ ./main
+Matched: 3
+&lt;/pre&gt;
+
+
+&lt;h2&gt;Mid-Level IR (MIR)&lt;/h2&gt;
+
+&lt;p&gt;I was curious though: If these two code snippets are entirely equivalent, then
+the Rust compiler should generate &lt;em&gt;exactly the same executable program&lt;/em&gt; when I
+compile them. In theory, therefore, I should be able to compare the two
+executable binaries to test whether TRPL’s statement about syntactic sugar is
+accurate. But comparing binary executables might not work. Likely there are
+timestamps or other ephemeral values encoded in the executable that would break
+the comparison. I decided to look for an easier way to test the compiler’s
+output.&lt;/p&gt;
+
+&lt;p&gt;Then I came across mid-level intermediate representation (MIR), described &lt;a href="https://blog.rust-lang.org/2016/04/19/MIR.html"&gt;here
+on the Rust blog&lt;/a&gt;. MIR is an
+internal text language the rust compiler produces when you include the
+&lt;span class="code"&gt;—emit-mir&lt;/span&gt; flag, like this:&lt;/p&gt;
+
+&lt;pre&gt;
+$ rustc --emit mir if-let.rs
+&lt;/pre&gt;
+
+
+&lt;p&gt;With this option specified, rust generates a file called if-let.mir. Opening up
+this file, I see:&lt;/p&gt;
+
+&lt;pre&gt;
+// WARNING: This output format is intended for human consumers only
+// and is subject to change without notice. Knock yourself out.
+fn main() -&gt; () {
+    let mut _0: ();                      // return pointer
+    scope 1 {
+        let _1: std::option::Option&lt;u8&gt;; // "some_u8_value" in scope 1 at src/if-let.rs:16:9: 16:22
+
+etc…
+&lt;/pre&gt;
+
+
+&lt;p&gt;“Knock yourself out;” now I’m really intrigued!&lt;/p&gt;
+
+&lt;h2&gt;A First Look at MIR&lt;/h2&gt;
+
+&lt;p&gt;I decided to compare the MIR text file the Rust compiler produced for the &lt;span class="code"&gt;if
+let&lt;/span&gt; snippet vs. the &lt;span class="code"&gt;match&lt;/span&gt; snippet. If Rust
+considers &lt;span class="code"&gt;if let&lt;/span&gt; to be syntactic sugar for &lt;span
+class="code"&gt;match&lt;/span&gt;, then the MIR representation of the two snippets
+should be the same.&lt;/p&gt;
+
+&lt;p&gt;But when I started reading the MIR code, I found the call to the &lt;span
+class="code"&gt;println!&lt;/span&gt; macro generated a lot of verbose text:&lt;/p&gt;
+
+&lt;pre&gt;
+let mut _3: isize;
+let mut _4: ();
+let mut _5: std::fmt::Arguments;
+let mut _6: &amp;[&amp;str];
+let mut _7: &amp;[&amp;str; 2];
+let mut _8: &amp;[&amp;str; 2];
+let mut _9: &amp;[std::fmt::ArgumentV1];
+let mut _10: &amp;[std::fmt::ArgumentV1; 1];
+let mut _11: &amp;[std::fmt::ArgumentV1; 1];
+let mut _12: [std::fmt::ArgumentV1; 1];
+let mut _13: (&amp;u8,);
+let mut _14: &amp;u8;
+let mut _16: std::fmt::ArgumentV1;
+let mut _17: &amp;u8;
+let mut _18: fn(&amp;u8, &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::result::Result&lt;(), std::fmt::Error&gt;;
+&lt;/pre&gt;
+
+
+&lt;p&gt;All of this MIR pseudocode might confuse my comparison unnecessarily, so I
+decided to simplify my &lt;span class="code"&gt;if let&lt;/span&gt; example by removing the
+&lt;span class="code"&gt;println!&lt;/span&gt; call entirely. I rewrote the &lt;span
+class="code"&gt;if let&lt;/span&gt; snippet like this (if-let.rs):&lt;/p&gt;
+
+&lt;pre&gt;
+fn main() {
+    let some_u8_value = Some(3u8);
+    if let Some(i) = some_u8_value {
+        let _ = i;
+    }
+}
+&lt;/pre&gt;
+
+
+&lt;p&gt;And the &lt;span class="code"&gt;match&lt;/span&gt; snippet like this (match.rs):&lt;/p&gt;
+
+&lt;pre&gt;
+fn main() {
+    let some_u8_value = Some(3u8);
+    match some_u8_value {
+        Some(i) =&gt; { let _ = i; }
+        None =&gt; ()
+    }
+}
+&lt;/pre&gt;
+
+
+&lt;p&gt;I also noticed the MIR file contained many comments with line numbers:&lt;/p&gt;
+
+&lt;pre&gt;
+_2 = ((_1 as Some).0: u8);       // scope 3 at if-let.rs:3:17: 3:18
+StorageLive(_5);                 // scope 3 at &lt;print macros&gt;:2:27: 2:58
+StorageLive(_6);                 // scope 3 at &lt;println macros&gt;:3:18: 3:43
+&lt;/pre&gt;
+
+
+&lt;p&gt;I realized the line numbers would likely cause problems comparing one MIR file
+to another, so I removed all of the comments using sed:&lt;/p&gt;
+
+&lt;pre&gt;
+$ rustc if-let.rs --emit mir
+$ cat if-let.mir | sed -e 's/\/\/.*$//' &gt; if-let.mir.nocomments
+&lt;/pre&gt;
+
+
+&lt;p&gt;This generates a new text file called if-let.mir.nocomments, which contains the
+same content as if-let.mir, but with no comments. And this command processes
+the match.rs file in the same way:&lt;/p&gt;
+
+&lt;pre&gt;
+$ rustc match.rs --emit mir
+$ cat match.mir | sed -e 's/\/\/.*$//' &gt; match.mir.nocomments
+&lt;/pre&gt;
+
+
+&lt;h2&gt;Comparing MIR Files&lt;/h2&gt;
+
+&lt;p&gt;Now I ran a simple diff command on the simplified MIR text files. If the
+compiler considers &lt;span class="code"&gt;if let&lt;/span&gt; to be exactly the same as
+&lt;span class="code"&gt;match&lt;/span&gt; then there should be no difference, then the
+output of diff should be empty.&lt;/p&gt;
+
+&lt;p&gt;But running diff I saw:&lt;/p&gt;
+
+&lt;pre&gt;
+$ diff if-let.mir.nocomments match.mir.nocomments
+19c19
+&lt;         switchInt(_3) -&gt; [1isize: bb2, otherwise: bb1];
+---
+&gt;         switchInt(_3) -&gt; [0isize: bb1, otherwise: bb2];
+&lt;/pre&gt;
+
+
+&lt;p&gt;My two MIR files are &lt;em&gt;almost&lt;/em&gt; identical; the MIR text Rust generates for &lt;span
+class="code"&gt;if let&lt;/span&gt; is exactly the same as the MIR text Rust generates
+for &lt;span class="code"&gt;match&lt;/span&gt;, except for line 19. I’ve &lt;em&gt;almost&lt;/em&gt; proven
+the hypothesis that &lt;span class="code"&gt;if let&lt;/span&gt; is syntactic sugar for
+&lt;span class="code"&gt;match&lt;/span&gt;, but not quite.&lt;/p&gt;
+
+&lt;p&gt;Let’s take a close look at the MIR code around line 19 and try to understand
+what it means. Here’s a portion of if-let.mir.nocomments, produced by the Rust
+compiler from my &lt;span class="code"&gt;if let&lt;/span&gt; code above:&lt;/p&gt;
+
+&lt;pre&gt;
+bb0: {
+    StorageLive(_1);
+    _1 = std::option::Option&lt;u8&gt;::Some(const 3u8,);
+    _3 = discriminant(_1);
+    switchInt(_3) -&gt; [1isize: bb2, otherwise: bb1];
+}
+
+bb1: {
+    _0 = ();
+    goto -&gt; bb3;
+}
+
+bb2: {
+    StorageLive(_2);
+    _2 = ((_1 as Some).0: u8);
+    _0 = ();
+    goto -&gt; bb3;
+}
+&lt;/pre&gt;
+
+
+&lt;p&gt;I don’t understand MIR syntax, but it’s not hard to guess what’s going on. Each
+of these “bb” blocks of code &lt;span class="code"&gt;{ … }&lt;/span&gt; probably
+represents a logical piece of my program.&lt;/p&gt;
+
+&lt;p&gt;The first block, &lt;span class="code"&gt;bb0&lt;/span&gt;, seems to assign the value &lt;span class="code"&gt;Some(3)&lt;/span&gt; to _1, and then calls
+&lt;span class="code"&gt;discriminant(_1)&lt;/span&gt; and saves the “discriminant,” whatever that is, in _3.
+Finally, it tests whether the discriminant is 1. If the discriminant is 1 it
+jumps to &lt;span class="code"&gt;bb2&lt;/span&gt;, or otherwise to &lt;span
+class="code"&gt;bb1&lt;/span&gt;. So &lt;span class="code"&gt;bb0&lt;/span&gt; likely represents the
+&lt;span class="code"&gt;if&lt;/span&gt; portion of my &lt;span class="code"&gt;if let&lt;/span&gt;
+snippet, testing a condition:&lt;/p&gt;
+
+&lt;pre&gt;
+if let Some(i) = some_u8_value
+&lt;/pre&gt;
+
+
+&lt;p&gt;The &lt;span class="code"&gt;bb1&lt;/span&gt; block saves &lt;span class="code"&gt;()&lt;/span&gt; in &lt;span
+class="code"&gt;_0&lt;/span&gt; and jumps to &lt;span class="code"&gt;bb3&lt;/span&gt;. This likely represents the
+missing/default else clause of my &lt;span class="code"&gt;if let&lt;/span&gt; statement.&lt;/p&gt;
+
+&lt;p&gt;And the &lt;span class="code"&gt;bb2&lt;/span&gt; block saves 3, the unwrapped value inside of &lt;span class="code"&gt;Some(3)&lt;/span&gt;, in &lt;span class="code"&gt;_2&lt;/span&gt; and
+jumps to &lt;span class="code"&gt;bb3&lt;/span&gt;. Probably &lt;span class="code"&gt;_2&lt;/span&gt; is the variable &lt;span class="code"&gt;i&lt;/span&gt;, and this block of MIR text
+represents the &lt;span class="code"&gt;let&lt;/span&gt; portion of my &lt;span
+class="code"&gt;if let&lt;/span&gt; snippet:&lt;/p&gt;
+
+&lt;pre&gt;
+let Some(i) = some_u8_value
+let _ = i;
+&lt;/pre&gt;
+
+
+&lt;p&gt;Now let’s take a look at the &lt;span class="code"&gt;match&lt;/span&gt; version, the contents of
+match.mir.nocomments. It’s entirely the same, except for the &lt;span class="code"&gt;switchInt&lt;/span&gt; line:&lt;/p&gt;
+
+&lt;pre&gt;
+bb0: {
+    StorageLive(_1);
+    _1 = std::option::Option&lt;u8&gt;::Some(const 3u8,);
+    _3 = discriminant(_1);
+    &lt;b&gt;switchInt(_3) -&gt; [0isize: bb1, otherwise: bb2];&lt;/b&gt;
+}
+&lt;/pre&gt;
+
+
+&lt;p&gt;Reading this carefully, I saw that actually it does mean the same thing: If the
+discriminant is 0, Rust calls the &lt;span class="code"&gt;bb1&lt;/span&gt; block, or
+otherwise the &lt;span class="code"&gt;bb2&lt;/span&gt; block.&lt;/p&gt;
+
+&lt;p&gt;So, summarizing, the &lt;span class="code"&gt;if let&lt;/span&gt; snippet ran this
+pseudo-code:&lt;/p&gt;
+
+&lt;blockquote&gt;
+If the discriminant is 1, call bb1, else bb2.
+&lt;/blockquote&gt;
+
+
+&lt;p&gt;…and the &lt;span class="code"&gt;match&lt;/span&gt; snippet ran this pseudo-code:&lt;/p&gt;
+
+&lt;blockquote&gt;
+If the discriminant is 0, call bb2, else bb1.
+&lt;/blockquote&gt;
+
+
+&lt;p&gt;So, in fact, the two versions use the same logic, assuming the value of
+discriminant is either 0 or 1. If discriminant = 0, Rust assumes the comparison
+was true and executes the match clause; if discriminant = 1, Rust executes the
+else clause.&lt;/p&gt;
+
+&lt;p&gt;Clearly the discriminant function is crucial &amp;ndash; when I have time next, I’ll
+explore what discriminant means, where it’s implemented and how it works. Or if
+anyone from the Rust teams happens to read this, let us know.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Looking Inside Postgres at a GiST Index</title>
     <link href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index" rel="alternate"/>
     <id>http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index</id>
@@ -3816,329 +4195,6 @@ true!)&lt;/p&gt;
 &lt;p&gt;But I love Ruby. It’s a joy to use. Ruby code has a very human elegance to it
 that I haven’t seen in other programming languages. I just wish Ruby would
 catch me every time I fall.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Is Your Postgres Query Starved for Memory?</title>
-    <link href="http://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory" rel="alternate"/>
-    <id>http://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory</id>
-    <published>2016-01-22T04:00:00Z</published>
-    <updated>2016-01-22T04:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: left; padding: 7px 30px 20px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/1/22/sphygmomanometer.png"&gt;&lt;br/&gt;
-  &lt;i&gt;
-Like a patient with low blood pressure, a slow SQL&lt;br/&gt;
-query might not be getting the memory it needs.
-  &lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;For years or even decades, I’ve heard about how important it is to optimize my
-SQL statements and database schema.</summary>
-    <content type="html">&lt;div style="float: left; padding: 7px 30px 20px 0px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/1/22/sphygmomanometer.png"&gt;&lt;br/&gt;
-  &lt;i&gt;
-Like a patient with low blood pressure, a slow SQL&lt;br/&gt;
-query might not be getting the memory it needs.
-  &lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;For years or even decades, I’ve heard about how important it is to optimize my
-SQL statements and database schema. When my application starts to
-slow down, I look for missing indexes; I look for unnecessary joins; I think
-about caching results with a materialized view.&lt;/p&gt;
-
-&lt;p&gt;But instead, the problem might be my Postgres server was not installed and
-tuned properly. Buried inside the &lt;span class="code"&gt;postgresql.conf&lt;/span&gt;
-file is an obscure, technical setting called &lt;span
-class="code"&gt;work_mem&lt;/span&gt;. This controls how much “working memory” your
-Postgres server allocates for each sort or join operation. The default value
-for this is only 4MB:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/1/22/work_mem.png"/&gt;&lt;/p&gt;
-
-&lt;div style="clear: left"&gt;&lt;/div&gt;
-
-
-&lt;p&gt;If your application ever tries to sort or join more than four megabytes worth
-of data, this working memory buffer will fill up. Instead of just returning the
-dataset you want, Postgres will waste time streaming excess data out to disk &amp;ndash;
-only to read it back again later as the hash join or sort algorithm proceeds.&lt;/p&gt;
-
-&lt;p&gt;Today I’ll start with a look at how Postgres scales up the hash join algorithm
-for larger and larger data sets. Then I’ll measure how much slower a hash join
-query is when the hash table doesn’t fit into the working memory buffer. You’ll
-learn how to use the EXPLAIN ANALYZE command to find out if your slow query is
-starved for memory.&lt;/p&gt;
-
-&lt;h2&gt;Hash Tables Inside of Postgres&lt;/h2&gt;
-
-&lt;p&gt;In my last article, I described &lt;a href="http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join"&gt;how Postgres implements the hash join
-algorithm&lt;/a&gt;.
-I showed how Postgres scans over all the records in one of the tables from the
-join and saves them in a hash table.&lt;/p&gt;
-
-&lt;p&gt;Here’s what a hash table might look like conceptually:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/1/22/table1.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;On the left is an array of pointers called &lt;em&gt;buckets&lt;/em&gt;. Each of these pointers is
-the head of a linked list, which I show on the right using blue rectangles. The
-rectangles represent values from one of the tables in the join. Postgres groups
-the values into lists based on their hash values. By organizing the values from one
-table like this, Postgres can later scan over a second table and repeatedly
-search the hash table to perform the join efficiently. This algorithm is known
-as a &lt;em&gt;hash join&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;Postgres’s hash join code gracefully scales up to process larger and larger
-data sets by increasing the number of buckets. If the target table had more
-records, Postgres would use 2048 buckets instead of 1024:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/1/22/table2.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Before starting to execute the hash join algorithm, Postgres estimates how many
-records it will need to add to the hash table, using the query plan. Then
-Postgres chooses a bucket count large enough to fit all of the records.&lt;/p&gt;
-
-&lt;p&gt;Postgres’s bucket count formula keeps the average linked list length less than
-10 (the constant &lt;span class="code"&gt;NTUP_PER_BUCKET&lt;/span&gt; in the Postgres
-source code), to avoid iterating over long lists. It also sets the bucket count
-to a power of two, which allows Postgres to use C bitmask operations to assign
-buckets to hash values. The least significant bits of the hash value for each
-record becomes the bucket number.&lt;/p&gt;
-
-&lt;p&gt;If you’re curious, Postgres implements the bucket count formula in a C function
-called &lt;span class="code"&gt;ExecChooseHashTableSize&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class="sign"&gt;
-  &lt;div class="sign-icon"&gt;&lt;/div&gt;
-  &lt;div class="function-info"&gt;
-    &lt;div class="function-name"&gt;ExecChooseHashTableSize&lt;/div&gt;
-    &lt;div class="function-link"&gt;&lt;a href="http://doxygen.postgresql.org/nodeHash_8c.html#a5b805ac64e22306b7307b4a07ae2b34e"&gt;view on postgresql.org&lt;/a&gt;&lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="function-code"&gt;
-    &lt;img src="http://patshaughnessy.net/assets/2016/1/22/ExecChooseHashTableSize.png"/&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/p&gt;
-
-
-&lt;h2&gt;How Large Can a Postgres Hash Table Grow?&lt;/h2&gt;
-
-&lt;p&gt;If the table from your join query was even larger, then Postgres would use 4096
-buckets instead of 2048:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/1/22/table3.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;In theory, this doubling of the bucket count could continue forever: 8192
-buckets, 16384 buckets, etc. With 10 records per linked list, this would
-accommodate 81,920 values, 163,840 values, etc.&lt;/p&gt;
-
-&lt;p&gt;In practice, as the total size of the data set being saved into the hash table
-continues to increase Postgres will eventually run out of memory. But that
-doesn’t seem to be an immediate problem, does it? Modern server hardware
-contains tens or even hundreds of GBs &amp;ndash; that is plenty of room to hold an
-extremely large hash table.&lt;/p&gt;
-
-&lt;p&gt;But in fact, Postgres limits the size of each hash table to only 4MB!&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/1/22/table4.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The rectangle I drew around the hash table above is the working memory buffer
-assigned to that table. Regardless of how much memory my server hardware
-actually has, Postgres won’t allow the hash table to consume more than 4MB.
-This value is the &lt;span class="code"&gt;work_mem&lt;/span&gt; setting found in the
-&lt;span class="code"&gt;postgresql.conf&lt;/span&gt; file.&lt;/p&gt;
-
-&lt;p&gt;At the same time Postgres calculates the number of buckets, it also calculates
-the total amount of memory it expects the hash table to consume. If this amount
-exceeds 4MB, Postgres divides the hash operation up into a series of &lt;em&gt;batches&lt;/em&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/1/22/batches.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;In this example, Postgres calculated that it would need up to 8MB to hold the
-hash table. A larger join query might have many more batches, each holding 4MB
-of data. Like the bucket count, Postgres sets the batch count to a power of two
-also.  The first batch, shown on the left, contains the actual hash table in
-memory.  The second batch, shown on the right, contains the records that won’t
-fit into the 4MB hash table in the first batch.  Postgres assigns a batch
-number to each record, along with the bucket number.  Then it saves the records
-from the first batch into the hash table, and streams the remaining data out to
-disk. Each batch gets its own temporary file.&lt;/p&gt;
-
-&lt;p&gt;Using an algorithm known as the &lt;a href="https://en.wikipedia.org/wiki/Hash_join#Hybrid_hash_join"&gt;Hybrid hash
-join&lt;/a&gt;, Postgres first
-searches the hash table already in memory. Then it streams all of the data back
-from disk for the next batch, builds another hash table and searches it,
-repeating this process for each batch.&lt;/p&gt;
-
-&lt;br/&gt;
-
-
-
-
-&lt;blockquote&gt;
-Note: Postgres actually holds a second hash table in memory, called the skew
-table. For simplicity I’m not showing this in the diagram. This special hash
-table is an optimization to handle hash values that occur frequently in the
-data. Postgres saves the skew table inside the same 4MB working memory buffer,
-so the primary hash table actually has a bit less than 4MB available to it.
-&lt;/blockquote&gt;
-
-
-&lt;h2&gt;Measuring Your SQL Statement’s Blood Pressure&lt;/h2&gt;
-
-&lt;p&gt;If one of the SQL queries in your application is running slowly, use the
-&lt;span class="code"&gt;EXPLAIN ANALYZE&lt;/span&gt; to find out what’s going on:&lt;/p&gt;
-
-&lt;pre style="font-size: 10px"&gt;
-&gt; explain analyze select title, company from publications, authors where author = name;
-
-                                                          QUERY PLAN                                                           
--------------------------------------------------------------------------------------------------------------------------------
- Hash Join  (cost=2579.00..53605.00 rows=50000 width=72) (actual time=66.820..959.794 rows=21 loops=1)
-   Hash Cond: ((authors.name)::text = (publications.author)::text)
-   -&gt;  Seq Scan on authors  (cost=0.00..20310.00 rows=1000000 width=50) (actual time=0.059..267.217 rows=1000000 loops=1)
-   -&gt;  Hash  (cost=1270.00..1270.00 rows=50000 width=88) (actual time=38.054..38.054 rows=50000 loops=1)
-         Buckets: 4096  Batches: 2  Memory Usage: 2948kB
-         -&gt;  Seq Scan on publications  (cost=0.00..1270.00 rows=50000 width=88) (actual time=0.010..14.211 rows=50000 loops=1)
- Planning time: 0.489 ms
- Execution time: 960.482 ms
-(8 rows)
-&lt;/pre&gt;
-
-
-&lt;p&gt;Postgres’s &lt;span class="code"&gt;EXPLAIN&lt;/span&gt; command displays the query plan, a
-tree data structure containing instructions that Postgres follows when it
-executes the query. By using &lt;span class="code"&gt;EXPLAIN ANALYZE&lt;/span&gt; we ask
-Postgres to execute the query also, displaying time and data metrics when its
-finished. We can see in this example there were one million records in the
-authors table and 50 thousand records in the publications table. At the bottom
-we see that the join operation took a total of 960ms to finish.&lt;/p&gt;
-
-&lt;p&gt;&lt;span class="code"&gt;EXPLAIN ANALYZE&lt;/span&gt; also tells us how many buckets and
-batches the hash table used:&lt;/p&gt;
-
-&lt;pre&gt;
-Buckets: 4096  Batches: 2  Memory Usage: 2948kB
-&lt;/pre&gt;
-
-
-&lt;p&gt;Like my diagram above, this query used 2 batches: Only half of the data fit
-into the 4MB working memory buffer! Postgres saved the other half of the data
-in the file buffer.&lt;/p&gt;
-
-&lt;h2&gt;Increasing work_mem&lt;/h2&gt;
-
-&lt;p&gt;Now let’s increase the size of the working memory buffer by editing the &lt;span
-class="code"&gt;postgresql.conf&lt;/span&gt; file and restarting the Postgres server.&lt;/p&gt;
-
-&lt;p&gt;First, I stop my Postgres server:&lt;/p&gt;
-
-&lt;pre&gt;
-$ launchctl unload homebrew.mxcl.postgresql.plist
-&lt;/pre&gt;
-
-
-&lt;p&gt;Then I edit &lt;span class="code"&gt;postgresql.conf&lt;/span&gt;:&lt;/p&gt;
-
-&lt;pre&gt;
-$ vim /usr/local/var/postgres/postgresql.conf
-&lt;/pre&gt;
-
-
-&lt;p&gt;…uncommenting and changing the setting:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/1/22/work_mem2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Finally I restart my server and repeat the test:&lt;/p&gt;
-
-&lt;pre&gt;
-$ launchctl load homebrew.mxcl.postgresql.plist
-&lt;/pre&gt;
-
-
-
-
-&lt;pre style="font-size: 10px"&gt;
-&gt; explain analyze select title, company from publications, authors where author = name;
-                                                          QUERY PLAN                                                           
--------------------------------------------------------------------------------------------------------------------------------
- Hash Join  (cost=1895.00..32705.00 rows=50000 width=72) (actual time=59.224..624.716 rows=21 loops=1)
-   Hash Cond: ((authors.name)::text = (publications.author)::text)
-   -&gt;  Seq Scan on authors  (cost=0.00..20310.00 rows=1000000 width=50) (actual time=0.031..146.327 rows=1000000 loops=1)
-   -&gt;  Hash  (cost=1270.00..1270.00 rows=50000 width=88) (actual time=34.436..34.436 rows=50000 loops=1)
-         Buckets: 8192  Batches: 1  Memory Usage: 5860kB
-         -&gt;  Seq Scan on publications  (cost=0.00..1270.00 rows=50000 width=88) (actual time=0.008..13.382 rows=50000 loops=1)
- Planning time: 0.481 ms
- Execution time: 625.796 ms
-(8 rows)
-&lt;/pre&gt;
-
-
-&lt;p&gt;You can see the number of batches is now 1, and the memory usage increased to
-5.8MB:&lt;/p&gt;
-
-&lt;pre&gt;
-Buckets: 8192  Batches: 1  Memory Usage: 5860kB
-&lt;/pre&gt;
-
-
-&lt;p&gt;Postgres was able to use a working memory buffer size larger than 4MB. This
-allowed it to save the entire data set into a single, in memory hash table and
-avoid using temporary buffer files.&lt;/p&gt;
-
-&lt;p&gt;Because of this, the total execution time decreased from 960ms to 625ms:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/1/22/chart.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;Too Good To Be True&lt;/h2&gt;
-
-&lt;p&gt;If memory intensive Postgres SQL statements could run so much faster, why does
-Postgres use only 4MB by default for the working memory buffer size? In this
-example I increased &lt;span class="code"&gt;work_mem&lt;/span&gt; modestly from 4MB to
-8MB &amp;ndash; why not increase it to 1GB or 10GB? Why not use all of your server’s
-available memory to run all of your SQL statements as fast as possible, all of
-the time? That’s why you bought that fat box to host your Postgres server,
-isn’t it?&lt;/p&gt;
-
-&lt;p&gt;This result seems too easy, too good to be true. And it is.&lt;/p&gt;
-
-&lt;p&gt;Database servers like Postgres are optimized to handle many small, concurrent
-requests at the same time. Each request needs its own working memory buffer.
-Not only that, each SQL statement Postgres executes might require multiple
-memory buffers, one for each join or sort operation the query plan calls for.&lt;/p&gt;
-
-&lt;div style="float: right; padding: 0px 30px 50px 10px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/1/22/bp1.png"&gt;&lt;br/&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;My Postgres server isn’t entirely dedicated to executing this one example SQL
-statement and nothing else. By increasing the value of &lt;span
-class="code"&gt;work_mem&lt;/span&gt;, I’ve increased it server-wide for every request,
-not just for my one slow hash join. Given the same amount of total RAM
-available on the server box, increasing &lt;span class="code"&gt;work_mem&lt;/span&gt;
-means Postgres can handle fewer concurrent requests before running out of
-memory.&lt;/p&gt;
-
-&lt;p&gt;However, it certainly might be the case that 8MB or some larger value for &lt;span
-class="code"&gt;work_mem&lt;/span&gt; is appropriate given the amount of memory I have,
-and the number of concurrent connections I expect.&lt;/p&gt;
-
-&lt;p&gt;Be smart about how you configure your Postgres server. Don’t blindly accept the
-default values, or guess what they should be at the moment you install
-Postgres. Instead, after your application is finished and running in
-production, look for memory intensive SQL statements. Measure the SQL queries
-your application actually executes. Take their blood pressure using the &lt;span
-class="code"&gt;EXPLAIN ANALYZE&lt;/span&gt; command; you might find they are memory
-starved!&lt;/p&gt;
 </content>
   </entry>
 </feed>
