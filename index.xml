@@ -7,6 +7,336 @@
     <name></name>
   </author>
   <entry>
+    <title>How Rust Implements Tagged Unions</title>
+    <link href="http://patshaughnessy.net/2018/3/15/how-rust-implements-tagged-unions" rel="alternate"/>
+    <id>http://patshaughnessy.net/2018/3/15/how-rust-implements-tagged-unions</id>
+    <published>2018-03-15T03:00:00Z</published>
+    <updated>2018-03-15T03:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2018/3/15/covers.png"&gt;&lt;br/&gt;
+&lt;i&gt; &lt;small&gt;(&lt;a href="https://www.amazon.com/Programming-Language-Brian-W-Kernighan/dp/0131101633/ref=pd_lpo_sbs_14_img_1?_encoding=UTF8&amp;psc=1&amp;refRID=J7H21QEX2A2NN3Y6EG00"&gt;The C Programming Language&lt;/a&gt; and &lt;a href="https://nostarch.com/</summary>
+    <content type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2018/3/15/covers.png"&gt;&lt;br/&gt;
+&lt;i&gt; &lt;small&gt;(&lt;a href="https://www.amazon.com/Programming-Language-Brian-W-Kernighan/dp/0131101633/ref=pd_lpo_sbs_14_img_1?_encoding=UTF8&amp;psc=1&amp;refRID=J7H21QEX2A2NN3Y6EG00"&gt;The C Programming Language&lt;/a&gt; and &lt;a href="https://nostarch.com/Rust"&gt;The Rust Programming Language&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
+&lt;/div&gt;
+
+
+&lt;p&gt;Rust &lt;a href="https://www.rust-lang.org/en-US/"&gt;describes itself&lt;/a&gt; as:&lt;/p&gt;
+
+&lt;br/&gt;
+
+
+
+
+&lt;blockquote&gt;
+…a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety.
+&lt;/blockquote&gt;
+
+
+&lt;p&gt;Of course, this is in contrast to C, a different systems programming language
+that encourages segfaults and makes no guarantees at all about thread safety.
+Rust improves on C in many ways, most famously with its innovative ownnership
+model for managing memory.&lt;/p&gt;
+
+&lt;p&gt;Another less obvious improvement Rust makes to C has to do with the &lt;span
+class="code"&gt;union&lt;/span&gt; keyword. The Rust compiler implements &lt;em&gt;tagged
+unions&lt;/em&gt;, which prevent you from crashing your program by initializing a union
+with one variant and accessing it with another. But the Rust doesn’t include
+the &lt;span class="code"&gt;union&lt;/span&gt; keyword at all; instead, Rust uses &lt;span
+class="code"&gt;enum&lt;/span&gt; to improve on both C enums and C unions at the same
+time.&lt;/p&gt;
+
+&lt;div style="clear: both"&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Not sure what a tagged union is? Or why it’s an improvement over an old
+fashioned C union? Today I’ll explain. First I’ll start with a quick review of
+C unions, how they work and why they are dangerous. Then I’ll show you how Rust
+enums improve on them.&lt;/p&gt;
+
+&lt;h2&gt;C Unions&lt;/h2&gt;
+
+&lt;p&gt;Unions are one of the most dangerous features of C. Here’s an example:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/union1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Here the union &lt;span class="code"&gt;num_or_str&lt;/span&gt; saves either a number or
+a character pointer but not both. (A union can contain any number of members;
+for simplicity my example union has only two.) On the right I show how the C
+compiler would allocate memory for an instance of &lt;span
+class="code"&gt;num_or_str&lt;/span&gt;. It allocates enough memory to hold the longest
+value in the union, but not both values at the same time. The integer is a
+short, meaning it occupies 16 bits or two bytes, and the string is a char
+pointer which takes 64 bits or 8 bytes using a modern 64-bit CPU. The two
+options for what might be stored in the union, &lt;span class="code"&gt;num&lt;/span&gt;
+and &lt;span class="code"&gt;str&lt;/span&gt; in this example, are known as &lt;em&gt;variants&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h2&gt;Why C Unions Are Dangerous&lt;/h2&gt;
+
+&lt;p&gt;Unions are dangerous because you, the C programmer, need to remember which
+variant you set in the union. If you save one type of value but then access the
+other, your program will crash.&lt;/p&gt;
+
+&lt;p&gt;For example this code works fine:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/c-code1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;But if you forget &lt;span class="code"&gt;a_number&lt;/span&gt; contains a number, and use
+&lt;span class="code"&gt;a_number&lt;/span&gt; as a string instead, your program will
+crash:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/c-code2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Notice the C compiler didn’t help me here at all. It didn’t display any sort of
+warning or error when I wrote &lt;span class="code"&gt;a_number.str&lt;/span&gt;. It
+silently allowed me to write dangerous code; in fact, union syntax encouraged
+me to introduce a segmentation fault.&lt;/p&gt;
+
+&lt;p&gt;Writing C code with unions is like driving very fast down a highway full of
+potholes. You might be the best driver in the world, but eventually you’re
+going to hit one of the holes and crash.&lt;/p&gt;
+
+&lt;h2&gt;Tagged Unions&lt;/h2&gt;
+
+&lt;p&gt;C programmers have been writing code with unions for years &amp;ndash; for decades in
+fact. How have they avoided this problem? There must be a safe way of writing C
+code with unions.&lt;/p&gt;
+
+&lt;p&gt;The most common and robust solution is to keep track of which union variant is
+valid using an integer value saved right next to the union in memory. This
+integer is known as a tag, and the combination of the tag and the union is a
+&lt;em&gt;tagged union&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here’s an example:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/tagged_union.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;On the right side I’ve allocated some memory right before the union for the tag
+using a struct. C structs, unlike unions, allocate enough memory to store all
+of their members at once. Note: Using two bytes to save a small integer value
+is unnecessary. C programs often use only one byte, or even represent the
+integer value using a bit mask inside the union’s values. But the principle
+remains the same.&lt;/p&gt;
+
+&lt;p&gt;Now when I save an integer in an instance of the union I can also set the tag
+to the value 1, for example, which I decide will mean that &lt;span
+class="code"&gt;a_number&lt;/span&gt; contains a number:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/c-code3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;And if I want to save a string instead, I set the tag to 2, for example:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/c-code4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Later when I access the tagged union, I first check the tag before deciding
+which variant I can access:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/c-code5.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Of course, tagged unions are not foolproof. I invented the tag values 1 and 2
+and wrote the code that checks for them. There’s nothing to prevent me from
+forgetting to save the tag value, saving the wrong tag value or misinterpreting
+the tag value when I later read it. And, if I ever add new variants to the
+union, I have to add a new branch to every &lt;span class="code"&gt;if&lt;/span&gt;
+statement in my app that checks the tags, handling the new value. Needless to
+say, the C compiler won’t help me find those &lt;span class="code"&gt;if&lt;/span&gt;
+statements or check whether I’ve covered all the possible tag values.&lt;/p&gt;
+
+&lt;p&gt;I’m a forgetful and  easily distracted person. I need a programming language
+that will keep me out of trouble. Even with tagged unions I’m sure I would
+write dangerous, crashing C code before long.&lt;/p&gt;
+
+&lt;h2&gt;Tagged Unions in Rust&lt;/h2&gt;
+
+&lt;p&gt;Rust implements tagged unions using the &lt;span class="code"&gt;enum&lt;/span&gt; keyword.
+For example, to declare a Rust enum type equivalent to the C tagged union above
+I write:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/rust-enum1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The questions for today are: Why are enums equivalent to tagged unions in C?
+And: What should I draw on the right side? What would I see if I could find and
+examine an enum in the memory space of a running Rust process?&lt;/p&gt;
+
+&lt;h2&gt;Saving a Rust Enum&lt;/h2&gt;
+
+&lt;p&gt;To find out, let’s create an instance of &lt;span class="code"&gt;NumOrStr&lt;/span&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/rust-enum2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Notice that instead of 4, I’ve saved a more recognizable value, 1234. Now, if I
+compile it with the &lt;span class="code"&gt;-—emit asm&lt;/span&gt; flag:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/rust-emit-asm.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;…Rust generates a file called union.s which contains the assembly language
+version of my program. If I open union.s and search for 1234, the integer value
+I saved above, I see:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/asm1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;I’ve found it; here are the x86 assembly language instructions that initialize
+&lt;span class="code"&gt;a_number&lt;/span&gt;. These show me exactly how Rust represents
+enums in memory, how Rust implements tagged unions.&lt;/p&gt;
+
+&lt;p&gt;The only problem is… I have no idea what this means!&lt;/p&gt;
+
+&lt;h2&gt;The movw x86 Instruction&lt;/h2&gt;
+
+&lt;p&gt;What does &lt;span class="code"&gt;movw&lt;/span&gt; mean? And what about &lt;span
+class="code"&gt;-32(%rbp)&lt;/span&gt;?&lt;/p&gt;
+
+&lt;p&gt;It turns out x86 assembly language isn’t that hard to follow, once you learn
+the basic syntax. For a quick introduction, see my article from 2016: &lt;a href="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language"&gt;Learning
+to Read x86 Assembly
+Language&lt;/a&gt;.
+Intel, the company that built the microprocessor inside my Mac, defines the
+&lt;span class="code"&gt;mov&lt;/span&gt; instruction to mean “move.” (Note: the
+instructions I show here that &lt;span class="code"&gt;rustc —emit asm&lt;/span&gt;
+generates aren’t written using Intel x86 syntax, but with GAS x86 syntax
+instead.)&lt;/p&gt;
+
+&lt;p&gt;Here’s a diagram showing what the first &lt;span class="code"&gt;movw&lt;/span&gt;
+instruction moves:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/asm2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;It turns out that &lt;span class="code"&gt;movw&lt;/span&gt; stands for “move a word.” A
+word is defined as 16 bits, or 2 bytes. There are a few different variations on
+move, &lt;span class="code"&gt;movb&lt;/span&gt;, &lt;span class="code"&gt;movw&lt;/span&gt;, &lt;span
+class="code"&gt;movl&lt;/span&gt;, &lt;span class="code"&gt;movq&lt;/span&gt;, which move 1
+byte, 2 bytes, 4 bytes or 8 bytes respectively.&lt;/p&gt;
+
+&lt;p&gt;Next, the &lt;span class="code"&gt;$&lt;/span&gt; notation indicates a literal value &amp;ndash;  in
+this case zero: &lt;span class="code"&gt;$0&lt;/span&gt;. Now we can see the first
+instruction above is moving 2 bytes containing the value zero. Similarly, the
+second instruction is moving 2 bytes containing the value 1234:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/asm3.png"/&gt;&lt;/p&gt;
+
+&lt;h2&gt;The rbp Register&lt;/h2&gt;
+
+&lt;p&gt;But where are these &lt;span class="code"&gt;movw&lt;/span&gt; instructions moving these
+values to? To understand that we need to understand the odd &lt;span
+class="code"&gt;-32(%rbp)&lt;/span&gt; syntax on the right side of the instructions. The
+&lt;span class="code"&gt;%&lt;/span&gt; sign indicates a register inside my Mac’s
+microprocessor, in this case the “base pointer” register. So &amp;ldquo;bp&amp;rdquo; means &amp;ldquo;base
+pointer.&amp;rdquo; And the “r” prefix in &amp;ldquo;rbp&amp;rdquo; means the move instruction is using all 8
+bytes (64 bits) of this register’s value.&lt;/p&gt;
+
+&lt;p&gt;The &lt;span class="code"&gt;-32(%rbp)&lt;/span&gt; notation calculates a memory address
+for the instruction using the contents of the &lt;span class="code"&gt;%rbp&lt;/span&gt;
+register &amp;ndash; in this case the address of where to move the data to. The
+expression &lt;span class="code"&gt;-32(%rbp)&lt;/span&gt; in English means: “Take the 64
+bit memory address value from the base pointer register, and subtract 32 from
+it.”&lt;/p&gt;
+
+&lt;p&gt;Compiled Rust programs &amp;ndash; all programs really &amp;ndash; that run on the x86 platform
+store values for local variables on the stack, using the base pointer register
+in this fashion. The base pointer, as it’s name indicates, stores the base
+address of my program&amp;rsquo;s current stack frame. Each local variable in my code,
+for example &lt;span class="code"&gt;a_number&lt;/span&gt;, is saved somewhere on the
+stack. If you’re not familiar with the concept of a stack, think of it as a
+convenient place for quickly saving and retrieving values while your program is
+running.&lt;/p&gt;
+
+&lt;h2&gt;How Rust Saves an Integer Enum Variant&lt;/h2&gt;
+
+&lt;p&gt;Taking a step back for a moment, here’s what we’ve learned so far. When I save
+an enum value containing an integer, Rust saves &lt;em&gt;two&lt;/em&gt; values, 0 and 1234:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/save1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;What does the &lt;span class="code"&gt;0&lt;/span&gt; mean? Rust records a zero to indicate
+that &lt;span class="code"&gt;a_number&lt;/span&gt; uses the &lt;span
+class="code"&gt;NumOrStr::Num&lt;/span&gt; variant. In other words, &lt;span
+class="code"&gt;a_number&lt;/span&gt; is a tagged union, and the zero value is the tag.
+We know the tag occupies 2 bytes because of the &lt;span class="code"&gt;movw&lt;/span&gt;
+instruction above. The integer value itself, &lt;span class="code"&gt;1234&lt;/span&gt;,
+also takes 2 bytes because I declared it using &lt;span
+class="code"&gt;Num(i16)&lt;/span&gt;, and we saw Rust used a movw to save that also.&lt;/p&gt;
+
+&lt;h2&gt;How Rust Saves an String Enum Variant&lt;/h2&gt;
+
+&lt;p&gt;But what about the other variant, the string? When I save a string in &lt;span
+class="code"&gt;NumOrStr&lt;/span&gt;, what does Rust do? To find out, I’ll replace my
+main function from above with this line of code:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/save2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;The I’ll compile it again using the &lt;span class="code"&gt;&amp;mdash;emit asm&lt;/span&gt;
+option. Now I find this assembly language code in the union.s file:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/asm4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Unfortunately this code snippet is much more complex: It first calls &lt;span
+class="code"&gt;String::from&lt;/span&gt; passing a string literal, and then saves the
+string into the enum via a method called &lt;span
+class="code"&gt;drop_in_place&lt;/span&gt;. This is much harder to understand.&lt;/p&gt;
+
+&lt;p&gt;Rather than trying to figure this out, I decided to debug my Rust sample
+program using LLDB, and inspect the memory &lt;span class="code"&gt;a_string&lt;/span&gt;
+occupies. I found that Rust used 26 bytes to represent the string variant,
+starting with a 16 bit word containing 1:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/save3.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;This is again the tag; in this case &lt;span class="code"&gt;1&lt;/span&gt; means &lt;span
+class="code"&gt;a_string&lt;/span&gt; uses the &lt;span class="code"&gt;NumOrStr::Str&lt;/span&gt;
+variant. Following this I found a pointer to the string itself:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/save4.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;Pointers on a 64-bit microprocessor occupy 8 bytes and contain the memory
+address of something, in this case my string &amp;ldquo;This is a test.” After the
+pointer I found two 64 bit values, each containing 15:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/save5.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;These are two attributes of the string: its capacity and length. By inspecting
+my process&amp;rsquo;s memory I’ve started to learn a bit about how Rust manages memory
+for strings.&lt;/p&gt;
+
+&lt;p&gt;But what’s important for me today is the first word, the value 1. Again, we see
+the same pattern. Rust saves an integer value, the tag, indicating which
+variant this instance of the enum uses. Then Rust saves the enum variant’s
+payload in the memory that follows:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/save6.png"/&gt;&lt;/p&gt;
+
+&lt;h2&gt;Tagged Unions in Rust and C&lt;/h2&gt;
+
+&lt;p&gt;Let’s review by declaring a tagged union in C and Rust:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/review1.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;On the left using C, I have to include the tag explicitly in a surrounding
+struct. Rust handles this for me automatically, saving the tag value inside the
+enum alongside the enum’s value. The code looks very different, but as we saw above
+the implementations are&lt;em&gt; identical&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Using a tagged union looks somewhat similar in C and Rust:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2018/3/15/review2.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;But there are very important differences here! Using C, I need to remember to
+check the tag and to use the proper variant inside the union. The Rust
+compiler, on the other hand, checks the tag for me automatically and won’t
+allow me to access the wrong variant. The code inside of &lt;span class="code"&gt;if
+let&lt;/span&gt; will never be executed unless the internal tag value matches the
+&lt;span class="code"&gt;NumOrStr::Num&lt;/span&gt; variant.&lt;/p&gt;
+
+&lt;p&gt;Under the hood, the two languages implement tagged unions the same way. But
+writing code in C and Rust is very different. C encourages me to write
+dangerous, crashing code, while Rust prevents me from writing dangerous code in
+the first place.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>Learning Rust: If Let vs. Match</title>
     <link href="http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match" rel="alternate"/>
     <id>http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match</id>
@@ -3786,415 +4116,6 @@ carefully about which types of values your code should be able to handle.&lt;/p&
 
 &lt;p&gt;Bring your important Ruby code to the Crystal compiler for a second opinion.
 You might be surprised by what Crystal finds.&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Two Dumb Ruby Mistakes</title>
-    <link href="http://patshaughnessy.net/2016/4/2/two-dumb-ruby-mistakes" rel="alternate"/>
-    <id>http://patshaughnessy.net/2016/4/2/two-dumb-ruby-mistakes</id>
-    <published>2016-04-02T03:00:00Z</published>
-    <updated>2016-04-02T03:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: right; padding: 0px 0px 20px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/4/2/rope-climber.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;Coding is like climbing: You need equipment&lt;br/&gt; that will catch you when you make a mistake.&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:Free_climbing_20060701.jpg"&gt;Elke Wetzig via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;</summary>
-    <content type="html">&lt;div style="float: right; padding: 0px 0px 20px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/4/2/rope-climber.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;Coding is like climbing: You need equipment&lt;br/&gt; that will catch you when you make a mistake.&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:Free_climbing_20060701.jpg"&gt;Elke Wetzig via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Most Ruby blog posts show you examples of code you should write: how to solve a
-certain problem, how to use some library or gem, how Ruby itself works. But
-today I decided to write about a few dumb mistakes I’ve made using Ruby
-recently. Read on to see two things you &lt;em&gt;should not do&lt;/em&gt; with the Ruby language,
-for a change.&lt;/p&gt;
-
-&lt;p&gt;The depressing thing about this is that I made these dumb mistakes just in the
-past few weeks! I’ve been using Ruby professionally every day for eight years,
-I’ve researched and written about Ruby in my spare time as a hobby, and &lt;em&gt;I still
-make dumb mistakes with the language all the time!&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;Coding is like climbing: Sooner or later we all make mistakes and fall. What
-you need to do is plan on this happening and use the appropriate equipment to
-avoid disaster. Climbers use carabiners, ropes and harnesses to catch them when
-they fall. Developers should use a language that will catch them when they make
-dumb mistakes.&lt;/p&gt;
-
-&lt;h2&gt;Searching For An Array Element&lt;/h2&gt;
-
-&lt;p&gt;Let’s start with some test data. Here’s an array of &lt;span
-class="code"&gt;Person&lt;/span&gt; objects, each with a first name, last name and an
-insult count:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-    &lt;span class="constant"&gt;Person&lt;/span&gt; = &lt;span class="constant"&gt;Struct&lt;/span&gt;.new(&lt;span class="symbol"&gt;:first_name&lt;/span&gt;, &lt;span class="symbol"&gt;:last_name&lt;/span&gt;, &lt;span class="symbol"&gt;:insults&lt;/span&gt;)
-    candidates = [ 
-        &lt;span class="constant"&gt;Person&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Ted&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Cruz&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="integer"&gt;432&lt;/span&gt;),
-        &lt;span class="constant"&gt;Person&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Donald&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Trump&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="integer"&gt;892&lt;/span&gt;),
-        &lt;span class="constant"&gt;Person&lt;/span&gt;.new(&lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Marco&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Rubio&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class="integer"&gt;321&lt;/span&gt;)
-    ]
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;A couple of weeks ago (using different data of course) I wrote this line of
-code to search for a specific element in the array:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/mistake1.png"/&gt;&lt;/p&gt;
-
-&lt;div style="clear: both"&gt;&lt;/div&gt;
-
-
-&lt;p&gt;What I wanted was the first person in the array named “Marco.” Instead when I
-ran the code what I got was the first element of the array, but with the first
-name set to “Marco:”&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-p marco
-=&amp;gt; &lt;span class="comment"&gt;#&amp;lt;struct Person first_name=&amp;quot;Marco&amp;quot;, last_name=&amp;quot;Cruz&amp;quot;, insults=432&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Of course, I should have known better. The proper line of code is:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/correct1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;I should have used &lt;span class="code"&gt;==&lt;/span&gt; instead of &lt;span
-class="code"&gt;=&lt;/span&gt;. What a dumb mistake. I can’t believe I wrote this code;
-how embarrassing! I’m sure you all saw the problem right away, and maybe a few
-of you have made the same mistake before. But let’s walk through what happened
-when I ran the incorrect code, just to be sure we thoroughly understand the
-problem.&lt;/p&gt;
-
-&lt;p&gt;Ruby started with the &lt;span class="code"&gt;candidates&lt;/span&gt; array, and called
-the &lt;span class="code"&gt;find&lt;/span&gt; method on it:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/array1.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The &lt;span class="code"&gt;find&lt;/span&gt; method is actually a member of the &lt;span
-class="code"&gt;Enumerable&lt;/span&gt; module, which Ruby includes automatically into
-the &lt;span class="code"&gt;Array&lt;/span&gt; class. When &lt;span class="code"&gt;find&lt;/span&gt;
-ran, it iterated over the elements of the array and called the block I
-provided, passing in each element. The first element was the “Ted Cruz” person
-object:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/call-block1.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Now the block executed. And my dumb mistake came into play. What I intended was
-for the block to return whether or not the first name of the given person was
-equal to “Marco.” If the first name was “Marco” then &lt;span
-class="code"&gt;Person#first_name == &amp;quot;Marco&amp;quot;&lt;/span&gt; would return &lt;span
-class="code"&gt;true&lt;/span&gt;, the block would return &lt;span class="code"&gt;true&lt;/span&gt;
-and &lt;span class="code"&gt;Enumerable#find&lt;/span&gt; would return the target person.
-In this case, &amp;ldquo;Ted&amp;rdquo; is not &amp;ldquo;Marco&amp;rdquo; so the block would return &lt;span
-class="code"&gt;false&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;But my block didn’t check whether the person is named “Marco;” instead, it
-called the &lt;span class="code"&gt;Person#first_name=&lt;/span&gt; method, setting the
-person’s name to “Marco!”&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/set-first-name.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;And now, to make matters worse, the block returned the value returned by
-&lt;span class="code"&gt;Person#first_name=&lt;/span&gt;, which was the string “Marco,” the new value of the first
-name attribute. Because Ruby considered “Marco” to be &lt;em&gt;truthy&lt;/em&gt;, &lt;span class="code"&gt;Enumerable#find&lt;/span&gt;
-returned the first person, even though that person was originally named Ted
-Cruz. My surrounding code now thinks it found Marco Rubio, but instead has Ted
-Cruz, renamed to Marco Cruz. What a mess.&lt;/p&gt;
-
-&lt;h2&gt;Why Didn’t Ruby Tell Me Something Was Wrong?&lt;/h2&gt;
-
-&lt;div style="float: right; padding: 0px 0px 20px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/4/2/bouldering.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt; As a developer, you’re always just one&lt;br/&gt; keystroke away from falling off a cliff.  &lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:Bouldering.jpg"&gt;DecafGrub47393 via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Think about this for a moment: I used the &lt;span class="code"&gt;find&lt;/span&gt;
-method, which called a block and expected that block to return &lt;span
-class="code"&gt;true&lt;/span&gt; or &lt;span class="code"&gt;false&lt;/span&gt;.  But my block
-returned neither &lt;span class="code"&gt;true&lt;/span&gt; nor &lt;span
-class="code"&gt;false&lt;/span&gt;. It returned “Marco.”&lt;/p&gt;
-
-&lt;p&gt;Why didn’t Ruby issue some sort of error or warning in this case? Yes, I
-understand that Ruby considers all values, except for &lt;span
-class="code"&gt;false&lt;/span&gt; and &lt;span class="code"&gt;nil&lt;/span&gt;, to be equivalent
-to &lt;span class="code"&gt;true&lt;/span&gt;. In fact, Ruby developers quite often take
-advantage of this fact to write more concise readable code: We can write &lt;span
-class="code"&gt;if value&lt;/span&gt; instead of &lt;span class="code"&gt;if value !=
-false&lt;/span&gt; or &lt;span class="code"&gt;if value != nil&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;But in this case, Ruby’s silence allowed my simple coding mistake to become a
-serious problem. If Ruby had given me some sort of warning or error the first
-time I ran this code, I would have found the problem and fixed it in 5 seconds.
-Instead, this code ran for weeks and failed every single time, and I had no
-idea.&lt;/p&gt;
-
-&lt;p&gt;When I fell, Ruby didn’t catch me, it allowed me to fall off the cliff!&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; Erik Michaels-Ober &lt;a href="https://twitter.com/sferik/status/716289922005475328"&gt;pointed out today on
-Twitter&lt;/a&gt; that if you
-always put the variable on the right and the constant on the left, for example
-like this:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-marco = candidates.find { |person| &lt;span class="string"&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;span class="content"&gt;Marco&lt;/span&gt;&lt;span class="delimiter"&gt;'&lt;/span&gt;&lt;/span&gt; = person.first_name }
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;…then Ruby will immediately report a syntax error and tell you where the
-problem was if you ever confuse &lt;span class="code"&gt;=&lt;/span&gt; with &lt;span
-class="code"&gt;==&lt;/span&gt;. Joshua Ballanco told us that this style of putting the
-constant before the variable is known as a &lt;a href="https://en.wikipedia.org/wiki/Yoda_conditions"&gt;Yoda
-condition&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2&gt;Finding The Maximum Value in an Array&lt;/h2&gt;
-
-&lt;p&gt;We all have a bad day from time to time. After making that mistake I just
-continued to work on my project, trying harder not to make any more dumb
-mistakes. It was my fault, I thought. I just needed to be a better programmer.&lt;/p&gt;
-
-&lt;p&gt;But of course, it happened again! I made another dumb Ruby mistake just a few
-days later. This time I wanted to sort the same array. Specifically, I wanted
-to find the array element with the maximum value for some attribute. I was
-using different data, of course, but we can translate the problem to our
-candidate data set easily.&lt;/p&gt;
-
-&lt;p&gt;Suppose I wanted to find the candidate with the maximum number of insults.
-Easy, right? Here’s the line of code I wrote:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/mistake2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Can you spot the problem here? When I run that code I don’t get Donald Trump, who has the most insults. Instead, I get:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-p most_insulting
-=&amp;gt; &lt;span class="comment"&gt;#&amp;lt;struct Person first_name=&amp;quot;Marco&amp;quot;, last_name=&amp;quot;Rubio&amp;quot;, insults=321&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Again a simple, dumb mistake. I should have called &lt;span
-class="code"&gt;max_by&lt;/span&gt;, instead of &lt;span class="code"&gt;max&lt;/span&gt;. Here’s
-the correct code:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/correct2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;span class="code"&gt;Enumerable#max_by&lt;/span&gt; does what I thought &lt;span
-class="code"&gt;Enumerable#max&lt;/span&gt; would do: It sorts the values returned by
-the block, and then returns the object corresponding to the maximum value.
-This is only slightly less embarrassing than my first dumb mistake. Almost all
-modern programming languages use &lt;span class="code"&gt;==&lt;/span&gt; and &lt;span
-class="code"&gt;=&lt;/span&gt; for equality vs. assignment. There’s no excuse for making
-that mistake: It was just dumb.&lt;/p&gt;
-
-&lt;p&gt;The difference between &lt;span class="code"&gt;max&lt;/span&gt; and &lt;span
-class="code"&gt;max_by&lt;/span&gt; is not quite as obvious. But again, I’ve been using
-Ruby for 8 years now. I should know better! I’m just a bad Ruby developer. But
-before we blame this mistake entirely on me, let’s take a closer look at what
-actually happened when I ran my bad code. Let’s step through what &lt;span
-class="code"&gt;Enumerable#max&lt;/span&gt; did, just as we did before with &lt;span
-class="code"&gt;Enumerable#find&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;Again Ruby started by calling &lt;span class="code"&gt;Enumerable#max&lt;/span&gt; on the
-candidates array:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/array2.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;And again, just like &lt;/span&gt;find&lt;/span&gt;, &lt;span class="code"&gt;max&lt;/span&gt; iterates
-over the array elements. However, instead of passing each person to the block
-one at a time, it actually passes the array elements in pairs:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/4/2/call-block2.svg"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Why did Ruby pass two &lt;span class="code"&gt;Person&lt;/span&gt; objects to my block?
-&lt;span class="code"&gt;Enumerable#max&lt;/span&gt; searches for the array element &amp;ndash; not
-the return value of a block &amp;ndash; which has the maximum value. It assumes that the
-values in the array can be compared, that they have a natural sort order.
-&lt;span class="code"&gt;Enumerable#max&lt;/span&gt; is perfect for an array of integers or
-an array of strings. Ruby can sort them automatically and find the maximum
-value by returning the last element.&lt;/p&gt;
-
-&lt;p&gt;Additionally, Ruby allows you to use &lt;span class="code"&gt;max&lt;/span&gt; when the
-array elements can’t be sorted automatically, when you have an array of
-objects, like my &lt;span class="code"&gt;Person&lt;/span&gt; structures. Because Ruby
-doesn’t know whether one person is greater or less than another, it allows you
-to pass a block to &lt;span class="code"&gt;max&lt;/span&gt; that answers that question.
-The block should accept two arguments return one of three numeric values: -1, 0
-or 1:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;-1 if the first value is less than the second (they are in ascending order)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;0 indicates they are the same, at least in terms of their sort order, and&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;1 if the first value is greater than the second (they are in descending order)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;So what happened here was that by using &lt;span
-class="code"&gt;Enumerable#max&lt;/span&gt; and providing a block, Ruby assumed my block
-was there to determine the sort order of the Person objects, not to return an
-attribute for each one.&lt;/p&gt;
-
-&lt;p&gt;As you probably know, Ruby makes our lives easier by providing the “space ship”
-operator, &lt;span class="code"&gt;&amp;lt;=&gt;&lt;/span&gt;, that compares two values and returns
-this sort order number: -1, 0 or 1. The correct way to find the most insulting
-candidate using &lt;span class="code"&gt;max&lt;/span&gt; would be to compare the two
-values of &lt;span class="code"&gt;Person#insults&lt;/span&gt; using &lt;span
-class="code"&gt;&amp;lt;=&gt;:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-most_insulting = candidates.max{|person1, person2| person1.insults &amp;lt;=&amp;gt; person2.insults}
-p most_insulting
-=&amp;gt; &lt;span class="comment"&gt;#&amp;lt;struct Person first_name=&amp;quot;Donald&amp;quot;, last_name=&amp;quot;Trump&amp;quot;, insults=892&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;h2&gt;Why Didn’t Ruby Tell Me Something Was Wrong?&lt;/h2&gt;
-
-&lt;p&gt;I knew all about the space ship operator and sort order blocks, but for
-whatever reason in the moment I typed in my bad code I just forgot. Maybe I was
-in a rush, maybe I was just tired. Maybe I really thought I typed &lt;span
-class="code"&gt;max_by&lt;/span&gt; but somehow the “_by” part just didn’t leave my
-brain and make it to the keyboard.&lt;/p&gt;
-
-&lt;p&gt;But Ruby knew I should have used &lt;span class="code"&gt;max_by&lt;/span&gt;, or least
-that I should have accepted two parameters in my block. Why didn’t it tell me?&lt;/p&gt;
-
-&lt;p&gt;That is, my block expected only one argument, not two. I wrote:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-{|person| etc…}
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;and not:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-{|person1, person2| etc… }
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;Why didn’t Ruby complain when it tried to pass two objects, but my block
-only accepted one? It turns out when you pass extra arguments to a block Ruby
-silently ignores them. Note: Ruby does check the number of arguments when you
-explicitly use &lt;span class="code"&gt;lambda{}&lt;/span&gt; or &lt;span
-class="code"&gt;&amp;ndash;&gt;()&lt;/span&gt; and then call it using the &lt;span
-class="code"&gt;Proc.call&lt;/span&gt; method.  But 99% of the time Ruby developers use
-blocks in the standard, default manner and don’t create &lt;span
-class="code"&gt;Proc&lt;/span&gt; objects explicitly.&lt;/p&gt;
-
-&lt;p&gt;Ruby could have told me something was wrong by displaying a warning or an error
-message, maybe: “wrong number of arguments (2 for 1) (ArgumentError).” But
-instead, it remained silent. It assumed that I just didn’t need that second
-block argument, that I wanted to keep my code simpler and easier to read, and
-conveniently allowed me to leave it out of the block’s argument list. Ruby
-assumed I was a smart, experienced developer who doesn’t make dumb mistakes
-like this. Ruby was so wrong!&lt;/p&gt;
-
-&lt;p&gt;What happened next? Ruby continued to run my block, and things got really ugly.
-Take another look at the block’s code:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-{|person| person.insults}
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;It returns the insult count for the given person &amp;ndash; a number! Next Ruby
-interpreted the numerical value my block returned, 432, 892 or 321, as the sort
-order indicator. That’s right: Ruby will accept any positive value from the
-sort order block, not just 1, and consider that to mean the two objects are in
-descending order. Similarly, it will take any negative value to mean the values
-are in ascending order.&lt;/p&gt;
-
-&lt;p&gt;Again, Ruby could have told me: “wrong type for block return value (Integer for
-SortOrder) (TypeError).” But, of course, Ruby isn’t a statically typed
-language. It doesn&amp;rsquo;t check the types of method and block arguments, or their
-return values.&lt;/p&gt;
-
-&lt;div style="float: right; padding: 70px 0px 30px 30px; text-align: center;"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/4/2/carabiner.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;Your coding equipment should catch you&lt;br/&gt;when you make a mistake and fall.&lt;/i&gt;&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a
-href="https://commons.wikimedia.org/wiki/File:Carabiner.jpg"&gt;Marcin Jahr via
-Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; &lt;/div&gt;
-
-
-&lt;p&gt;Once again, Ruby erred on the side of convenience, and assumed I knew what I
-was doing. It conveniently allowed me to return 321 instead of 1, just in case
-I really wanted to return 321 without having to convert it to 1.&lt;/p&gt;
-
-&lt;h2&gt;Our Programming Language Should Catch Our Dumb Mistakes&lt;/h2&gt;
-
-&lt;p&gt;We actually make dumb mistakes all the time, not just once or twice a week, but
-probably hundreds of times every day. Every time we misspell a keyword, forget
-a method argument, or use an API the wrong way we have made a mistake. But we
-don’t think of these mistakes as mistakes &amp;ndash; they are just how we work as
-humans. When we type, we usually press the backspace key quite often. When we
-use an API or run shell commands we have to check the documentation or
-StackOverflow to remind ourselves what arguments or options to use.&lt;/p&gt;
-
-&lt;p&gt;And usually our programming language, whether it’s Ruby or something else,
-finds our mistakes immediately and tells us about them with a syntax error
-message. We correct the mistake within seconds and continue coding, climbing
-higher and higher up the cliff. But in my two examples the mistakes,
-unfortunately, weren’t apparent immediately.  This incorrect code ran for weeks
-before I discovered the problem. You always want to fail fast: The worst
-mistakes are the ones you never notice until it’s too late.&lt;/p&gt;
-
-&lt;p&gt;But why didn’t I discover these mistakes sooner by running tests? Don’t I use
-TDD? Don’t I at least write tests to check my code after I’ve written it? Yes.
-But in my actual project, these mistakes were part of my test code. They
-allowed my tests to pass, but caused them to return a false positive result. My
-tests were green, but actually weren’t functioning at all. Tests aren&amp;rsquo;t
-perfect. They are only as good as the code you write to implement them.&lt;/p&gt;
-
-&lt;p&gt;Maybe these two dumb Ruby mistakes were exactly that: mistakes Ruby made and
-not me. I’m only human; it’s normal for me to type in nonsense and garbage all
-day long into the computer. But Ruby is a programming language. It’s job &amp;ndash; it’s
-most important job &amp;ndash; is to tell me when my code is incorrect as soon as
-possible. In these two examples, it was the Ruby language itself that made the
-dumb mistake. The bugs weren’t in my code, they were in the language itself.&lt;/p&gt;
-
-&lt;p&gt;Of course, I could just switch to a statically typed language, like Java or Go.
-These languages automatically check the types of arguments and return values
-for me. If I used Swift I could take advantage of static types and use
-blocks/closures. I could even use a language like Haskell where the type system
-is so powerful that merely by allowing my code to run with no errors, the
-compiler has mathematically proven my code is correct. (If this could only be
-true!)&lt;/p&gt;
-
-&lt;p&gt;But I love Ruby. It’s a joy to use. Ruby code has a very human elegance to it
-that I haven’t seen in other programming languages. I just wish Ruby would
-catch me every time I fall.&lt;/p&gt;
 </content>
   </entry>
 </feed>
