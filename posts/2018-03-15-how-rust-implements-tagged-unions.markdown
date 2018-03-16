@@ -23,12 +23,17 @@ model for managing memory.
 Another less obvious improvement Rust makes to C has to do with the <span
 class="code">union</span> keyword. The Rust compiler implements _tagged
 unions_, which prevent you from crashing your program by initializing a union
-with one variant and accessing it with another. But the Rust doesn’t include
-the <span class="code">union</span> keyword at all; instead, Rust uses <span
-class="code">enum</span> to improve on both C enums and C unions at the same
-time.
+with one variant and accessing it with another. <del>But the Rust doesn’t include
+the <span class="code">union</span> keyword at all</del>; instead, Rust
+uses <span class="code">enum</span> to improve on both C enums and C unions at
+the same time.
 
 <div style="clear: both"></div>
+
+(Update: I heard [on
+Twitter](https://twitter.com/josh_triplett/status/974312496717742080) and in
+the comments that Rust does include untagged unions for use in FFI to
+interoperate with C, or for unsafe code building custom unions.)
 
 Not sure what a tagged union is? Or why it’s an improvement over an old
 fashioned C union? Today I’ll explain. First I’ll start with a quick review of
