@@ -32,6 +32,10 @@ two garbage collectors work and answer these questions. But before we
 get to generational GC, we first need to learn more about a serious theoretical
 problem with Python’s reference counting algorithm.
 
+**Update:** If you speak Russian, there's a [translation of this
+article](http://howtorecover.me/generiruusii-gc-v-python-i-ruby) by Vlad Brown
+on <a href="http://howtorecover.me">HTR</a>.
+
 ## Cyclic Data Structures and Reference Counting in Python
 
 We saw last time that Python uses an integer value saved inside of each object,
