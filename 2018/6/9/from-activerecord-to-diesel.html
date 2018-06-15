@@ -261,8 +261,8 @@ $ diesel print-schema --database-url=postgres://pat@patshaughnessy.net:5432/name
 table! {
     users (id) {
         id -> Int4,
-        first_name -> Nullable<Varchar>,
-        last_name -> Nullable<Varchar>,
+        first_name -> Nullable&lt;Varchar>,
+        last_name -> Nullable&lt;Varchar>,
     }
 }
 </pre>
