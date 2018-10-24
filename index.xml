@@ -7,6 +7,524 @@
     <name></name>
   </author>
   <entry>
+    <title>Summer School With The Rust Compiler</title>
+    <link href="http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"/>
+    <id>http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler</id>
+    <published>2018-10-24T03:00:00Z</published>
+    <updated>2018-10-24T03:00:00Z</updated>
+    <category>ruby</category>
+    <author>
+      <name></name>
+    </author>
+    <summary type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png"&gt;&lt;br/&gt;
+&lt;i&gt; &lt;small&gt;(source: &lt;a href="https://twitter.com/steveklabnik/status/1022518806814617601"&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;A few months ago, I saw this tweet from Steve. I&amp;rsquo;m not even sure what
+&amp;ldquo;d</summary>
+    <content type="html">&lt;div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png"&gt;&lt;br/&gt;
+&lt;i&gt; &lt;small&gt;(source: &lt;a href="https://twitter.com/steveklabnik/status/1022518806814617601"&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;A few months ago, I saw this tweet from Steve. I&amp;rsquo;m not even sure what
+&amp;ldquo;derridean&amp;rdquo; means, but now the image of an insane coach pops into my head every
+time I try to write Rust code.&lt;/p&gt;
+
+&lt;p&gt;Learning Rust is hard for everyone, but it’s even worse for me because I’ve
+been working with Ruby during past ten years. Switching to Rust from Ruby is
+leaving an anything-goes hippie commune to a summer school for delinquent
+programmers run by a sadistic and unforgiving teacher.&lt;/p&gt;
+
+&lt;p&gt;Why would anyone use a compiler like this? The answer is simple: to learn how
+to write better code. This past summer I had some free time and decided to
+convert a simple Ruby script into Rust. As you’ll see, the Rust compiler beat
+me up a few times; it wasn’t easy. But after some tough love I ended up
+learning something, not only about Rust but about Ruby too.&lt;/p&gt;
+
+&lt;div style="clear: both"&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Iterating Over an Array in Ruby&lt;/h2&gt;
+
+&lt;p&gt;Here’s my example program. It’s so short and simple you can read and understand
+it in just a few seconds:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+array = [&lt;span class="integer"&gt;1&lt;/span&gt;, &lt;span class="integer"&gt;2&lt;/span&gt;, &lt;span class="integer"&gt;3&lt;/span&gt;]
+&lt;span class="keyword"&gt;for&lt;/span&gt; i &lt;span class="keyword"&gt;in&lt;/span&gt; array
+  puts i
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;When I ran it, the output was:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ ruby int-loop.rb
+1
+2
+3
+&lt;/pre&gt;
+
+
+
+
+&lt;div style="float: right; padding: 70px 0px 30px 30px; text-align: center;"&gt;
+  &lt;img src="http://patshaughnessy.net/assets/2018/10/24/garden-earthly-delights.png"&gt;&lt;br/&gt;
+  &lt;i&gt;&lt;small&gt;&lt;a href="https://en.wikipedia.org/wiki/The_Garden_of_Earthly_Delights"&gt;The Garden of Earthly Delights&lt;/a&gt; (detail), by Hieronymus Bosch&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+
+&lt;p&gt;Ruby’s syntax and feature set are designed to make my life easier as a
+developer.  Writing Ruby for me is as natural as writing English; it’s like
+having a pleasant conversation with my computer. I’m living in the Garden of
+Earthly Delights. If I can imagine a code change, I can write it. Using Ruby,
+all of my dreams can come true.&lt;/p&gt;
+
+&lt;p&gt;Next I decided to increment the values before printing them out. I added just
+one line of code to my example, &lt;span class="code"&gt;i = i+1&lt;/span&gt;:&lt;/p&gt;
+
+&lt;div class="CodeRay"&gt;
+  &lt;div class="code"&gt;&lt;pre&gt;
+array = [&lt;span class="integer"&gt;1&lt;/span&gt;, &lt;span class="integer"&gt;2&lt;/span&gt;, &lt;span class="integer"&gt;3&lt;/span&gt;]
+&lt;span class="keyword"&gt;for&lt;/span&gt; i &lt;span class="keyword"&gt;in&lt;/span&gt; array
+  i = i+&lt;span class="integer"&gt;1&lt;/span&gt;
+  puts i
+&lt;span class="keyword"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+
+
+&lt;p&gt;As I expected, Ruby printed out 2 through 4:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ ruby int-loop.rb
+2
+3
+4
+&lt;/pre&gt;
+
+
+&lt;p&gt;Of course, there are other ways to produce the same result. I could have used
+&lt;span class="code"&gt;puts i+1&lt;/span&gt;, or mapped the original array to a new array
+&lt;span class="code"&gt;[2, 3, 4]&lt;/span&gt;. But Ruby doesn’t care. Today I felt like
+writing &lt;span class="code"&gt;i = i+1&lt;/span&gt;, and Ruby let me do it without
+comment. Ruby is the parent of an unruly teenager that gets away with anything.&lt;/p&gt;
+
+&lt;p&gt;As I found out later, using &lt;span class="code"&gt;i = i+1&lt;/span&gt; might have broken
+a Computer Science rule or two, but I was blissfully unaware. What you don’t
+know can’t hurt you. Ruby didn’t tell me anything might be wrong… but as we’ll
+see Rust certainly did!&lt;/p&gt;
+
+&lt;h2&gt;Rust: Similar to Ruby At First Glance&lt;/h2&gt;
+
+&lt;p&gt;I was curious: What would the Rust compiler think of this example? I was able
+to rewrite it in only a few minutes:&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;span style="color:#a71d5d;"&gt;fn &lt;/span&gt;&lt;span style="color:#795da3;"&gt;main&lt;/span&gt;&lt;span style="color:#000000;"&gt;() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;let&lt;/span&gt;&lt;span style="color:#000000;"&gt; array &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= &lt;/span&gt;&lt;span style="color:#000000;"&gt;[&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;2&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;3&lt;/span&gt;&lt;span style="color:#000000;"&gt;];&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;for&lt;/span&gt;&lt;span style="color:#000000;"&gt; i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;in&lt;/span&gt;&lt;span style="color:#000000;"&gt; array.iter() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        println!(&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#d08770;"&gt;{}&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#000000;"&gt;, i);&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    }&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;p&gt;I had to type semicolons after each line and use a &lt;span
+class="code"&gt;main&lt;/span&gt; function. A bit more typing, but really this is
+exactly the same program. Running this, of course, produced the same result:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ rustc int-loop.rs &amp;&amp; ./int-loop
+1
+2
+3
+&lt;/pre&gt;
+
+
+&lt;p&gt;Then I decided to try using the same &lt;span class="code"&gt;i = i+1&lt;/span&gt; line from above:&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;span style="color:#a71d5d;"&gt;fn &lt;/span&gt;&lt;span style="color:#795da3;"&gt;main&lt;/span&gt;&lt;span style="color:#000000;"&gt;() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;let&lt;/span&gt;&lt;span style="color:#000000;"&gt; array &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= &lt;/span&gt;&lt;span style="color:#000000;"&gt;[&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;2&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;3&lt;/span&gt;&lt;span style="color:#000000;"&gt;];&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;for&lt;/span&gt;&lt;span style="color:#000000;"&gt; i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;in&lt;/span&gt;&lt;span style="color:#000000;"&gt; array.iter() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;=&lt;/span&gt;&lt;span style="color:#000000;"&gt; i&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;+&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;;&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        println!(&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#d08770;"&gt;{}&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#000000;"&gt;, i);&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    }&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;h2&gt;Lesson One: Passing By Reference vs. Passing By Value&lt;/h2&gt;
+
+&lt;p&gt;Compiling this, the Rust compiler hit me over the head with Computer Science!&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ rustc int-loop.rs &amp;&amp; ./int-loop
+error[E0271]: type mismatch resolving `&lt;&amp;i32 as std::ops::Add&lt;i32&gt;&gt;::Output == &amp;i32`
+  --&gt; int-loop.rs:4:14
+   |
+ 4 |         i = i+1;
+   |              ^ expected i32, found &amp;i32
+   |
+   = note: expected type `i32`
+              found type `&amp;i32`
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0271`.
+&lt;/pre&gt;
+
+
+&lt;p&gt;What in the world does this mean? I wrote a very simple line of code, and got a
+message straight out of type theory! The error &lt;span class="code"&gt;type mismatch
+resolving `&amp;lt;&amp;amp;i32 as std::ops::Add&gt;::Output == &amp;amp;i32`&lt;/span&gt; makes no sense to me at
+all.&lt;/p&gt;
+
+&lt;p&gt;I decided to take the compiler’s suggestion and run the explain command:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ rustc --explain E0271
+This is because of a type mismatch between the associated type of some
+trait (e.g. `T::Bar`, where `T` implements `trait Quux { type Bar; }`)
+and another type `U` that is required to be equal to `T::Bar`, but is not.
+Examples follow.
+&lt;/pre&gt;
+
+
+&lt;p&gt;The explain output continued for about two more pages, with examples that
+didn’t resemble my code at all. What is a trait? What is an associated type? I
+didn’t use any of these more advanced Rust concepts in my simple script. Maybe
+I needed a PhD. in Computer Science even to try to use Rust?&lt;/p&gt;
+
+&lt;p&gt;Eventually, I figured it out. The key lines from the error message were:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+ 4 |         i = i+1;
+   |              ^ expected i32, found &amp;i32
+&lt;/pre&gt;
+
+
+&lt;p&gt;Rust is telling me that &lt;span class="code"&gt;iter()&lt;/span&gt; yielded references to
+integers, but my code expected an actual integer, not a reference to an
+integer. But what are references, exactly?&lt;/p&gt;
+
+&lt;p&gt;Running my code above, Ruby passed each integer from the array to my code as a
+simple value:&lt;/p&gt;
+
+&lt;p&gt;&lt;img width="185" src="http://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;But Rust passed each integer from the array as a reference, or in other words
+as a pointer to the value itself:&lt;/p&gt;
+
+&lt;p&gt;&lt;img width="287" src="http://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;In Ruby, of course, I didn’t have to worry about references, pointers or even
+types, so none of this came up. Or at least that’s what I thought at the time.&lt;/p&gt;
+
+&lt;h2&gt;Lesson Two: Borrowed Values&lt;/h2&gt;
+
+&lt;p&gt;Ah &amp;ndash; according to the Rust compiler’s error message I just had to dereference
+the reference before using it. I changed &lt;span class="code"&gt;i = i+1&lt;/span&gt; to
+&lt;span class="code"&gt;*i = *i+1&lt;/span&gt;:&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;span style="color:#a71d5d;"&gt;fn &lt;/span&gt;&lt;span style="color:#795da3;"&gt;main&lt;/span&gt;&lt;span style="color:#000000;"&gt;() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;let&lt;/span&gt;&lt;span style="color:#000000;"&gt; array &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= &lt;/span&gt;&lt;span style="color:#000000;"&gt;[&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;2&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;3&lt;/span&gt;&lt;span style="color:#000000;"&gt;];&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;for&lt;/span&gt;&lt;span style="color:#000000;"&gt; i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;in&lt;/span&gt;&lt;span style="color:#000000;"&gt; array.iter() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;*&lt;/span&gt;&lt;span style="color:#000000;"&gt;i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= *&lt;/span&gt;&lt;span style="color:#000000;"&gt;i&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;+&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;;&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        println!(&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#d08770;"&gt;{}&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#000000;"&gt;, i);&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    }&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;p&gt;Then Rust slapped me in the face again with more Computer Science:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ rustc int-loop.rs &amp;&amp; ./int-loop
+error[E0594]: cannot assign to immutable borrowed content `*i`
+  --&gt; int-loop.rs:26:9
+   |
+26 |         *i = *i+1;
+   |         ^^^^^^^^^ cannot borrow as mutable
+
+error: aborting due to previous error
+
+For more information about this error, try `rustc --explain E0594`.
+&lt;/pre&gt;
+
+
+&lt;p&gt;Ugh. I guess that was a bad idea. What in the world happened here? I thought I
+had the dereferencing syntax correct, &lt;span class="code"&gt;*i&lt;/span&gt;, the same
+syntax I’m used to from C.  Actually Rust didn’t complain about types any more
+or about using a reference vs. a value. But what does “borrow as mutable” mean?
+And why doesn’t Rust let me do that?&lt;/p&gt;
+
+&lt;p&gt;Again, the problem here is that I don’t know enough Rust even to understand the
+compiler’s error messages. I need to take a few months off from my day job and
+read a book, or take a class. I need to understand Rust’s ownership model.&lt;/p&gt;
+
+&lt;p&gt;In Rust, every value is “owned” by the spot in my code where I allocate that
+value. In this example, the integers and the array that contains them are owned
+by the &lt;span class="code"&gt;main&lt;/span&gt; function. When the &lt;span
+class="code"&gt;main&lt;/span&gt; function goes out of scope, Rust frees the memory for
+that array automatically. In this diagram, the red arrow shows where Rust
+allocates the array (at the top), and where Rust frees it (at the bottom):&lt;/p&gt;
+
+&lt;p&gt;&lt;img width="339" src="http://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png"/&gt;&lt;/p&gt;
+
+&lt;p&gt;You can think of the red arrow as the “lifetime” of the array. When I pass a
+value from one spot to another, when I call a function or a closure, I can
+either “move” that value to the new function, or the function can ”borrow” it.
+In this example, the call to &lt;span class="code"&gt;iter()&lt;/span&gt; borrowed the
+elements inside the array, passing a reference to each element into the
+closure. The blue array in this diagram indicates each element of the array,
+&lt;span class="code"&gt;i&lt;/span&gt;, is a borrowed value inside the closure:&lt;/p&gt;
+
+&lt;p&gt;&lt;img width="334" src="http://patshaughnessy.net/assets/2018/10/24/rust-borrow.png"/&gt;&lt;/p&gt;
+
+&lt;h2&gt;Lesson Three: Immutable vs. Mutable Values&lt;/h2&gt;
+
+&lt;p&gt;But using borrowed values isn’t the problem here. The problem is that my code
+tries to change them, or mutate them:&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;span style="color:#4f5b66;"&gt;*&lt;/span&gt;&lt;span style="color:#000000;"&gt;i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= *&lt;/span&gt;&lt;span style="color:#000000;"&gt;i&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;+&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;;&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;p&gt;Because the value of &lt;span class="code"&gt;i&lt;/span&gt; each time around the loop was
+an element of the array, and because &lt;span class="code"&gt;iter()&lt;/span&gt; borrowed
+each element from the original array, the elements are marked as immutable,
+just as the array was. Or at least I that’s how I understood the previous error
+message.&lt;/p&gt;
+
+&lt;p&gt;Back in the &lt;span class="code"&gt;main&lt;/span&gt; function when I typed:&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;span style="color:#a71d5d;"&gt;let&lt;/span&gt;&lt;span style="color:#000000;"&gt; array &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= &lt;/span&gt;&lt;span style="color:#000000;"&gt;[&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;2&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;3&lt;/span&gt;&lt;span style="color:#000000;"&gt;];&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;p&gt;…Rust created an immutable array of three integers. All variables in Rust are
+immutable by default. Because it was immutable, my code can’t change it.&lt;/p&gt;
+
+&lt;p&gt;Ah… so the fix is to mark my array as mutable:&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;span style="color:#a71d5d;"&gt;fn &lt;/span&gt;&lt;span style="color:#795da3;"&gt;main&lt;/span&gt;&lt;span style="color:#000000;"&gt;() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;let mut&lt;/span&gt;&lt;span style="color:#000000;"&gt; array &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= &lt;/span&gt;&lt;span style="color:#000000;"&gt;[&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;2&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;3&lt;/span&gt;&lt;span style="color:#000000;"&gt;];&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;for&lt;/span&gt;&lt;span style="color:#000000;"&gt; i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;in&lt;/span&gt;&lt;span style="color:#000000;"&gt; array.iter() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;*&lt;/span&gt;&lt;span style="color:#000000;"&gt;i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= *&lt;/span&gt;&lt;span style="color:#000000;"&gt;i&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;+&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;;&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        println!(&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#d08770;"&gt;{}&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#000000;"&gt;, i);&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    }&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;h2&gt;Lesson Four: Declaring Side Effects&lt;/h2&gt;
+
+&lt;p&gt;Running the Rust compiler again, I got the same error along with a new warning:&lt;/p&gt;
+
+&lt;pre class="console"&gt;
+$ rustc int-loop.rs &amp;&amp; ./int-loop
+error[E0594]: cannot assign to immutable borrowed content `*i`
+  --&gt; int-loop.rs:14:9
+   |
+14 |         *i = *i+1;
+   |         ^^^^^^^^^ cannot borrow as mutable
+
+warning: variable does not need to be mutable
+  --&gt; int-loop.rs:12:9
+   |
+12 |     let mut array = [1, 2, 3];
+   |         ----^^^^^
+   |         |
+   |         help: remove this `mut`
+   |
+&lt;/pre&gt;
+
+
+&lt;p&gt;Wait &amp;ndash; so now Rust was telling me I shouldn’t add the &lt;span
+class="code"&gt;mut&lt;/span&gt; keyword? That my last change was dead wrong? Why was it
+wrong? Probably I didn’t understand what “cannot borrow as mutable” really
+meant.&lt;/p&gt;
+
+&lt;p&gt;It took me a while to figure this out but eventually I ran into this &lt;a href="https://hermanradtke.com/2015/06/22/effectively-using-iterators-in-rust.html"&gt;great
+article&lt;/a&gt;
+which explained what I was doing wrong and how to fix it. I needed to use
+&lt;span class="code"&gt;iter_mut&lt;/span&gt; instead of &lt;span class="code"&gt;iter&lt;/span&gt;. &lt;span
+class="code"&gt;iter_mut&lt;/span&gt; yields mutable references to the closure, while
+&lt;span class="code"&gt;iter&lt;/span&gt; yields normal, immutable references.&lt;/p&gt;
+
+&lt;p&gt;That is, by calling &lt;span class="code"&gt;iter_mut&lt;/span&gt; I’m declaring that the
+code inside of the closure might mutate the elements of the array. This is
+knowns as a &lt;em&gt;side effect&lt;/em&gt;. As a side effect of the iteration, the code inside
+might also change the values of the collection it is iterating over. Rust
+forced me to declare that my code might change the array.&lt;/p&gt;
+
+&lt;p&gt;Finally, running my program with &lt;span class="code"&gt;iter_mut&lt;/span&gt; finally worked!&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;span style="color:#a71d5d;"&gt;fn &lt;/span&gt;&lt;span style="color:#795da3;"&gt;main&lt;/span&gt;&lt;span style="color:#000000;"&gt;() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;let mut&lt;/span&gt;&lt;span style="color:#000000;"&gt; array &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= &lt;/span&gt;&lt;span style="color:#000000;"&gt;[&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;2&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;3&lt;/span&gt;&lt;span style="color:#000000;"&gt;];&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;for&lt;/span&gt;&lt;span style="color:#000000;"&gt; i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;in&lt;/span&gt;&lt;span style="color:#000000;"&gt; array.iter_mut() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;*&lt;/span&gt;&lt;span style="color:#000000;"&gt;i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= *&lt;/span&gt;&lt;span style="color:#000000;"&gt;i&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;+&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;;&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        println!(&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#d08770;"&gt;{}&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#000000;"&gt;, i);&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    }&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+
+
+
+
+&lt;pre class="console"&gt;
+$ rustc int-loop.rs &amp;&amp; ./int-loop
+2
+3
+4
+&lt;/pre&gt;
+
+
+&lt;h2&gt;What Rust Taught Me&lt;/h2&gt;
+
+&lt;p&gt;My example today started out as a trivial, 4 line Ruby script. It was so
+simple, there really wasn’t anything that could possibly go wrong when I ran
+it. Then I added one simple line of code: i = i+1. When I added this to my Ruby
+script, it worked just fine.&lt;/p&gt;
+
+&lt;p&gt;As we saw, this line of code got the Rust compiler very angry. It slapped me in
+the face with four Computer Science lessons. I learned:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;about passing values vs. passing references.&lt;/li&gt;
+&lt;li&gt;about mutable vs. immutable values.&lt;/li&gt;
+&lt;li&gt;about value ownership, lifetimes and borrowing values.&lt;/li&gt;
+&lt;li&gt;about side effects, and declaring them.&lt;/li&gt;
+&lt;/ul&gt;
+
+
+&lt;p&gt;As you can see, the Rust compiler is an amazing tool you can use to learn more
+about Computer Science. The problem is that it’s hard to get along with.
+Compiling a Rust program will fail over and over again until you your code is
+100% correct. You need to have tremendous patience to use Rust, especially as a
+beginner.&lt;/p&gt;
+
+&lt;p&gt;Worse than that, the Rust compiler’s error messages are hard to understand, and
+easy to misinterpret. They can seem to be self-contradictory as we saw above. The
+Rust compiler assumes you already know what it is trying to teach you. Not only
+is Rust a violent teacher, it’s a bad one. If I knew that &lt;span
+class="code"&gt;iter()&lt;/span&gt; borrowed immutable values, if I knew what
+“borrowing” and “immutable” even meant, then I likely wouldn’t have run into
+that compiler error in the first place.&lt;/p&gt;
+
+&lt;p&gt;And Rust’s confusing error message lead me in the wrong direction. In this
+example, I didn’t really want to mutate the array, I just wanted to print out
+the incremented values. I could have just incremented an intermediate value and
+left the original array alone. Instead, the complex error messages confused and
+mislead me, and I never discovered this simpler code:&lt;/p&gt;
+
+&lt;pre&gt;
+&lt;span style="color:#a71d5d;"&gt;fn &lt;/span&gt;&lt;span style="color:#795da3;"&gt;main&lt;/span&gt;&lt;span style="color:#000000;"&gt;() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;let&lt;/span&gt;&lt;span style="color:#000000;"&gt; array &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;= &lt;/span&gt;&lt;span style="color:#000000;"&gt;[&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;2&lt;/span&gt;&lt;span style="color:#000000;"&gt;, &lt;/span&gt;&lt;span style="color:#d08770;"&gt;3&lt;/span&gt;&lt;span style="color:#000000;"&gt;];&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    &lt;/span&gt;&lt;span style="color:#a71d5d;"&gt;for&lt;/span&gt;&lt;span style="color:#000000;"&gt; i &lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;in&lt;/span&gt;&lt;span style="color:#000000;"&gt; array.iter() {&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;        println!(&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#d08770;"&gt;{}&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;&amp;quot;&lt;/span&gt;&lt;span style="color:#000000;"&gt;, i&lt;/span&gt;&lt;span style="color:#4f5b66;"&gt;+&lt;/span&gt;&lt;span style="color:#d08770;"&gt;1&lt;/span&gt;&lt;span style="color:#000000;"&gt;);&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;    }&lt;/span&gt;
+&lt;span style="color:#000000;"&gt;}&lt;/span&gt;
+&lt;/pre&gt;
+
+
+&lt;p&gt;The Rust compiler is an amazing tool for learning; the problem is you need to
+have a deep understanding of the Rust language before you can use it
+effectively. Rust needs a --beginner option. Using this option on the
+command line would intstruct the compiler to produce error messages designed
+for Rust learners, rather than Rust experts.&lt;/p&gt;
+
+&lt;h2&gt;What Ruby Didn’t Tell Me&lt;/h2&gt;
+
+&lt;p&gt;I had the opposite experience using Ruby. No confusing compiler errors; in
+fact, no compiler at all. No types, no need to worry about immutability or
+whether I’m passing references or values. Everything just worked.&lt;/p&gt;
+
+&lt;p&gt;Or did it? Because Ruby passed integers by value, the array in my original
+example wasn’t modified:&lt;/p&gt;
+
+&lt;pre&gt;
+array = [1, 2, 3]
+for i in array
+  i = i+1
+  puts i
+end
+puts "----"
+p array
+&lt;/pre&gt;
+
+
+
+
+&lt;pre class="console"&gt;
+$ ruby int-loop.rb
+2
+3
+4
+----
+[1, 2, 3]
+&lt;/pre&gt;
+
+
+&lt;p&gt;This is probably a good thing. Side effects like mutating a collection while
+iterating over it can easily lead to bugs. Maybe code later in my program
+needed the original, unchanged values in that array? Maybe another thread was
+trying to use that collection at the same time?&lt;/p&gt;
+
+&lt;p&gt;The problem with using Ruby is that you don’t know what Ruby isn’t telling you.
+Because Ruby didn’t display any warnings or error messages when I added &lt;span
+class="code"&gt;i = i+1&lt;/span&gt; to my loop, I didn’t even think about any of these
+issues. Fortunately, Ruby didn&amp;rsquo;t modify the array so it wasn&amp;rsquo;t a problem.&lt;/p&gt;
+
+&lt;p&gt;But suppose my array contained strings and not integers:&lt;/p&gt;
+
+&lt;pre&gt;
+array = ["one", "two", "three"]
+for str in array
+    str = str &lt;&lt; "-mutated"
+    puts str
+end
+puts "----"
+p array
+&lt;/pre&gt;
+
+
+
+
+&lt;pre class="console"&gt;
+$ ruby string-loop.rb
+one-mutated
+two-mutated
+three-mutated
+----
+["one-mutated", "two-mutated", "three-mutated"]
+&lt;/pre&gt;
+
+
+&lt;p&gt;Now the array was mutated! It turns out Ruby passed integers to the closure by
+value, but strings by reference. Updating each string inside the loop also
+updated that string inside the array. Now my program will have bugs, unless the
+point of running that loop was to mutate the array, and not just to print it
+out.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
     <title>From ActiveRecord to Diesel</title>
     <link href="http://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel" rel="alternate"/>
     <id>http://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel</id>
@@ -236,8 +754,8 @@ $ diesel print-schema --database-url=postgres://pat@patshaughnessy.net:5432/name
 table! {
     users (id) {
         id -&gt; Int4,
-        first_name -&gt; Nullable&lt;Varchar&gt;,
-        last_name -&gt; Nullable&lt;Varchar&gt;,
+        first_name -&gt; Nullable&amp;lt;Varchar&gt;,
+        last_name -&gt; Nullable&amp;lt;Varchar&gt;,
     }
 }
 &lt;/pre&gt;
@@ -3366,480 +3884,6 @@ finally ready to read and understand a simple assembly language program. In my
 next point I’ll look at how my Crystal and C compilers assign memory addresses
 on the stack for local variables, and why they use a stack in the first place.
 Should be fun!&lt;/p&gt;
-</content>
-  </entry>
-  <entry>
-    <title>Learning to Read x86 Assembly Language</title>
-    <link href="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language" rel="alternate"/>
-    <id>http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language</id>
-    <published>2016-11-26T04:00:00Z</published>
-    <updated>2016-11-26T04:00:00Z</updated>
-    <category>ruby</category>
-    <author>
-      <name></name>
-    </author>
-    <summary type="html">&lt;div style="float: right; padding: 0px 0px 30px 30px; text-align: center; line-height:16px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/11/26/8086.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;A 16-bit Intel 8086 microprocessor from 1978&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:L_intel-c8086.jpg"&gt;RodolfoNeres via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Writing assembly language is </summary>
-    <content type="html">&lt;div style="float: right; padding: 0px 0px 30px 30px; text-align: center; line-height:16px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/11/26/8086.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;A 16-bit Intel 8086 microprocessor from 1978&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:L_intel-c8086.jpg"&gt;RodolfoNeres via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;Writing assembly language is something best left for the experts. To write code
-that runs directly on your microprocessor you need to know how memory
-segmentation works, what the intended use of each register is, how codes
-executes in real and protected modes and much, much more. And, of course,
-modern compilers will usually produce faster, more optimized code than you ever
-could, without making any mistakes.&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Reading&lt;/em&gt; assembly language, on the other hand, isn’t nearly as difficult and can
-be a useful skill to have: Someday you might need to debug code without having
-the original source. You’ll begin to understand what a microprocessor can and
-can’t do by reading it’s language directly. And you’ll appreciate and
-understand your favorite programming language even more after seeing your own
-code translated into low level machine instructions.&lt;/p&gt;
-
-&lt;p&gt;But most importantly, learning about assembly language can be a lot of fun.&lt;/p&gt;
-
-&lt;h2&gt;Usually Reading Assembly Language Is No Fun At All&lt;/h2&gt;
-
-&lt;p&gt;Unfortunately, most of us only see assembly language after something has gone
-wrong, terribly wrong, when we encounter something like this:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/segfault.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This is what a segmentation fault looks like in a debugger. The debugger shows
-me assembly language because it doesn’t know what else to show me. A
-“segmentation fault” means one of the assembly language instructions, for
-example the &lt;span class="code"&gt;movb $0x6c, 0x1(%rax)&lt;/span&gt; line above, has
-tried to write to a portion of memory which it is not allowed to.&lt;/p&gt;
-
-&lt;p&gt;It’s no wonder that most of us dislike reading low level code like this. We
-only ever see it when we’re in the midst of debugging something, when the
-language and tools we normally rely on have let us down. We never see assembly
-language under happier circumstances; it is always the bearer of bad news.&lt;/p&gt;
-
-&lt;h2&gt;Converting My Own Code to Assembly Language&lt;/h2&gt;
-
-&lt;p&gt;This week I had some free time and decided to read some assembly language just
-for fun. I wanted to read low level code that was working properly, not code
-that was overwriting some other process&amp;rsquo;s memory. I wanted to see if I could
-understand it like any other programming language. To make things easier, I
-decided to translate some of my own code into assembly language so I could
-focus on the assembly language syntax. It was easier to figure out what the
-instructions meant because I knew what they were doing.&lt;/p&gt;
-
-&lt;p&gt;I’m a Ruby developer, and so I was interested in knowing how my Ruby code would
-look translated into assembly language. Unfortunately, the Ruby interpreter (at
-least the standard “MRI” version of Ruby) never does this. Instead, the Ruby
-interpreter itself is compiled into machine language and runs my code using a
-virtual machine. But I wanted to see what a real machine would do, not a
-virtual one.&lt;/p&gt;
-
-&lt;p&gt;Instead I decided to use &lt;a href="https://crystal-lang.org"&gt;Crystal&lt;/a&gt;, a variation on
-Ruby that uses &lt;a href="http://llvm.org"&gt;LLVM&lt;/a&gt; to compile Ruby to native machine
-language before running it. And because the LLVM system can also produce an
-assembly language version of the code it produces, using Crystal was the
-perfect way for me to see my Ruby code translated so a microprocessor could
-understand it.&lt;/p&gt;
-
-&lt;p&gt;I started by writing an extremely simple program that adds 42 to a given
-integer:&lt;/p&gt;
-
-&lt;div class="CodeRay"&gt;
-  &lt;div class="code"&gt;&lt;pre&gt;
-&lt;span class="keyword"&gt;def&lt;/span&gt; &lt;span class="function"&gt;add_forty_two&lt;/span&gt;(n)
-  n+&lt;span class="integer"&gt;42&lt;/span&gt;  
-&lt;span class="keyword"&gt;end&lt;/span&gt;
-
-puts add_forty_two(&lt;span class="integer"&gt;10&lt;/span&gt;)
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-
-
-
-&lt;p&gt;This was both Ruby code:&lt;/p&gt;
-
-&lt;pre&gt;
-$ ruby add_forty_two.rb 
-52
-&lt;/pre&gt;
-
-
-&lt;p&gt;And Crystal code:&lt;/p&gt;
-
-&lt;pre&gt;
-$ crystal add_forty_two.rb
-52
-&lt;/pre&gt;
-
-
-&lt;p&gt;Both produced the same result, of course. But only Crystal could produce a copy
-in assembly language: &lt;/p&gt;
-
-&lt;pre&gt;
-$ crystal build add_forty_two.rb --emit asm
-&lt;/pre&gt;
-
-
-&lt;p&gt;This created a file called add_forty_two.s which contained 10,000s of lines of
-assembly language code. (Most of this was the compiled version of the Crystal
-runtime library.) I opened add_forty_two.s in a text editor and searched for
-“add_forty_two,” the name of my function. First I found the call site, the code
-that calls my add_forty_two function:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;I’ll return to this a bit later. Searching again I found the x86 assembly
-language version of my function:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Next, I deleted all of the assembler directives, such as &lt;span
-class="code"&gt;.globl&lt;/span&gt; and &lt;span class="code"&gt;.cfi_offset.&lt;/span&gt; Someday
-it would be interesting to learn about these, but I wanted to focus on the
-actual machine instructions. And finally I pasted the the remaining code inside
-of my Ruby function.&lt;/p&gt;
-
-&lt;p&gt;Then I saw what my computer actually does when it executes &lt;span
-class="code"&gt;add_forty_two&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code2.png"/&gt;&lt;/p&gt;
-
-&lt;h2&gt;x86 Assembly Language: Almost Easy to Read&lt;/h2&gt;
-
-&lt;p&gt;This code is &lt;em&gt;almost&lt;/em&gt; easy to follow. I can guess what each instruction means:
-push, add, move, etc., but I can’t quite follow what’s going on here. &lt;span
-class="code"&gt;mov&lt;/span&gt; probably means to move, but what is the computer
-moving? And from where to where?&lt;/p&gt;
-
-&lt;div style="float: right; padding: 20px 0px 0px 30px; text-align: center; line-height:16px"&gt;
-  &lt;img src="http://patshaughnessy.net/assets/2016/11/26/budapest.jpg"&gt;&lt;br/&gt;
-  &lt;i&gt;Was x86 assembly language designed in Hungary?&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;The problem is that x86 assembly language was designed by Hungarians. I don’t
-mean that literally; in fact, I have no idea who designed x86 assembly
-language. I mean that x86 code reminds me of the Hungarian language.&lt;/p&gt;
-
-&lt;p&gt;I lived in Budapest for about a year in 1992 and managed to become
-conversational in Hungarian, although I’ve forgotten all of it since. A
-beautiful language, Hungarian is notoriously difficult for foreigners to learn.
-Related only to Finnish and Estonian, its grammar doesn’t resemble Italian,
-French or other romance languages; nor does it resemble Russian or any of the
-other Slavic languages from Eastern Europe.&lt;/p&gt;
-
-&lt;p&gt;The one bit of Hungarian grammar I still remember is that instead of using
-separate words for prepositions, such as inside, outside, etc., you append
-different suffixes to the target word. For example “inside the house” would be
-&lt;em&gt;a házban&lt;/em&gt;. House is &lt;em&gt;ház&lt;/em&gt; while inside is &lt;em&gt;ban&lt;/em&gt;. Similarly “in Budapest” would
-be &lt;em&gt;Budapesten&lt;/em&gt; &amp;ndash; the &lt;em&gt;en&lt;/em&gt; suffix means “in.” x86 assembly language code
-reminds me of Hungarian. You don’t use &lt;span class="code"&gt;mov&lt;/span&gt; to move
-something; you use &lt;span class="code"&gt;movq&lt;/span&gt;. You don’t &lt;span
-class="code"&gt;add&lt;/span&gt; something; you use the &lt;span class="code"&gt;addl&lt;/span&gt;
-instruction.&lt;/p&gt;
-
-&lt;p&gt;It turns out x86 assembly is much simpler than Hungarian; there are only a few
-simple suffixes that refer to the size of the data you are operating on. Here
-are two examples:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/addl1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The &lt;span class="code"&gt;addl&lt;/span&gt; instruction really means “add long,” where
-“long” refers to a 4 byte or 32 bit value. In Crystal, it corresponds to the
-&lt;span class="code"&gt;Int32&lt;/span&gt; type, which is the default integer type and the
-type my &lt;span class="code"&gt;add_forty_two&lt;/span&gt; method uses.&lt;/p&gt;
-
-&lt;p&gt;Here’s another example:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq1.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The letter &lt;em&gt;q&lt;/em&gt; refers to a “quad” word, or an 8 byte or 64 bit value. Most x86
-code these days works with 64 bit or 32 bit values, so you’ll most often see
-instructions that end with &lt;em&gt;q&lt;/em&gt; or &lt;em&gt;l&lt;/em&gt;. Other suffixes are &lt;em&gt;w&lt;/em&gt; for word (16 bits
-or 2 bytes) or &lt;em&gt;b&lt;/em&gt; for 1 byte or 8 bits.&lt;/p&gt;
-
-&lt;h2&gt;x86 Registers&lt;/h2&gt;
-
-&lt;p&gt;But what about all of the operands of the instructions? Why do they all have a
-&amp;ldquo;%&amp;rdquo; prefix, such as &lt;span class="code"&gt;%rsp&lt;/span&gt; or &lt;span
-class="code"&gt;%edi&lt;/span&gt;? Reading x86 assembly language also reminds me of
-reading Perl code. Lots of punctuation symbols for no apparent reason.  Similar
-to Perl, x86 assembly language uses &lt;em&gt;sigils&lt;/em&gt; or magical punctuation characters
-to indicate the type of each operand value.&lt;/p&gt;
-
-&lt;p&gt;Here are my two example instructions again:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/addl2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Here the &amp;ldquo;$&amp;rdquo; symbol means the 42 is a literal or “immediate” value. As you
-might guess, this is the line of code that adds 42 to something. But what does
-it add it to? From the &amp;ldquo;%&amp;rdquo; character we can see the x86 code is adding 42 to
-the &lt;span class="code"&gt;edi&lt;/span&gt; register.&lt;/p&gt;
-
-&lt;p&gt;And what is a register? In a nutshell, the microprocessor inside your computer
-uses registers to hold values while your code is running. So the instruction
-above adds 42 to whatever value is contained in the &lt;span
-class="code"&gt;edi&lt;/span&gt; register, and saves it back into &lt;span
-class="code"&gt;edi&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;Here’s the second example again:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This instruction, &lt;span class="code"&gt;movq&lt;/span&gt;, refers to two registers:
-&lt;span class="code"&gt;rsp&lt;/span&gt; and &lt;span class="code"&gt;rbp&lt;/span&gt;. As you can
-guess, it moves whatever value is found in the &lt;span class="code"&gt;rsp&lt;/span&gt;
-register to the &lt;span class="code"&gt;rbp&lt;/span&gt; register.&lt;/p&gt;
-
-&lt;p&gt;How many registers are there? What are they called? Let’s look at them using
-LLDB:&lt;/p&gt;
-
-&lt;pre&gt;
-(lldb) register read
-General Purpose Registers:
-       rax = 0x0000000100300268
-       rbx = 0x0000000000000000
-       rcx = 0x00007fffd8132201  libsystem_kernel.dylib`__shmsys + 9
-       rdx = 0x0000000000000000
-       rdi = 0x000000000000000a
-       rsi = 0x00007fff5fbff898
-       rbp = 0x00007fff5fbffa30
-       rsp = 0x00007fff5fbff908
-        r8 = 0x0000000100014b60  add`sigfault_handler
-        r9 = 0x0000000100400000
-       r10 = 0x0000000000000000
-       r11 = 0x0000000000000206
-       r12 = 0x0000000000000000
-       r13 = 0x0000000000000000
-       r14 = 0x0000000000000000
-       r15 = 0x0000000000000000
-       rip = 0x0000000100013cd0  add`*add_forty_two&lt;Int32&gt;:Int32
-    rflags = 0x0000000000000202
-        cs = 0x000000000000002b
-        fs = 0x0000000000000000
-        gs = 0x0000000000000000
-&lt;/pre&gt;
-
-
-&lt;p&gt;You can see there are over 20 registers inside my Mac’s Intel CPU, each
-containing a 64 bit or 8 byte value. LLDB shows the values in hexadecimal. I
-don’t have time today to explain what all of these registers are used for, but
-here are a few highlights:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;rax&lt;/span&gt;, &lt;span class="code"&gt;rbx&lt;/span&gt;, &lt;span
-class="code"&gt;rcx&lt;/span&gt; and &lt;span class="code"&gt;rdx&lt;/span&gt; are general purpose
-registers used to hold on to intermediate values loaded from memory or used
-during a calculation of some kind.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;rsp&lt;/span&gt; is the stack pointer, which holds the memory
-location of the top of the stack.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;rbp&lt;/span&gt; is the base pointer, which holds the memory
-location of the base of the current stack frame&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;span class="code"&gt;rip&lt;/span&gt; is the instruction pointer, which holds the
-memory location of the next instruction to execute&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;and &lt;span class="code"&gt;rflags&lt;/span&gt; holds a series of flags, used by
-comparison instructions for example.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-
-&lt;p&gt;In fact, there are many more registers in a modern x86 microprocessor; LLDB is
-only showing me the most commonly used registers. For a complete explanation,
-the definitive guide to all of this is the &lt;a href="http://www.intel.com/content/www/us/en/processors/architectures-software-developer-manuals.html"&gt;Intel Software Developer’s
-Manual&lt;/a&gt;.
-Fortunately, my function’s assembly language code only uses a few registers. I
-don’t need to understand them all.&lt;/p&gt;
-
-&lt;div style="padding: 30px 0px 30px 0px; text-align: center; line-height:16px"&gt;
-&lt;img src="http://patshaughnessy.net/assets/2016/11/26/registers.svg"/&gt;
-&lt;i&gt;Registers available in the x86 instruction set&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href="https://commons.wikimedia.org/wiki/File:Table_of_x86_Registers_svg.svg"&gt;Immae via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;But wait a minute. Why does my &lt;span class="code"&gt;addl&lt;/span&gt; instruction refer
-to the &lt;span class="code"&gt;edi&lt;/span&gt; register? This isn’t in the list of
-registers shown by LLDB. Where does this add operation occur? What register
-does it use?&lt;/p&gt;
-
-&lt;p&gt;It’s those Hungarian designers again. It turns out that x86 assembly language
-also decorates the register names to indicate their sizes, similar to what we
-saw above with the instruction name suffixes. But for register names x86 syntax
-uses prefixes, not suffixes. (In C programming &lt;em&gt;Hungarian notation&lt;/em&gt; actually
-refers to the practice of using prefixes on variable names to indicate their
-type.)&lt;/p&gt;
-
-&lt;p&gt;What? This is a crazy! Why would any programming language use prefixes to
-indicate data size in one place, but then use suffixes to indicate the same
-thing somewhere else?  To understand this, you have to remember that assembly
-language syntax wasn’t developed overnight. Instead, it gradually evolved of
-the course of many years. Originally, the registers used simple two letter
-names: &lt;span class="code"&gt;ax&lt;/span&gt;, &lt;span class="code"&gt;bx&lt;/span&gt;, &lt;span
-class="code"&gt;cx&lt;/span&gt;.  &lt;span class="code"&gt;dx&lt;/span&gt;, &lt;span
-class="code"&gt;sp&lt;/span&gt; and &lt;span class="code"&gt;ip&lt;/span&gt;. These were the
-registers on the original 8086 16-bit microprocessor from the 1970s. Later in
-the 1980s when Intel built 32 bit microprocessors, starting with the 80386,
-they renamed (or &lt;em&gt;extended&lt;/em&gt;) the &lt;span class="code"&gt;ax&lt;/span&gt;, &lt;span
-class="code"&gt;bx&lt;/span&gt;, &lt;span class="code"&gt;cx&lt;/span&gt;, etc., registers to become
-&lt;span class="code"&gt;eax&lt;/span&gt;, &lt;span class="code"&gt;ebx&lt;/span&gt;, &lt;span
-class="code"&gt;ecx&lt;/span&gt;, etc. These were later renamed again to &lt;span
-class="code"&gt;rax&lt;/span&gt;, &lt;span class="code"&gt;rbx&lt;/span&gt; etc. for 64-bit
-processors.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/register.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;As you can see here, even today x86 assembly code can refer to the same
-register using many different names, for example &lt;span class="code"&gt;al&lt;/span&gt;
-or &lt;span class="code"&gt;ah&lt;/span&gt; for 8-bits, &lt;span class="code"&gt;ax&lt;/span&gt; bit 16
-bits, &lt;span class="code"&gt;eax&lt;/span&gt; for 32 bits and &lt;span
-class="code"&gt;rax&lt;/span&gt; for 64 bits.&lt;/p&gt;
-
-&lt;h2&gt;x86 Assembly Language: Reads Left to Right, Except When It Reads Right to Left&lt;/h2&gt;
-
-&lt;p&gt;Returning to the move instruction from above, how do we know which way the move
-happens?&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;That is, does this instruction move data from &lt;span class="code"&gt;rsp&lt;/span&gt; to
-&lt;span class="code"&gt;rbp&lt;/span&gt;? Or from &lt;span class="code"&gt;rbp&lt;/span&gt; to &lt;span
-class="code"&gt;rsp&lt;/span&gt;?  Does it read left to right, or right to left?&lt;/p&gt;
-
-&lt;p&gt;It could be either! It turns out there are two versions of x86
-syntax: &amp;ldquo;AT&amp;amp;T or GNU Assembler (GAS)&amp;rdquo; syntax, which I’ve been using until now,
-and also &amp;ldquo;Intel&amp;rdquo; syntax. GAS reads left to right:&lt;/p&gt;
-
-&lt;div style="padding: 30px 0px 30px 0px; line-height:16px; width: 300px"&gt;
-&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq3.png"/&gt;&lt;br/&gt;
-&lt;center&gt;&lt;i&gt;AT&amp;T/GAS syntax&lt;/i&gt;&lt;/center&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;But equally valid and common is the Intel syntax, which reads right to left:&lt;/p&gt;
-
-&lt;div style="padding: 30px 0px 30px 0px; line-height:16p; width: 300px"&gt;
-&lt;img src="http://patshaughnessy.net/assets/2016/11/26/movq4.png"/&gt;&lt;br/&gt;
-&lt;center&gt;&lt;i&gt;Intel syntax&lt;/i&gt;&lt;/center&gt;
-&lt;/div&gt;
-
-
-&lt;p&gt;If you see Perl-like sigils (&lt;span class="code"&gt;%rsp&lt;/span&gt; and &lt;span
-class="code"&gt;%rbp&lt;/span&gt; for example) then you’re reading GAS syntax and values
-will move from left to right. If you don’t see any &amp;ldquo;%&amp;rdquo; or &amp;ldquo;$&amp;rdquo; signs, then you
-have Intel syntax and values move right to left. Also notice the Intel syntax
-doesn’t append “q” or “l” on to the instruction names. &lt;a href="http://www.imada.sdu.dk/Courses/DM18/Litteratur/IntelnATT.htm"&gt;This
-article&lt;/a&gt; does a
-great job explaining the differences between the two styles.&lt;/p&gt;
-
-&lt;p&gt;What a train wreck! It’s hard to imagine a more confusing state of affairs. But
-again, remember all of this has evolved over the course of 40 years. It wasn’t
-designed by any single person at any one time. There’s a tremendous amount of
-history behind each x86 assembly language instruction.&lt;/p&gt;
-
-&lt;h2&gt;Executing My Simple Program&lt;/h2&gt;
-
-&lt;p&gt;Now that I understand the basics of x86 assembly language syntax, I’m ready to
-return to my &lt;span class="code"&gt;add_forty_two&lt;/span&gt; code and to try to
-understand how it works. Here it is again:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code2.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Reading the 6 instructions inside of &lt;span class="code"&gt;add_forty_two&lt;/span&gt;,
-there are three different operations going on. First, we setup a new stack
-frame for our function:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code3.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;The stack frame is an area of memory that my code can use to save local
-variable and other information. I won’t spend time on this today because my
-code is so simple it doesn’t use any local variables. The last two instructions
-clean up this stack frame and return to the calling code:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code4.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;I won’t cover this today either. In my next article, I’ll go through a slightly
-more complicated example containing local variables and explain how x86
-assembly code accesses them on the stack.&lt;/p&gt;
-
-&lt;p&gt;For today, I want to focus on the two instructions in the middle which actually
-implement &lt;span class="code"&gt;add_forty_two&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code5.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;We’re down to two assembly language instructions, but it’s still far from
-obvious what this code means! The key to understanding these two instructions
-is to realize that the argument to my function, &lt;span class="code"&gt;n&lt;/span&gt;, is
-passed in using a register:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code6.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;We can see this is true by returning to the call site in the &lt;span
-class="code"&gt;add_forty_two.s&lt;/span&gt; file, to the code which calls my function:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Note how the first &lt;span class="code"&gt;movl&lt;/span&gt; instruction copies the value
-10 into the &lt;span class="code"&gt;edi&lt;/span&gt; register (the lower 32 bits of the
-&lt;span class="code"&gt;rdi&lt;/span&gt; register):&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code7.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Next the &lt;span class="code"&gt;callq&lt;/span&gt; instruction calls my function with 10
-in &lt;span class="code"&gt;edi&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code8.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;So when the &lt;span class="code"&gt;addl&lt;/span&gt; instruction runs, it will add 42 to
-the argument 10.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code9.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Next, the &lt;span class="code"&gt;movl&lt;/span&gt; instruction runs and copies the result
-52 from &lt;span class="code"&gt;edi&lt;/span&gt; to &lt;span class="code"&gt;eax&lt;/span&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code10.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;This, in turn, becomes the return value from my function:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/code11.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;Again, we can see this is the case by reading the call site code again:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/&gt;&lt;/p&gt;
-
-&lt;p&gt;What happens after &lt;span class="code"&gt;add_forty_two&lt;/span&gt; returns? It moves
-&lt;span class="code"&gt;%eax&lt;/span&gt;, the return value, to &lt;span
-class="code"&gt;%edi&lt;/span&gt; where it becomes the argument to a second function
-call, the call to &lt;span class="code"&gt;puts&lt;/span&gt;.&lt;/p&gt;
-
-&lt;p&gt;I’m not sure whether this pattern of using the &lt;span class="code"&gt;%edi&lt;/span&gt;
-and &lt;span class="code"&gt;%eax&lt;/span&gt; registers to hold the function arguments and
-return values is a x86 standard convention. My guess is that instead it’s a
-pattern the LLVM code generator uses. It may be that LLVM only uses this
-technique for a single argument and single return value function like &lt;span
-class="code"&gt;add_forty_two&lt;/span&gt;.&lt;/p&gt;
-
-&lt;h2&gt;Next Time&lt;/h2&gt;
-
-&lt;p&gt;I haven’t done much, but already I’m beginning to understand x86 assembly
-language. Almost unintelligible when I first saw it, now I can start to follow
-what the machine instructions do when my code is executed. The key was learning
-how the instruction and register names change depending on the size of the
-value they operate on.&lt;/p&gt;
-
-&lt;p&gt;There’s much more to learn, of course. In my next article I’ll take a look at
-how an x86 microprocessor uses the stack to save values, and how this maps to
-Ruby using a slightly more complex example. Along the way I’ll learn about a
-few more important syntax rules of x86 assembly language.&lt;/p&gt;
 </content>
   </entry>
 </feed>
