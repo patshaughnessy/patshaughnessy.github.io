@@ -1,0 +1,6 @@
+[package]
+name = "patshaughnessy-dot-net"
+version = "0.1.0"
+authors = ["Pat Shaughnessy <pat@patshaughnessy.net>"]
+
+[dependencies]
