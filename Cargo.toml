@@ -1,6 +1,14 @@
 [package]
-name = "patshaughnessy-dot-net"
+name = "blogc"
 version = "0.1.0"
 authors = ["Pat Shaughnessy <pat@patshaughnessy.net>"]
+
+[lib]
+name = "blog"
+path = "src/lib.rs"
+
+[[bin]]
+name = "blogc"
+path = "src/bin.rs"
 
 [dependencies]
