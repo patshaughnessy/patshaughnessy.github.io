@@ -1,8 +1,10 @@
 extern crate blog;
 
-use blog::some_string;
+use blog::compile;
 
 #[test]
-fn test_one() {
-    assert_eq!("some-string-value", some_string());
+fn test_compile() {
+    if let Err(e) = compile("a", "b") {
+        panic!("compile() returned an error: {}", e);
+    }
 }

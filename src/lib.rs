@@ -1,5 +1,7 @@
-pub fn some_string() -> String {
-    "some-string-value".to_string()
+use std::error::Error;
+
+pub fn compile(_input_path: &str, _output_path: &str) -> Result<(), Box<Error>> {
+    Ok(())
 }
 
 #[cfg(test)]
@@ -8,7 +10,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_some_string() {
-        assert_eq!("some-string-value", some_string());
+    fn test_compile() {
+        if let Err(e) = compile("a", "b") {
+            panic!("compile() returned an error: {}", e);
+        }
     }
 }

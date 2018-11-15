@@ -1,8 +1,12 @@
 extern crate blog;
+use std::process;
 
-use blog::some_string;
+use blog::compile;
 
 pub fn main() {
-    let str = some_string();
-    println!("{}", str);
+    if let Err(err) = compile("a", "b") {
+        println!("{}", err);
+        process::exit(1);
+    }
+    println!("Success.");
 }
