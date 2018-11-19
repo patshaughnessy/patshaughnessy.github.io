@@ -8,8 +8,8 @@ pub fn main() {
         let dir = env::current_dir().unwrap();
         let input_path = dir.join(input_arg);
         let output_path = dir.join("output_file.txt");
-        let contents = compile(&input_path, &output_path).unwrap_or(format!("Unable to compile: {:?}\n", input_path));
-        print!("{}", contents);
+        compile(&input_path, &output_path).expect(&format!("Unable to compile: {:?}\n", input_path));
+        println!("Success.");
     } else {
         println!("Usage: blogc INPUT_PATH");
     }

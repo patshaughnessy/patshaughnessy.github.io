@@ -1,3 +1,4 @@
+use std::fs;
 use std::env;
 use std::path::PathBuf;
 
@@ -6,9 +7,10 @@ extern crate blog;
 use blog::compile;
 
 #[test]
-fn it_reads_input_path() {
-    let contents = compile(&input_path(), &output_path()).unwrap();
-    assert_eq!(contents, "This is an input file.\n");
+fn it_copies_input_to_output() {
+    compile(&input_path(), &output_path()).unwrap();
+    let copied = fs::read_to_string(&output_path()).expect("Failed: Didn't find output file.");
+    assert_eq!(copied, "This is an input file.\n");
 }
 
 #[test]
