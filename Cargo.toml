@@ -12,3 +12,4 @@ name = "blogc"
 path = "src/bin.rs"
 
 [dependencies]
+maud = "*"
