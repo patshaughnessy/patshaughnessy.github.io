@@ -1,1 +1,19 @@
-This is an input file.
+<div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
+  <img src="http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png"><br/>
+<i> <small>(source: <a href="https://twitter.com/steveklabnik/status/1022518806814617601">Steve Klabnik via Twitter</a>)</small></i>
+</div>
+
+A few months ago, I saw this tweet from Steve. I'm not even sure what
+"derridean" means, but now the image of an insane coach pops into my head every
+time I try to write Rust code.
+
+Learning Rust is hard for everyone, but it’s even worse for me because I’ve
+been working with Ruby during past ten years. Switching to Rust from Ruby is
+leaving an anything-goes hippie commune to a summer school for delinquent
+programmers run by a sadistic and unforgiving teacher.
+
+Why would anyone use a compiler like this? The answer is simple: to learn how
+to write better code. This past summer I had some free time and decided to
+convert a simple Ruby script into Rust. As you’ll see, the Rust compiler beat
+me up a few times; it wasn’t easy. But after some tough love I ended up
+learning something, not only about Rust but about Ruby too.

@@ -13,3 +13,4 @@ path = "src/bin.rs"
 
 [dependencies]
 maud = "*"
+pulldown-cmark = "*"
