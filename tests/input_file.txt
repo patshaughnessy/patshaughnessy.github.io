@@ -1,3 +1,7 @@
+title: "Summer School With The Rust Compiler"
+date: 2018/10/24
+tag: Rust
+
 <div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png"><br/>
 <i> <small>(source: <a href="https://twitter.com/steveklabnik/status/1022518806814617601">Steve Klabnik via Twitter</a>)</small></i>
@@ -17,3 +21,17 @@ to write better code. This past summer I had some free time and decided to
 convert a simple Ruby script into Rust. As you’ll see, the Rust compiler beat
 me up a few times; it wasn’t easy. But after some tough love I ended up
 learning something, not only about Rust but about Ruby too.
+
+<div style="clear: both"></div>
+
+## Iterating Over an Array in Ruby
+
+Here’s my example program. It’s so short and simple you can read and understand
+it in just a few seconds:
+
+<pre type="ruby">
+array = [1, 2, 3]
+for i in array
+  puts i
+end
+</pre>

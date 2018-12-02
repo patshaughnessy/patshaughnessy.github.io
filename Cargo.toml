@@ -14,3 +14,5 @@ path = "src/bin.rs"
 [dependencies]
 maud = "*"
 pulldown-cmark = "*"
+regex = "*"
+lazy_static = "*"
