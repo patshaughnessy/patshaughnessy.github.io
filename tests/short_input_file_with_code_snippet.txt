@@ -1,0 +1,14 @@
+title: "Summer School With The Rust Compiler"
+date: 2018/10/24
+tag: Rust
+
+Learning Rust is hard for everyone, but it’s even worse for me because I’ve
+been working with Ruby during past ten years.
+
+<pre type="ruby">
+
+  array = [1, 2, 3]
+  for i in array
+    puts i
+  end
+  </pre>

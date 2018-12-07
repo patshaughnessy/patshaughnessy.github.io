@@ -13,6 +13,7 @@ use std::path::PathBuf;
 use std::io::Error;
 use std::io::BufReader;
 use regex::Regex;
+use regex::RegexBuilder;
 
 mod layout;
 use layout::render;
@@ -27,6 +28,24 @@ pub fn compile(input_path: &PathBuf, output_path: &PathBuf) -> Result<(), Error>
 
     let mut file = File::create(&output_path)?;
     file.write_fmt(format_args!("<html>{}</html>", render(html)))
+}
+
+fn code_snippets(markdown: &String) -> Result<Vec<String>, Error> {
+
+    lazy_static! {
+        static ref CODE_SNIPPET: Regex = RegexBuilder::new("<pre[^>]*>(.*)</pre>")
+                                            .dot_matches_new_line(true)
+                                            .build()
+                                            .unwrap();
+        //static ref CODE_SNIPPET: Regex = Regex::new("<pre[^>]*>(.*)</pre>").unwrap();
+
+    }
+    println!("MARKDOWN: {}", markdown);
+    for snippet in CODE_SNIPPET.captures_iter(&markdown) {
+        println!("MATCH: {:?}", snippet.get(1).unwrap().as_str());
+    }
+
+    return Ok([].to_vec());
 }
 
 fn read_lines(path: &PathBuf) -> Result<Vec<String>, Error> {
@@ -58,6 +77,15 @@ mod tests {
     use std::env;
 
     #[test]
+    fn it_returns_each_code_snippet() {
+        let lines = read_lines(&snippet_input_path()).unwrap();
+        let markdown = text_following_headers(&lines);
+        let snippets = code_snippets(&markdown);
+        let empty_snippets: Vec<String> = [].to_vec();
+        assert_eq!(snippets.unwrap(), empty_snippets);
+    }
+
+    #[test]
     fn it_returns_the_markdown_after_the_header_lines() {
         let lines = read_lines(&input_path()).unwrap();
         let markdown = text_following_headers(&lines);
@@ -81,6 +109,10 @@ mod tests {
         let lines = read_lines(&input_path()).unwrap();
         assert_eq!(lines.len(), 6);
         assert_eq!(lines[5], "been working with Ruby during past ten years.");
+    }
+
+    fn snippet_input_path() -> PathBuf {
+        tests_path().join("short_input_file_with_code_snippet.txt")
     }
 
     fn input_path() -> PathBuf {
