@@ -2,13 +2,23 @@ title: "Summer School With The Rust Compiler"
 date: 2018/10/24
 tag: Rust
 
-Learning Rust is hard for everyone, but it’s even worse for me because I’ve
-been working with Ruby during past ten years.
+## Iterating Over an Array in Ruby
+
+Here’s my example program. It’s so short and simple you can read and understand
+it in just a few seconds:
 
 <pre type="ruby">
-
   array = [1, 2, 3]
   for i in array
     puts i
   end
-  </pre>
+</pre>
+
+When I ran it, the output was:
+
+<pre class="console">
+$ ruby int-loop.rb
+1
+2
+3
+</pre>

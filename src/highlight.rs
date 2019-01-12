@@ -1,43 +1,32 @@
 extern crate syntect;
 
+use std::env;
 use std::path::Path;
+use std::path::PathBuf;
 
-use syntect::parsing::SyntaxSet;
-use syntect::highlighting::{Color, ThemeSet};
-use syntect::html::highlighted_snippet_for_file;
+use self::syntect::parsing::{SyntaxReference, SyntaxSet};
+use self::syntect::highlighting::{Theme, ThemeSet};
+use self::syntect::html::highlighted_html_for_string;
 
-fn main() {
-
-    let ss = SyntaxSet::load_defaults_nonewlines(); // TODO: maybe just load the Ruby syntax set alone?
-
-
-
-    let theme_file : String = "/Users/pat/apps/rust_blog3/pat.tmTheme".to_string();
-    let tm_path = Path::new(&theme_file);
-    let theme = ThemeSet::get_theme(tm_path).unwrap();
-
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() < 2 {
-        println!("Please pass in a file to highlight");
-        return;
+pub fn highlighted_html_for(snippet: &String) -> String {
+    lazy_static! {
+        static ref SYNTAX_SET: SyntaxSet = SyntaxSet::load_from_folder(syntax_path()).unwrap();
+        static ref THEME: Theme = ThemeSet::get_theme(theme_path().as_path()).unwrap();
+        static ref SYNTAX: &'static SyntaxReference = SYNTAX_SET.find_syntax_by_extension("rb").unwrap();
     }
 
-    // This checks which syntax set I'm using.
+    // TODO Load the appropriate one
+    //let syntax = SYNTAX_SET.find_syntax_by_extension("rb").unwrap();
+    let html = highlighted_html_for_string(&snippet, &SYNTAX_SET, &SYNTAX, &THEME);
+    println!("Highlighted!");
+    html
+}
 
-    //let syntax = ss.find_syntax_for_file(&args[1])
-        //.unwrap() // for IO errors, you may want to use try!() or another plain text fallback
-        //.unwrap_or_else(|| ss.find_syntax_plain_text());
-    //assert_eq!(syntax.name, "HTML (Rails)");
+fn theme_path() -> PathBuf {
+    let dir = env::current_dir().unwrap();
+    dir.join("theme").join("pat.tmTheme")
+}
 
-    let html = highlighted_snippet_for_file(&args[1], &ss, &theme).unwrap();
-    println!("<html>
-                <head>
-                  <link rel=\"stylesheet\" href=\"http://localhost/assets/css/main.css\"href=\"/assets/css/main.css\" type=\"text/css\" media=\"screen\" >
-                  <title>Testing...!</title>
-                </head>
-                <body>
-                  {}
-                </body>
-              </html>", html);
-
+fn syntax_path() -> PathBuf {
+    env::current_dir().unwrap().join("syntax")
 }

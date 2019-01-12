@@ -14,11 +14,16 @@ use std::io::Error;
 use std::io::BufReader;
 use regex::Regex;
 use regex::RegexBuilder;
+use regex::Captures;
 
 mod layout;
 use layout::render;
 
+mod highlight;
+use highlight::highlighted_html_for;
+
 pub fn compile(input_path: &PathBuf, output_path: &PathBuf) -> Result<(), Error> {
+    println!("DEBUG compile");
     let lines = read_lines(input_path)?;
     let markdown = text_following_headers(&lines);
 
@@ -26,26 +31,24 @@ pub fn compile(input_path: &PathBuf, output_path: &PathBuf) -> Result<(), Error>
     let mut html = String::new();
     html::push_html(&mut html, parser);
 
+    let highlighted_html = with_highlighted_code_snippets(&html);
+
     let mut file = File::create(&output_path)?;
-    file.write_fmt(format_args!("<html>{}</html>", render(html)))
+    file.write_fmt(format_args!("<html>{}</html>", render(highlighted_html)))
 }
 
-fn code_snippets(markdown: &String) -> Result<Vec<String>, Error> {
-
+fn with_highlighted_code_snippets(html: &String) -> String {
     lazy_static! {
-        static ref CODE_SNIPPET: Regex = RegexBuilder::new("<pre[^>]*>(.*)</pre>")
+        static ref CODE_SNIPPET: Regex = RegexBuilder::new("<pre[^>]*>(.*?)</pre>")
                                             .dot_matches_new_line(true)
                                             .build()
                                             .unwrap();
-        //static ref CODE_SNIPPET: Regex = Regex::new("<pre[^>]*>(.*)</pre>").unwrap();
 
     }
-    println!("MARKDOWN: {}", markdown);
-    for snippet in CODE_SNIPPET.captures_iter(&markdown) {
-        println!("MATCH: {:?}", snippet.get(1).unwrap().as_str());
-    }
-
-    return Ok([].to_vec());
+    CODE_SNIPPET.replace_all(html, |captures: &Captures| {
+        let snippet = captures.get(1).map_or("", |m| m.as_str()).to_string();
+        format!("START{}END", highlighted_html_for(&snippet))
+    }).into()
 }
 
 fn read_lines(path: &PathBuf) -> Result<Vec<String>, Error> {
@@ -77,12 +80,24 @@ mod tests {
     use std::env;
 
     #[test]
-    fn it_returns_each_code_snippet() {
+    fn it_highlights_each_code_snippet() {
         let lines = read_lines(&snippet_input_path()).unwrap();
         let markdown = text_following_headers(&lines);
-        let snippets = code_snippets(&markdown);
-        let empty_snippets: Vec<String> = [].to_vec();
-        assert_eq!(snippets.unwrap(), empty_snippets);
+
+        let parser = Parser::new(&markdown);
+        let mut html = String::new();
+        html::push_html(&mut html, parser);
+
+        let highlighted_html = with_highlighted_code_snippets(&html);
+
+        println!();
+        println!("{}", highlighted_html);
+        println!();
+
+
+        //assert_eq!(snippets.len(), 2);
+        //assert_eq!(snippets[0], "array = [1, 2, 3]\n  for i in array\n    puts i\n  end");
+        //assert_eq!(snippets[1], "$ ruby int-loop.rb\n1\n2\n3");
     }
 
     #[test]
