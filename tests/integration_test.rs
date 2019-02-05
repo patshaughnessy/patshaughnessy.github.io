@@ -18,14 +18,14 @@ fn it_copies_input_to_output() {
     let actual_html_separated = str::replace(&actual_html, ">", ">\n");
     let actual_html_lines = actual_html_separated.split("\n");
     for line in expected_html_lines.zip(actual_html_lines) {
-        //println!();
-        //println!("EXPECTED:");
-        //println!("-------");
-        //println!("{}", line.0.trim());
-        //println!();
-        //println!("ACTUAL:");
-        //println!("-------");
-        //println!("{}", line.1.trim());
+        println!();
+        println!("EXPECTED:");
+        println!("-------");
+        println!("{}", line.0.trim());
+        println!();
+        println!("ACTUAL:");
+        println!("-------");
+        println!("{}", line.1.trim());
         assert_eq!(line.0.trim(), line.1.trim());
     }
 }
