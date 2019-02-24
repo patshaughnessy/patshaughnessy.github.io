@@ -9,10 +9,8 @@ use std::error::Error;
 use std::env;
 
 use blog::compile;
-
-mod post;
-use post::Post;
-use post::InvalidPostError;
+use blog::post::Post;
+use blog::post::InvalidPostError;
 
 fn run(input_path: PathBuf, output_path: PathBuf) -> Result<(), Box<Error>> {
     let paths = fs::read_dir(input_path)?;
@@ -28,7 +26,7 @@ fn run(input_path: PathBuf, output_path: PathBuf) -> Result<(), Box<Error>> {
             let mut result: Result<(), Box<Error>> = Ok(());
             for post in posts {
                 println!("{:?} => {:?}", post.input_path, post.output_path);
-                match compile(&post.input_path, &post.output_path) {
+                match compile(&post) {
                     Ok(result) => { () },
                     Err(e) => {
                         result = Result::Err(Box::new(e));

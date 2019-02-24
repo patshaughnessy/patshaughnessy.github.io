@@ -14,7 +14,8 @@ use std::fmt;
 #[derive(Debug, Clone)]
 pub struct Post {
     pub input_path: PathBuf,
-    pub output_path: PathBuf
+    pub output_path: PathBuf,
+    pub output_directory: PathBuf
 }
 
 impl Post {
@@ -24,7 +25,6 @@ impl Post {
             static ref POST_PATH: Regex = Regex::new(r"(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})-(?P<filename>.*)\.markdown$").unwrap();
         }
         let s = input_path.to_str().unwrap();
-        println!("DEBUG: input path: {:?}", s);
         if let Some(captures) = POST_PATH.captures(s) {
             let year = date_value(&captures, "year")?;
             let month = date_value(&captures, "month")?;
@@ -33,12 +33,13 @@ impl Post {
             Ok(
                 Post {
                     input_path: input_path.clone(),
-                    output_path: root_path.join(year).join(month).join(day).join(filename)
+                    output_path: root_path.join(&year).join(&month).join(&day).join(&filename),
+                    output_directory: root_path.join(&year).join(&month).join(&day)
                 }
             )
         } else {
-            // TODO return the actual bad filename/path
-            Err(InvalidPostError::new("Invalid post filename"))
+            let message = format!("Invalid post filename: {}", s);
+            Err(InvalidPostError::new(&message))
         }
     }
 }
@@ -78,15 +79,6 @@ impl From<std::num::ParseIntError> for InvalidPostError {
     }
 }
 
-// a test function that returns our error result
-fn raises_my_error(yes: bool) -> Result<(),InvalidPostError> {
-    if yes {
-        Err(InvalidPostError::new("borked"))
-    } else {
-        Ok(())
-    }
-}
-
 #[cfg(test)]
 mod tests {
 
@@ -98,6 +90,7 @@ mod tests {
         let root_path = PathBuf::from("tests/output");
         let post = Post::from(&root_path, &input_path()).unwrap();
         assert_eq!(post.output_path, PathBuf::from("tests/output/2018/1/18/learning-rust-if-let-vs-match.html"));
+        assert_eq!(post.output_directory, PathBuf::from("tests/output/2018/1/18"));
     }
 
     #[test]

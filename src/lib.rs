@@ -6,6 +6,7 @@ extern crate regex;
 
 use pulldown_cmark::{Parser, html};
 
+use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::PathBuf;
@@ -22,15 +23,20 @@ use layout::render;
 mod highlight;
 use highlight::highlighted_html_for;
 
-pub fn compile(input_path: &PathBuf, output_path: &PathBuf) -> Result<(), Error> {
-    let lines = read_lines(input_path)?;
+pub mod post;
+use post::Post;
+use post::InvalidPostError;
+
+pub fn compile(post: &Post) -> Result<(), Error> {
+    let lines = read_lines(&post.input_path)?;
     let markdown = text_following_headers(&lines);
     let parser = Parser::new(&markdown);
     let mut html = String::new();
     html::push_html(&mut html, parser);
     let highlighted_html = with_highlighted_code_snippets(&html);
 
-    let mut file = File::create(&output_path)?;
+    fs::create_dir_all(&post.output_directory)?;
+    let mut file = File::create(&post.output_path)?;
     file.write_fmt(format_args!("<html>{}</html>", render(highlighted_html)))
 }
 

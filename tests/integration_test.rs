@@ -5,6 +5,7 @@ use std::path::PathBuf;
 extern crate blog;
 
 use blog::compile;
+use blog::post::Post;
 
 #[test]
 fn it_copies_input_to_output() {
@@ -30,14 +31,6 @@ fn it_copies_input_to_output() {
     //    println!("{}", line.1.trim());
     //    assert_eq!(line.0.trim(), line.1.trim());
     //}
-}
-
-
-#[test]
-fn it_returns_error_for_invalid_input_path() {
-    let invalid_input_path = tests_path().join("invalid.txt");
-    let contents = compile(&invalid_input_path, &output_path());
-    assert!(contents.is_err());
 }
 
 fn input_path() -> PathBuf {
