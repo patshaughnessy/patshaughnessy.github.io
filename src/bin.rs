@@ -4,14 +4,9 @@ extern crate blog;
 extern crate regex;
 
 use std::fs;
-//use std::path::Path;
 use std::path::PathBuf;
 use std::error::Error;
 use std::env;
-
-
-//use regex::Regex;
-//use regex::RegexBuilder;
 
 use blog::compile;
 
@@ -30,7 +25,18 @@ fn run(input_path: PathBuf, output_path: PathBuf) -> Result<(), Box<Error>> {
     match posts {
         Ok(posts) => {
             println!("Read {} posts.", posts.len());
-            Ok(())
+            let mut result: Result<(), Box<Error>> = Ok(());
+            for post in posts {
+                println!("{:?} => {:?}", post.input_path, post.output_path);
+                match compile(&post.input_path, &post.output_path) {
+                    Ok(result) => { () },
+                    Err(e) => {
+                        result = Result::Err(Box::new(e));
+                        break
+                    }
+                }
+            };
+            result
         },
         Err(e) => {
             Result::Err(Box::new(e))
@@ -50,4 +56,3 @@ pub fn main() {
     }
 }
 
-//        compile(&input_path, &output_path).expect(&format!("Unable to compile: {:?}\n", input_path));

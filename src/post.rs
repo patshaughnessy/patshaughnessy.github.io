@@ -2,6 +2,7 @@ extern crate regex;
 
 use regex::Regex;
 use regex::RegexBuilder;
+use regex::Captures;
 
 //use std::fs;
 //use std::path::Path;
@@ -18,31 +19,34 @@ pub struct Post {
 
 impl Post {
 
-    //pub fn from(root_path: &PathBuf, input_path: &PathBuf) -> Option<Post> {
     pub fn from(root_path: &PathBuf, input_path: &PathBuf) -> Result<Post, InvalidPostError> {
         lazy_static! {
-            static ref POST_PATH: Regex = Regex::new(r"(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})-(?P<filename>.*)").unwrap();
+            static ref POST_PATH: Regex = Regex::new(r"(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})-(?P<filename>.*)\.markdown$").unwrap();
         }
         let s = input_path.to_str().unwrap();
-        // TODO:
-        // - Return a custom error if the regex fails here.
-        // - And look for an "else" style syntax
+        println!("DEBUG: input path: {:?}", s);
         if let Some(captures) = POST_PATH.captures(s) {
-            // Why aren't the [] returning optionals?
-            let year = captures["year"].to_string();
-            let month = captures["month"].to_string();
-            let day = captures["day"].to_string();
-            let filename = captures["filename"].to_string();
+            let year = date_value(&captures, "year")?;
+            let month = date_value(&captures, "month")?;
+            let day = date_value(&captures, "day")?;
+            let filename = format!("{}.html", captures["filename"].to_string());
             Ok(
                 Post {
-                input_path: input_path.clone(),
-                output_path: root_path.join(year).join(month).join(day).join(filename)
+                    input_path: input_path.clone(),
+                    output_path: root_path.join(year).join(month).join(day).join(filename)
                 }
             )
         } else {
+            // TODO return the actual bad filename/path
             Err(InvalidPostError::new("Invalid post filename"))
         }
     }
+}
+
+fn date_value(captures: &Captures, name: &str) -> Result<String, InvalidPostError> {
+    let text_date = &captures[name];
+    let int_date = text_date.parse::<i32>()?;
+    Ok(int_date.to_string())
 }
 
 #[derive(Debug)]
@@ -68,6 +72,12 @@ impl Error for InvalidPostError {
     }
 }
 
+impl From<std::num::ParseIntError> for InvalidPostError {
+    fn from(_: std::num::ParseIntError) -> InvalidPostError {
+        InvalidPostError{details: "Unable to parse integer".to_string()}
+    }
+}
+
 // a test function that returns our error result
 fn raises_my_error(yes: bool) -> Result<(),InvalidPostError> {
     if yes {
@@ -87,7 +97,7 @@ mod tests {
     fn it_calculates_an_output_path() {
         let root_path = PathBuf::from("tests/output");
         let post = Post::from(&root_path, &input_path()).unwrap();
-        assert_eq!(post.output_path, PathBuf::from("tests/output/2018/01/18/learning-rust-if-let-vs-match.markdown"));
+        assert_eq!(post.output_path, PathBuf::from("tests/output/2018/1/18/learning-rust-if-let-vs-match.html"));
     }
 
     #[test]
