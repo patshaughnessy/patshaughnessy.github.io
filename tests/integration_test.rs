@@ -1,11 +1,11 @@
-use std::fs;
-use std::env;
-use std::path::PathBuf;
-
-extern crate blog;
-
-use blog::compile;
-use blog::post::Post;
+//use std::fs;
+//use std::env;
+//use std::path::PathBuf;
+//
+//extern crate blog;
+//
+//use blog::compile;
+//use blog::post::Post;
 
 #[test]
 fn it_copies_input_to_output() {
@@ -33,18 +33,18 @@ fn it_copies_input_to_output() {
     //}
 }
 
-fn input_path() -> PathBuf {
-    tests_path().join("input_file.txt")
-}
-
-fn expected_html_path() -> PathBuf {
-    tests_path().join("summer-school-with-the-rust-compiler-adjusted.html")
-}
-
-fn output_path() -> PathBuf {
-    tests_path().join("output_file.txt")
-}
-
-fn tests_path() -> PathBuf {
-    PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("tests")
-}
+//fn input_path() -> PathBuf {
+//    tests_path().join("input_file.txt")
+//}
+//
+//fn expected_html_path() -> PathBuf {
+//    tests_path().join("summer-school-with-the-rust-compiler-adjusted.html")
+//}
+//
+//fn output_path() -> PathBuf {
+//    tests_path().join("output_file.txt")
+//}
+//
+//fn tests_path() -> PathBuf {
+//    PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("tests")
+//}

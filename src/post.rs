@@ -1,82 +1,97 @@
 extern crate regex;
 
 use regex::Regex;
-use regex::RegexBuilder;
 use regex::Captures;
 
-//use std::fs;
-//use std::path::Path;
+use std::fs;
+use std::fs::File;
+//use std::io::prelude::*;
 use std::path::PathBuf;
+use std::io::BufRead;
+use std::io::BufReader;
+use std::io::Error;
+use std::collections::HashMap;
 
-use std::error::Error;
-use std::fmt;
+use invalid_post_error::InvalidPostError;
 
 #[derive(Debug, Clone)]
 pub struct Post {
     pub input_path: PathBuf,
     pub output_path: PathBuf,
-    pub output_directory: PathBuf
+    pub output_directory: PathBuf,
+    pub headers: HashMap<String, String>
 }
 
 impl Post {
 
     pub fn from(root_path: &PathBuf, input_path: &PathBuf) -> Result<Post, InvalidPostError> {
-        lazy_static! {
-            static ref POST_PATH: Regex = Regex::new(r"(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})-(?P<filename>.*)\.markdown$").unwrap();
+        let lines = read_lines(input_path)?;
+        let header_lines = header_lines(&lines);
+        let header_map = header_map(&header_lines);
+        let output_path_tbd = PathBuf::from("TBD output path");
+        let output_dir_tbd = PathBuf::from("TBD output dir");
+        Ok(
+            Post {
+                input_path: input_path.clone(),
+                output_path: output_path_tbd,
+                output_directory: output_dir_tbd,
+                headers: header_map
+            }
+        )
+    }
+
+    // Make it pass using rust equivalent of find...
+    // But: error handling?
+    fn header(&self, name: &str) -> Option<String> {
+        println!("DEBUG header: {:?}", self.headers);
+
+        // TODO: deal with borrowing here.
+        let h = self.headers.clone().into_iter().find(|(key, value)| key == name);
+        match h {
+            Some(h) => Some(h.1),
+            None => None
         }
-        let s = input_path.to_str().unwrap();
-        if let Some(captures) = POST_PATH.captures(s) {
-            let year = date_value(&captures, "year")?;
-            let month = date_value(&captures, "month")?;
-            let day = date_value(&captures, "day")?;
-            let filename = format!("{}.html", captures["filename"].to_string());
-            Ok(
-                Post {
-                    input_path: input_path.clone(),
-                    output_path: root_path.join(&year).join(&month).join(&day).join(&filename),
-                    output_directory: root_path.join(&year).join(&month).join(&day)
-                }
-            )
-        } else {
-            let message = format!("Invalid post filename: {}", s);
-            Err(InvalidPostError::new(&message))
+    }
+
+}
+
+fn read_lines(path: &PathBuf) -> Result<Vec<String>, Error> {
+    let file = File::open(path)?;
+    let reader = BufReader::new(file);
+    Ok(
+        reader.lines().map(|l| l.unwrap()).collect()
+    )
+}
+
+// TODO would be nice to use this regex to get the values also
+fn is_header(line: &String) -> bool {
+    lazy_static! {
+        static ref IS_HEADER: Regex = Regex::new("^[a-z]+:").unwrap();
+    }
+    line.trim().is_empty() || IS_HEADER.is_match(line)
+}
+
+fn header_lines(lines: &Vec<String>) -> Vec<String> {
+    lines.iter().take_while(|l| is_header(l)).map(|l| l.to_string()).collect()
+}
+
+fn header_map(header_lines: &Vec<String>) -> HashMap<String, String> {
+    lazy_static! {
+        static ref HEADER_VALUE: Regex = Regex::new("^[a-z]+:(.*)").unwrap();
+    }
+    let mut headers = HashMap::new();
+    for line in header_lines {
+
+        println!("HEADER {}", line);
+        if let Some(captures) = HEADER_VALUE.captures(line) {
+            println!("HEADER CAPTURES {:?}", captures);
+            println!("HEADER CAPTURES 1 {:?}", &captures[1]);
+            if let value = Some(&captures[1]) {
+                headers.insert("Key", value);
+            }
         }
     }
-}
-
-fn date_value(captures: &Captures, name: &str) -> Result<String, InvalidPostError> {
-    let text_date = &captures[name];
-    let int_date = text_date.parse::<i32>()?;
-    Ok(int_date.to_string())
-}
-
-#[derive(Debug)]
-pub struct InvalidPostError {
-    details: String
-}
-
-impl InvalidPostError {
-    fn new(msg: &str) -> InvalidPostError {
-        InvalidPostError{details: msg.to_string()}
-    }
-}
-
-impl fmt::Display for InvalidPostError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.details)
-    }
-}
-
-impl Error for InvalidPostError {
-    fn description(&self) -> &str {
-        &self.details
-    }
-}
-
-impl From<std::num::ParseIntError> for InvalidPostError {
-    fn from(_: std::num::ParseIntError) -> InvalidPostError {
-        InvalidPostError{details: "Unable to parse integer".to_string()}
-    }
+    headers
 }
 
 #[cfg(test)]
@@ -85,13 +100,24 @@ mod tests {
     use super::*;
     use std::env;
 
+
+
+    // TODO:
+    // - working on this:
     #[test]
-    fn it_calculates_an_output_path() {
+    fn it_parses_the_title() {
         let root_path = PathBuf::from("tests/output");
         let post = Post::from(&root_path, &input_path()).unwrap();
-        assert_eq!(post.output_path, PathBuf::from("tests/output/2018/1/18/learning-rust-if-let-vs-match.html"));
-        assert_eq!(post.output_directory, PathBuf::from("tests/output/2018/1/18"));
+        assert_eq!(*post.header("title").unwrap(), "Learning Rust: If Let vs. Match".to_string());
     }
+
+    //#[test]
+    //fn it_calculates_an_output_path() {
+    //    let root_path = PathBuf::from("tests/output");
+    //    let post = Post::from(&root_path, &input_path()).unwrap();
+    //    assert_eq!(post.output_path, PathBuf::from("tests/output/2018/1/18/learning-rust-if-let-vs-match.html"));
+    //    assert_eq!(post.output_directory, PathBuf::from("tests/output/2018/1/18"));
+    //}
 
     #[test]
     fn it_returns_an_error_for_an_unexpected_filename() {

@@ -25,7 +25,8 @@ use highlight::highlighted_html_for;
 
 pub mod post;
 use post::Post;
-use post::InvalidPostError;
+
+pub mod invalid_post_error;
 
 pub fn compile(post: &Post) -> Result<(), Error> {
     let lines = read_lines(&post.input_path)?;

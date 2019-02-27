@@ -10,7 +10,6 @@ use std::env;
 
 use blog::compile;
 use blog::post::Post;
-use blog::post::InvalidPostError;
 
 fn run(input_path: PathBuf, output_path: PathBuf) -> Result<(), Box<Error>> {
     let paths = fs::read_dir(input_path)?;
