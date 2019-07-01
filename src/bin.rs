@@ -1,6 +1,4 @@
 extern crate blog;
-
-#[macro_use] extern crate lazy_static;
 extern crate regex;
 
 use std::fs;
@@ -26,7 +24,7 @@ fn run(input_path: PathBuf, output_path: PathBuf) -> Result<(), Box<Error>> {
             for post in posts {
                 println!("{:?} => {:?}", post.input_path, post.output_path);
                 match compile(&post) {
-                    Ok(result) => { () },
+                    Ok(_) => { () },
                     Err(e) => {
                         result = Result::Err(Box::new(e));
                         break
