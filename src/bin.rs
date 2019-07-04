@@ -1,5 +1,6 @@
 extern crate blog;
 extern crate regex;
+extern crate chrono;
 
 use std::fs;
 use std::path::PathBuf;

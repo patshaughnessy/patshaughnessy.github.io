@@ -3,6 +3,7 @@
 #[macro_use] extern crate lazy_static;
 extern crate pulldown_cmark;
 extern crate regex;
+extern crate chrono;
 
 use pulldown_cmark::{Parser, html};
 
@@ -29,6 +30,8 @@ use post::Post;
 pub mod invalid_post_error;
 
 pub fn compile(post: &Post) -> Result<(), Error> {
+
+    // TODO: we probably want to get this from each post, right?
     let lines = read_lines(&post.input_path)?;
     let markdown = text_following_headers(&lines);
     let parser = Parser::new(&markdown);
@@ -36,8 +39,10 @@ pub fn compile(post: &Post) -> Result<(), Error> {
     html::push_html(&mut html, parser);
     let highlighted_html = with_highlighted_code_snippets(&html);
 
-    fs::create_dir_all(&post.output_directory)?;
-    let mut file = File::create(&post.output_path)?;
+    let output_directory = &post.output_path;
+    fs::create_dir_all(output_directory)?;
+    let output_path = &post.output_path;
+    let mut file = File::create(output_path)?;
     file.write_fmt(format_args!("<html>{}</html>", render(highlighted_html)))
 }
 
