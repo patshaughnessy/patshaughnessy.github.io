@@ -1,4 +1,4 @@
-title: Using method_missing to customize SearchLogic
+title: "Using method_missing to customize SearchLogic"
 date: 2010/06/12
 tag: Ruby
 

@@ -1,4 +1,4 @@
-title: Mephisto Setup on HostingRails.com
+title: "Mephisto Setup on HostingRails.com"
 date: 2008/09/09
 url: /2008/9/9/mephisto-on-hostingrails-com
 tag: Ruby

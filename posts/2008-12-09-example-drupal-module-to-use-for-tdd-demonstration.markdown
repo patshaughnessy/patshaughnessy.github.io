@@ -1,4 +1,4 @@
-title: Example Drupal module to use for TDD demonstration
+title: "Example Drupal module to use for TDD demonstration"
 date: 2008/12/09
 tag: Drupal
 

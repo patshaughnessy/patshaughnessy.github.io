@@ -1,4 +1,4 @@
-title: Database storage for Paperclip
+title: "Database storage for Paperclip"
 date: 2009/02/19
 tag: Paperclip
 

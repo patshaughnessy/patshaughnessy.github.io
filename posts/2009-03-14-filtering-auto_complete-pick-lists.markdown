@@ -1,4 +1,4 @@
-title: Filtering auto_complete pick lists
+title: "Filtering auto_complete pick lists"
 date: 2009/03/14
 tag: the auto_complete plugin
 

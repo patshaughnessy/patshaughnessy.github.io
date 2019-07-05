@@ -1,4 +1,4 @@
-title: Auto_complete scaffolding
+title: "Auto_complete scaffolding"
 date: 2009/10/01
 tag: View Mapper
 

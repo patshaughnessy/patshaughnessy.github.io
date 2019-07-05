@@ -1,4 +1,4 @@
-title: How to create a slideshow using JQuery and Rails in 10 minutes or less
+title: "How to create a slideshow using JQuery and Rails in 10 minutes or less"
 date: 2010/04/28
 tag: Ruby
 

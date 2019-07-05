@@ -1,4 +1,4 @@
-title: Using LEFT OUTER JOIN with SearchLogic
+title: "Using LEFT OUTER JOIN with SearchLogic"
 date: 2010/07/09
 tag: Ruby
 

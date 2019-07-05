@@ -1,4 +1,4 @@
-title: Generating view scaffolding code for existing models
+title: "Generating view scaffolding code for existing models"
 date: 2009/07/24
 tag: View Mapper
 

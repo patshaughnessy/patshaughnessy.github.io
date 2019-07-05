@@ -1,4 +1,4 @@
-title: OSCON
+title: "OSCON"
 date: 2010/07/19
 
 <p>Update: OSCON was a lot of fun... if anyone is interested in seeing the slides Alex and I wrote they&rsquo;re up on <a href="http://www.slideshare.net/alexrothenberg/rails-in-the-enterprise">slide share</a>.</p>

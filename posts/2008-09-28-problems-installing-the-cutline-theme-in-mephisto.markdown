@@ -1,4 +1,4 @@
-title: Problems Installing the Cutline Theme in Mephisto
+title: "Problems Installing the Cutline Theme in Mephisto"
 date: 2008/09/28
 tag: Ruby
 

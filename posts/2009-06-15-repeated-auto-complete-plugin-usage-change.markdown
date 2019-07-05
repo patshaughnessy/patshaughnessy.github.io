@@ -1,4 +1,4 @@
-title: Repeated auto complete plugin usage change
+title: "Repeated auto complete plugin usage change"
 date: 2009/06/15
 tag: the auto_complete plugin
 

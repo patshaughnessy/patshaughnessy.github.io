@@ -1,4 +1,4 @@
-title: Paperclip scaffolding
+title: "Paperclip scaffolding"
 date: 2009/10/16
 tag: View Mapper
 

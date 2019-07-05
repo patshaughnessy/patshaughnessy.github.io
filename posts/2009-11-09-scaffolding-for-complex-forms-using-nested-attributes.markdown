@@ -1,4 +1,4 @@
-title: Scaffolding for complex forms using nested attributes
+title: "Scaffolding for complex forms using nested attributes"
 date: 2009/11/09
 tag: View Mapper
 

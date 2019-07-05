@@ -1,4 +1,4 @@
-title: How to install Paperclip in a Rails 3 app
+title: "How to install Paperclip in a Rails 3 app"
 date: 2010/05/23
 tag: Paperclip
 

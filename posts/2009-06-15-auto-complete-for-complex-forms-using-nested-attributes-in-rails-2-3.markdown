@@ -1,4 +1,4 @@
-title: Auto complete for complex forms using nested attributes in Rails 2.3
+title: "Auto complete for complex forms using nested attributes in Rails 2.3"
 date: 2009/06/15
 tag: the auto_complete plugin
 

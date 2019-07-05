@@ -1,4 +1,4 @@
-title: Sample app for auto complete on a complex form
+title: "Sample app for auto complete on a complex form"
 date: 2009/01/30
 tag: the auto_complete plugin
 

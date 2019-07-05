@@ -1,4 +1,4 @@
-title: The auto_complete plugin refactored to support repeated fields and named scopes
+title: "The auto_complete plugin refactored to support repeated fields and named scopes"
 date: 2008/11/18
 url: /repeated_auto_complete
 tag: the auto_complete plugin

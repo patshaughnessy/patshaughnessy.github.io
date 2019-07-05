@@ -1,4 +1,4 @@
-title: Modifying the auto_complete Plugin to Allow Repeated Fields
+title: "Modifying the auto_complete Plugin to Allow Repeated Fields"
 date: 2008/10/31
 url: /2008/10/31/modifying-the-autocomplete-plugin-to-allow-repeated-fields
 tag: the auto_complete plugin

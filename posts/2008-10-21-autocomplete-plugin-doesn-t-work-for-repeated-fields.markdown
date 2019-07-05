@@ -1,4 +1,4 @@
-title: Autocomplete plugin doesn’t work for repeated fields
+title: "Autocomplete plugin doesn’t work for repeated fields"
 date: 2008/10/20
 url: /2008/10/21/autocomplete-plugin-doesn-t-work-for-repeated-fields
 tag: the auto_complete plugin

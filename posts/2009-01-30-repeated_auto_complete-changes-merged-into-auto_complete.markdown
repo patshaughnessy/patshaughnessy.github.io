@@ -1,4 +1,4 @@
-title: Repeated_auto_complete changes merged into auto_complete
+title: "Repeated_auto_complete changes merged into auto_complete"
 date: 2009/01/30
 tag: the auto_complete plugin
 

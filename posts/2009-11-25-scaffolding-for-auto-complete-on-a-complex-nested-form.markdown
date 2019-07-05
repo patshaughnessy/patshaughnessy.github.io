@@ -1,4 +1,4 @@
-title: Scaffolding for auto complete on a complex, nested form
+title: "Scaffolding for auto complete on a complex, nested form"
 date: 2009/11/25
 tag: View Mapper
 

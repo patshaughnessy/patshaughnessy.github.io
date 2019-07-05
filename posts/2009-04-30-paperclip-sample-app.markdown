@@ -1,4 +1,4 @@
-title: Paperclip sample app
+title: "Paperclip sample app"
 date: 2009/04/30
 tag: Paperclip
 

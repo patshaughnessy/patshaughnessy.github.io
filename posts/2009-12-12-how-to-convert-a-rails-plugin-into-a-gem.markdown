@@ -1,4 +1,4 @@
-title: How to convert a Rails plugin into a gem
+title: "How to convert a Rails plugin into a gem"
 date: 2009/12/12
 tag: Ruby
 

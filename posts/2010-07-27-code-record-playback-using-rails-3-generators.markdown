@@ -1,4 +1,4 @@
-title: Code record/playback using Rails 3 generators
+title: "Code record/playback using Rails 3 generators"
 date: 2010/07/27
 url: /2010/7/27/code-record-playback-using-rails-3-generators
 tag: Ruby
