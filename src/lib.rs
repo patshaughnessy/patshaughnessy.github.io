@@ -11,8 +11,10 @@ use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::PathBuf;
+use std::path::Path;
 
 use std::io::Error;
+use std::io::ErrorKind;
 use std::io::BufReader;
 use regex::Regex;
 use regex::RegexBuilder;
@@ -39,9 +41,11 @@ pub fn compile(post: &Post) -> Result<(), Error> {
     html::push_html(&mut html, parser);
     let highlighted_html = with_highlighted_code_snippets(&html);
 
-    let output_directory = &post.output_path;
-    fs::create_dir_all(output_directory)?;
     let output_path = &post.output_path;
+    let output_directory = Path::new(output_path).parent().ok_or(
+        Error::new(ErrorKind::Other, "Invalid output path")
+    )?;
+    fs::create_dir_all(output_directory)?;
     let mut file = File::create(output_path)?;
     file.write_fmt(format_args!("<html>{}</html>", render(highlighted_html)))
 }

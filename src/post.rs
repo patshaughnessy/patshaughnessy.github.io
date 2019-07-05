@@ -5,6 +5,7 @@ use regex::Regex;
 
 use std::fs::File;
 use std::path::PathBuf;
+use std::path::Path;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Error;
@@ -19,27 +20,47 @@ use invalid_post_error::InvalidPostError;
 pub struct Post {
     pub input_path: PathBuf,
     pub output_path: PathBuf,
-    pub output_directory: PathBuf,
     pub headers: HashMap<String, String>
 }
 
 impl Post {
-
     pub fn from(root_path: &PathBuf, input_path: &PathBuf) -> Result<Post, InvalidPostError> {
         let lines = read_lines(input_path)?;
         let header_lines = header_lines(&lines);
         let header_map = header_map(&header_lines);
-        let path = path_from_date(&header_map)?;
-        let slug = slug_from_title(&header_map)?;
+        let path = path_from_headers(&header_map)?;
         Ok(
             Post {
                 input_path: input_path.clone(),
-                output_path: root_path.join(&path).join(slug),
-                output_directory: root_path.join(&path),
+                output_path: root_path.join(&path),
                 headers: header_map
             }
         )
     }
+}
+
+fn path_from_headers(header_map: &HashMap<String, String>) -> Result<PathBuf, InvalidPostError> {
+    let url = header_map.get("url");
+    match url {
+        Some(url) => Ok(path_from_url(url)),
+        None      => path_from_date_and_title(header_map)
+    }
+}
+
+fn path_from_url(url: &str) -> PathBuf {
+    let mut path = if Path::new(url).has_root() {
+        PathBuf::from(&url[1..])
+    } else {
+        PathBuf::from(url)
+    };
+    path.set_extension("html");
+    path
+}
+
+fn path_from_date_and_title(header_map: &HashMap<String, String>) -> Result<PathBuf, InvalidPostError> {
+    let path = path_from_date(&header_map)?;
+    let slug = slug_from_title(&header_map)?;
+    Ok(path.join(slug))
 }
 
 fn path_from_date(header_map: &HashMap<String, String>) -> Result<PathBuf, InvalidPostError> {
@@ -54,8 +75,8 @@ fn path_from_date(header_map: &HashMap<String, String>) -> Result<PathBuf, Inval
 fn slug_from_title(header_map: &HashMap<String, String>) -> Result<PathBuf, InvalidPostError> {
     lazy_static! {
         static ref AMPERSANDS: Regex = Regex::new(r"&").unwrap();
-        static ref WHITESPACE: Regex = Regex::new(r"(\s|\.)+").unwrap();
-        static ref OTHER: Regex = Regex::new(r"[^a-z0-9\-]").unwrap();
+        static ref WHITESPACE: Regex = Regex::new(r"(\s+)|\.").unwrap();
+        static ref OTHER: Regex = Regex::new(r"[^_a-z0-9\-]").unwrap();
     }
     let title = header_map.get("title").ok_or_else(|| InvalidPostError::new("Missing title"))?;
     let title = title.to_ascii_lowercase();
@@ -130,8 +151,15 @@ mod tests {
     fn it_calculates_an_output_path_and_directory() {
         let root_path = PathBuf::from("tests/output");
         let post = Post::from(&root_path, &input_path()).unwrap();
-        assert_eq!(post.output_path, PathBuf::from("tests/output/2018/1/18/learning-rust-if-let-vs-match.html"));
-        assert_eq!(post.output_directory, PathBuf::from("tests/output/2018/1/18"));
+        assert_eq!(post.output_path, PathBuf::from("tests/output/2018/1/18/learning-rust-if-let-vs--match.html"));
+    }
+
+    #[test]
+    fn it_overrides_the_path_when_url_is_specified() {
+        let root_path = PathBuf::from("tests/output");
+        let input_path = tests_path().join("2009-04-14-database-storage-for-paperclip-rewritten-to-use-a-single-table.markdown");
+        let post = Post::from(&root_path, &input_path).unwrap();
+        assert_eq!(post.output_path, PathBuf::from("tests/output/paperclip-database-storage.html"));
     }
 
     #[test]
