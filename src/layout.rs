@@ -50,19 +50,6 @@ pub fn render(content: String) -> String {
                 }
                 section class="content" { (PreEscaped(content)) }
               }
-              script type="text/javascript" {
-                (PreEscaped(r#"
-                  var disqus_identifier = 'http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler';
-                  var disqus_shortname = 'patshaughnessy';
-                  var disqus_title = 'Summer School With The Rust Compiler';
-                  (function () {
-                      var s = document.createElement('script'); s.async = true;
-                      s.type = 'text/javascript';
-                      s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
-                      (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-                  }());
-                  "#))
-              }
             }
             div class="twocol last" id="right" {
               div id="sidebar" {

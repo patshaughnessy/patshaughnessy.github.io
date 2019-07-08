@@ -90,7 +90,7 @@ fn read_lines(path: &PathBuf) -> Result<Vec<String>, Error> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     Ok(
-        reader.lines().map(|l| l.unwrap()).collect()
+        reader.lines().filter_map(Result::ok).collect()
     )
 }
 

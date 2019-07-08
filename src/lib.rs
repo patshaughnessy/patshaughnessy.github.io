@@ -52,15 +52,16 @@ pub fn compile(post: &Post) -> Result<(), Error> {
 
 fn with_highlighted_code_snippets(html: &String) -> String {
     lazy_static! {
-        static ref CODE_SNIPPET: Regex = RegexBuilder::new("<pre[^>]*>(.*?)</pre>")
+        static ref CODE_SNIPPET: Regex = RegexBuilder::new("<pre([^>]*)>(.*?)</pre>")
                                             .dot_matches_new_line(true)
                                             .build()
                                             .unwrap();
 
     }
     CODE_SNIPPET.replace_all(html, |captures: &Captures| {
-        let snippet = captures.get(1).map_or("", |m| m.as_str()).to_string();
-        format!("START{}END", highlighted_html_for(&snippet))
+        let attributes = captures.get(1).map(|m| m.as_str().to_string());
+        let snippet = captures.get(2).map_or("", |m| m.as_str()).to_string();
+        format!("{}", highlighted_html_for(&snippet, attributes))
     }).into()
 }
 
