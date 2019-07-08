@@ -20,7 +20,8 @@ use invalid_post_error::InvalidPostError;
 pub struct Post {
     pub input_path: PathBuf,
     pub output_path: PathBuf,
-    pub headers: HashMap<String, String>
+    pub headers: HashMap<String, String>,
+    pub lines: Vec<String>
 }
 
 impl Post {
@@ -33,7 +34,8 @@ impl Post {
             Post {
                 input_path: input_path.clone(),
                 output_path: root_path.join(&path),
-                headers: header_map
+                headers: header_map,
+                lines: lines
             }
         )
     }

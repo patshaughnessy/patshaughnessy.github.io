@@ -34,8 +34,8 @@ pub mod invalid_post_error;
 pub fn compile(post: &Post) -> Result<(), Error> {
 
     // TODO: we probably want to get this from each post, right?
-    let lines = read_lines(&post.input_path)?;
-    let markdown = text_following_headers(&lines);
+    //let lines = read_lines(&post.input_path)?;
+    let markdown = text_following_headers(&post.lines);
     let parser = Parser::new(&markdown);
     let mut html = String::new();
     html::push_html(&mut html, parser);
@@ -65,13 +65,13 @@ fn with_highlighted_code_snippets(html: &String) -> String {
     }).into()
 }
 
-fn read_lines(path: &PathBuf) -> Result<Vec<String>, Error> {
-    let file = File::open(path)?;
-    let reader = BufReader::new(file);
-    Ok(
-        reader.lines().map(|l| l.unwrap()).collect()
-    )
-}
+//fn read_lines(path: &PathBuf) -> Result<Vec<String>, Error> {
+//    let file = File::open(path)?;
+//    let reader = BufReader::new(file);
+//    Ok(
+//        reader.lines().map(|l| l.unwrap()).collect()
+//    )
+//}
 
 fn text_following_headers(lines: &Vec<String>) -> String {
     lines.iter().skip_while(|l| is_header(l))

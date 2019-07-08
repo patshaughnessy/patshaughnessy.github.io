@@ -20,11 +20,14 @@ pub fn highlighted_html_for_language(snippet: &String, attributes: String) -> St
         static ref THEME: Theme = ThemeSet::get_theme(theme_path().as_path()).unwrap();
         static ref RUBY_SYNTAX: &'static SyntaxReference = SYNTAX_SET.find_syntax_by_extension("rb").unwrap();
         static ref RUST_SYNTAX: &'static SyntaxReference = SYNTAX_SET.find_syntax_by_extension("rs").unwrap();
+        static ref C_SYNTAX: &'static SyntaxReference = SYNTAX_SET.find_syntax_by_extension("c").unwrap();
     }
     if attributes.contains("ruby") {
         highlighted_html_for_string(&snippet, &SYNTAX_SET, &RUBY_SYNTAX, &THEME)
     } else if attributes.contains("rust") {
         highlighted_html_for_string(&snippet, &SYNTAX_SET, &RUST_SYNTAX, &THEME)
+    } else if attributes.contains("type=\"c\"") {
+        highlighted_html_for_string(&snippet, &SYNTAX_SET, &C_SYNTAX, &THEME)
     } else {
         format!("<pre>{}</pre>", snippet.to_string())
     }

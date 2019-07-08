@@ -6,24 +6,28 @@ use std::fs;
 use std::path::PathBuf;
 use std::error::Error;
 use std::env;
+use std::ffi::OsStr;
 
 use blog::compile;
 use blog::post::Post;
 
 fn run(input_path: PathBuf, output_path: PathBuf) -> Result<(), Box<Error>> {
     let paths = fs::read_dir(input_path)?;
-    let posts: Result<Vec<_>, _> = paths.map(
-        |p| Post::from(
-                &output_path,
-                &p.unwrap().path()
-            )
-        ).collect();
+    let markdown_paths = paths.filter_map(Result::ok).filter(|f|
+        f.path().extension().and_then(OsStr::to_str) == Some("markdown")
+    );
+    let posts: Result<Vec<_>, _> = markdown_paths.map(|p|
+        Post::from(
+            &output_path,
+            &p.path()
+        )
+    ).collect();
     match posts {
         Ok(posts) => {
             println!("Read {} posts.", posts.len());
             let mut result: Result<(), Box<Error>> = Ok(());
             for post in posts {
-                println!("{:?} => {:?}", post.input_path, post.output_path);
+                //println!("{:?} => {:?}", post.input_path, post.output_path);
                 match compile(&post) {
                     Ok(_) => { () },
                     Err(e) => {
