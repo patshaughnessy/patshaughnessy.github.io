@@ -10,12 +10,10 @@ use pulldown_cmark::{Parser, html};
 use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
-use std::path::PathBuf;
 use std::path::Path;
 
 use std::io::Error;
 use std::io::ErrorKind;
-use std::io::BufReader;
 use regex::Regex;
 use regex::RegexBuilder;
 use regex::Captures;
@@ -30,11 +28,11 @@ pub mod post;
 use post::Post;
 
 pub mod invalid_post_error;
+use invalid_post_error::InvalidPostError;
 
-pub fn compile(post: &Post) -> Result<(), Error> {
+use chrono::NaiveDate;
 
-    // TODO: we probably want to get this from each post, right?
-    //let lines = read_lines(&post.input_path)?;
+pub fn compile(post: &Post) -> Result<(), InvalidPostError> {
     let markdown = text_following_headers(&post.lines);
     let parser = Parser::new(&markdown);
     let mut html = String::new();
@@ -47,7 +45,23 @@ pub fn compile(post: &Post) -> Result<(), Error> {
     )?;
     fs::create_dir_all(output_directory)?;
     let mut file = File::create(output_path)?;
-    file.write_fmt(format_args!("<html>{}</html>", render(highlighted_html)))
+    let title = post.headers.get("title").ok_or_else(|| InvalidPostError::new_for_post(&post, "Missing title"))?;
+    let date_string = post.headers.get("date").ok_or_else(|| InvalidPostError::new_for_post(&post, "Missing date"))?;
+    let date = NaiveDate::parse_from_str(date_string, "%Y/%m/%d").map_err(|_| InvalidPostError::new_for_post(&post, "Invalid date"))?;
+    let formatted_date_string = date.format("%B %e, %Y").to_string();
+    let tag = post.headers.get("tag");
+    file.write_fmt(
+        format_args!(
+            "<html>{}</html>",
+            render(
+                highlighted_html,
+                &title,
+                &formatted_date_string,
+                tag
+            )
+        )
+    )?;
+    Ok(())
 }
 
 fn with_highlighted_code_snippets(html: &String) -> String {
@@ -64,14 +78,6 @@ fn with_highlighted_code_snippets(html: &String) -> String {
         format!("{}", highlighted_html_for(&snippet, attributes))
     }).into()
 }
-
-//fn read_lines(path: &PathBuf) -> Result<Vec<String>, Error> {
-//    let file = File::open(path)?;
-//    let reader = BufReader::new(file);
-//    Ok(
-//        reader.lines().map(|l| l.unwrap()).collect()
-//    )
-//}
 
 fn text_following_headers(lines: &Vec<String>) -> String {
     lines.iter().skip_while(|l| is_header(l))
@@ -92,33 +98,22 @@ mod tests {
 
     use super::*;
     use std::env;
+    use std::path::PathBuf;
 
     #[test]
     fn it_highlights_each_code_snippet() {
-        let lines = read_lines(&snippet_input_path()).unwrap();
-        let markdown = text_following_headers(&lines);
+        let root_path = PathBuf::from("tests/output");
+        let post = Post::from(&root_path, &snippet_input_path()).unwrap();
+        let markdown = text_following_headers(&post.lines);
 
         let parser = Parser::new(&markdown);
         let mut html = String::new();
         html::push_html(&mut html, parser);
 
         let highlighted_html = with_highlighted_code_snippets(&html);
-
-        println!();
-        println!("{}", highlighted_html);
-        println!();
-
-
         //assert_eq!(snippets.len(), 2);
         //assert_eq!(snippets[0], "array = [1, 2, 3]\n  for i in array\n    puts i\n  end");
         //assert_eq!(snippets[1], "$ ruby int-loop.rb\n1\n2\n3");
-    }
-
-    #[test]
-    fn it_returns_the_markdown_after_the_header_lines() {
-        let lines = read_lines(&input_path()).unwrap();
-        let markdown = text_following_headers(&lines);
-        assert_eq!(markdown, "Learning Rust is hard for everyone, but it’s even worse for me because I’ve\nbeen working with Ruby during past ten years.\n");
     }
 
     #[test]
@@ -133,19 +128,8 @@ mod tests {
         assert_eq!(true, is_header(&line));
     }
 
-    #[test]
-    fn it_reads_an_array_of_lines() {
-        let lines = read_lines(&input_path()).unwrap();
-        assert_eq!(lines.len(), 6);
-        assert_eq!(lines[5], "been working with Ruby during past ten years.");
-    }
-
     fn snippet_input_path() -> PathBuf {
         tests_path().join("short_input_file_with_code_snippet.txt")
-    }
-
-    fn input_path() -> PathBuf {
-        tests_path().join("short_input_file.txt")
     }
 
     fn tests_path() -> PathBuf {

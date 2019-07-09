@@ -4,16 +4,16 @@ use self::maud::html;
 use self::maud::DOCTYPE;
 use self::maud::PreEscaped;
 
-pub fn render(content: String) -> String {
+pub fn render(content: String, title: &String, date_string: &String, tag: Option<&String>) -> String {
     let rendered = html! {
       (DOCTYPE)
       head {
           link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen";
           link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen";
-          link rel="alternate" type="application/atom+xml" title="Summer School With The Rust Compiler - feed" href="http://feeds2.feedburner.com/patshaughnessy";
+          link rel="alternate" type="application/atom+xml" title={ (title) " - Feed" } href="http://feeds2.feedburner.com/patshaughnessy";
           meta http-equiv="Content-Type" content="text/html; charset=UTF-8";
           title {
-              "Summer School With The Rust Compiler - Pat Shaughnessy"
+              (title) " - Pat Shaughnessy"
           }
       }
       body {
@@ -38,13 +38,9 @@ pub fn render(content: String) -> String {
             div class="ninecol white" {
               article class="post" {
                 header {
-                  h1 {
-                    "Summer School With The Rust Compiler"
-                  }
+                  h1 { (title) }
                   div class="metadata" {
-                    span class="date" {
-                      "October 24th 2018"
-                    }
+                    span class="date" { (date_string) }
                     (PreEscaped("&nbsp;&mdash;&nbsp;"))
                   }
                 }
@@ -94,8 +90,10 @@ pub fn render(content: String) -> String {
                     }
                   }
                 }
-                div class="header" {
-                  "More on Rust"
+                @if let Some(t) = tag {
+                    div class="header" {
+                      "More on Rust"
+                    }
                 }
                 div class="links" {
                   ul {

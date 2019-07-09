@@ -29,7 +29,7 @@ impl Post {
         let lines = read_lines(input_path)?;
         let header_lines = header_lines(&lines);
         let header_map = header_map(&header_lines);
-        let path = path_from_headers(&header_map)?;
+        let path = path_from_headers(&header_map, input_path)?;
         Ok(
             Post {
                 input_path: input_path.clone(),
@@ -41,11 +41,11 @@ impl Post {
     }
 }
 
-fn path_from_headers(header_map: &HashMap<String, String>) -> Result<PathBuf, InvalidPostError> {
+fn path_from_headers(header_map: &HashMap<String, String>, input_path: &PathBuf) -> Result<PathBuf, InvalidPostError> {
     let url = header_map.get("url");
     match url {
         Some(url) => Ok(path_from_url(url)),
-        None      => path_from_date_and_title(header_map)
+        None      => path_from_date_and_title(header_map, input_path)
     }
 }
 
@@ -59,28 +59,28 @@ fn path_from_url(url: &str) -> PathBuf {
     path
 }
 
-fn path_from_date_and_title(header_map: &HashMap<String, String>) -> Result<PathBuf, InvalidPostError> {
-    let path = path_from_date(&header_map)?;
-    let slug = slug_from_title(&header_map)?;
+fn path_from_date_and_title(header_map: &HashMap<String, String>, input_path: &PathBuf) -> Result<PathBuf, InvalidPostError> {
+    let path = path_from_date(&header_map, input_path)?;
+    let slug = slug_from_title(&header_map, input_path)?;
     Ok(path.join(slug))
 }
 
-fn path_from_date(header_map: &HashMap<String, String>) -> Result<PathBuf, InvalidPostError> {
-    let date_string = header_map.get("date").ok_or_else(|| InvalidPostError::new("Missing date"))?;
-    let date = NaiveDate::parse_from_str(date_string, "%Y/%m/%d").map_err(|_| InvalidPostError::new("Invalid date"))?;
+fn path_from_date(header_map: &HashMap<String, String>, input_path: &PathBuf) -> Result<PathBuf, InvalidPostError> {
+    let date_string = header_map.get("date").ok_or_else(|| InvalidPostError::new_for_path(&input_path, "Missing date"))?;
+    let date = NaiveDate::parse_from_str(date_string, "%Y/%m/%d").map_err(|_| InvalidPostError::new_for_path(&input_path, "Invalid date"))?;
     let year = PathBuf::from(date.year().to_string());
     let month = PathBuf::from(date.month().to_string());
     let day = PathBuf::from(date.day().to_string());
     Ok(year.join(month).join(day))
 }
 
-fn slug_from_title(header_map: &HashMap<String, String>) -> Result<PathBuf, InvalidPostError> {
+fn slug_from_title(header_map: &HashMap<String, String>, input_path: &PathBuf) -> Result<PathBuf, InvalidPostError> {
     lazy_static! {
         static ref AMPERSANDS: Regex = Regex::new(r"&").unwrap();
         static ref WHITESPACE: Regex = Regex::new(r"(\s+)|\.").unwrap();
         static ref OTHER: Regex = Regex::new(r"[^_a-z0-9\-]").unwrap();
     }
-    let title = header_map.get("title").ok_or_else(|| InvalidPostError::new("Missing title"))?;
+    let title = header_map.get("title").ok_or_else(|| InvalidPostError::new_for_path(&input_path, "Missing title"))?;
     let title = title.to_ascii_lowercase();
     let title = AMPERSANDS.replace_all(&title, "and");
     let title = WHITESPACE.replace_all(&title, "-");

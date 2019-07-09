@@ -1,20 +1,67 @@
+//extern crate blog;
+
 use std::fmt;
 use std::error::Error;
+use std::path::PathBuf;
+
+use post::Post;
+//use invalid_post_error::InvalidPostError;
+
+#[derive(Debug)]
+enum InvalidPostErrorContext {
+    PostContext(Post),
+    PathContext(PathBuf)
+}
 
 #[derive(Debug)]
 pub struct InvalidPostError {
+    context: Option<InvalidPostErrorContext>,
     details: String
 }
 
 impl InvalidPostError {
+    pub fn new_for_post(post: &Post, msg: &str) -> InvalidPostError {
+        let context = InvalidPostErrorContext::PostContext(post.clone());
+        InvalidPostError {
+            context: Some(context),
+            details: msg.to_string()
+        }
+    }
+
+    pub fn new_for_path(path: &PathBuf, msg: &str) -> InvalidPostError {
+        let context = InvalidPostErrorContext::PathContext(path.clone());
+        InvalidPostError {
+            context: Some(context),
+            details: msg.to_string()
+        }
+    }
+
     pub fn new(msg: &str) -> InvalidPostError {
-        InvalidPostError{details: msg.to_string()}
+        InvalidPostError {
+            context: None,
+            details: msg.to_string()
+        }
     }
 }
 
 impl fmt::Display for InvalidPostError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.details)
+        if let Some(ref c) = self.context {
+            write_context(c, &self.details, f)
+        } else {
+            write!(f, "{}", self.details)
+        }
+    }
+}
+
+fn write_context(context: &InvalidPostErrorContext, details: &String, f: &mut fmt::Formatter) -> fmt::Result {
+    match context {
+        InvalidPostErrorContext::PostContext(post) => {
+            write!(f, "{} in {}", details, post.input_path.to_str().unwrap())
+        }
+        InvalidPostErrorContext::PathContext(path) => {
+            write!(f, "{} in {}", details, path.to_str().unwrap())
+        }
     }
 }
 
@@ -26,12 +73,12 @@ impl Error for InvalidPostError {
 
 impl From<std::num::ParseIntError> for InvalidPostError {
     fn from(_: std::num::ParseIntError) -> InvalidPostError {
-        InvalidPostError{details: "Unable to parse integer".to_string()}
+        InvalidPostError::new("Unable to parse integer")
     }
 }
 
 impl From<std::io::Error> for InvalidPostError {
     fn from(_: std::io::Error) -> InvalidPostError {
-        InvalidPostError{details: "TBD IO Error".to_string()}
+        InvalidPostError::new("TBD IO Error")
     }
 }
