@@ -9,11 +9,10 @@ use pulldown_cmark::{Parser, html};
 
 use std::fs;
 use std::fs::File;
-use std::io::prelude::*;
 use std::path::Path;
-
 use std::io::Error;
 use std::io::ErrorKind;
+use std::io::prelude::*;
 use regex::Regex;
 use regex::RegexBuilder;
 use regex::Captures;
@@ -32,22 +31,39 @@ use invalid_post_error::InvalidPostError;
 
 use chrono::NaiveDate;
 
-pub fn compile(post: &Post) -> Result<(), InvalidPostError> {
-    let markdown = text_following_headers(&post.lines);
+use std::ffi::OsStr;
+use std::path::PathBuf;
+
+pub fn run(input_path: PathBuf, output_path: PathBuf) -> Result<Vec<Post>, InvalidPostError> {
+    let paths = fs::read_dir(input_path)?;
+    let markdown_paths = paths.filter_map(Result::ok).filter(|f|
+        f.path().extension().and_then(OsStr::to_str) == Some("markdown")
+    );
+    let posts: Result<Vec<Post>, InvalidPostError> = markdown_paths.map(|p|
+        Post::from(&output_path, &p.path())
+    ).collect();
+    if let Ok(posts) = posts {
+        posts.into_iter().map(|p| compile(&p)).collect()
+    } else {
+        posts
+    }
+}
+
+pub fn compile(post: &Post) -> Result<Post, InvalidPostError> {
+    let markdown = text_following_headers(&post.lines); // Should be a Post method
     let parser = Parser::new(&markdown);
     let mut html = String::new();
     html::push_html(&mut html, parser);
     let highlighted_html = with_highlighted_code_snippets(&html);
-
     let output_path = &post.output_path;
-    let output_directory = Path::new(output_path).parent().ok_or(
+    let output_directory = Path::new(&output_path).parent().ok_or(
         Error::new(ErrorKind::Other, "Invalid output path")
     )?;
     fs::create_dir_all(output_directory)?;
     let mut file = File::create(output_path)?;
-    let title = post.headers.get("title").ok_or_else(|| InvalidPostError::new_for_post(&post, "Missing title"))?;
-    let date_string = post.headers.get("date").ok_or_else(|| InvalidPostError::new_for_post(&post, "Missing date"))?;
-    let date = NaiveDate::parse_from_str(date_string, "%Y/%m/%d").map_err(|_| InvalidPostError::new_for_post(&post, "Invalid date"))?;
+    let title = post.headers.get("title").ok_or_else(|| InvalidPostError::new_for_post(post, "Missing title"))?;
+    let date_string = post.headers.get("date").ok_or_else(|| InvalidPostError::new_for_post(post, "Missing date"))?;
+    let date = NaiveDate::parse_from_str(date_string, "%Y/%m/%d").map_err(|_| InvalidPostError::new_for_post(post, "Invalid date"))?;
     let formatted_date_string = date.format("%B %e, %Y").to_string();
     let tag = post.headers.get("tag");
     file.write_fmt(
@@ -61,7 +77,7 @@ pub fn compile(post: &Post) -> Result<(), InvalidPostError> {
             )
         )
     )?;
-    Ok(())
+    Ok(post.clone())
 }
 
 fn with_highlighted_code_snippets(html: &String) -> String {
@@ -79,6 +95,7 @@ fn with_highlighted_code_snippets(html: &String) -> String {
     }).into()
 }
 
+// These two methods should go into Post
 fn text_following_headers(lines: &Vec<String>) -> String {
     lines.iter().skip_while(|l| is_header(l))
                 .fold(String::new(), |str, line|
