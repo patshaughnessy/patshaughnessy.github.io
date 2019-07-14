@@ -4,16 +4,26 @@ use self::maud::html;
 use self::maud::DOCTYPE;
 use self::maud::PreEscaped;
 
-pub fn render(content: String, title: &String, date_string: &String, tag: Option<&String>) -> String {
+use post::Post;
+
+pub fn render(highlighted_html: String, post: &Post, all_posts: &Vec<Post>) -> String {
+    let formatted_date_string = post.date.format("%B %e, %Y").to_string();
+    let recent_posts = all_posts.iter().filter(|p| p.tag == post.tag || post.tag.is_none()).take(4);
+    let recent_links = recent_posts.map(|p|
+        (
+            &p.url,
+            &p.title
+        )
+    );
     let rendered = html! {
       (DOCTYPE)
       head {
           link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen";
           link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen";
-          link rel="alternate" type="application/atom+xml" title={ (title) " - Feed" } href="http://feeds2.feedburner.com/patshaughnessy";
+          link rel="alternate" type="application/atom+xml" title={ (post.title) " - Feed" } href="http://feeds2.feedburner.com/patshaughnessy";
           meta http-equiv="Content-Type" content="text/html; charset=UTF-8";
           title {
-              (title) " - Pat Shaughnessy"
+              (post.title) " - Pat Shaughnessy"
           }
       }
       body {
@@ -38,13 +48,13 @@ pub fn render(content: String, title: &String, date_string: &String, tag: Option
             div class="ninecol white" {
               article class="post" {
                 header {
-                  h1 { (title) }
+                  h1 { (post.title) }
                   div class="metadata" {
-                    span class="date" { (date_string) }
+                    span class="date" { (formatted_date_string) }
                     (PreEscaped("&nbsp;&mdash;&nbsp;"))
                   }
                 }
-                section class="content" { (PreEscaped(content)) }
+                section class="content" { (PreEscaped(highlighted_html)) }
               }
             }
             div class="twocol last" id="right" {
@@ -90,26 +100,18 @@ pub fn render(content: String, title: &String, date_string: &String, tag: Option
                     }
                   }
                 }
-                @if let Some(t) = tag {
-                    div class="header" {
-                      "More on Rust"
-                    }
+                @if let Some(ref t) = post.tag {
+                  div class="header" {
+                    "More on " (t)
+                  }
                 }
                 div class="links" {
                   ul {
-                    li {
-                      a href="/2018/6/9/from-activerecord-to-diesel" {
-                        "From ActiveRecord to Diesel"
-                      }
-                    }
-                    li {
-                      a href="/2018/3/15/how-rust-implements-tagged-unions" {
-                        "How Rust Implements Tagged Unions"
-                      }
-                    }
-                    li {
-                      a href="/2018/1/18/learning-rust-if-let-vs--match" {
-                        "Learning Rust: If Let vs. Match"
+                    @for (link_url, link_title) in recent_links {
+                      li {
+                        a href=(link_url) {
+                          (link_title)
+                        }
                       }
                     }
                   }

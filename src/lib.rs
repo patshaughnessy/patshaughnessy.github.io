@@ -13,6 +13,7 @@ use std::path::Path;
 use std::io::Error;
 use std::io::ErrorKind;
 use std::io::prelude::*;
+use std::cmp::Reverse;
 use regex::Regex;
 use regex::RegexBuilder;
 use regex::Captures;
@@ -42,14 +43,15 @@ pub fn run(input_path: PathBuf, output_path: PathBuf) -> Result<Vec<Post>, Inval
     let posts: Result<Vec<Post>, InvalidPostError> = markdown_paths.map(|p|
         Post::from(&output_path, &p.path())
     ).collect();
-    if let Ok(posts) = posts {
-        posts.into_iter().map(|p| compile(&p)).collect()
+    if let Ok(mut posts) = posts {
+        posts.sort_by_key(|p| Reverse(p.date));
+        posts.iter().map(|p| compile(&p, &posts)).collect()
     } else {
         posts
     }
 }
 
-pub fn compile(post: &Post) -> Result<Post, InvalidPostError> {
+pub fn compile(post: &Post, all_posts: &Vec<Post>) -> Result<Post, InvalidPostError> {
     let markdown = text_following_headers(&post.lines); // Should be a Post method
     let parser = Parser::new(&markdown);
     let mut html = String::new();
@@ -61,19 +63,13 @@ pub fn compile(post: &Post) -> Result<Post, InvalidPostError> {
     )?;
     fs::create_dir_all(output_directory)?;
     let mut file = File::create(output_path)?;
-    let title = post.headers.get("title").ok_or_else(|| InvalidPostError::new_for_post(post, "Missing title"))?;
-    let date_string = post.headers.get("date").ok_or_else(|| InvalidPostError::new_for_post(post, "Missing date"))?;
-    let date = NaiveDate::parse_from_str(date_string, "%Y/%m/%d").map_err(|_| InvalidPostError::new_for_post(post, "Invalid date"))?;
-    let formatted_date_string = date.format("%B %e, %Y").to_string();
-    let tag = post.headers.get("tag");
     file.write_fmt(
         format_args!(
             "<html>{}</html>",
             render(
                 highlighted_html,
-                &title,
-                &formatted_date_string,
-                tag
+                &post,
+                &all_posts
             )
         )
     )?;
