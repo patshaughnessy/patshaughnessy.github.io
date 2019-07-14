@@ -6,7 +6,7 @@ use self::maud::PreEscaped;
 
 use post::Post;
 
-pub fn render(highlighted_html: String, post: &Post, all_posts: &Vec<Post>) -> String {
+pub fn render_article(highlighted_html: String, post: &Post, all_posts: &Vec<Post>) -> String {
     let formatted_date_string = post.date.format("%B %e, %Y").to_string();
     let recent_posts = all_posts.iter().filter(|p| p.tag == post.tag || post.tag.is_none()).take(4);
     let recent_links = recent_posts.map(|p|
@@ -159,6 +159,21 @@ pub fn render(highlighted_html: String, post: &Post, all_posts: &Vec<Post>) -> S
             }
           }
         }
+      }
+    };
+    rendered.into_string()
+}
+
+pub fn render_home_page(all_posts: &Vec<Post>) -> String {
+    let rendered = html! {
+      (DOCTYPE)
+      head {
+          title {
+              "Pat Shaughnessy"
+          }
+      }
+      body {
+          "to do"
       }
     };
     rendered.into_string()

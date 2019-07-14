@@ -17,6 +17,9 @@ use chrono::Datelike;
 
 use invalid_post_error::InvalidPostError;
 
+// TODO:
+// - remove input path from the struct - just need it inside of from
+// - only save the relative path in output_path, and rename it to be path
 #[derive(Debug, Clone, Eq)]
 pub struct Post {
     pub input_path: PathBuf,

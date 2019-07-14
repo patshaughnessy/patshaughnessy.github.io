@@ -10,7 +10,7 @@ pub fn main() {
         println!("Usage: blogc INPUT_PATH OUTPUT_PATH");
     } else {
         match run(PathBuf::from(&args[1]), PathBuf::from(&args[2])) {
-            Ok(posts) => println!("Compiled {} posts.", posts.len()),
+            Ok(count) => println!("Compiled {} posts.", count),
             Err(e) => println!("{}", e)
         }
     }
