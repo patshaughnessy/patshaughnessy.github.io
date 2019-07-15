@@ -57,6 +57,10 @@ impl Post {
             }
         )
     }
+
+    pub fn month_name(self: &Post) -> String {
+        self.date.format("%B").to_string()
+    }
 }
 
 // TODO some tests around the url attribute
@@ -158,6 +162,45 @@ fn header_map(header_lines: &Vec<String>) -> HashMap<String, String> {
     headers
 }
 
+#[derive(Debug, Clone, Eq)]
+pub struct PostLink {
+    pub date_string: Option<String>,
+    pub url: String,
+    pub title: String
+}
+
+impl PartialEq for PostLink {
+    fn eq(&self, other: &Self) -> bool {
+        self.date_string == other.date_string &&
+        self.url == other.url &&
+        self.title == other.title
+    }
+}
+
+impl PostLink {
+    pub fn from(posts: &Vec<Post>) -> Vec<PostLink> {
+        let mut last_date_string: Option<String> = None;
+        posts.iter().map(|p| {
+            let date_string = p.date.format("%B %Y").to_string();
+            let post_link = match last_date_string {
+                Some(ref last) if last == &date_string =>
+                    PostLink {
+                        date_string: None,
+                        url: p.url.clone(),
+                        title: p.title.clone()
+                    },
+                _ => PostLink {
+                        date_string: Some(date_string.clone()),
+                        url: p.url.clone(),
+                        title: p.title.clone()
+                    }
+            };
+            last_date_string = Some(date_string);
+            post_link
+        }).collect()
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -179,6 +222,13 @@ mod tests {
     }
 
     #[test]
+    fn it_returns_a_month_name() {
+        let root_path = PathBuf::from("tests/output");
+        let post = Post::from(&root_path, &input_path()).unwrap();
+        assert_eq!(post.month_name(), "January");
+    }
+
+    #[test]
     fn it_calculates_an_output_path_and_directory() {
         let root_path = PathBuf::from("tests/output");
         let post = Post::from(&root_path, &input_path()).unwrap();
@@ -197,6 +247,40 @@ mod tests {
         let root_path = PathBuf::from("tests/output");
         let post = Post::from(&root_path, &invalid_input_path());
         assert!(post.is_err(), "Post should be invalid");
+    }
+
+    #[test]
+    fn it_returns_an_empty_array_of_links() {
+        assert_eq!(PostLink::from(&[].to_vec()), [].to_vec());
+    }
+
+    #[test]
+    fn it_returns_a_valid_array_of_links() {
+        let root_path = PathBuf::from("tests/output");
+        let post = Post::from(&root_path, &input_path()).unwrap();
+        let post2 = Post::from(&root_path, &input_path2()).unwrap();
+        let posts = [post, post2].to_vec();
+        let links = PostLink::from(&posts);
+        assert_eq!(links.len(), 2);
+        let link = &links[0];
+        assert_eq!(link.date_string, Some("January 2018".to_string()));
+        let link = &links[1];
+        assert_eq!(link.date_string, Some("April 2009".to_string()));
+    }
+
+    #[test]
+    fn it_returns_links_without_repeated_months() {
+        let root_path = PathBuf::from("tests/output");
+        let post = Post::from(&root_path, &input_path()).unwrap();
+        let mut post2 = Post::from(&root_path, &input_path2()).unwrap();
+        post2.date = post.date;
+        let posts = [post, post2].to_vec();
+        let links = PostLink::from(&posts);
+        assert_eq!(links.len(), 2);
+        let link = &links[0];
+        assert_eq!(link.date_string, Some("January 2018".to_string()));
+        let link = &links[1];
+        assert_eq!(link.date_string, None);
     }
 
     fn input_path() -> PathBuf {

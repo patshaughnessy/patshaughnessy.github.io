@@ -18,9 +18,10 @@ use regex::Regex;
 use regex::RegexBuilder;
 use regex::Captures;
 
+mod article_layout;
+mod home_page_layout;
+mod rss_layout;
 mod layout;
-use layout::render_article;
-use layout::render_home_page;
 
 mod highlight;
 use highlight::highlighted_html_for;
@@ -30,8 +31,6 @@ use post::Post;
 
 pub mod invalid_post_error;
 use invalid_post_error::InvalidPostError;
-
-use chrono::NaiveDate;
 
 use std::ffi::OsStr;
 use std::path::PathBuf;
@@ -45,24 +44,27 @@ pub fn run(input_path: PathBuf, output_path: PathBuf) -> Result<usize, InvalidPo
     let paths = fs::read_dir(&input_path)?;
     let all_posts: Result<Vec<Post>, InvalidPostError> =
         paths.filter_map(Result::ok)
-        .filter(|f| f.path().extension().and_then(OsStr::to_str) == Some("markdown"))
-        .map(|p| Post::from(&output_path, &p.path())).collect();
+             .filter(|f| f.path().extension().and_then(OsStr::to_str) == Some("markdown"))
+             .map(|p| Post::from(&output_path, &p.path())).collect();
     let mut all_posts = all_posts?;
     let count = all_posts.len();
     all_posts.sort_by_key(|p| Reverse(p.date));
     let input = CompileInput {all_posts: all_posts, output_path: output_path};
     Ok(input).and_then(compile_posts)
              .and_then(compile_home_page)
-             .map(|output| count)
+             .and_then(compile_rss_feed)
+             .map(|_output| count)
 }
 
 fn compile_posts(input: CompileInput) -> Result<CompileInput, InvalidPostError> {
-    let compiled_posts: Result<Vec<Post>, InvalidPostError> =
+    let result: Result<Vec<Post>, InvalidPostError> =
         input.all_posts.iter().map(|p|
             compile_post(&p, &input.all_posts)
         ).collect();
-    let compiled_posts = compiled_posts?;
-    Ok(input)
+    match result {
+        Ok(_) => Ok(input),
+        Err(e) => Err(e)
+    }
 }
 
 // It's a bit weird that post encapsulates the output path.
@@ -81,22 +83,12 @@ pub fn compile_post(post: &Post, all_posts: &Vec<Post>) -> Result<Post, InvalidP
     )?;
     fs::create_dir_all(output_directory)?;
     let mut file = File::create(output_path)?;
-    file.write_fmt(
-        format_args!(
-            "<html>{}</html>",
-            render_article(
-                highlighted_html,
-                &post,
-                &all_posts
-            )
-        )
-    )?;
-    let mut home_page_file = File::create("index.html")?;
-    home_page_file.write_fmt(
-        format_args!(
-            "<html>{}</html>",
-            render_home_page(&all_posts)
-        )
+    file.write_all(
+        article_layout::render(
+            highlighted_html,
+            &post,
+            &all_posts
+        ).as_bytes()
     )?;
     Ok(post.clone())
 }
@@ -105,11 +97,18 @@ fn compile_home_page(input: CompileInput) -> Result<CompileInput, InvalidPostErr
     let mut output_path = input.output_path.clone();
     output_path.push("index.html");
     let mut file = File::create(output_path)?;
-    file.write_fmt(
-        format_args!(
-            "<html>{}</html>",
-            render_home_page(&input.all_posts)
-        )
+    file.write_all(
+        home_page_layout::render(&input.all_posts).as_bytes()
+    )?;
+    Ok(input)
+}
+
+fn compile_rss_feed(input: CompileInput) -> Result<CompileInput, InvalidPostError> {
+    let mut output_path = input.output_path.clone();
+    output_path.push("index.rss");
+    let mut file = File::create(output_path)?;
+    file.write_all(
+        rss_layout::render(&input.all_posts).as_bytes()
     )?;
     Ok(input)
 }
