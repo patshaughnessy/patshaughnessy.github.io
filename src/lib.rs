@@ -29,6 +29,8 @@ use highlight::highlighted_html_for;
 pub mod post;
 use post::Post;
 
+pub mod post_link;
+
 pub mod invalid_post_error;
 use invalid_post_error::InvalidPostError;
 

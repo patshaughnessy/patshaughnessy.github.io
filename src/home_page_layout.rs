@@ -3,34 +3,11 @@ extern crate maud;
 use self::maud::html;
 use self::maud::PreEscaped;
 
-use chrono::NaiveDate;
-use chrono::Datelike;
-
 use post::Post;
+use post_link::PostLink;
 use super::layout;
 
-struct MonthAndPost {
-    month: Option<String>,
-    post: Post
-}
-
 pub fn render(all_posts: &Vec<Post>) -> String {
-    let mut last_date_var: Option<NaiveDate> = None;
-    let months_and_posts = all_posts.iter().map(|p| {
-        let month_and_post = match last_date_var {
-            Some(last_date) if last_date.year() == p.date.year() && last_date.month() == p.date.month() =>
-                MonthAndPost {
-                    month: None,
-                    post: p.clone()
-                },
-            _ => MonthAndPost {
-                    month: Some(p.month_name()),
-                    post: p.clone()
-                }
-        };
-        last_date_var = Some(p.date);
-        month_and_post
-    });
     let content = html! {
       div class="row" {
         div class="onecol" { }
@@ -118,18 +95,18 @@ pub fn render(all_posts: &Vec<Post>) -> String {
             h2 { "All Articles" }
           }
           table id="archive-table" {
-            @for month_and_post in months_and_posts {
+            @for link in PostLink::all_from(&all_posts) {
               tr {
                 td align="right" {
-                  @if let Some(m) = month_and_post.month {
-                    (m)
+                  @if let Some(str) = link.date_string {
+                    (str)
                   } else {
                     ""
                   }
                 }
                 td {
-                  a href=(month_and_post.post.url) {
-                    (month_and_post.post.title)
+                  a href=(link.url) {
+                    (link.title)
                   }
                 }
               }
