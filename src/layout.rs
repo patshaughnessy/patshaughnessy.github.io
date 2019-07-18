@@ -4,7 +4,11 @@ use self::maud::html;
 use self::maud::DOCTYPE;
 use self::maud::PreEscaped;
 
-pub fn render(content: String, title_string: Option<&String>) -> String {
+pub mod post;
+pub mod home_page;
+pub mod rss;
+
+pub fn render(content: String, title: Option<&String>) -> String {
     let rendered = html! {
       (DOCTYPE)
       html {
@@ -14,7 +18,7 @@ pub fn render(content: String, title_string: Option<&String>) -> String {
           link rel="alternate" type="application/atom+xml" title={ "Pat Shaughnessy - Feed" } href="http://feeds2.feedburner.com/patshaughnessy";
           meta http-equiv="Content-Type" content="text/html; charset=UTF-8";
           title {
-            @if let Some(t) = title_string {
+            @if let Some(t) = title{
               (t) " - Pat Shaughnessy"
             } @else {
               "Pat Shaughnessy"

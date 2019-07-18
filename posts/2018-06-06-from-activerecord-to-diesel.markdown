@@ -142,7 +142,7 @@ etc…
   Compiling diesel_derives v1.3.0
    Compiling diesel v1.3.0
    Compiling last_names v0.1.0 (file:///Users/pat/path/to/last_names)
-    Finished dev [unoptimized + debuginfo] target(s) in 47.30 secs
+    Finished dev [unoptimized + debuginfo] target(s) in 47.30 secs
 </pre>
 
 ## Connecting to Postgres

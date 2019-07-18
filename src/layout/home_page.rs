@@ -5,7 +5,6 @@ use self::maud::PreEscaped;
 
 use post::Post;
 use post_link::PostLink;
-use super::layout;
 
 pub fn render(all_posts: &Vec<Post>) -> String {
     let content = html! {
@@ -115,5 +114,5 @@ pub fn render(all_posts: &Vec<Post>) -> String {
         }
       }
     };
-    layout::render(content.into_string(), None)
+    content.into_string()
 }
