@@ -205,45 +205,42 @@ mod tests {
 
     #[test]
     fn it_parses_the_title() {
-        let root_path = PathBuf::from("tests/output");
-        let post = Post::from(&root_path, &input_path()).unwrap();
+        let post = Post::from(&input_path()).unwrap();
         assert_eq!(post.title, "Learning Rust: If Let vs. Match");
     }
 
     #[test]
     fn it_parses_the_date() {
-        let root_path = PathBuf::from("tests/output");
-        let post = Post::from(&root_path, &input_path()).unwrap();
-        assert_eq!(post.date, DateTime<Utc>::parse_from_str("2018/1/18", "%Y/%m/%d").unwrap());
+        let post = Post::from(&input_path()).unwrap();
+        let expected = DateTime::parse_from_rfc3339("2018-01-18T00:00:00+00:00").unwrap();
+        assert_eq!(post.date, expected);
     }
 
     #[test]
     fn it_calculates_an_output_path_and_directory() {
-        let root_path = PathBuf::from("tests/output");
-        let post = Post::from(&root_path, &input_path()).unwrap();
-        assert_eq!(post.output_path, PathBuf::from("tests/output/2018/1/18/learning-rust-if-let-vs--match.html"));
+        let post = Post::from(&input_path()).unwrap();
+        assert_eq!(post.path, PathBuf::from("2018/1/18/learning-rust-if-let-vs--match.html"));
+        assert_eq!(post.url, "/2018/1/18/learning-rust-if-let-vs--match.html");
     }
 
     #[test]
     fn it_overrides_the_path_when_url_is_specified() {
-        let root_path = PathBuf::from("tests/output");
-        let post = Post::from(&root_path, &input_path2()).unwrap();
-        assert_eq!(post.output_path, PathBuf::from("tests/output/paperclip-database-storage.html"));
+        let post = Post::from(&input_path2()).unwrap();
+        assert_eq!(post.path, PathBuf::from("paperclip-database-storage.html"));
+        assert_eq!(post.url, "/paperclip-database-storage.html");
     }
 
     #[test]
     fn it_returns_an_error_for_an_unexpected_filename() {
-        let root_path = PathBuf::from("tests/output");
-        let post = Post::from(&root_path, &invalid_input_path());
+        let post = Post::from(&invalid_input_path());
         assert!(post.is_err(), "Post should be invalid");
     }
 
     #[test]
     fn it_renders_html() {
-        let root_path = PathBuf::from("tests/output");
-        let post = Post::from(&root_path, &input_path()).unwrap();
+        let post = Post::from(&input_path()).unwrap();
         let html = fs::read_to_string(rendered_html_path()).unwrap();
-        assert_eq!(post.content(), html);
+        assert_eq!(post.content, html);
     }
 
     fn input_path() -> PathBuf {

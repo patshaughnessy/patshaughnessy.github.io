@@ -57,9 +57,8 @@ mod tests {
 
     #[test]
     fn it_returns_a_valid_array_of_links() {
-        let root_path = PathBuf::from("tests/output");
-        let post = Post::from(&root_path, &input_path()).unwrap();
-        let post2 = Post::from(&root_path, &input_path2()).unwrap();
+        let post = Post::from(&input_path()).unwrap();
+        let post2 = Post::from(&input_path2()).unwrap();
         let posts = [post, post2].to_vec();
         let links = PostLink::all_from(&posts);
         assert_eq!(links.len(), 2);
@@ -71,9 +70,8 @@ mod tests {
 
     #[test]
     fn it_returns_links_without_repeated_months() {
-        let root_path = PathBuf::from("tests/output");
-        let post = Post::from(&root_path, &input_path()).unwrap();
-        let mut post2 = Post::from(&root_path, &input_path2()).unwrap();
+        let post = Post::from(&input_path()).unwrap();
+        let mut post2 = Post::from(&input_path2()).unwrap();
         post2.date = post.date;
         let posts = [post, post2].to_vec();
         let links = PostLink::all_from(&posts);
