@@ -1,15 +1,9 @@
-//extern crate blog;
-
 use std::fmt;
 use std::error::Error;
 use std::path::PathBuf;
 
-use post::Post;
-//use invalid_post_error::InvalidPostError;
-
 #[derive(Debug)]
 enum InvalidPostErrorContext {
-    PostContext(Post),
     PathContext(PathBuf)
 }
 
@@ -20,14 +14,6 @@ pub struct InvalidPostError {
 }
 
 impl InvalidPostError {
-    pub fn new_for_post(post: &Post, msg: &str) -> InvalidPostError {
-        let context = InvalidPostErrorContext::PostContext(post.clone());
-        InvalidPostError {
-            context: Some(context),
-            details: msg.to_string()
-        }
-    }
-
     pub fn new_for_path(path: &PathBuf, msg: &str) -> InvalidPostError {
         let context = InvalidPostErrorContext::PathContext(path.clone());
         InvalidPostError {
@@ -56,9 +42,6 @@ impl fmt::Display for InvalidPostError {
 
 fn write_context(context: &InvalidPostErrorContext, details: &String, f: &mut fmt::Formatter) -> fmt::Result {
     match context {
-        InvalidPostErrorContext::PostContext(post) => {
-            write!(f, "{} in {}", details, post.input_path.to_str().unwrap())
-        }
         InvalidPostErrorContext::PathContext(path) => {
             write!(f, "{} in {}", details, path.to_str().unwrap())
         }

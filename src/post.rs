@@ -20,18 +20,17 @@ use highlight::highlighted_html_for;
 
 #[derive(Debug, Clone, Eq)]
 pub struct Post {
-    pub input_path: PathBuf,
-    pub output_path: PathBuf,
-    pub url: String,
+    pub path: PathBuf,
     pub title: String,
     pub date: DateTime<Utc>,
     pub tag: Option<String>,
+    pub url: String,
     pub headers: HashMap<String, String>,
     pub content: String
 }
 
 impl Post {
-    pub fn from(root_path: &PathBuf, input_path: &PathBuf) -> Result<Post, InvalidPostError> {
+    pub fn from(input_path: &PathBuf) -> Result<Post, InvalidPostError> {
         let lines = read_lines(input_path)?;
         // TODO: partition to get other lines also
         let header_lines = header_lines(&lines);
@@ -40,16 +39,17 @@ impl Post {
         let tag = header_map.get("tag").map(|str| str.clone());
         let date = date_from_headers(&header_map, input_path)?;
         let path = path_from_headers(&header_map, title, &date)?;
-        let url_string = path.as_path().as_os_str().to_str().ok_or_else(|| InvalidPostError::new_for_path(input_path, "Invalid path"))?;
-        let absolute_url = format!("/{}", url_string);
+        let url = format!(
+            "/{}",
+            path.as_path().as_os_str().to_str().ok_or_else(|| InvalidPostError::new_for_path(input_path, "Invalid path"))?
+        );
         Ok(
             Post {
-                input_path: input_path.clone(),
-                output_path: root_path.join(&path),
-                url: absolute_url,
+                path: path,
                 title: title.clone(),
                 date: date,
                 tag: tag,
+                url: url,
                 headers: header_map.clone(),
                 content: html(lines)
             }
