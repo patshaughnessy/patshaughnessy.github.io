@@ -3,7 +3,6 @@ extern crate chrono;
 
 use std::fs::File;
 use std::path::PathBuf;
-use std::path::Path;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Error;
@@ -32,26 +31,22 @@ pub struct Post {
 impl Post {
     pub fn from(input_path: &PathBuf) -> Result<Post, InvalidPostError> {
         let lines = read_lines(input_path)?;
-        // TODO: partition to get other lines also
         let header_lines = header_lines(&lines);
         let header_map = header_map(&header_lines);
         let title = header_map.get("title").ok_or_else(|| InvalidPostError::new_for_path(input_path, "Missing title"))?;
-        let tag = header_map.get("tag").map(|str| str.clone());
         let date = date_from_headers(&header_map, input_path)?;
-        let path = path_from_headers(&header_map, title, &date)?;
-        let url = format!(
-            "/{}",
-            path.as_path().as_os_str().to_str().ok_or_else(|| InvalidPostError::new_for_path(input_path, "Invalid path"))?
-        );
+        let url = path_from_headers(&header_map, title, &date);
+        let mut path = PathBuf::from(&url);
+        path.set_extension("html");
         Ok(
             Post {
                 path: path,
                 title: title.clone(),
                 date: date,
-                tag: tag,
+                tag: header_map.get("tag").map(|str| str.clone()),
                 url: url,
                 headers: header_map.clone(),
-                content: html(lines)
+                content: html(&lines)
             }
         )
     }
@@ -80,38 +75,32 @@ fn date_from_headers(header_map: &HashMap<String, String>, input_path: &PathBuf)
     Ok(DateTime::<Utc>::from_utc(naive_date.and_time(midnight), Utc))
 }
 
-fn path_from_headers(header_map: &HashMap<String, String>, title: &String, date: &DateTime<Utc>) -> Result<PathBuf, InvalidPostError> {
+fn path_from_headers(header_map: &HashMap<String, String>, title: &String, date: &DateTime<Utc>) -> String {
     let url = header_map.get("url");
     match url {
-        Some(url) => Ok(path_from_url(url)),
+        Some(url) => url.to_string(),
         None      => path_from_title_and_date(title, date)
     }
 }
 
-fn path_from_url(url: &str) -> PathBuf {
-    let mut path = if Path::new(url).has_root() {
-        PathBuf::from(&url[1..])
-    } else {
-        PathBuf::from(url)
-    };
-    path.set_extension("html");
+fn path_from_title_and_date(title: &String, date: &DateTime<Utc>) -> String {
+    let mut path = "/".to_string();
+    path.push_str(&path_from_date(date));
+    path.push('/');
+    path.push_str(&slug(title));
     path
 }
 
-fn path_from_title_and_date(title: &String, date: &DateTime<Utc>) -> Result<PathBuf, InvalidPostError> {
-    let path = path_from_date(date)?;
-    let slug = slug(title)?;
-    Ok(path.join(slug))
+fn path_from_date(date: &DateTime<Utc>) -> String {
+    let mut path = date.year().to_string();
+    path.push('/');
+    path.push_str(&date.month().to_string());
+    path.push('/');
+    path.push_str(&date.day().to_string());
+    path
 }
 
-fn path_from_date(date: &DateTime<Utc>) -> Result<PathBuf, InvalidPostError> {
-    let year = PathBuf::from(date.year().to_string());
-    let month = PathBuf::from(date.month().to_string());
-    let day = PathBuf::from(date.day().to_string());
-    Ok(year.join(month).join(day))
-}
-
-fn slug(title: &String) -> Result<PathBuf, InvalidPostError> {
+fn slug(title: &String) -> String {
     lazy_static! {
         static ref AMPERSANDS: Regex = Regex::new(r"&").unwrap();
         static ref WHITESPACE: Regex = Regex::new(r"(\s+)|\.").unwrap();
@@ -121,58 +110,7 @@ fn slug(title: &String) -> Result<PathBuf, InvalidPostError> {
     let title = AMPERSANDS.replace_all(&title, "and");
     let title = WHITESPACE.replace_all(&title, "-");
     let title = OTHER.replace_all(&title, "");
-    Ok(PathBuf::from(title.to_string() + ".html"))
-}
-
-pub fn html(lines: Vec<String>) -> String {
-    let markdown = lines.iter().skip_while(|l| is_header(l))
-                               .fold(String::new(), |str, line|
-                                    str+&format!("{}\n", line)
-                               );
-    let parser = Parser::new(&markdown);
-    let mut html = String::new();
-    html::push_html(&mut html, parser);
-    with_delim_removed(
-        with_highlighted_code_snippets(&html)
-    )
-}
-
-fn with_highlighted_code_snippets(html: &String) -> String {
-    lazy_static! {
-        static ref CODE_SNIPPET: Regex = RegexBuilder::new("<pre([^>]*)>(.*?)</pre>")
-                                            .dot_matches_new_line(true)
-                                            .build()
-                                            .unwrap();
-
-    }
-    CODE_SNIPPET.replace_all(html, |captures: &Captures| {
-        let attributes = captures.get(1).map(|m| m.as_str().to_string());
-        let snippet = captures.get(2).map_or("", |m| m.as_str()).to_string();
-        format!("{}", highlighted_html_for(&snippet, attributes))
-    }).to_string()
-}
-
-fn with_delim_removed(html: String) -> String {
-    str::replace(&html, "DELIM", "")
-}
-
-fn read_lines(path: &PathBuf) -> Result<Vec<String>, Error> {
-    let file = File::open(path)?;
-    let reader = BufReader::new(file);
-    Ok(
-        reader.lines().filter_map(Result::ok).collect()
-    )
-}
-
-fn is_header(line: &String) -> bool {
-    lazy_static! {
-        static ref IS_HEADER: Regex = Regex::new("^[a-z]+:").unwrap();
-    }
-    line.trim().is_empty() || IS_HEADER.is_match(line)
-}
-
-fn header_lines(lines: &Vec<String>) -> Vec<String> {
-    lines.iter().take_while(|l| is_header(l)).map(|l| l.to_string()).collect()
+    title.to_string()
 }
 
 fn header_map(header_lines: &Vec<String>) -> HashMap<String, String> {
@@ -194,6 +132,62 @@ fn header_map(header_lines: &Vec<String>) -> HashMap<String, String> {
         }
     }
     headers
+}
+
+pub fn html(lines: &Vec<String>) -> String {
+    let mut markdown = String::new();
+    for line in other_lines(lines) {
+        markdown.push_str(&line);
+        markdown.push('\n');
+    }
+    let parser = Parser::new(&markdown);
+    let mut html = String::new();
+    html::push_html(&mut html, parser);
+    with_delim_removed(
+        with_highlighted_code_snippets(&html)
+    )
+}
+
+fn with_highlighted_code_snippets(html: &String) -> String {
+    lazy_static! {
+        static ref CODE_SNIPPET: Regex = RegexBuilder::new("<pre([^>]*)>(.*?)</pre>")
+                                            .dot_matches_new_line(true)
+                                            .build()
+                                            .unwrap();
+
+    }
+    CODE_SNIPPET.replace_all(html, |captures: &Captures| {
+        let attributes = captures.get(1).map(|m| m.as_str().to_string());
+        let snippet = captures.get(2).map_or("", |m| m.as_str()).to_string();
+        highlighted_html_for(&snippet, attributes)
+    }).to_string()
+}
+
+fn with_delim_removed(html: String) -> String {
+    str::replace(&html, "DELIM", "")
+}
+
+fn other_lines(lines: &Vec<String>) -> Vec<String> {
+    lines.iter().skip_while(|l| is_header(l)).map(|l| l.to_string()).collect()
+}
+
+fn header_lines(lines: &Vec<String>) -> Vec<String> {
+    lines.iter().take_while(|l| is_header(l)).map(|l| l.to_string()).collect()
+}
+
+fn is_header(line: &String) -> bool {
+    lazy_static! {
+        static ref IS_HEADER: Regex = Regex::new("^[a-z]+:").unwrap();
+    }
+    line.trim().is_empty() || IS_HEADER.is_match(line)
+}
+
+fn read_lines(path: &PathBuf) -> Result<Vec<String>, Error> {
+    let file = File::open(path)?;
+    let reader = BufReader::new(file);
+    Ok(
+        reader.lines().filter_map(Result::ok).collect()
+    )
 }
 
 #[cfg(test)]
@@ -219,15 +213,15 @@ mod tests {
     #[test]
     fn it_calculates_an_output_path_and_directory() {
         let post = Post::from(&input_path()).unwrap();
-        assert_eq!(post.path, PathBuf::from("2018/1/18/learning-rust-if-let-vs--match.html"));
-        assert_eq!(post.url, "/2018/1/18/learning-rust-if-let-vs--match.html");
+        assert_eq!(post.path, PathBuf::from("/2018/1/18/learning-rust-if-let-vs--match.html"));
+        assert_eq!(post.url, "/2018/1/18/learning-rust-if-let-vs--match");
     }
 
     #[test]
     fn it_overrides_the_path_when_url_is_specified() {
         let post = Post::from(&input_path2()).unwrap();
-        assert_eq!(post.path, PathBuf::from("paperclip-database-storage.html"));
-        assert_eq!(post.url, "/paperclip-database-storage.html");
+        assert_eq!(post.path, PathBuf::from("/paperclip-database-storage.html"));
+        assert_eq!(post.url, "/paperclip-database-storage");
     }
 
     #[test]
