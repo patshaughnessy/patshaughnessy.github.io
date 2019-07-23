@@ -61,7 +61,8 @@ impl From<std::num::ParseIntError> for InvalidPostError {
 }
 
 impl From<std::io::Error> for InvalidPostError {
-    fn from(_: std::io::Error) -> InvalidPostError {
+    fn from(e: std::io::Error) -> InvalidPostError {
+        println!("{:?}", e);
         InvalidPostError::new("TBD IO Error")
     }
 }

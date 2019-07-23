@@ -20,10 +20,10 @@ use highlight::highlighted_html_for;
 #[derive(Debug, Clone, Eq)]
 pub struct Post {
     pub path: PathBuf,
+    pub url: String,
     pub title: String,
     pub date: DateTime<Utc>,
     pub tag: Option<String>,
-    pub url: String,
     pub headers: HashMap<String, String>,
     pub content: String
 }
@@ -35,16 +35,14 @@ impl Post {
         let header_map = header_map(&header_lines);
         let title = header_map.get("title").ok_or_else(|| InvalidPostError::new_for_path(input_path, "Missing title"))?;
         let date = date_from_headers(&header_map, input_path)?;
-        let url = path_from_headers(&header_map, title, &date);
-        let mut path = PathBuf::from(&url);
-        path.set_extension("html");
+        let url = url_from_headers(&header_map, title, &date);
         Ok(
             Post {
-                path: path,
+                path: path_from_url(&url),
+                url: url,
                 title: title.clone(),
                 date: date,
                 tag: header_map.get("tag").map(|str| str.clone()),
-                url: url,
                 headers: header_map.clone(),
                 content: html(&lines)
             }
@@ -75,23 +73,31 @@ fn date_from_headers(header_map: &HashMap<String, String>, input_path: &PathBuf)
     Ok(DateTime::<Utc>::from_utc(naive_date.and_time(midnight), Utc))
 }
 
-fn path_from_headers(header_map: &HashMap<String, String>, title: &String, date: &DateTime<Utc>) -> String {
+fn url_from_headers(header_map: &HashMap<String, String>, title: &String, date: &DateTime<Utc>) -> String {
     let url = header_map.get("url");
     match url {
-        Some(url) => url.to_string(),
-        None      => path_from_title_and_date(title, date)
+        Some(url) => url_without_leading_slash(url),
+        None      => url_from_title_and_date(title, date)
     }
 }
 
-fn path_from_title_and_date(title: &String, date: &DateTime<Utc>) -> String {
-    let mut path = "/".to_string();
-    path.push_str(&path_from_date(date));
+fn url_without_leading_slash(url: &str) -> String {
+    let mut char_indices = url.char_indices();
+    match char_indices.next() {
+        Some((_, chr)) if chr == '/' => String::from(&url[1..]),
+        Some((_, _))                 => String::from(&url[0..]),
+        None                         => String::from("")
+    }
+}
+
+fn url_from_title_and_date(title: &String, date: &DateTime<Utc>) -> String {
+    let mut path = url_from_date(date);
     path.push('/');
     path.push_str(&slug(title));
     path
 }
 
-fn path_from_date(date: &DateTime<Utc>) -> String {
+fn url_from_date(date: &DateTime<Utc>) -> String {
     let mut path = date.year().to_string();
     path.push('/');
     path.push_str(&date.month().to_string());
@@ -111,6 +117,12 @@ fn slug(title: &String) -> String {
     let title = WHITESPACE.replace_all(&title, "-");
     let title = OTHER.replace_all(&title, "");
     title.to_string()
+}
+
+fn path_from_url(url: &String) -> PathBuf {
+    let mut path = PathBuf::from(url);
+    path.set_extension("html");
+    path
 }
 
 fn header_map(header_lines: &Vec<String>) -> HashMap<String, String> {

@@ -29,7 +29,7 @@ struct CompileParams {
     output_path: PathBuf
 }
 
-pub fn run(input_path: PathBuf, output_path: PathBuf) -> Result<usize, InvalidPostError> {
+pub fn run(input_path: PathBuf, output_path: PathBuf, _draft: bool) -> Result<usize, InvalidPostError> {
     let paths = fs::read_dir(&input_path)?;
     let all_posts: Result<Vec<Post>, InvalidPostError> =
         paths.filter_map(Result::ok)
