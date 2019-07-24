@@ -225,15 +225,15 @@ mod tests {
     #[test]
     fn it_calculates_an_output_path_and_directory() {
         let post = Post::from(&input_path()).unwrap();
-        assert_eq!(post.path, PathBuf::from("/2018/1/18/learning-rust-if-let-vs--match.html"));
-        assert_eq!(post.url, "/2018/1/18/learning-rust-if-let-vs--match");
+        assert_eq!(post.path, PathBuf::from("2018/1/18/learning-rust-if-let-vs--match.html"));
+        assert_eq!(post.url, "2018/1/18/learning-rust-if-let-vs--match");
     }
 
     #[test]
     fn it_overrides_the_path_when_url_is_specified() {
         let post = Post::from(&input_path2()).unwrap();
-        assert_eq!(post.path, PathBuf::from("/paperclip-database-storage.html"));
-        assert_eq!(post.url, "/paperclip-database-storage");
+        assert_eq!(post.path, PathBuf::from("paperclip-database-storage.html"));
+        assert_eq!(post.url, "paperclip-database-storage");
     }
 
     #[test]
@@ -262,7 +262,7 @@ mod tests {
     }
 
     fn rendered_html_path() -> PathBuf {
-        tests_path().join("learning-rust-if-let-vs-match.html")
+        tests_path().join("learning-rust-if-let-vs--match.html")
     }
 
     fn tests_path() -> PathBuf {
