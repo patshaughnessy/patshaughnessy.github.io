@@ -61,6 +61,10 @@ section.comments {
   margin-bottom: 8px;
 }
 
+#right #feed {
+  margin-left: 4px;
+}
+
 #right li#eBook {
   font-size: 12px;
   line-height: 12px;

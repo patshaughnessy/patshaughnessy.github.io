@@ -47,7 +47,7 @@ pub fn render(content: String, title: Option<&String>) -> String {
               p {
                 "Content and UI design "
                 (PreEscaped("&copy;"))
-                " 2018 Pat Shaughnessy"
+                " 2019 Pat Shaughnessy"
               }
             }
           }

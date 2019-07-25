@@ -5,7 +5,7 @@ use self::maud::PreEscaped;
 
 use post::Post;
 
-pub fn render(post: &Post, all_posts: &Vec<Post>) -> String {
+pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
     let formatted_date_string = post.date.format("%B %e, %Y").to_string();
     let recent_posts = all_posts.iter().filter(|p| p.tag == post.tag || post.tag.is_none()).take(4);
     let recent_links = recent_posts.map(|p|
@@ -24,9 +24,54 @@ pub fn render(post: &Post, all_posts: &Vec<Post>) -> String {
               div class="metadata" {
                 span class="date" { (formatted_date_string) }
                 (PreEscaped("&nbsp;&mdash;&nbsp;"))
+                @if !draft {
+                    a href="#disqus_thread" data-disqus-identifier={ "http://patshaughnessy.net/" (post.url) } class="date" {
+                        (PreEscaped("&nbsp; Comments and &nbsp; Reactions"))
+                    }
+                    (PreEscaped("<br>"))
+                    a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text=(post.title) {
+                        "Tweet"
+                    }
+                    script type="text/javascript" src="//platform.twitter.com/widgets.js" { }
+                }
               }
             }
             section class="content" { (PreEscaped(&post.content)) }
+            @if !draft {
+              section class="comments" {
+                div id="disqus_thread" {
+                  script type="text/javascript" {
+                    (PreEscaped(r#"var disqus_identifier = '"#))
+                    "http://patshaughnessy.net/"
+                    (post.url)
+                    (PreEscaped(r#"'; var disqus_shortname = 'patshaughnessy'; var disqus_title = '"#))
+                    (post.title)
+                    (PreEscaped(r#"';"#))
+                  }
+                }
+                script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js" { }
+                noscript {
+                  a href="http://patshaughnessy.disqus.com/?url=ref" {
+                    "View the discussion thread."
+                  }
+                }
+              }
+            }
+          }
+          @if !draft {
+            script type="text/javascript" {
+              (PreEscaped(r#"var disqus_identifier = '"#))
+              "http://patshaughnessy.net/"
+              (post.url)
+              (PreEscaped(r#"'; var disqus_shortname = 'patshaughnessy'; var disqus_title = '"#))
+              (post.title)
+              (PreEscaped(r#"';(function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());"#))
+            }
           }
         }
         div class="twocol last" id="right" {
@@ -41,13 +86,13 @@ pub fn render(post: &Post, all_posts: &Vec<Post>) -> String {
                   a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false" {
                     "Follow @pat_shaughnessy"
                   }
-                  a href="http://feeds.feedburner.com/patshaughnessy" {
-                    img src="/assets/images/feed-icon16x16B.png" { }
-                  }
                   script {
                     (PreEscaped(r#"
                       !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
                     "#))
+                  }
+                  a id="feed" href="http://feeds.feedburner.com/patshaughnessy" {
+                    img src="/assets/images/feed-icon16x16B.png" { }
                   }
                   a href="http://twitter.com/pat_shaughnessy" {
                     "@pat_shaughnessy"

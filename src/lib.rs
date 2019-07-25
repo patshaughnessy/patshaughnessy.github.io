@@ -26,10 +26,11 @@ use invalid_post_error::InvalidPostError;
 
 struct CompileParams {
     all_posts: Vec<Post>,
-    output_path: PathBuf
+    output_path: PathBuf,
+    draft: bool
 }
 
-pub fn run(input_path: PathBuf, output_path: PathBuf, _draft: bool) -> Result<usize, InvalidPostError> {
+pub fn run(input_path: PathBuf, output_path: PathBuf, draft: bool) -> Result<usize, InvalidPostError> {
     let paths = fs::read_dir(&input_path)?;
     let all_posts: Result<Vec<Post>, InvalidPostError> =
         paths.filter_map(Result::ok)
@@ -38,7 +39,7 @@ pub fn run(input_path: PathBuf, output_path: PathBuf, _draft: bool) -> Result<us
     let mut all_posts = all_posts?;
     let count = all_posts.len();
     all_posts.sort_by_key(|p| Reverse(p.date));
-    let params = CompileParams {all_posts: all_posts, output_path: output_path};
+    let params = CompileParams {all_posts: all_posts, output_path: output_path, draft: draft};
     Ok(params).and_then(compile_posts)
              .and_then(compile_home_page)
              .and_then(compile_rss_feed)
@@ -61,7 +62,7 @@ fn compile_post(post: &Post, params: &CompileParams) -> Result<(), InvalidPostEr
     )?;
     fs::create_dir_all(output_directory)?;
     let mut file = File::create(output_path)?;
-    let content = layout::post::render(post, &params.all_posts);
+    let content = layout::post::render(post, &params.all_posts, params.draft);
     let content = layout::render(content, Some(&post.title));
     file.write_all(content.as_bytes())?;
     Ok(())
