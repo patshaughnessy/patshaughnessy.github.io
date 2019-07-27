@@ -1,66 +1,14 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Need a Second Opinion on Your Ruby Code? Ask Crystal - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Need a Second Opinion on Your Ruby Code? Ask Crystal - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Need a Second Opinion on Your Ruby Code? Ask Crystal</h1>
-  
-    <div class="metadata">
-    <span class="date">October 7th 2016</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Need a Second Opinion on Your Ruby Code? Ask Crystal">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 0px 30px 0px 0px; text-align: center;">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Need a Second Opinion on Your Ruby Code? Ask Crystal - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Need a Second Opinion on Your Ruby Code? Ask Crystal</h1><div class="metadata"><span class="date">October 7th 2016</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Need a Second Opinion on Your Ruby Code? Ask Crystal">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 0px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2016/10/7/x-ray1.jpg"><br/>
   <i>Running the Crystal compiler on your Ruby code<br/>is like asking a second doctor for their opinion.</i><br/>
 </div>
-
-
 <p>When it comes to your health, you don’t hesitate to get a second opinion.
 Doctors don’t always agree, and a second doctor’s appointment is always time
 well spent when it comes to staying healthy.</p>
-
 <p>But what about your code? A code review is similar to going to see a doctor:
 Someone examines your code, looks for potential problems and hopefully gives
 you some advice you can take away. Sadly, however, we don’t always have the
 time or opportunity for a real code review.</p>
-
 <p>Recently I’ve been learning about the <a href="https://crystal-lang.org">Crystal programming
 language</a>, a variation on Ruby syntax implemented on
 the <a href="http://llvm.org">LLVM platform</a>. What’s interesting about Crystal is that
@@ -69,194 +17,149 @@ elegance and natural feel. The two languages are so similar, in fact, it’s
 possible to use the Crystal compiler to parse your Ruby code after making just
 a few superficial changes. This can be a great way to get helpful feedback on
 your Ruby code, a free code review from a dramatically different perspective.</p>
-
 <p>Using a compiler for one language on code from another sounds crazy. Will it
 really work? To find out, let’s look at a simple example.</p>
-
 <h2>Rock Stars</h2>
-
 <p>Here’s a Ruby class that represents the lead singer of a rock band, and a
 couple of methods that use it:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Singer</span>
-
-  attr_reader <span class="symbol">:band</span>, <span class="symbol">:first_name</span>, <span class="symbol">:last_name</span>
-
-  <span class="keyword">def</span> <span class="function">initialize</span>(band, first_name, last_name)
-    <span class="instance-variable">@band</span> = band
-    <span class="instance-variable">@first_name</span> = first_name
-    <span class="instance-variable">@last_name</span> = last_name
-  <span class="keyword">end</span> 
-
-<span class="keyword">end</span>
-
-<span class="keyword">def</span> <span class="function">lead_singer_for</span>(band, singers)
-  singers.find{|s| s.band == band}
-<span class="keyword">end</span>
-
-<span class="keyword">def</span> <span class="function">longest_last_name</span>(singers)
-  singers.map{|s| s.last_name}.max_by{|name| name.size }
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
+</span><span style="color:#343d46;">
+</span><span style="color:#343d46;">  </span><span style="color:#795da3;">attr_reader </span><span style="color:#008080;">:band</span><span style="color:#000000;">, </span><span style="color:#008080;">:first_name</span><span style="color:#000000;">, </span><span style="color:#008080;">:last_name
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">initialize</span><span style="color:#000000;">(band, first_name, last_name)
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">band </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> band
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">first_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> first_name
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">last_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> last_name
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">lead_singer_for</span><span style="color:#000000;">(band, singers)
+</span><span style="color:#000000;">  singers.find{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.band </span><span style="color:#4f5b66;">==</span><span style="color:#000000;"> band}
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
+</span><span style="color:#000000;">  singers.map{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.last_name}.max_by{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">name</span><span style="color:#4f5b66;">| </span><span style="color:#000000;">name.size }
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>This is similar to Ruby code I write everyday: small classes containing a few
 instance variables, and short, simple methods. With some test data we can try
 out this code to see if it works:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-lead_singers = [ 
-  <span class="constant">Singer</span>.new(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Rolling Stones</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Mick</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Jagger</span><span class="delimiter">&quot;</span></span>),
-  <span class="constant">Singer</span>.new(<span class="string"><span class="delimiter">&quot;</span><span class="content">Queen</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Freddie</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Mercury</span><span class="delimiter">&quot;</span></span>),
-  <span class="constant">Singer</span>.new(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Doors</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Jim</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Morrison</span><span class="delimiter">&quot;</span></span>)
-]
-
-singer = lead_singer_for(<span class="string"><span class="delimiter">'</span><span class="content">The Doors</span><span class="delimiter">'</span></span>, lead_singers)
-puts <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>singer.first_name<span class="inline-delimiter">}</span></span><span class="content"> </span><span class="inline"><span class="inline-delimiter">#{</span>singer.last_name<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
-<span class="comment"># =&gt; Jim Morrison</span>
-
-puts longest_last_name(lead_singers)
-<span class="comment"># =&gt; Morrison</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">lead_singers </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[ 
+</span><span style="color:#000000;">  </span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Rolling Stones</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Mick</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Jagger</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">),
+</span><span style="color:#000000;">  </span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Queen</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Freddie</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Mercury</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">),
+</span><span style="color:#000000;">  </span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Doors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Jim</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Morrison</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">]
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">The Doors</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, lead_singers)
+</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{singer.first_name} #{singer.last_name}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#a7adba;"># =&gt; Jim Morrison
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">puts longest_last_name(lead_singers)
+</span><span style="color:#a7adba;"># =&gt; Morrison
+</span></pre>
 
 <p>Everything works well. On a real project I’d express this as a series of
 Minitest expectations, and seeing green I’d go ahead and check it into Git on a
 branch and ask a colleague for a code review.</p>
-
 <p>But what if no one is around or even awake in my time zone? Or what if I’m
 working alone on this? Well, I’d have to review my own code alone.</p>
-
 <h2>Code Reviewing Yourself</h2>
-
 <p>I believe in the medical world doctors have a legal or at least an ethical
 prohibition on treating themselves, for obvious reasons. And just as giving
 yourself a physical exam makes no sense, reviewing your own code doesn’t
 either. You don’t have perspective on what you wrote, especially just after you
 finish writing it. Usually a fresh pair of eyes will see mistakes that you
 can’t see.</p>
-
-<p>But in this case I have no choice &ndash; I decide to review my own code before
+<p>But in this case I have no choice - I decide to review my own code before
 checking it in. And right away I find a problem: I call <code>find</code> but never consider
 whether the return value could be <code>nil</code>:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">lead_singer_for</span>(band, singers)
-  singers.find{|s| s.band == band}
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">lead_singer_for</span><span style="color:#000000;">(band, singers)
+</span><span style="color:#000000;">  singers.find{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.band </span><span style="color:#4f5b66;">==</span><span style="color:#000000;"> band}
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>In my test, I happened to pick a band name that existed in the test data set,
 but if I misspell it or look for a different band, I would get an error:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-singer = lead_singer_for(<span class="string"><span class="delimiter">'</span><span class="content">Doors</span><span class="delimiter">'</span></span>, lead_singers)
-puts <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>singer.first_name<span class="inline-delimiter">}</span></span><span class="content"> </span><span class="inline"><span class="inline-delimiter">#{</span>singer.last_name<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
-<span class="comment"># =&gt; undefined method `first_name' for nil:NilClass (NoMethodError)</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Doors</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, lead_singers)
+</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{singer.first_name} #{singer.last_name}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#a7adba;"># =&gt; undefined method `first_name&#39; for nil:NilClass (NoMethodError)
+</span></pre>
 
 <p>I make this sort of mistake quite often, actually. In fact, I do it so often
 that checking for <code>nil</code> after calling <code>find</code> is part of my mental checklist for
 code reviews.</p>
-
 <h2>Superficial Syntax Differences: Crystal vs. Ruby</h2>
-
 <p>But suppose I was tired or in a rush; I might not have noticed the call to
 <code>find</code>. And often forgetting to check for a <code>nil</code> return value isn’t as obvious as
 it is here in this example. What if there was a way to find code issues the
 Ruby interpreter doesn’t report? Imagine if this code review could happen before
 my code is ever deployed or used?</p>
-
 <p>There is; we just need to run my Ruby code through the Crystal compiler:</p>
-
-<pre class="console">
+<pre>
 $ cp lead_singers.rb lead_singers.cr
 $ crystal lead_singers.cr
 </pre>
-
-
 <p>What? Pat, this is nuts. Crystal, while superficially similar to Ruby, is a
 very different language. How in the world can I use a compiler written for one
 language on code written in another?</p>
-
 <p>Well, you’re right. I run into a syntax error immediately:</p>
-
-<pre class="console">
+<pre>
 $ crystal lead_singers.cr 
 Syntax error in ./lead_singers.cr:27: unterminated char literal, use double quotes for strings
 
 singer = lead_singer_for('Doors', lead_singers)
                          ^
 </pre>
-
-
 <p>The most common difference of all between Crystal and Ruby is that Crystal uses
 only double quotes for string literals, while Ruby allows either single or
 double quotes. (<a href="https://www.viget.com/articles/just-use-double-quoted-ruby-strings">Some people
 think</a> Ruby
 should limit us to double quotes also.) A quick search and replace solves this
 problem:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-singer = lead_singer_for(<span class="string"><span class="delimiter">&quot;</span><span class="content">Doors</span><span class="delimiter">&quot;</span></span>, lead_singers)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Doors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, lead_singers)
+</span></pre>
 
 <p>Let’s compile again:</p>
-
-<pre class="console">
+<pre>
 $ crystal lead_singers.cr 
 Error in ./lead_singers.cr:3: undefined method 'attr_reader'
 
   attr_reader :band, :first_name, :last_name
   ^~~~~~~~~~~
 </pre>
-
-
 <p>We’ve run into another difference: Crystal uses the <code>property</code> keyword
 (actually a macro) instead of <code>attr_reader</code>, <code>attr_writer</code> and <code>attr_accessor</code>.
 Easy enough to fix:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Singer</span>
-
-  property <span class="symbol">:band</span>, <span class="symbol">:first_name</span>, <span class="symbol">:last_name</span>
-
-  <span class="keyword">def</span> <span class="function">initialize</span>(band, first_name, last_name)
-    <span class="instance-variable">@band</span> = band
-    <span class="instance-variable">@first_name</span> = first_name
-    <span class="instance-variable">@last_name</span> = last_name
-  <span class="keyword">end</span> 
-
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
+</span><span style="color:#343d46;">
+</span><span style="color:#343d46;">  </span><span style="color:#000000;">property </span><span style="color:#008080;">:band</span><span style="color:#000000;">, </span><span style="color:#008080;">:first_name</span><span style="color:#000000;">, </span><span style="color:#008080;">:last_name
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">initialize</span><span style="color:#000000;">(band, first_name, last_name)
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">band </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> band
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">first_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> first_name
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">last_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> last_name
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Now let’s try again. Compiling my Ruby code using Crystal for a third time, I
 get:</p>
-
-<pre class="console">
+<pre>
 $ crystal lead_singers.cr
 Error in ./lead_singers.cr:22: instantiating 'Singer:Class#new(String, String, String)'
 
@@ -294,25 +197,18 @@ Can't infer the type of instance variable '@band' of Singer
     @band = band
     ^~~~~
 </pre>
-
-
 <p>Oh my God, I’ve made a mistake so terrible the Crystal compiler has given me an
 error message an entire page long! This is never going to work.  As you might
 guess, I’ve fixed all of the superficial syntax issues. Now my Ruby code is
 essentially Crystal code. This error is telling me I haven’t picked a type for
 one of my instance variables, which I’ll do next.</p>
-
 <p>But let’s stop for a moment to review what I’ve changed so far:</p>
-
 <ul>
 <li>First, I replaced single quotes with double quotes for all of my string literals.</li>
 <li>Then, I changed <code>attr_reader</code> to <code>property</code>.</li>
 </ul>
-
-
 <p>There are a few other superficial differences you’ll run into between Ruby and
 Crystal. Here are a few more I’ve come across:</p>
-
 <ul>
 <li><code>include?</code> is called <code>includes?</code> in Crystal. This reads better in English, but I
 suppose Crystal looses a bit of that charming Japanese style we’ve come to
@@ -324,75 +220,57 @@ why</a> on their blog.</li>
 <li>Declaring an empty array <code>[]</code> or hash <code>{}</code> requires a type definition, like
 this: <code>[] of Int32</code>.</li>
 </ul>
-
-
 <p>The syntax changes I had to deal with are quite small. In fact, it’s amazing
 the two languages are so similar. In just a few minutes I can change my code
 from Ruby, a dynamic language running with an interpreter, to Crystal, a
 statically typed language that compiles to LLVM byte code and later native
 machine language.</p>
-
 <h2>Think About Which Types to Use</h2>
-
 <div style="float: right; padding: 0px 0px 50px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2016/10/7/x-ray2.png"><br/>
   <i>Like an X-Ray, Crystal can find problems with<br/> your Ruby code hidden underneath the surface.</i>
 </div>
-
-
 <p>Of course, now that I’m using a language with static types I have to pick types
-for my variables. If you&rsquo;ve ever used an older, statically typed language like
+for my variables. If you've ever used an older, statically typed language like
 Java or C, you know how tedious and verbose this can be. In fact, avoiding
 static types is why many of us started to use Ruby in the first place.</p>
-
 <p>But one of Crystal’s strengths is that it can guess which type to use for each
 value in your code based on a series of rules. I don’t have to explicitly write
 the type for every variable, method argument or return value in my code. This
 might even be a preview of <a href="http://confreaks.tv/videos/rubyconf2014-opening-keynote">how Ruby might work in the
 future</a>.</p>
-
 <p>However, in some cases Crystal can’t guess which type to use. That’s what
 happened here. Take the time to read through the page-long error message; it’s
 quite helpful. It explains all of the patterns the Crystal compiler looked for
-in my code, <code>@band = 1</code>, <code>@band = Type.new</code> etc. But because my assignment <code>@band =
-band</code> didn’t fall into any of these categories, Crystal couldn’t figure out what
+in my code, <code>@band = 1</code>, <code>@band = Type.new</code> etc. But because my assignment <code>@band = band</code> didn’t fall into any of these categories, Crystal couldn’t figure out what
 type of value <code>@band</code> represents:</p>
-
-<pre class="console">
+<pre>
 in ./lead_singers.cr:6: Can't infer the type of instance variable '@band' of Singer
 </pre>
-
-
 <p>To fix this, I’ll just declare the type of my <code>@band</code> variable right where I
 declare it, along with my two other instance variables:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Singer</span>
-
-  property band : <span class="constant">String</span>
-  property first_name : <span class="constant">String</span>
-  property last_name : <span class="constant">String</span>
-    
-  <span class="keyword">def</span> <span class="function">initialize</span>(band, first_name, last_name)
-    <span class="instance-variable">@band</span> = band 
-    <span class="instance-variable">@first_name</span> = first_name
-    <span class="instance-variable">@last_name</span> = last_name
-  <span class="keyword">end</span>
-
-<span class="keyword">end</span> 
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
+</span><span style="color:#343d46;">
+</span><span style="color:#343d46;">  </span><span style="color:#000000;">property band </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
+</span><span style="color:#000000;">  property first_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
+</span><span style="color:#000000;">  property last_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
+</span><span style="color:#000000;">    
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">initialize</span><span style="color:#000000;">(band, first_name, last_name)
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">band </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> band 
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">first_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> first_name
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">last_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> last_name
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">end 
+</span></pre>
 
 <p>Notice here I use <code>property</code> three times, specifying each variable’s
 name and type. My three variables, <code>band</code>, <code>first_name</code> and <code>last_name</code> are all
 strings, so I just need to tell Crystal this using a more verbose declaration.</p>
-
-<p>Now we should be good to go! Let&rsquo;s try compiling again:</p>
-
-<pre class="console">
+<p>Now we should be good to go! Let's try compiling again:</p>
+<pre>
 $ crystal lead_singers.cr         
 Error in ./lead_singers.cr:30: undefined method 'first_name' for Nil (compile-time type
 is (Singer | Nil))
@@ -439,136 +317,102 @@ Nil trace:
       def find(if_none = nil)
                          ^
 </pre>
-
-
 <p>Ugh; more trouble. Another page-long error message. Maybe I should just forget
 all about Crystal and go back to writing Ruby.</p>
-
 <h2>Understanding a Crystal Nil Trace</h2>
-
 <p>Instead, I decide to take some time to understand what Crystal is telling me. I
 focus at the beginning of the Crystal error message:</p>
-
-<pre class="console">
+<pre>
 Error in ./lead_singers.cr:30: undefined method 'first_name' for Nil (compile-time type
 is (Singer | Nil))
 
 puts "#{singer.first_name} #{singer.last_name}"
                ^~~~~~~~~~
 </pre>
-
-
 <p>This looks unfamiliar to me, a Ruby developer, at first. The message is similar
 to the error I saw earlier in Ruby when I didn’t check the return value for
 <code>find</code>. Recall that was “undefined method `first_name' for nil:NilClass
 (NoMethodError)”. Crystal seems to be telling me the same thing: “undefined
-method &lsquo;first_name&rsquo; for Nil.”</p>
-
+method 'first_name' for Nil.”</p>
 <p>And it is. But instead of giving me a runtime exception, Crystal is giving me a
 compile time error based on types. Ruby didn’t report the problem until I ran
 my Ruby code, when Ruby actually tried to call the <code>first_name</code> method on the
 <code>NilClass</code> class. But Crystal’s compiler has found the problem before my code was
 ever run. It knows the <code>Nil</code> class doesn’t have a <code>first_name</code> method at compile
 time.</p>
-
 <p>But why does Crystal think there is a <code>Nil</code> class in my code? I just told it my
 three instance variables are strings:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-  property band : <span class="constant">String</span>
-  property first_name : <span class="constant">String</span>
-  property last_name : <span class="constant">String</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">  property band </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
+</span><span style="color:#000000;">  property first_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
+</span><span style="color:#000000;">  property last_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
+</span></pre>
 
 <p>What the Crystal compiler did is quite interesting! While compiling my code, it
 saw that I use the <code>@band</code> instance variable in the <code>lead_singer_for</code> method:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">lead_singer_for</span>(band, singers)
-  singers.find{|s| s.band == band}
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">lead_singer_for</span><span style="color:#000000;">(band, singers)
+</span><span style="color:#000000;">  singers.find{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.band </span><span style="color:#4f5b66;">==</span><span style="color:#000000;"> band}
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Internally, the Crystal compiler now has to decide what type <code>lead_singer_for</code>
 returns. That’s obvious, isn’t it? It should return a <code>Singer</code>. The call to <code>find</code>
 returns a <code>Singer</code> object, the first element of the <code>singers</code> array which matches
 the band, the element for which the block returns <code>true</code>.</p>
-
 <p>But what if the band name doesn’t match any singers? What if the block never
 returns <code>true</code> for any element in the array? As we know from Ruby, in that case
 <code>lead_singer_for</code> would return <code>nil</code>. So <code>lead_singer_for</code> might return <code>nil</code> or it
 might return a singer.</p>
-
 <p>Crystal’s type system has a solution for this situation: a <a href="https://crystal-lang.org/2013/09/23/type-inference-part-1.html">union
 type</a>.
 Crystal decides <code>lead_singer_for</code> returns a <code>(Singer | Nil)</code> type, which it
 mentions in the error message. Now when I use this return value, Crystal’s
 compiler knows to check whether the <code>first_name</code> and <code>last_name</code> methods are
 defined for every class in that union type: <code>Singer</code> and <code>Nil</code>.</p>
-
 <p>The rest of the long error message is known as a “Nil trace.” To help us
 understand what is wrong, Crystal backtracks through the code starting from
 where the missing method was found to where the offending type was introduced.
 You can read the Nil trace above for yourself. It starts with:</p>
-
-<pre class="console">
+<pre>
  ./lead_singers.cr:29
 
     singer = lead_singer_for("Doors", lead_singers)
     ^~~~~~
 </pre>
-
-
 <p>And reading down you can see where the <code>Nil</code> type was actually introduced:</p>
-
-<pre class="console">
+<pre>
   /Users/pat/bllvm/crystal/src/enumerable.cr:228
 
       def find(if_none = nil)
 </pre>
-
-
 <p>As you can see, the <code>Nil</code> type is a default value passed to the <code>Enumerable#find</code>
 method, which I call in <code>lead_singer_for</code>. Crystal’s standard library is
 entirely implemented using Crystal. This means if I’m curious (and I am) I can
 read how Crystal implements all of the <code>Enumerable</code> methods. I could even go
 and experiment with the language by modifying them.</p>
-
 <p>In fact, the Crystal compiler itself is implemented with Crystal! Interested in
 learning about how a real world compiler works but don’t have time to learn C
 or C++? Read the Crystal source code.</p>
-
 <h2>Think Twice About Which Types to Use</h2>
-
 <p>Now back to my example. I’m done, right? Recall in my Ruby code I added a check
 for the return value of <code>lead_singer_for</code>:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-singer = lead_singer_for(<span class="string"><span class="delimiter">&quot;</span><span class="content">Doors</span><span class="delimiter">&quot;</span></span>, lead_singers)
-<span class="keyword">if</span> singer
-  puts <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>singer.first_name<span class="inline-delimiter">}</span></span><span class="content"> </span><span class="inline"><span class="inline-delimiter">#{</span>singer.last_name<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
-<span class="keyword">else</span>
-  puts <span class="string"><span class="delimiter">&quot;</span><span class="content">Not found</span><span class="delimiter">&quot;</span></span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Doors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, lead_singers)
+</span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> singer
+</span><span style="color:#000000;">  puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{singer.first_name} #{singer.last_name}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#a71d5d;">else
+</span><span style="color:#000000;">  puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Not found</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>The same fix will work for Crystal. The Crystal compiler is clever enough to
 know that inside the first branch of the if-statement the type of <code>singer</code> is
 <code>Singer</code> and not <code>Nil</code>. And in the second, else branch it is <code>Nil</code> and not <code>Singer</code>. It
 splits up the union type again depending on the syntax of my program. Amazing.</p>
-
 <p>But before I declare victory, this business about the <code>(Singer | Nil)</code> union type
 has got me thinking… Crystal decided that a <code>nil</code> value can be introduced by my
 code in a certain scenario. But maybe <code>nil</code> should be a valid value for one of my
@@ -576,21 +420,15 @@ variables? After all, I’m dealing with rock stars. Sometimes rock stars become
 so famous they decide they don’t need a last name any more. What about lead
 singers like Sting, Bono or Prince? How would I represent them in my test data
 set?</p>
-
 <p>The answer is obvious: their singer objects would have a <code>nil</code> <code>last_name</code> value. I
 would create them like this:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Singer</span>.new(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Police</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Sting</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">nil</span>)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Police</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Sting</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#d08770;">nil</span><span style="color:#000000;">)
+</span></pre>
 
 <p>In Ruby, this would have worked just fine. But Crystal objects:</p>
-
-<pre class="console">
+<pre>
 $ crystal lead_singers.cr      
 Error in ./lead_singers.cr:26: instantiating 'Singer:Class#new(String, String, Nil)'
 
@@ -604,47 +442,35 @@ in ./lead_singers.cr:10: instance variable '@last_name' of Singer must be String
     @last_name = last_name
     ^~~~~~~~~~
 </pre>
-
-
 <p>What do I do now? How can I save a <code>nil</code> last name in my <code>Singer</code> class? The
 instance variables are strings and cannot hold <code>nil</code>.</p>
-
 <p>The answer is I picked the wrong type for <code>last_name</code>. To accommodate
 super-famous singers, I need to use the same union type we saw earlier:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Singer</span>
-
-  property band : <span class="constant">String</span>
-  property first_name : <span class="constant">String</span>
-  property last_name : (<span class="constant">String</span> | <span class="constant">Nil</span>)
-
-  <span class="keyword">def</span> <span class="function">initialize</span>(band, first_name, last_name)
-    <span class="instance-variable">@band</span> = band
-    <span class="instance-variable">@first_name</span> = first_name
-    <span class="instance-variable">@last_name</span> = last_name
-  <span class="keyword">end</span> 
-
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
+</span><span style="color:#343d46;">
+</span><span style="color:#343d46;">  </span><span style="color:#000000;">property band </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
+</span><span style="color:#000000;">  property first_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
+</span><span style="color:#000000;">  property last_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">(String </span><span style="color:#4f5b66;">| </span><span style="color:#000000;">Nil)
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">initialize</span><span style="color:#000000;">(band, first_name, last_name)
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">band </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> band
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">first_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> first_name
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">last_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> last_name
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Now I can create the Sting object no problem:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Singer</span>.new(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Police</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Sting</span><span class="delimiter">&quot;</span></span>, <span class="predefined-constant">nil</span>)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Police</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Sting</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#d08770;">nil</span><span style="color:#000000;">)
+</span></pre>
 
 <p>Finally, we’re ready to compile my Ruby and move on!</p>
-
-<pre class="console">
+<pre>
 $ crystal lead_singers.cr
 Error in ./lead_singers.cr:37: instantiating 'longest_last_name(Array(Singer))'
 
@@ -665,221 +491,102 @@ Nil trace:
       singers.map{|s| s.last_name}.max_by{|name| name.size }
                                            ^~~~
 </pre>
-
-
 <p>Once again the Crystal compiler has stopped me in my tracks. When will I ever
 get this right? Is this another Ruby vs. Crystal difference? Another subtlety
 of the Crystal type system I need to learn about?</p>
-
 <h2>Static Types Reveal a Hidden Problem</h2>
-
 <p>No. Crystal has found a real problem with my Ruby code, a problem I never
 noticed. Because Sting doesn’t have a last name, the <code>longest_last_name</code> method
 runs into a problem:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">longest_last_name</span>(singers)
-  singers.map{|s| s.last_name}.max_by{|name| name.size }
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
+</span><span style="color:#000000;">  singers.map{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.last_name}.max_by{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">name</span><span style="color:#4f5b66;">| </span><span style="color:#000000;">name.size }
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>The first call to <code>map</code> returns an array of last names, which now will contain
 <code>nil</code>. Then I pass that array into <code>max_by</code> which converts the names into
 corresponding name lengths, and then returns the longest name.</p>
-
 <p>Now that I know where to look, it’s easy to see the problem: <code>max_by</code> will pass
 <code>nil</code> to the second block for Sting’s missing last name, and the block will then
 try to call the <code>size</code> method on <code>nil</code>. Easy enough to fix:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">longest_last_name</span>(singers)
-  singers.map{|s| s.last_name}.compact.max_by{|name| name.size }
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
+</span><span style="color:#000000;">  singers.map{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.last_name}.compact.max_by{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">name</span><span style="color:#4f5b66;">| </span><span style="color:#000000;">name.size }
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Using <code>compact</code>, I remove the <code>nil</code> element from the array of names, meaning the
 <code>size</code> method will never be called on <code>nil</code>. Of course, now that I’m thinking about
 <code>nil</code> values and the <code>longest_last_name</code> method, I realize that maybe all the
 singers are super-famous and have no last names, or possibly there were no
 singers to begin with. I tighten up my code even more:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">longest_last_name</span>(singers)
-  singers_with_last_names = singers.map{|s| s.last_name}.compact
-  <span class="keyword">unless</span> singers_with_last_names.empty?
-    singers_with_last_names.max_by{|name| name.size }
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-last_name = longest_last_name(lead_singers)
-<span class="keyword">if</span> last_name
-  puts last_name
-<span class="keyword">else</span>
-  puts <span class="string"><span class="delimiter">&quot;</span><span class="content">Not found</span><span class="delimiter">&quot;</span></span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
+</span><span style="color:#000000;">  singers_with_last_names </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> singers.map{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.last_name}.compact
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> singers_with_last_names.empty?
+</span><span style="color:#000000;">    singers_with_last_names.max_by{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">name</span><span style="color:#4f5b66;">| </span><span style="color:#000000;">name.size }
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">last_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> longest_last_name(lead_singers)
+</span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> last_name
+</span><span style="color:#000000;">  puts last_name
+</span><span style="color:#a71d5d;">else
+</span><span style="color:#000000;">  puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Not found</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Now everything works!</p>
-
 <p>One interesting footnote here: Ruby allows me to get away without checking for
 an empty array using <code>unless</code>. In Ruby if I call <code>max_by</code> on an empty array it
 simply returns <code>nil</code>, meaning there is no maximum value at all. But Crystal is
-even more strict: It raises an runtime exception &ldquo;Empty enumerable
-(Enumerable::EmptyError)&rdquo;. In a sense this is going a bit overboard, because <code>nil</code>
+even more strict: It raises an runtime exception &quot;Empty enumerable
+(Enumerable::EmptyError)&quot;. In a sense this is going a bit overboard, because <code>nil</code>
 seems to me a valid result in this case. But on the other hand, calling <code>max_by</code>
 on an empty array might be an indication of other problems in my code. Crystal
 brings that to my attention, but with a runtime exception not a compile error.
 Crystal reports runtime errors for other cases as well, for example looking for
 a value in a hash when the key doesn’t exist:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-hash = { <span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span> =&gt; <span class="integer">123</span> } 
-puts hash[<span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span>]
-<span class="comment"># =&gt; Missing hash key: :b (KeyError)</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">hash </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">{ </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">a</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">=&gt; </span><span style="color:#d08770;">123 </span><span style="color:#000000;">} 
+</span><span style="color:#000000;">puts hash[</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">b</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">]
+</span><span style="color:#a7adba;"># =&gt; Missing hash key: :b (KeyError)
+</span></pre>
 
 <p>The Crystal compiler expects a higher level of quality and thoroughness in my
 code than Ruby does, it seems to me.</p>
-
 <h2>Conclusion</h2>
-
 <p>There are two important concepts I took away from this exercise. First, using
 Ruby we depend on the completeness of our test suite in order to find and avoid
 mistakes. Precisely which values you choose for your test data set is very
 important. If I had thought of using Sting when I originally wrote my tests, I
 would have found the missing last name problem right away.  But I didn’t.</p>
-
 <p>Second, the most tedious and time consuming part of converting from Ruby to
 Crystal, choosing a type for each value in my code, is of course the most
 valuable step in the process. It wasn’t until I tried using <code>(String | Nil)</code> for
 the <code>@last_name</code> variable that the Crystal compiler found the missing last name
 problem for me.</p>
-
 <p>You still may not be convinced. This was obviously a very contrived example and
 using the Crystal compiler on real world Ruby code won’t be easy. I agree. It
 would be pointless to try to compile a large Rails application using Crystal.</p>
-
 <p>But look over your code. I would guess there are a few important methods or
 classes which are central to your application’s behavior and logic. Take an
 hour or two and copy and paste those important lines of code into a separate
 file, stub out any dependencies, and run it through the Crystal compiler. Take
 the time to convert your code to use static types. Take the time to think
 carefully about which types of values your code should be able to handle.</p>
-
 <p>Bring your important Ruby code to the Crystal compiler for a second opinion.
 You might be surprised by what Crystal finds.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Need a Second Opinion on Your Ruby Code? Ask Crystal';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Need a Second Opinion on Your Ruby Code? Ask Crystal';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Need a Second Opinion on Your Ruby Code? Ask Crystal';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                    <li><a href="/2015/1/8/using-rake-to-generate-a-blog">Using Rake to Generate a Blog</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li><li><a href="2015/1/8/using-rake-to-generate-a-blog">Using Rake to Generate a Blog</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

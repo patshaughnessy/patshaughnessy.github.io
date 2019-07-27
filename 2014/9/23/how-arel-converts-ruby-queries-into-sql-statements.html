@@ -1,57 +1,7 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="How Arel Converts Ruby Queries Into SQL Statements - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>How Arel Converts Ruby Queries Into SQL Statements - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>How Arel Converts Ruby Queries Into SQL Statements</h1>
-  
-    <div class="metadata">
-    <span class="date">September 23rd 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How Arel Converts Ruby Queries Into SQL Statements">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>How Arel Converts Ruby Queries Into SQL Statements - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>How Arel Converts Ruby Queries Into SQL Statements</h1><div class="metadata"><span class="date">September 23rd 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How Arel Converts Ruby Queries Into SQL Statements">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/9/23/battle.png"><br/>
   <i>In one of the climactic scenes in <a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea">20,000 Leagues Under the<br/>Sea</a>, Captain Nemo and his crew battle a giant octopus.</i>
 </div>
-
-
 <p><b>
 This is the second of a series of four posts based on a presentation I did at the
 <a href="http://www.baruco.org">Barcelona Ruby Conference</a> called “20,000 Leagues Under
@@ -60,11 +10,9 @@ ActiveRecord.” (posts:
 <a href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals">three</a>
 <a href="http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes">four</a>
 and <a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4">video</a>).</b></p>
-
 <p>I took an innocent and unsuspecting audience on an adventure
 inside and underneath ActiveRecord to find out how Rails and PostgreSQL
 actually execute a simple SQL query.</p>
-
 <p>In the <a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">first part of the
 presentation</a>
 I showed what ActiveRecord does internally when you call methods such as <span
@@ -72,67 +20,51 @@ class="code">where</span> and <span class="code">limit</span>. We saw how each
 scoping method returns a new instance of the <span
 class="code">ActiveRecord::Relation</span> class, gradually building up a
 description of your query.</p>
-
 <p>Today I’ll continue by looking at what ActiveRecord does next: How it uses the
 Arel gem to convert the <span class="code">ActiveRecord::Relation</span> object
 describing your query into a string containing a SQL statement. Later, in the
 third post we’ll dive down inside the PostgreSQL database server itself to see
 how it executes this SQL statement.</p>
-
 <h2>The Arel Gem</h2>
-
 <p>Here again is the instance of the <span class="code">ActiveRecord::Relation</span> class that represents
 our query to find the user named “Captain Nemo:”</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/ar-relation1.png"/></p>
-
 <p>Now that we’ve specified the query we want to execute, what does ActiveRecord
 do next? How does it actually execute the query and return the results to us?
 We can find a clue by looking more closely at the relation object and the
 metadata values it stores:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/AR-Relation2.png"/></p>
-
 <p>If you inspect an <span class="code">ActiveRecord::Relation</span> object in
 the Rails console, you’ll find that its instance variables are not simple
 values, but instead references to other Ruby objects. These objects have class
 names such as <span class="code">Arel::Nodes::Equality</span> and <span
 class="code">Arel::Nodes::Attribute</span>. What are these Ruby objects?  Where
 are they created? What do these class names mean?</p>
-
 <p>It turns out that ActiveRecord itself doesn’t convert your
 <span class="code">ActiveRecord::Relation</span> query to SQL; instead, it uses
 a separate gem called Arel to do that. Googling for “Arel” we can easily find
 its Github repo:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/arel1.png"/><br/>
 <img src="http://patshaughnessy.net/assets/2014/9/23/arel2.png"/></p>
-
 <p>The gem’s description is simply “A Relational Algebra.” What in the world does
 this mean? And farther down in the Readme there’s another interesting line:
 “Arel is a SQL AST manager for Ruby.” What does “AST” mean, and what does an
 “AST manager” do?</p>
-
 <p>AST stands for “Abstract Syntax Tree,” an important concept from computer
 science. I’ll explain what that means in a minute. But first let’s look at some
 computer science history to find out what Relational Algebra is.</p>
-
 <h2>Relational Algebra</h2>
-
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/9/23/codd.jpg"><br/>
   <i>Edgar Codd</i>
 </div>
-
-
 <p>Relational Algebra is a branch of computer science that forms the mathematical
 foundation underpinning relational database servers and the SQL language. An
 influential computer scientist named <a href="http://en.wikipedia.org/wiki/Edgar_F._Codd">Edgar
 Codd</a> first described Relational
-Algebra in his groundbreaking academic paper <a href="http://www.seas.upenn.edu/~zives/03f/cis550/codd.pdf">A Relational Model of Data for
+Algebra in his groundbreaking academic paper <a href="http://www.seas.upenn.edu/%7Ezives/03f/cis550/codd.pdf">A Relational Model of Data for
 Large Shared Data Banks</a>,
 published in 1970. Codd described the term “relation” as follows:</p>
-
 <blockquote>
 1.3. A RELATIONAL VIEW OF DATA<br/>
 The term relation is used here in its accepted mathematical sense. Given sets
@@ -140,57 +72,41 @@ S<sub>1</sub>, S<sub>2</sub>, ... , S<sub>n</sub>, (not necessarily distinct), R
 these n sets if it is a set of n-tuples each of which has its first element
 from S<sub>1</sub>, its second element from S<sub>2</sub>, and so on.
 </blockquote>
-
-
 <p>He later went on to define various mathematical operations on relations,
 including <em>projection</em>, <em>restriction</em>, and <em>join</em>. He also used terms such as <em>normal
 form</em>, <em>primary key</em> and <em>foreign key</em>. Today, almost 45 years later, we still use
 Codd’s terminology and the associated mathematical theories when discussing
 database tables and queries.</p>
-
 <p>In another interesting passage, Codd wrote about the need for a language we
 could use to articulate and describe Relational Algebra concepts:</p>
-
 <blockquote>
 1.5. SOME LINGUISTIC ASPECTS<br/>
 The adoption of a relational model of data, as described above, permits the
 development of a universal data sublanguage based on an applied predicate
 calculus.
 </blockquote>
-
-
 <p>This “universal sublanguage” is the Structured Query Language or SQL. I find
 the term “sublanguage” to be very appropriate; SQL is a language used inside
 larger applications written in some other programming language, such as Ruby.</p>
-
 <p>Returning to our example, here’s the SQL statement that represents our search
 for the user named Captain Nemo:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/sql.png"/></p>
-
 <p>The SQL language existed before Codd wrote his paper on Relational Algebra in
 1970, but it didn’t resemble the version of SQL we all know and love today. The
 mathematical concepts Codd first described form the basis for the modern
 version of SQL.</p>
-
 <p>Now let’s return to the question of what an “AST manager” is.</p>
-
 <h2>Abstract Syntax Trees</h2>
-
 <p>An abstract syntax tree is a hierarchical arrangement of objects or memory
 structures that represent a series of words or some syntax from a text
 language. In this case, the AST inside of Arel is a tree of Ruby objects that
 represents a SQL statement.</p>
-
 <p>Here’s the AST Arel creates internally for our example query:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/tree1.png"/></p>
-
 <p>You can see the top or root of the tree is a Ruby object called
 <span class="code">SelectStatement</span>, and under that the various branches
 of the tree represent the from, where, order by and limit clauses in our
 select statement.</p>
-
 <p>The Arel gem “is a Relational Algebra” in the sense that it provides a Ruby API
 that contains methods such as <span class="code">project</span>, <span
 class="code">where</span> and <span class="code">order</span> that represent
@@ -199,20 +115,14 @@ and save them in the AST. Arel’s API is similar to ActiveRecord’s, but is
 somewhat more granular and detailed. When we call ActiveRecord methods such as
 <span class="code">where</span> and <span class="code">limit</span>, internally
 ActiveRecord calls the corresponding methods in the Arel gem.</p>
-
 <p>Here’s our example query written using both ActiveRecord (top) and Arel
 (bottom) method calls:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/arel-and-ar.png"/></p>
-
 <div style="float: right; padding: 7px 0px 60px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/9/23/window.png"><br/>
   <i>Professor Aronnax, Conseil and Ned Land spent hours marveling<br/>at the underwater world through the windows of the Nautilus.</i>
 </div>
-
-
 <p>Notice the Arel query is longer and more verbose. Expressing our query using Arel we call:</p>
-
 <ul>
 <li><span class="code">project</span> to specify which columns or attributes we
 are looking for (<em>projection</em> in Codd’s Relational Algebra)</li>
@@ -221,29 +131,21 @@ how to filter the result set (<em>restriction</em> in Relational Algebra)</li>
 <li><span class="code">order</span> to specify the sort order, and</li>
 <li><span class="code">limit</span> to specify how many records we want.</li>
 </ul>
-
-
 <p>Each time you call an ActiveRecord scoping method, it calls down into one of
 these Arel methods, inserting objects into the same AST.</p>
-
 <h2>The Visitor Pattern</h2>
-
 <p>Creating an AST containing Ruby objects is one thing, but generating an actual
 SQL statement is another. How does Arel do this? Why is building up an AST
 useful in any way?</p>
-
 <p>Using a very elegant algorithm, Arel iterates over the nodes in the AST and
 concatenates different SQL fragments to form a complete SQL statement. This
 algorithm is an example of the “visitor pattern.” The term visitor pattern
 simply means that some object, function or other piece of code is executed once
 for each node in some data structure, such as an array, linked list or tree.</p>
-
 <p>To understand this a bit better, let’s take our example AST and follow Arel’s
 visitor as it traverses the tree, starting at the <span
 class="code">SelectStatement</span> root node:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/tree2.png"/></p>
-
 <p>The blue arrow at the top is the visitor, a Ruby object. Depending on which
 database server you are using, Arel creates a different visitor object. This is
 a fascinating detail about Arel’s internal design: Arel can generate different
@@ -251,51 +153,35 @@ variations of SQL equally well by using different visitor objects. If you
 connect your Rails app to SQLite, Arel uses a SQLite visitor. If you are using
 MySQL, Arel uses a MySQL visitor. Because we’re using PostgreSQL today, Arel
 creates a Postgres visitor.</p>
-
 <h2>Visiting All the Nodes in the AST</h2>
-
 <p>Now let’s follow Arel’s visitor as it iterates over the Ruby objects in the
 AST, shown as a moving blue arrow. Above each diagram I’ll show the SQL string
 the visitor cumulatively builds up as it goes.</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/tree2b.png"/></p>
-
 <p>Here you can see the visitor arrow next to the <span
 class="code">SelectStatement</span> node. Above the diagram I’ve written the
 word “SELECT.” Arel’s visitor knows to write SELECT when it encounters <span
 class="code">SelectStatement</span> root node.</p>
-
 <p>Next Arel moves down to the left:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/tree3.png"/></p>
-
 <p>This time Arel doesn’t write anything new into the string; <span
 class="code">SelectCode</span> is just a container for other branches of the
 tree.</p>
-
 <p>Next, Arel moves down and left again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/tree4.png"/></p>
-
 <p>Now Arel’s visitor see the <span class="code">Attribute</span> node. This
 represents the projection or list of attributes we want in the result set. Arel
 appends <span class="code">&quot;users&quot;.*</span> to the SQL string.</p>
-
 <p>Next, the visitor moves to the right:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/tree5.png"/></p>
-
 <p>Encountering the <span class="code">JoinSource</span> node, Arel writes <span
 class="code">FROM &quot;users&quot;</span> onto the end of the SQL statement. <span
 class="code">JoinSource</span> and its child nodes list the tables that our
 query will read from. In this example, we don’t have any joins and just a
 single table, so <span class="code">JoinSource</span> has only one <span
 class="code">Table</span> child node.</p>
-
 <p>Next, the visitor moves to the right again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/tree6.png"/></p>
-
 <p>Now Arel writes the where clause for our SQL statement: <span class="code">WHERE &quot;users&quot;.&quot;name&quot; =
 $1</span>. The <span class="code">And</span> node is the root of a subbranch of the AST that represents the
 boolean expression we want the database server to use to filter our result set.
@@ -303,147 +189,43 @@ In our example we are only checking that the name column equals “Captain Nemo�
 so the AST contains a single <span class="code">Equality</span> node under
 <span class="code">And</span>. The <span class="code">And</span> node doesn’t
 really do anything in this case.</p>
-
 <p>Now the visitor continues to the right:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/tree7.png"/></p>
-
 <p>Here you can see Arel finds the <span class="code">Ascending</span> node and appends our order by clause.</p>
-
 <p>Finally, the visitor moves to the right one last time:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/9/23/tree8.png"/></p>
-
 <p>Finding the <span class="code">Limit</span> node, Arel’s visitor completes the
 SQL statement by concatenating <span class="code">LIMIT 1</span> onto our select statement.</p>
-
 <p>Using the visitor pattern in this way, Arel has converted our query from a
 collection of Ruby objects into a single string containing a SQL select
 statement. Arel has expressed our Ruby query using Codd’s Relational Algebra.</p>
-
 <p>Every time you execute a simple database query using ActiveRecord in your Rails
 app, you are relying on a series of elegant algorithms and computer science
 theories developed many years ago. Rails is so simple and easy to use only
-because we are standing on the shoulders of giants &ndash; computer scientists like
-Edgar Codd &ndash; who have already done the difficult theoretical work that makes
+because we are standing on the shoulders of giants - computer scientists like
+Edgar Codd - who have already done the difficult theoretical work that makes
 building apps today possible.</p>
-
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/9/23/south-pole.png"><br/>
   <i>A citizen of no country, Captain Nemo claimed the <br/>south pole as his own using a black flag with a large "N."</i>
 </div>
-
-
 <h2>Why Stop Here?</h2>
-
 <p>We’ve learned a lot about ActiveRecord and the Arel gem. Now we know what
 happens when we call scoping methods such as <span class="code">where</span>
 and <span class="code">first</span>. We’ve seen how ActiveRecord calls Arel’s
 lower level, more granular API, and now we know how Arel uses the visitor
 pattern and an AST to convert these Ruby method calls into a SQL string.</p>
-
 <p>But why stop here? Why not dive even deeper? … farther below the surface of
 your Rails app into the PostgreSQL server itself! Next we’ll leave the world of
 Ruby entirely and look at what the Postgres server does when it receives this
 select statement. How does it understand the SQL we send it? How does it
 actually find our data, the user record with the name “Captain Nemo?” In my next
 post, I’ll continue our underwater adventure by looking at Postgres internals.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'How Arel Converts Ruby Queries Into SQL Statements';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'How Arel Converts Ruby Queries Into SQL Statements';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'How Arel Converts Ruby Queries Into SQL Statements';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

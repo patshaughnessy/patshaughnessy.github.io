@@ -1,223 +1,126 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="The technology you never knew you were using to test your Rails site - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>The technology you never knew you were using to test your Rails site - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>The technology you never knew you were using to test your Rails site</h1>
-  
-    <div class="metadata">
-    <span class="date">October 1st 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/10/1/the-technology-you-never-knew-you-were-using-to-test-your-rails-site" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="The technology you never knew you were using to test your Rails site">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>The technology you never knew you were using to test your Rails site - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>The technology you never knew you were using to test your Rails site</h1><div class="metadata"><span class="date">October 1st 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/10/1/the-technology-you-never-knew-you-were-using-to-test-your-rails-site" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="The technology you never knew you were using to test your Rails site">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/10/1/libxml2.gif"></td></tr>
   <tr><td align="center"><small><i>Libxml2 powers your BDD/integration tests<br/>
 that use the default Capybara driver</i></small></td></tr>
 </table>
 </div>
-
-
 <p>If you’re a Rails developer using Behavior Driven Development, then you’re probably using either Cucumber features or RSpec integration tests with the <a href="https://github.com/jnicklas/capybara">Capybara gem</a> to simulate what a user would do with a real browser. You probably know that by default Capybara uses a driver based on Rack to connect to your Rails app and make simulated HTTP requests, all within the same process using only Ruby.</p>
-
-<p></p>
-
-<br/>
-
-
-<p>But what you probably didn’t know is that indirectly Capybara uses a large, complex open source C library called <a href="http://xmlsoft.org">Libxml2</a> to parse the HTML returned by your site, and to run assertions against it. It’s interesting to me that each time I run a Cucumber BDD test on a Ruby on Rails web site, the HTML I’m trying to inspect and test is passed into a C library&hellip; in other words, that my Cucumber tests are actually implemented by C code I never even knew I had on my machine.</p>
-
+<p>
+<br/></p>
+<p>But what you probably didn’t know is that indirectly Capybara uses a large, complex open source C library called <a href="http://xmlsoft.org">Libxml2</a> to parse the HTML returned by your site, and to run assertions against it. It’s interesting to me that each time I run a Cucumber BDD test on a Ruby on Rails web site, the HTML I’m trying to inspect and test is passed into a C library... in other words, that my Cucumber tests are actually implemented by C code I never even knew I had on my machine.</p>
 <h2>An example Rails BDD/integration test</h2>
-
 <p>Let’s start by taking a look at a typical Cucumber feature:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 {^rx:Scenario:^} Viewing the home page
     {^kw:Given^} I am on the home page
-     {^cl:Then^} I should see &quot;This is a simple web page.&quot;
-</pre></div>
-</div>
-
-
-
+     {^cl:Then^} I should see "This is a simple web page."
+</pre>
 <p>This tests one of the web pages in a Rails app, the “home page,” and checks whether the text “This is a simple web page.” appears on it. You could just as easily have written this by calling Capybara directly from RSpec:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-describe <span class="string"><span class="delimiter">'</span><span class="content">the text on the home page</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-  it <span class="string"><span class="delimiter">'</span><span class="content">should explain what to do next</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-    visit <span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>
-    page.should have_content(<span class="string"><span class="delimiter">'</span><span class="content">This is a simple web page.</span><span class="delimiter">'</span></span>)
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">describe </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">the text on the home page</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  it </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">should explain what to do next</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">    visit </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    page.should have_content(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">This is a simple web page.</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>In either case there are two steps to the test:</p>
-
 <ul>
   <li>Load the home page using a simulated HTTP request via Rack, and</li>
   <li>Assert that “This is a simple web page” appears on that page, i.e. in the HTML response returned by your Rails web site.</li>
 </ul>
-
-
-<p>In a future blog post I may look at step 1 in more detail: how does Capybara simulate the HTTP request via Rack? But for today I’ll just assume that Capybara somehow calls the target Rails application and saves the response away in an internal variable. Instead, let’s take a closer look at step 2: how does Capybara assert something about your web site’s page, the home page in this example? In other words, how does the call to <span class="code">page.should have_content(&hellip;)</span> work?</p>
-
+<p>In a future blog post I may look at step 1 in more detail: how does Capybara simulate the HTTP request via Rack? But for today I’ll just assume that Capybara somehow calls the target Rails application and saves the response away in an internal variable. Instead, let’s take a closer look at step 2: how does Capybara assert something about your web site’s page, the home page in this example? In other words, how does the call to <span class="code">page.should have_content(...)</span> work?</p>
 <h2>Capybara, Nokogiri and Libxml2</h2>
-
 <p>It turns out that Capybara does this by parsing the HTML returned by the home page request using a gem called <a href="http://nokogiri.org/">Nokogiri</a>, which, in turn, uses the Libxml2 C library to perform the actual HTML parsing work. Here’s a diagram summarizing all of this:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/10/1/capybara-libxml.png" alt="capybara, nokogiri and libxml2" /></p>
-
-<p>All of the code above the dashed line is Ruby, while the code below the line is C. I show Nokogiri straddling the dashed line, since it actually uses both C and Ruby code. Nokogiri contains “C extension code;” you can find this inside the gem’s “ext” folder. For Nokogiri you can <a href="https://github.com/tenderlove/nokogiri/tree/master/ext/nokogiri">look here on github</a> to see its C extension code. C extension code allows a gem author to write functions in C that can be called by their Ruby code. C extension code, therefore, often plays the role of a bridge between Ruby and other C code in the application. When you install a Ruby gem containing C extension code, you’ll see the message “Compiling native extensions” appear &ndash; this means that Rubygems has called your C compiler to produce the native binaries needed to run the code on your platform.</p>
-
+<p>All of the code above the dashed line is Ruby, while the code below the line is C. I show Nokogiri straddling the dashed line, since it actually uses both C and Ruby code. Nokogiri contains “C extension code;” you can find this inside the gem’s “ext” folder. For Nokogiri you can <a href="https://github.com/tenderlove/nokogiri/tree/master/ext/nokogiri">look here on github</a> to see its C extension code. C extension code allows a gem author to write functions in C that can be called by their Ruby code. C extension code, therefore, often plays the role of a bridge between Ruby and other C code in the application. When you install a Ruby gem containing C extension code, you’ll see the message “Compiling native extensions” appear - this means that Rubygems has called your C compiler to produce the native binaries needed to run the code on your platform.</p>
 <p>Nokogiri is a high level, elegant, Ruby abstraction layer on the Libxml2 library, and provides Ruby clients with a simple way to parse XML, HTML and also to use XPath operations to search through the DOM (Document Object Model) returned by Libxml2. Nokogiri uses its C extension code to call the Libxml2 C API functions, and convert data between the format Ruby uses and the format the C Libxml2 API requires.</p>
-
 <h2>Proving that Cucumber BDD tests use the Libxml2 C library</h2>
-
 <p>Next, let’s take a look at exactly how Nokogiri is calling Libxml2, and prove that this C library is being used in my example Cucumber test. Here’s the documentation for C Libxml2 API call used by Nokogiri to parse HTML (from: <a href="http://xmlsoft.org/html/libxml-HTMLparser.html#htmlReadMemory">http://xmlsoft.org/html/libxml-HTMLparser.html#htmlReadMemory</a>):</p>
-
 <p><b>Function: htmlReadMemory</b></p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-htmlDocPtr  htmlReadMemory (const char * buffer, 
+<pre>
+htmlDocPtr	htmlReadMemory (const char * buffer, 
       int size, 
       const char * URL, 
       const char * encoding, 
       int options)
-</pre></div>
-</div>
-
-
-
-<p>parse an XML in-memory document and build a tree.<br/>
+</pre>
+parse an XML in-memory document and build a tree.<br/>
 <i>buffer</i>: a pointer to a char array<br/>
 <i>size</i>: the size of the array<br/>
 <i>URL</i>: the base URL to use for the document<br/>
 <i>encoding</i>: the document encoding, or NULL<br/>
 <i>options</i>: a combination of htmlParserOption(s)<br/>
-<i>Returns</i>: the resulting document tree<br/></p>
-
+<i>Returns</i>: the resulting document tree<br/>
 <p>This C function is what actually parses the HTML text, and is located inside the Libxml2 library. You can see its declaration inside the HTMLparser.h header file, which on my machine is located in /usr/include/libxml2/libxml/HTMLparser.h. Depending on how you installed Libxml2 (homebrew, macports, from source) this will be located in a different location.</p>
-
 <p>This is called from the Nokogiri Ruby gem’s C extension code, in the <a href="https://github.com/tenderlove/nokogiri/blob/master/ext/nokogiri/html_document.c#L98">ext/nokogiri/html_document.c</a> file:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="comment">/*
- * call-seq:
- *  read_memory(string, url, encoding, options)
- *
- * Read the HTML document contained in +string+ with given +url+, +encoding+,
- * and +options+.  See Nokogiri::HTML.parse
- */</span>
-<span class="directive">static</span> VALUE read_memory( VALUE klass,
-                          VALUE string,
-                          VALUE url,
-                          VALUE encoding,
-                          VALUE options )
-{
-  <span class="directive">const</span> <span class="predefined-type">char</span> * c_buffer = StringValuePtr(string);
-  <span class="directive">const</span> <span class="predefined-type">char</span> * c_url    = NIL_P(url)      ? <span class="predefined-constant">NULL</span> : StringValuePtr(url);
-  <span class="directive">const</span> <span class="predefined-type">char</span> * c_enc    = NIL_P(encoding) ? <span class="predefined-constant">NULL</span> : StringValuePtr(encoding);
-  <span class="predefined-type">int</span> len               = (<span class="predefined-type">int</span>)RSTRING_LEN(string);
-  VALUE error_list      = rb_ary_new();
-  VALUE document;
-  htmlDocPtr doc;
-
-  <span class="comment">/* Added by Pat: */</span>
-  fprintf(stderr, <span class="string"><span class="delimiter">&quot;</span><span class="content">DEBUG: the HTML passed from Capybara and Nokogiri to Libxml2 is:</span><span class="char">\n</span><span class="delimiter">&quot;</span></span>);
-  fprintf(stderr, c_buffer);
-  fprintf(stderr, <span class="string"><span class="delimiter">&quot;</span><span class="content">DEBUG: end.</span><span class="char">\n</span><span class="delimiter">&quot;</span></span>);
-
-  xmlResetLastError();
-  xmlSetStructuredErrorFunc((<span class="directive">void</span> *)error_list, Nokogiri_error_array_pusher);
-
-  doc = htmlReadMemory(c_buffer, len, c_url, c_enc, (<span class="predefined-type">int</span>)NUM2INT(options));
-  xmlSetStructuredErrorFunc(<span class="predefined-constant">NULL</span>, <span class="predefined-constant">NULL</span>);
-
-  <span class="keyword">if</span>(doc == <span class="predefined-constant">NULL</span>) {
-    xmlErrorPtr error;
-
-    xmlFreeDoc(doc);
-
-    error = xmlGetLastError();
-    <span class="keyword">if</span>(error)
-      rb_exc_raise(Nokogiri_wrap_xml_syntax_error((VALUE)<span class="predefined-constant">NULL</span>, error));
-    <span class="keyword">else</span>
-      rb_raise(rb_eRuntimeError, <span class="string"><span class="delimiter">&quot;</span><span class="content">Could not parse document</span><span class="delimiter">&quot;</span></span>);
-
-    <span class="keyword">return</span> Qnil;
-  }
-
-  document = Nokogiri_wrap_xml_document(klass, doc);
-  rb_iv_set(document, <span class="string"><span class="delimiter">&quot;</span><span class="content">@errors</span><span class="delimiter">&quot;</span></span>, error_list);
-  <span class="keyword">return</span> document;
-}
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a7adba;">/*
+</span><span style="color:#a7adba;"> * call-seq:
+</span><span style="color:#a7adba;"> *  read_memory(string, url, encoding, options)
+</span><span style="color:#a7adba;"> *
+</span><span style="color:#a7adba;"> * Read the HTML document contained in +string+ with given +url+, +encoding+,
+</span><span style="color:#a7adba;"> * and +options+.  See Nokogiri::HTML.parse
+</span><span style="color:#a7adba;"> */
+</span><span style="color:#a71d5d;">static</span><span style="color:#000000;"> VALUE </span><span style="color:#795da3;">read_memory</span><span style="color:#000000;">( VALUE klass,
+</span><span style="color:#000000;">                          VALUE string,
+</span><span style="color:#000000;">                          VALUE url,
+</span><span style="color:#000000;">                          VALUE encoding,
+</span><span style="color:#000000;">                          VALUE options )
+</span><span style="color:#000000;">{
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">const char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;"> c_buffer </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">StringValuePtr</span><span style="color:#000000;">(string);
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">const char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;"> c_url    </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">NIL_P</span><span style="color:#000000;">(url)      </span><span style="color:#4f5b66;">? </span><span style="color:#d08770;">NULL </span><span style="color:#4f5b66;">: </span><span style="color:#795da3;">StringValuePtr</span><span style="color:#000000;">(url);
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">const char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;"> c_enc    </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">NIL_P</span><span style="color:#000000;">(encoding) </span><span style="color:#4f5b66;">? </span><span style="color:#d08770;">NULL </span><span style="color:#4f5b66;">: </span><span style="color:#795da3;">StringValuePtr</span><span style="color:#000000;">(encoding);
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">int</span><span style="color:#000000;"> len               </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">(</span><span style="color:#a71d5d;">int</span><span style="color:#000000;">)</span><span style="color:#795da3;">RSTRING_LEN</span><span style="color:#000000;">(string);
+</span><span style="color:#000000;">  VALUE error_list      </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">rb_ary_new</span><span style="color:#000000;">();
+</span><span style="color:#000000;">  VALUE document;
+</span><span style="color:#000000;">  htmlDocPtr doc;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;">/* Added by Pat: */
+</span><span style="color:#000000;">  fprintf(stderr, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">DEBUG: the HTML passed from Capybara and Nokogiri to Libxml2 is:</span><span style="color:#96b5b4;">\n</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">);
+</span><span style="color:#000000;">  fprintf(stderr, c_buffer);
+</span><span style="color:#000000;">  fprintf(stderr, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">DEBUG: end.</span><span style="color:#96b5b4;">\n</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">);
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">xmlResetLastError</span><span style="color:#000000;">();
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">xmlSetStructuredErrorFunc</span><span style="color:#000000;">((</span><span style="color:#a71d5d;">void </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">)error_list, Nokogiri_error_array_pusher);
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  doc </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">htmlReadMemory</span><span style="color:#000000;">(c_buffer, len, c_url, c_enc, (</span><span style="color:#a71d5d;">int</span><span style="color:#000000;">)</span><span style="color:#795da3;">NUM2INT</span><span style="color:#000000;">(options));
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">xmlSetStructuredErrorFunc</span><span style="color:#000000;">(</span><span style="color:#d08770;">NULL</span><span style="color:#000000;">, </span><span style="color:#d08770;">NULL</span><span style="color:#000000;">);
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if</span><span style="color:#000000;">(doc </span><span style="color:#4f5b66;">== </span><span style="color:#d08770;">NULL</span><span style="color:#000000;">) {
+</span><span style="color:#000000;">    xmlErrorPtr error;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#795da3;">xmlFreeDoc</span><span style="color:#000000;">(doc);
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    error </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">xmlGetLastError</span><span style="color:#000000;">();
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">if</span><span style="color:#000000;">(error)
+</span><span style="color:#000000;">      </span><span style="color:#795da3;">rb_exc_raise</span><span style="color:#000000;">(</span><span style="color:#795da3;">Nokogiri_wrap_xml_syntax_error</span><span style="color:#000000;">((VALUE)</span><span style="color:#d08770;">NULL</span><span style="color:#000000;">, error));
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">else
+</span><span style="color:#000000;">      </span><span style="color:#795da3;">rb_raise</span><span style="color:#000000;">(rb_eRuntimeError, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Could not parse document</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">);
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">return</span><span style="color:#000000;"> Qnil;
+</span><span style="color:#000000;">  }
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  document </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">Nokogiri_wrap_xml_document</span><span style="color:#000000;">(klass, doc);
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">rb_iv_set</span><span style="color:#000000;">(document, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">@errors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, error_list);
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">return</span><span style="color:#000000;"> document;
+</span><span style="color:#000000;">}
+</span></pre>
 
 <p>I added the three fprintf lines at the top of the C function which will print out the HTML that is passed in from Capybara to Nokogiri on its way to Libxml2. Now if we manually recompile the C extension code in Nokogiri:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ cd ~/.rvm/gems/ruby-1.8.7-p352/gems/nokogiri-1.5.0/ext/nokogiri
 $ make
 $ make install
 /usr/bin/install -c -m 0755 nokogiri.bundle
 /Users/pat/.rvm/gems/ruby-1.8.7-p352/gems/nokogiri-1.5.0/lib/nokogiri
-</pre></div>
-</div>
-
-
-
-<p>&hellip;and run the Cucumber test back in my Ruby app, we’ll see the HTML on it’s way to the Libxml2 library!</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+</pre>
+<p>...and run the Cucumber test back in my Ruby app, we’ll see the HTML on it’s way to the Libxml2 library!</p>
+<pre>
 $ bundle exec cucumber features/view_web_page.feature
 Using the default profile...
 Feature: View the home page
@@ -228,129 +131,34 @@ Feature: View the home page
   Scenario: Viewing the home page                  # features/view_web_page.feature:6
     {^s:Given I am on the home page^}                    # features/step_definitions/web_steps.rb:44
 DEBUG: the HTML passed from Capybara and Nokogiri to Libxml2 is:
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;head&gt;
-  &lt;title&gt;SimpleWebApp&lt;/title&gt;
-  &lt;link href=&quot;/assets/application.css&quot; media=&quot;screen&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
-  &lt;script src=&quot;/assets/application.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SimpleWebApp</title>
+  <link href="/assets/application.css" media="screen" rel="stylesheet" type="text/css" />
+  <script src="/assets/application.js" type="text/javascript"></script>
   
-&lt;/head&gt;
-&lt;body&gt;
+</head>
+<body>
 
 This is a simple web page.
 
 
-&lt;/body&gt;
-&lt;/html&gt;
+</body>
+</html>
 DEBUG: end.
-    {^s:Then I should see &quot;This is a simple web page.&quot;^} # features/step_definitions/web_steps.rb:105
+    {^s:Then I should see "This is a simple web page."^} # features/step_definitions/web_steps.rb:105
 
 1 scenario ({^s:1 passed^})
 2 steps ({^s:2 passed^})
 0m0.217s
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>Who knew so much C code was required by just a simple, elementary Cucumber integration test? I suppose this is one of the reasons for the success of the Ruby platform: it takes advantage of lower level native C libraries when necessary, but allows most developers to enjoy the elegance and succinctness of the Ruby language most of the time, without worrying about the low level details.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2011/10/1/the-technology-you-never-knew-you-were-using-to-test-your-rails-site';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'The technology you never knew you were using to test your Rails site';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2011/10/1/the-technology-you-never-knew-you-were-using-to-test-your-rails-site';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'The technology you never knew you were using to test your Rails site';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2011/10/1/the-technology-you-never-knew-you-were-using-to-test-your-rails-site'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'The technology you never knew you were using to test your Rails site';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

@@ -1,357 +1,200 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Never create Ruby strings longer than 23 characters - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Never create Ruby strings longer than 23 characters - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Never create Ruby strings longer than 23 characters</h1>
-  
-    <div class="metadata">
-    <span class="date">January 4th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Never create Ruby strings longer than 23 characters">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Never create Ruby strings longer than 23 characters - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Never create Ruby strings longer than 23 characters</h1><div class="metadata"><span class="date">January 4th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Never create Ruby strings longer than 23 characters">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2012/1/4/microscope.jpg"></td></tr>
   <tr><td align="center"><small><i>Looking at things through a microscope<br/>sometimes leads to surprising discoveries</i></small></td></tr>
 </table>
 </div>
-
-
-<p>Obviously this is an utterly preposterous statement: it’s hard to think of a more ridiculous and esoteric coding requirement. I can just imagine all sorts of amusing conversations with designers and business sponsors: “No&hellip; the size of this &lt;input&gt; field should be 23&hellip; 24 is just too long!”  Or: “We need to explain to users that their subject lines should be less than 23 letters&hellip;” Or: “Twitter got it all wrong&hellip; the 140 limit should have been 23!”</p>
-
+<p>Obviously this is an utterly preposterous statement: it’s hard to think of a more ridiculous and esoteric coding requirement. I can just imagine all sorts of amusing conversations with designers and business sponsors: “No... the size of this &lt;input&gt; field should be 23... 24 is just too long!”  Or: “We need to explain to users that their subject lines should be less than 23 letters...” Or: “Twitter got it all wrong... the 140 limit should have been 23!”</p>
 <p>Why in the world would I even imagine saying this? As silly as this requirement might be, there is actually a grain of truth behind it: creating shorter Ruby strings is actually much faster than creating longer ones. It turns out that this line of Ruby code:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">1234567890123456789012</span><span style="color:#4f5b66;">&quot; + &quot;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&quot;
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">1234567890123456789012</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">x</span><span class="delimiter">&quot;</span></span>
-</pre></div>
-</div>
-
-
-
-<p>&hellip; is executed about twice as fast by the MRI 1.9.3 Ruby interpreter than this line of Ruby code:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">12345678901234567890123</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">x</span><span class="delimiter">&quot;</span></span>
-</pre></div>
-</div>
-
-
+<p>... is executed about twice as fast by the MRI 1.9.3 Ruby interpreter than this line of Ruby code:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">12345678901234567890123</span><span style="color:#4f5b66;">&quot; + &quot;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&quot;
+</span></pre>
 
 <p>Huh? What’s the difference? These two lines look identical! Well, the difference is that the first line creates a new string containing 23 characters, while the second line creates one with 24. It turns out that the MRI Ruby 1.9 interpreter is optimized to handle strings containing 23 characters or less more quickly than longer strings. This isn’t true for Ruby 1.8.</p>
-
-<p>Today I’m going to take a close look at the MRI Ruby 1.9 interpreter to see how it actually handles saving string values&hellip; and why this is actually true.</p>
-
+<p>Today I’m going to take a close look at the MRI Ruby 1.9 interpreter to see how it actually handles saving string values... and why this is actually true.</p>
 <h2>Not all strings are created equal</h2>
-
 <p>Over the holidays I decided to read through the the <a href="http://rhg.rubyforge.org/">Ruby Hacking Guide</a>. If you’ve never heard of it, it’s a great explanation of how the Ruby interpreter works internally. Unfortunately it’s written in Japanese, but a few of the chapters have been translated into English. <a href="http://rhg.rubyforge.org/chapter02.html">Chapter 2</a>, one of the translated chapters, was a great place to start since it explains all of the basic Ruby data types, including strings.</p>
-
 <p>After reading through that, I decided to dive right into the MRI 1.9.3 C source code to learn more about how Ruby handles strings; since I use RVM for me the Ruby source code is located under ~/.rvm/src/ruby-1.9.3-preview1. I started by looking at include/ruby/ruby.h, which defines all of the basic Ruby data types, and string.c, which implements Ruby String objects.</p>
-
 <p>Reading the C code I discovered that Ruby actually uses three different types of string values, which I call:</p>
-
 <ul>
   <li>Heap Strings,</li>
   <li>Shared Strings, and</li>
   <li>Embedded Strings</li>
 </ul>
-
-
-<p>I found this fascinating! For years I’ve assumed every Ruby String object was like every other String object. But it turns out this is not true! Let’s take a closer look&hellip;</p>
-
+<p>I found this fascinating! For years I’ve assumed every Ruby String object was like every other String object. But it turns out this is not true! Let’s take a closer look...</p>
 <h2>Heap Strings</h2>
-
 <p>The standard and most common way for Ruby to save string data is in the “heap.” The heap is a core concept of the C language: it’s a large pool of memory that C programmers can allocate from and use via a call to the <span class="code">malloc</span> function. For example, this line of C code allocates a 100 byte chunk of memory from the heap and saves its memory address into a pointer:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="predefined-type">char</span> *ptr = malloc(<span class="integer">100</span>);
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">ptr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">malloc(</span><span style="color:#d08770;">100</span><span style="color:#000000;">);
+</span></pre>
 
 <p>Later, when the C programmer is done with this memory, she can release it and return it to the system using <span class="code">free</span>:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-free(ptr);
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#795da3;">free</span><span style="color:#000000;">(ptr);
+</span></pre>
 
 <p>Avoiding the need to manage memory in this very manual and explicit way is one of the biggest benefits of using any high level programming language, such as Ruby, Java, C#, etc. When you create a string value in Ruby code like this, for example:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span class="delimiter">&quot;</span></span>
-</pre></div>
-</div>
-
-
-
-<p>&hellip; the Ruby interpreter creates a structure called “RString” that conceptually looks like this:</p>
-
+<p>... the Ruby interpreter creates a structure called “RString” that conceptually looks like this:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/1/4/heap-string.png" alt="heap strings" /></p>
-
 <p>You can see here that the RString structure contains two values: <span class="code">ptr</span> and <span class="code">len</span>, but not the actual string data itself. Ruby actually saves the string character values themselves in some memory allocated from the heap, and then sets <span class="code">ptr</span> to the location of that heap memory, and <span class="code">len</span> to the length of the string.</p>
-
 <p>Here’s a simplified version of the C RString structure:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">struct </span><span style="color:#000000;">RString {
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">long</span><span style="color:#000000;"> len;
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">ptr;
+</span><span style="color:#000000;">};
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">struct</span> RString {
-  <span class="predefined-type">long</span> len;
-  <span class="predefined-type">char</span> *ptr;
-};
-</pre></div>
-</div>
-
-
-
-<p>I’ve simplified this a lot; there are actually a number of other values saved in this C struct. I’ll discuss some of them next, and others I’ll skip over for today. If you’re not familiar with C, you can think of <span class="code">struct</span> (short for “structure”) as an object that contains a set of instance variables, except in C there’s no object at all &ndash; a struct is just a chunk of memory containing a few values.</p>
-
+<p>I’ve simplified this a lot; there are actually a number of other values saved in this C struct. I’ll discuss some of them next, and others I’ll skip over for today. If you’re not familiar with C, you can think of <span class="code">struct</span> (short for “structure”) as an object that contains a set of instance variables, except in C there’s no object at all - a struct is just a chunk of memory containing a few values.</p>
 <p>I refer to this type of Ruby string as “Heap String,” since the actual string data is saved in the heap.</p>
-
 <h2>Shared Strings</h2>
-
 <p>Another type of string value that the Ruby interpreter uses is called a “Shared String” in the Ruby C source code. You create a Shared String every time you write a line of Ruby code that copies one string to another, similar to this:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span class="delimiter">&quot;</span></span>
-str2 = str
-</pre></div>
-</div>
-
-
-
-<p>Here the Ruby interpreter has realized that you are assigning the same string value to two variables: str and str2. So in fact there’s no need to create two copies of the string data itself; instead Ruby creates two RString values that share the single copy of the string data. The way this works is that both RString structs contain the same ptr value to the shared data&hellip; meaning both strings contain the same value. There’s also a <span class="code">shared</span> value saved in the second RString struct that points to the first RString struct. There are some other details which I’m not showing here, such as some bit mask flags that Ruby uses to keep track of which RString’s are shared and which are not.</p>
-
+<p>Here the Ruby interpreter has realized that you are assigning the same string value to two variables: str and str2. So in fact there’s no need to create two copies of the string data itself; instead Ruby creates two RString values that share the single copy of the string data. The way this works is that both RString structs contain the same ptr value to the shared data... meaning both strings contain the same value. There’s also a <span class="code">shared</span> value saved in the second RString struct that points to the first RString struct. There are some other details which I’m not showing here, such as some bit mask flags that Ruby uses to keep track of which RString’s are shared and which are not.</p>
 <p><img src="http://patshaughnessy.net/assets/2012/1/4/shared-string.png" alt="shared strings" /></p>
-
 <p>Aside from saving memory, this also speeds up execution of your Ruby programs dramatically by avoiding the need to allocate more memory from the heap using another call to <span class="code">malloc</span>. <span class="code">Malloc</span> is actually a fairly expensive operation: it takes time to track down available memory of the proper size in the heap, and also to keep track of it for freeing later.</p>
-
 <p>Here’s a somewhat more accurate version of the C RString structure, including the <span class="code">shared</span> value:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 struct RString {
     long len;
     char *ptr;
     VALUE shared;
 };
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>Strings that are copied from one variable to another like this I call “Shared Strings.”</p>
-
 <h2>Embedded Strings</h2>
-
 <p>The third and last way that MRI Ruby 1.9 saves string data is by embedding the characters into the RString structure itself, like this:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-str3 = <span class="string"><span class="delimiter">&quot;</span><span class="content">Lorem ipsum dolor</span><span class="delimiter">&quot;</span></span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str3 </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor</span><span style="color:#4f5b66;">&quot;
+</span></pre>
 
 <p><img src="http://patshaughnessy.net/assets/2012/1/4/embedded-string.png" alt="embedded strings" /></p>
-
 <p>This RString structure contains a character array called <span class="code">ary</span> and not the <span class="code">ptr</span>, <span class="code">len</span> and <span class="code">shared</span> values we saw above. Here’s another simplified definition of the same RString structure, this time containing the <span class="code">ary</span> character array:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">struct</span> RString {
-  <span class="predefined-type">char</span> ary[RSTRING_EMBED_LEN_MAX + <span class="integer">1</span>];
-}
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">struct </span><span style="color:#000000;">RString {
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">char</span><span style="color:#000000;"> ary[RSTRING_EMBED_LEN_MAX </span><span style="color:#4f5b66;">+ </span><span style="color:#d08770;">1</span><span style="color:#000000;">];
+</span><span style="color:#000000;">}
+</span></pre>
 
 <p>If you’re not familiar with C code, the syntax <span class="code">char ary[100]</span> creates an array of 100 characters (bytes). Unlike Ruby, C arrays are not objects; instead they are really just a collection of bytes. In C you have to specify the length of the array you want to create ahead of time.</p>
-
 <p>How do Embedded Strings work? Well, the key is the size of the <span class="code">ary</span> array, which is set to <span class="code">RSTRING_EMBED_LEN_MAX+1</span>. If you’re running a 64-bit version of Ruby <span class="code">RSTRING_EMBED_LEN_MAX</span> is set to 24. That means a short string like this will fit into the RString <span class="code">ary</span> array:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor</span><span style="color:#4f5b66;">&quot;
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">Lorem ipsum dolor</span><span class="delimiter">&quot;</span></span>
-</pre></div>
-</div>
-
-
-
-<p>&hellip; while a longer string like this will not:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span class="delimiter">&quot;</span></span>
-</pre></div>
-</div>
-
-
+<p>... while a longer string like this will not:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span></pre>
 
 <h2>How Ruby creates new string values</h2>
-
 <p>Whenever you create a string value in your Ruby 1.9 code, the interpreter goes through an algorithm similar to this:</p>
-
 <ul>
   <li>Is this a new string value? Or a copy of an existing string? If it’s a copy, Ruby creates a Shared String. This is the fastest option, since Ruby only needs a new RString structure, and not another copy of the existing string data.</li>
   <li>Is this a long string? Or a short string? If the new string value is 23 characters or less, Ruby creates an Embedded String. While not as fast as a Shared String, it’s still fast because the 23 characters are simply copied right into the RString structure and there’s no need to call <span class="code">malloc</span>.</li>
   <li>Finally, for long string values, 24 characters or more, Ruby creates a Heap String - meaning it calls <span class="code">malloc</span> and gets some new memory from the heap, and then copies the string value there. This is the slowest option.</li>
 </ul>
-
-
 <h2>The actual RString structure</h2>
-
 <p>For those of you familiar with the C language, here’s the actual Ruby 1.9 definition of RString:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">struct</span> RString {
-
-  <span class="keyword">struct</span> RBasic basic;
-
-  <span class="keyword">union</span> {
-    <span class="keyword">struct</span> {
-      <span class="predefined-type">long</span> len;
-      <span class="predefined-type">char</span> *ptr;
-      <span class="keyword">union</span> {
-        <span class="predefined-type">long</span> capa;
-        VALUE shared;
-      } aux;
-    } heap;
-
-    <span class="predefined-type">char</span> ary[RSTRING_EMBED_LEN_MAX + <span class="integer">1</span>];
-  } as;
-};
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">struct </span><span style="color:#000000;">RString {
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">struct</span><span style="color:#000000;"> RBasic basic;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">union </span><span style="color:#000000;">{
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">struct </span><span style="color:#000000;">{
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">long</span><span style="color:#000000;"> len;
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">ptr;
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">union </span><span style="color:#000000;">{
+</span><span style="color:#000000;">        </span><span style="color:#a71d5d;">long</span><span style="color:#000000;"> capa;
+</span><span style="color:#000000;">        VALUE shared;
+</span><span style="color:#000000;">      } aux;
+</span><span style="color:#000000;">    } heap;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">char</span><span style="color:#000000;"> ary[RSTRING_EMBED_LEN_MAX </span><span style="color:#4f5b66;">+ </span><span style="color:#d08770;">1</span><span style="color:#000000;">];
+</span><span style="color:#000000;">  } as;
+</span><span style="color:#000000;">};
+</span></pre>
 
 <p>I won’t try to explain all the code details here, but here are a couple important things to learn about Ruby strings from this definition:</p>
-
 <ul>
 <li>The <span class="code">RBasic</span> structure keeps track of various important bits of information about this string, such as flags indicating whether it’s shared or embedded, and a pointer to the corresponding Ruby String object structure.</li>
 <li>The <span class="code">capa</span> value keeps track of the “capacity” of each heap string... it turns out Ruby will often allocate more memory than is required for each heap string, again to avoid extra calls to <span class="code">malloc</span> if a string size changes.</li>
 <li>The use of <span class="code">union</span> allows Ruby to EITHER save the len/ptr/capa/shared information OR the actual string data itself.</li>
 <li>The value of <span class="code">RSTRING_EMBED_LEN_MAX</span> was chosen to match the size of the len/ptr/capa values. That’s where the 23 limit comes from.</li>
 </ul>
-
-
 <p>Here’s the line of code from ruby.h that defines this value:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="preprocessor">#define</span> RSTRING_EMBED_LEN_MAX ((<span class="predefined-type">int</span>)((<span class="keyword">sizeof</span>(VALUE)*<span class="integer">3</span>)/<span class="keyword">sizeof</span>(<span class="predefined-type">char</span>)-<span class="integer">1</span>))
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">#define </span><span style="color:#000000;">RSTRING_EMBED_LEN_MAX ((</span><span style="color:#a71d5d;">int</span><span style="color:#000000;">)((</span><span style="color:#4f5b66;">sizeof</span><span style="color:#000000;">(VALUE)</span><span style="color:#4f5b66;">*</span><span style="color:#d08770;">3</span><span style="color:#000000;">)</span><span style="color:#4f5b66;">/sizeof</span><span style="color:#000000;">(</span><span style="color:#a71d5d;">char</span><span style="color:#000000;">)</span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">1</span><span style="color:#000000;">))
+</span></pre>
 
 <p>On a 64 bit machine, sizeof(VALUE) is 8, leading to the limit of 23 characters. This will be smaller for a 32 bit machine.</p>
-
 <h2>Benchmarking Ruby string allocation</h2>
+<p>Let’s try to measure how much faster short strings are vs. long strings in Ruby 1.9.3 - here’s a simple line of code that dynamically creates a new string by appending a single character onto the end:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">new_string </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str </span><span style="color:#4f5b66;">+ &#39;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&#39;
+</span></pre>
 
-<p>Let’s try to measure how much faster short strings are vs. long strings in Ruby 1.9.3 &ndash; here’s a simple line of code that dynamically creates a new string by appending a single character onto the end:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-new_string = str + <span class="string"><span class="delimiter">'</span><span class="content">x</span><span class="delimiter">'</span></span>
-</pre></div>
-</div>
-
-
-
-<p>The <span class="code">new_string</span> value will either be a Heap String or an Embedded String, depending on how long the <span class="code">str</span> variable’s value is. The reason I need to use a string concatenation operation, the <span class="code">+ &lsquo;x&rsquo;</span> part, is to force Ruby to allocate a new string dynamically. Otherwise if I just used <span class="code">new_string = str</span>, I would get a Shared String.</p>
-
+<p>The <span class="code">new_string</span> value will either be a Heap String or an Embedded String, depending on how long the <span class="code">str</span> variable’s value is. The reason I need to use a string concatenation operation, the <span class="code">+ 'x'</span> part, is to force Ruby to allocate a new string dynamically. Otherwise if I just used <span class="code">new_string = str</span>, I would get a Shared String.</p>
 <p>Now I’ll call this method from a loop and benchmark it:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-require <span class="string"><span class="delimiter">'</span><span class="content">benchmark</span><span class="delimiter">'</span></span>
-
-<span class="constant">ITERATIONS</span> = <span class="integer">1000000</span>
-
-<span class="keyword">def</span> <span class="function">run</span>(str, bench)
-  bench.report(<span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>str.length + <span class="integer">1</span><span class="inline-delimiter">}</span></span><span class="content"> chars</span><span class="delimiter">&quot;</span></span>) <span class="keyword">do</span>
-    <span class="constant">ITERATIONS</span>.times <span class="keyword">do</span>
-      new_string = str + <span class="string"><span class="delimiter">'</span><span class="content">x</span><span class="delimiter">'</span></span>
-    <span class="keyword">end</span>
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">benchmark</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">ITERATIONS </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">1000000
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">run</span><span style="color:#000000;">(str, bench)
+</span><span style="color:#000000;">  bench.report(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{str.length </span><span style="color:#4f5b66;">+ </span><span style="color:#d08770;">1</span><span style="color:#000000;">}</span><span style="color:#008080;"> chars</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">    </span><span style="color:#008080;">ITERATIONS</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">      new_string </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str </span><span style="color:#4f5b66;">+ &#39;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Here I’m using the benchmark library to measure how long it takes to call that method 1 million times. Now running this with a variety of different string lengths:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Benchmark</span>.bm <span class="keyword">do</span> |bench|
-  run(<span class="string"><span class="delimiter">&quot;</span><span class="content">12345678901234567890</span><span class="delimiter">&quot;</span></span>, bench)
-  run(<span class="string"><span class="delimiter">&quot;</span><span class="content">123456789012345678901</span><span class="delimiter">&quot;</span></span>, bench)
-  run(<span class="string"><span class="delimiter">&quot;</span><span class="content">1234567890123456789012</span><span class="delimiter">&quot;</span></span>, bench)
-  run(<span class="string"><span class="delimiter">&quot;</span><span class="content">12345678901234567890123</span><span class="delimiter">&quot;</span></span>, bench)
-  run(<span class="string"><span class="delimiter">&quot;</span><span class="content">123456789012345678901234</span><span class="delimiter">&quot;</span></span>, bench)
-  run(<span class="string"><span class="delimiter">&quot;</span><span class="content">1234567890123456789012345</span><span class="delimiter">&quot;</span></span>, bench)
-  run(<span class="string"><span class="delimiter">&quot;</span><span class="content">12345678901234567890123456</span><span class="delimiter">&quot;</span></span>, bench)
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#008080;">Benchmark</span><span style="color:#000000;">.bm </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">bench</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">12345678901234567890</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
+</span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">123456789012345678901</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
+</span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">1234567890123456789012</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
+</span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">12345678901234567890123</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
+</span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">123456789012345678901234</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
+</span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">1234567890123456789012345</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
+</span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">12345678901234567890123456</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>We get an interesting result:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
        user     system      total        real
 21 chars  0.250000   0.000000   0.250000 (  0.247459)
 22 chars  0.250000   0.000000   0.250000 (  0.246954)
@@ -360,118 +203,18 @@ require <span class="string"><span class="delimiter">'</span><span class="conten
 25 chars  0.480000   0.000000   0.480000 (  0.479662)
 26 chars  0.480000   0.000000   0.480000 (  0.481211)
 27 chars  0.490000   0.000000   0.490000 (  0.490404)
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>Note that when the string length is 23 or less, it takes about 250ms to create 1 million new strings. But when my string length is 24 or more, it takes around 480ms, almost twice as long!</p>
-
 <p>Here’s a graph showing some more data; the bars show how long it takes to allocate 1 million strings of the given length:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/1/4/string-allocations.png" alt="string allocation chart" /></p>
-
 <h2>Conclusion</h2>
-
-<p>Don’t worry! I don’t think you should refactor all your code to be sure you have strings of length 23 or less. That would obviously be ridiculous. The speed increase sounds impressive, but actually the time differences I measured were insignificant until I allocated 100,000s or millions of strings &ndash; how many Ruby applications will need to create this many string values? And even if you do need to create many string objects, the pain and confusion caused by using only short strings would overwhelm any performance benefit you might get.</p>
-
-<p>For me I really think understanding something about how the Ruby interpreter works is just fun! I enjoyed taking a look through a microscope at these sorts of tiny details. I do also suspect having some understanding of how Matz and his colleagues actually implemented the language will eventually help me to use Ruby in a wiser and more knowledgeable way. We’ll have to see&hellip; stay tuned for some more posts about Ruby internals!</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Never create Ruby strings longer than 23 characters';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Never create Ruby strings longer than 23 characters';
-    (function () {
+<p>Don’t worry! I don’t think you should refactor all your code to be sure you have strings of length 23 or less. That would obviously be ridiculous. The speed increase sounds impressive, but actually the time differences I measured were insignificant until I allocated 100,000s or millions of strings - how many Ruby applications will need to create this many string values? And even if you do need to create many string objects, the pain and confusion caused by using only short strings would overwhelm any performance benefit you might get.</p>
+<p>For me I really think understanding something about how the Ruby interpreter works is just fun! I enjoyed taking a look through a microscope at these sorts of tiny details. I do also suspect having some understanding of how Matz and his colleagues actually implemented the language will eventually help me to use Ruby in a wiser and more knowledgeable way. We’ll have to see... stay tuned for some more posts about Ruby internals!</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Never create Ruby strings longer than 23 characters';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

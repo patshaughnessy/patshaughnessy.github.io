@@ -1,52 +1,4 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Creating associations to existing data part 1: belongs_to scaffolding - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Creating associations to existing data part 1: belongs_to scaffolding - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Creating associations to existing data part 1: belongs_to scaffolding</h1>
-  
-    <div class="metadata">
-    <span class="date">January 25th 2010</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>I decided it would be fun to look into various different types of Rails forms that allow you to create a new object that is associated with existing data. In my next few posts, I&rsquo;ll explore different ways to select existing records, and also how to work with has_and_belongs_to_many and has_many, through relationships in a Rails form. It seems to me that these use cases are more common than the nested models form in the <a href="http://github.com/ryanb/complex-form-examples">complex-form-examples</a> sample app that creates new records but doesn't associate with existing ones.</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Creating associations to existing data part 1: belongs_to scaffolding - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Creating associations to existing data part 1: belongs_to scaffolding</h1><div class="metadata"><span class="date">January 25th 2010</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Creating associations to existing data part 1: belongs_to scaffolding">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>I decided it would be fun to look into various different types of Rails forms that allow you to create a new object that is associated with existing data. In my next few posts, I&rsquo;ll explore different ways to select existing records, and also how to work with has_and_belongs_to_many and has_many, through relationships in a Rails form. It seems to me that these use cases are more common than the nested models form in the <a href="http://github.com/ryanb/complex-form-examples">complex-form-examples</a> sample app that creates new records but doesn't associate with existing ones.</p>
 <p>To start with today, here&rsquo;s the simplest such form I could think of &ndash; I call this a &ldquo;belongs_to&rdquo; form:<br/>
 <img src="http://patshaughnessy.net/assets/2010/1/24/new_shirt.png"/>
 <p>Here we can see a form for a new &ldquo;shirt&rdquo; record; along with the color and size the user can also select the person who owns the shirt. In this example, the shirt and person models have a has_many/belongs_to relationship. This form uses simple HTML &lt;select&gt; and &lt;option&gt; tags to display the list of people, and is generated by Rails ERB code that uses &ldquo;collection_select&rdquo; like this:
@@ -75,34 +27,20 @@ Successfully installed view_mapper-0.3.2
 <div class="CodeRay">
   <div class="code"><pre>$ ./script/generate view_for shirt --view belongs_to</pre></div>
 </div></p>
-
-
 <p>View Mapper will open the specified model (&ldquo;Shirt&rdquo;), detect the associated model(s) that Shirt belongs to, and then generate the form using collection_select along with all of the other standard scaffolding files. You can also have View Mapper generate the new Shirt model and the view scaffolding code at the same time like this:
 <div class="CodeRay">
   <div class="code"><pre>./script/generate scaffold_for_view shirt color:string size:integer
                                     --view belongs_to:person</pre></div>
 </div></p>
-
-
 <p>Here you&rsquo;ve specified the desired attributes for the new shirt model, along with the fact that you want it to belong to a person.</p>
-
-
 <p>To make the generated view code simple and concise, View Mapper makes a couple of assumptions about your models:
   <ul>
     <li>It assumes the parent model (&ldquo;Person&rdquo; in this example) has an attribute or method called &ldquo;name.&rdquo; This is used to display the list of people.</li>
     <li>It also assumes the child model (&ldquo;Shirt&rdquo;) has a method to display the name of the parent model it belongs to (&ldquo;person_name&rdquo; in this example).</li>
     </ul></p>
-
-
 <p>I decided not to make the View Mapper command line more complex than it already is by providing a way to pass the &ldquo;name&rdquo; attribute as another parameter. Instead you can just edit the scaffolding code it produces as desired.</p>
-
-
 <p><b>Detailed example and code review</b></p>
-
-
 <p>Let&rsquo;s create a sample app now together using View Mapper, and then review how this &ldquo;belongs_to view&rdquo; works. First, create a new Rails app:</p>
-
-
 <div class="CodeRay">
   <div class="code"><pre>$ rails belongs_to
       create  
@@ -112,11 +50,7 @@ Successfully installed view_mapper-0.3.2
       create  app/views/layouts
       create  config/environments
       etc...</pre></div>
-</div>
-
-
-<p></p></p>
-
+</div></p>
 <p>And now let&rsquo;s create the Person model with first and last name attributes; I&rsquo;ll also use the console to create a few Person records so we have some existing data to work with:
 <div class="CodeRay">
   <div class="code"><pre>$ cd belongs_to
@@ -141,16 +75,12 @@ Loading development environment (Rails 2.3.5)
 &gt;&gt; Person.create :first_name =&gt; 'George', :last_name =&gt; 'Bush'
 &gt;&gt; Person.create :first_name =&gt; 'Bill',   :last_name =&gt; 'Clinton'</pre></div>
 </div></p>
-
-
 <p>Now let&rsquo;s go ahead and run View Mapper to create the form&hellip;
 <div class="CodeRay">
   <div class="code"><pre>$ ./script/generate scaffold_for_view shirt color:string size:integer
                                       --view belongs_to:person
      warning  Model Person does not contain a has_many association for Shirt.</pre></div>
 </div></p>
-
-
 <p>Here View Mapper is warning us that we haven&rsquo;t called &ldquo;has_many :shirts&rdquo; in the Person model yet; let&rsquo;s edit person.rb and enter that code:
 <div class="CodeRay">
   <div class="code"><pre><span class="no">1</span> <span class="r">class</span> <span class="cl">Person</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
@@ -172,8 +102,6 @@ Loading development environment (Rails 2.3.5)
 <span class="no">5</span>   <span class="r">end</span><span class='overlay'></span></div><span class="no">6</span> <span class="r">end</span>
 </pre></div></p>
 </div></p>
-
-
 <p>The highlighted code returns the first and last names concatenated together as a single name. Now View Mapper won&rsquo;t complain and we can go ahead and create our new form:
 <div class="CodeRay">
   <div class="code"><pre>$ ./script/generate scaffold_for_view shirt color:string size:integer
@@ -181,7 +109,6 @@ Loading development environment (Rails 2.3.5)
       exists  app/models/
       exists  app/controllers/
 … etc …
-
 <div class='container'>     create  app/views/shirts/_form.html.erb<span class='overlay'></span></div>
 … etc …
       exists  test/fixtures/
@@ -189,11 +116,7 @@ Loading development environment (Rails 2.3.5)
       create  db/migrate/20100124121032_create_shirts.rb</pre></div>
 </div>
 </p>
-
-
 <p>Note the output here looks just like what you get from the standard Rails scaffold generator, except for the one additional line I highlighted above. If you run your app now, you&rsquo;ll be able to see scaffolding for the Shirts model at http://localhost:3000/shirts, and you&rsquo;ll see the person select box on the new and edit forms.</p>
-
-
 <p>Let me take a few more minutes to point out a couple of interesting details about the belongs_to scaffolding&hellip; first I&rsquo;ve moved the form fields into a partial shared among the new and edit views; this is the new _form.html.erb file highlighted above in the generator output. If you look at new.html.erb, you&rsquo;ll see a call to render :partial:
 <div class="CodeRay">
   <div class="code"><pre><span class="no"> 1</span> <span class="ta">&lt;h1&gt;</span>New shirt<span class="ta">&lt;/h1&gt;</span>
@@ -206,11 +129,7 @@ Loading development environment (Rails 2.3.5)
 <span class="no"> 9</span> 
 <span class="no">10</span> <span class="il"><span class="idl">&lt;%=</span> link_to <span class="s"><span class="dl">'</span><span class="k">Back</span><span class="dl">'</span></span>, shirts_path <span class="idl">%&gt;</span></span></pre></div>
 </div></p>
-
-
 <p>The edit.html.erb file looks similar. The actual call to collection_select is in _form.html.erb; that way if you need to display the list of people differently, for example to use a method other than &ldquo;name&rdquo; for each person or possibly to use a filtered list of people instead of Person.all, then you just need to make your changes in one place.</p>
-
-
 <p>And one more interesting detail: if you open up the new Shirts model that View Mapper generated you&rsquo;ll see this:
 <div class="CodeRay">
   <div class="code"><pre><span class="no">1</span> <span class="r">class</span> <span class="cl">Shirt</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
@@ -219,8 +138,6 @@ Loading development environment (Rails 2.3.5)
 <span class="no">4</span>     person.name <span class="r">if</span> person
 <span class="no">5</span>   <span class="r">end</span><span class='overlay'></span></div><span class="no">6</span> <span class="r">end</span></pre></div>
 </div></p>
-
-
 <p>The person_name method I highlighted above returns the person each shirt belongs to; it also checks if person is nil for that shirt. This simplifies the code in index.html.erb and show.html.erb; take a look at show.html.erb for example:
 <div class="CodeRay">
   <div class="code"><pre><span class="no"> 1</span> <span class="ta">&lt;p&gt;</span>
@@ -240,118 +157,18 @@ Loading development environment (Rails 2.3.5)
 <span class="no">16</span> <span class="il"><span class="idl">&lt;%=</span> link_to <span class="s"><span class="dl">'</span><span class="k">Edit</span><span class="dl">'</span></span>, edit_shirt_path(<span class="iv">@shirt</span>) <span class="idl">%&gt;</span></span> |
 <span class="no">17</span> <span class="il"><span class="idl">&lt;%=</span> link_to <span class="s"><span class="dl">'</span><span class="k">Back</span><span class="dl">'</span></span>, shirts_path <span class="idl">%&gt;</span></span></pre></div>
 </div></p>
-
-
 <p>Here the Person field looks just like any other field from the Shirt model. There&rsquo;s no need to repeat the check for person == nil in the view, and if you ever need to use a Person attribute other than name or if you needed to find the associated person in some more complex way, you&rsquo;ll only need to make the change to the model and not in each view file.</p>
-
-
 <p>Again, if you run View Mapper on two has_many/belongs_to models that you&rsquo;ve already written in your app, you will first need to provide:
   <ul>
     <li>A &ldquo;name&rdquo; method in the parent model, if it&rsquo;s not already an attribute, and</li>
     <li>A &ldquo;[parent_model]_name&rdquo; method in the child model</li></ul></p>
-
-
 <p>If these two methods don&rsquo;t exist, View Mapper will display warning messages and not proceed; this avoids the confusion you would run into when the scaffolding view code didn&rsquo;t work.</p>
-
-
 <p>Next time, I&rsquo;ll repeat this example but use type ahead/auto_complete to select the person instead...</p>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Creating associations to existing data part 1: belongs_to scaffolding';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Creating associations to existing data part 1: belongs_to scaffolding';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Creating associations to existing data part 1: belongs_to scaffolding';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on View Mapper</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2010/4/4/creating-associations-to-existing-data-part-3-has_many-through-scaffolding">Creating associations to existing data part 3: has_many :through scaffolding</a></li>
-                  
-                    <li><a href="/2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">Creating associations to existing data part 2: belongs_to with auto_complete</a></li>
-                  
-                    <li><a href="/2009/11/25/scaffolding-for-auto-complete-on-a-complex-nested-form">Scaffolding for auto complete on a complex, nested form</a></li>
-                  
-                    <li><a href="/2009/11/9/scaffolding-for-complex-forms-using-nested-attributes">Scaffolding for complex forms using nested attributes</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on View Mapper</div><div class="links"><ul><li><a href="2010/4/4/creating-associations-to-existing-data-part-3-has_many-through-scaffolding">Creating associations to existing data part 3: has_many :through scaffolding</a></li><li><a href="2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">Creating associations to existing data part 2: belongs_to with auto_complete</a></li><li><a href="2009/11/25/scaffolding-for-auto-complete-on-a-complex-nested-form">Scaffolding for auto complete on a complex, nested form</a></li><li><a href="2009/11/9/scaffolding-for-complex-forms-using-nested-attributes">Scaffolding for complex forms using nested attributes</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

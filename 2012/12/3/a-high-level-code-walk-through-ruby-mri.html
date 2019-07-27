@@ -1,59 +1,9 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="A High Level Code Walk Through Ruby MRI - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>A High Level Code Walk Through Ruby MRI - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>A High Level Code Walk Through Ruby MRI</h1>
-  
-    <div class="metadata">
-    <span class="date">December 3rd 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/12/3/a-high-level-code-walk-through-ruby-mri" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="A High Level Code Walk Through Ruby MRI">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 17px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>A High Level Code Walk Through Ruby MRI - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>A High Level Code Walk Through Ruby MRI</h1><div class="metadata"><span class="date">December 3rd 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/12/3/a-high-level-code-walk-through-ruby-mri" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="A High Level Code Walk Through Ruby MRI">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
     <tr><td align="center"><img src="http://patshaughnessy.net/assets/2012/12/3/screencast.png"></td></tr>
     <tr><td align="center"><i><a href="http://www.rubyinside.com/ruby-mri-code-walk-tour-6020.html">Watch it now on rubyinside.com!</a></i></td></tr>
   </table>
 </div>
-
-
 <p>Have you ever thought about taking at look at Ruby’s internal C source code,
 but weren’t quite sure where to get started? Well, this weekend <a href="http://peterc.org">Peter Cooper</a>
 and I recorded a screencast that is just for you. We went on a tour through the
@@ -62,7 +12,6 @@ Level Code Walk Through Ruby
 MRI</a>. We’ll give
 you a “lay of the land,” a sense of what is where inside the MRI C source code
 tree and suggest places to get started reading the C source code yourself.</p>
-
 <p>Special thanks to Peter for taking time out of his busy schedule to record and
 edit the video, and for being such a big fan of my book, <a href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
 Microscope</a>! I’m sure you
@@ -73,111 +22,19 @@ Walkthrough</a>, and earlier in February he
 did the fun <a href="http://rubyreloaded.com/trickshots/">Ruby Trick Shots</a> piece. In
 fact, Peter’s new Kickstarter project, <a href="http://www.kickstarter.com/projects/1225193080/the-ruby-20-walkthrough">The Ruby 2.0
 Walkthrough</a>,
-was backed just last week &ndash; keep an eye out for that in the coming months!
+was backed just last week - keep an eye out for that in the coming months!
 This is the first screencast I’ve ever done; having the chance to do it with
 Peter was a bit like stepping onto a tennis court for the first time and
-getting a private lesson from John McEnroe &ndash; or maybe Andy Murray would be a
+getting a private lesson from John McEnroe - or maybe Andy Murray would be a
 better analogy.</p>
-
 <p>Let us know if you like this; if enough people are interested we may do some
 more screencasts on Ruby internals, diving into more detail that we had time
 for this week. Enjoy!</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2012/12/3/a-high-level-code-walk-through-ruby-mri';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'A High Level Code Walk Through Ruby MRI';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2012/12/3/a-high-level-code-walk-through-ruby-mri';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'A High Level Code Walk Through Ruby MRI';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2012/12/3/a-high-level-code-walk-through-ruby-mri'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'A High Level Code Walk Through Ruby MRI';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

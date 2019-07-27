@@ -1,81 +1,19 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Using MySQL transactions with Drupal unit tests - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Using MySQL transactions with Drupal unit tests - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Using MySQL transactions with Drupal unit tests</h1>
-  
-    <div class="metadata">
-    <span class="date">January 19th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/1/19/using-mysql-transactions-with-drupal-unit-tests" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p><a href="http://patshaughnessy.net/2009/1/16/using-a-test-database-with-drupal-unit-tests">Last time</a> I wrote about how to use an entirely separate MySQL database to hold test data for Drupal unit tests, similar to the approach that the Ruby on Rails framework uses for test data. In this post I&rsquo;ll look at another Rails innovation that can be applied equally well to unit testing with Drupal: running each unit test in a separate database transaction.</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Using MySQL transactions with Drupal unit tests - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Using MySQL transactions with Drupal unit tests</h1><div class="metadata"><span class="date">January 19th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/1/19/using-mysql-transactions-with-drupal-unit-tests" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Using MySQL transactions with Drupal unit tests">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p><a href="http://patshaughnessy.net/2009/1/16/using-a-test-database-with-drupal-unit-tests">Last time</a> I wrote about how to use an entirely separate MySQL database to hold test data for Drupal unit tests, similar to the approach that the Ruby on Rails framework uses for test data. In this post I&rsquo;ll look at another Rails innovation that can be applied equally well to unit testing with Drupal: running each unit test in a separate database transaction.</p>
 <p>First let&rsquo;s take a quick look at what database transactions are, and how we would use them while running unit tests. In a nutshell, a database transaction is just a way to group a series of SQL operations together and insuring that they are all run together as a single unit &ndash; either all of them are executed, or none of them. Let&rsquo;s take an example. Here are some of the SQL statements Drupal executes when you save a new node in the database:</p>
-
-
 <pre>BEGIN
 INSERT INTO node_revisions (nid, uid, title, body, teaser, log, timestamp...
 INSERT INTO node (vid, type, language, title, uid, status, created, changed...
 UPDATE node_revisions SET nid = 2 WHERE vid = 2
 COMMIT</pre>
-
-
 <p>Normally Drupal does not use transactions, but I've inserted the &ldquo;BEGIN&rdquo; and &ldquo;COMMIT&rdquo; commands here as an example: the transaction starts with the BEGIN command, and ends with the COMMIT command. When MySQL receives the COMMIT command, it allows other database clients (future Drupal HTTP requests, or possibly future command line unit tests) to see the new inserted and updated node data. However, if the transaction were rolled back like this:</p>
-
-
 <pre>BEGIN
 INSERT INTO node_revisions (nid, uid, title, body, teaser, log, timestamp...
 INSERT INTO node (vid, type, language, title, uid, status, created, changed...
 UPDATE node_revisions SET nid = 2 WHERE vid = 2
 ROLLBACK</pre>
-
-
 <p>&hellip; then none of the changes would be made to the node and node_revisions tables. Instead when MySQL receives the ROLLBACK command it will discard the changes and these tables will appear the same way they did before the transaction started. Therefore, by running each unit test in a separate transaction and rolling it back at the end of each test, we can insure that any changes made to the database by that test are discarded&hellip; before the next test is run. Below I&rsquo;ll explain how to actually do this with PHPUnit and Drupal.</p>
-
-
 <p>But first let me quickly mention another huge benefit to using transactions with unit test suites: test performance. To learn more about why your tests will run a lot faster using MySQL transactions, read <a href="http://clarkware.com/cgi/blosxom/2005/10/24#Rails10FastTesting">this great article by Mike Clark</a> from the period when Rails 1.0 was released, way back in 2005. What Mike wrote about Rails in 2005 is still true today for Drupal: your unit tests will run faster because fewer SQL statements are required. You won’t need to execute DELETE SQL statements to remove the data after each test since rolling back each transaction accomplishes the same thing.</p>
-
-
 <p>Now let&rsquo;s get it to work with Drupal&hellip; first let me add a second unit test to my simple PHPUnit test class from <a href="http://patshaughnessy.net/2009/1/16/using-a-test-database-with-drupal-unit-tests">last time</a>:</p>
-
-
 <pre>&lt;?php
 require_once &#x27;./includes/phpunit_setup.inc&#x27;;
 class TestDataExampleTest2 extends PHPUnit_Framework_TestCase
@@ -103,11 +41,7 @@ class TestDataExampleTest2 extends PHPUnit_Framework_TestCase
   }
 }
 ?&gt;</pre>
-
-
 <p>In this example, I use the <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> file I wrote in my last post to clear out and setup a new Drupal schema each time I run the tests. Even though I have a clean test database each time I run PHPUnit, without using transactions one of these two unit tests will fail since each one creates its own test data, and assumes no other test data exist in the node table:</p>
-
-
 <pre>$ phpunit TestDataExampleTest2
           modules/test_data_module/TestDataExampleTest2.php 
 PHPUnit 3.2.21 by Sebastian Bergmann.
@@ -119,11 +53,7 @@ Failed asserting that &lt;string:3&gt; matches expected value &lt;integer:2&gt;.
 /Users/pat/htdocs/drupal4/modules/test_data_module/TestDataExampleTest2.php:24
 FAILURES!
 Tests: 2, Failures: 1.</pre>
-
-
 <p>Here the second test fails since the blog post created in the first test is still present in the database. The simplest way to start a new database transaction before each test is run, and to rollback after each test is completed, is with the PHPUnit setup/teardown methods as follows:</p>
-
-
 <pre>public function setup()
 {
   db_query(&quot;BEGIN&quot;);
@@ -132,11 +62,7 @@ public function teardown()
 {
   db_query(&quot;ROLLBACK&quot;);
 }</pre>
-
-
 <p>If you add these functions to the &ldquo;TestDataExampleTest2&rdquo; class above both tests should now pass since the ROLLBACK call will delete the nodes created by each test each time teardown is called&hellip;</p>
-
-
 <pre>$ phpunit TestDataExampleTest2
           modules/test_data_module/TestDataExampleTest2.php 
 PHPUnit 3.2.21 by Sebastian Bergmann.
@@ -144,20 +70,10 @@ PHPUnit 3.2.21 by Sebastian Bergmann.
 &hellip;
 FAILURES!
 Tests: 2, Failures: 1.</pre>
-
-
 <p>Wait&hellip; what happened? It failed!</p>
-
-
 <p>The problem is that MySQL does not support transactions using the MyISAM database engine, which is what Drupal uses by default. What we need to do is to convert all of the Drupal MySQL tables to use the InnoDB database engine instead. Unfortunately, there are many implications to using InnoDB vs. MyISAM in Drupal or with any MySQL based application. See "<a href="http://2bits.com/articles/mysql-innodb-performance-gains-as-well-as-some-pitfalls.html">MySQL InnoDB: performance gains as well as some pitfalls</a>" to read more. Specifically, there can be performance issues and degradation when using InnoDB incorrectly, or depending on the type of application you have. Drupal was actually designed and developed with MyISAM in mind, and not InnoDB, although there is some chance this might change for Drupal 7 someday.</p>
-
-
 <p>Despite all of this, using InnoDB in a <b>test database</b> is a great idea since you will get all of the benefits of isolating tests from each other without having to worry about how InnoDB will effect your production site&rsquo;s performance. In fact, the performance of your tests will actually be dramatically improved, <a href="http://clarkware.com/cgi/blosxom/2005/10/24#Rails10FastTesting">as Mike Clark explained</a>.</p>
-
-
 <p>With all of this in mind, I wrote some code to convert the newly created Drupal tables in the test database from MyISAM to InnoDB right after we clear out and reload the test database. Here&rsquo;s how it works; this code is from <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a>, which I included at the top of my PHPUnit test file:</p>
-
-
 <pre>function enable_mysql_transactions()
 {
   convert_test_tables_to_innodb();
@@ -182,14 +98,8 @@ function convert_to_innodb($table)
 {
   db_query(&quot;ALTER TABLE $table ENGINE = INNODB&quot;);
 }</pre>
-
-
 <p>This iterates over the Drupal tables in the test database and executes ALTER TABLE &hellip; ENGINE = INNODB on each one. The SET AUTOCOMMIT=0 command is used to prevent SQL statements from being committed immediately after they are executed, and to allow the InnoDB transactions to work properly.</p>
-
-
 <p>To repeat and summarize how to employ and separate MySQL test database and transactions in your PHPUnit tests for Drupal, just follow these steps:</p>
-
-
 <ol>
   <li><p>Edit settings.php and use an array of two values for $db_url:</p>
     <pre>$db_url["default"] = 'mysql://user:password@localhost/drupal;
@@ -205,11 +115,7 @@ PHPUnit 3.2.21 by Sebastian Bergmann.
 Time: 0 seconds
 OK (2 tests)</pre></li>
 </ol>
-
-
 <p>Here’s my finished test class:</p>
-
-
 <pre>&lt;?php
 require_once &#x27;./includes/phpunit_setup.inc&#x27;;
 class TestDataExampleTest2 extends PHPUnit_Framework_TestCase
@@ -245,103 +151,11 @@ class TestDataExampleTest2 extends PHPUnit_Framework_TestCase
   }
 }
 ?&gt;</pre>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2009/1/19/using-mysql-transactions-with-drupal-unit-tests';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Using MySQL transactions with Drupal unit tests';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2009/1/19/using-mysql-transactions-with-drupal-unit-tests';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Using MySQL transactions with Drupal unit tests';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2009/1/19/using-mysql-transactions-with-drupal-unit-tests'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Using MySQL transactions with Drupal unit tests';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Drupal</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/drupal-test-database">Using transactions in a separate database with Drupal PHPUnit tests</a></li>
-                  
-                    <li><a href="/2009/1/16/using-a-test-database-with-drupal-unit-tests">Using a test database with Drupal unit tests</a></li>
-                  
-                    <li><a href="/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal">TDD keeps your PHP code separate from Drupal</a></li>
-                  
-                    <li><a href="/2008/12/19/using-tdd-to-write-a-drupal-module">Using TDD to write a Drupal module</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Drupal</div><div class="links"><ul><li><a href="2009/1/16/using-a-test-database-with-drupal-unit-tests">Using a test database with Drupal unit tests</a></li><li><a href="2009/1/9/tdd-keeps-your-php-code-separate-from-drupal">TDD keeps your PHP code separate from Drupal</a></li><li><a href="2008/12/19/using-tdd-to-write-a-drupal-module">Using TDD to write a Drupal module</a></li><li><a href="2008/12/12/writing-your-first-phpunit-test-in-drupal">Writing your first PHPUnit test in Drupal</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

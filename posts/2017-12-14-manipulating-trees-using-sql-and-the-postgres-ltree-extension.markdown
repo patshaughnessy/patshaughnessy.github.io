@@ -124,8 +124,8 @@ G      | A.B.G |      3
 </pre>
 
 Looking at this, it’s easy to understand what the function returns: For a root
-node like <span class="code">A</span>, <span class="code">NLEVEL</span> returns
-1. For <span class="code">A</span>’s child nodes, <span class="code">A.B</span>
+node like <span class="code">A</span>, <span class="code">NLEVEL</span> returns 1.
+For <span class="code">A</span>’s child nodes, <span class="code">A.B</span>
 and <span class="code">A.C</span>, <span class="code">NLEVEL</span> returns 2,
 and for the grandchild nodes it returns 3. It simply counts the number of
 levels in each path string; internally, it parses the path string for period

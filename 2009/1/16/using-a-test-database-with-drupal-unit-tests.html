@@ -1,73 +1,17 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Using a test database with Drupal unit tests - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Using a test database with Drupal unit tests - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Using a test database with Drupal unit tests</h1>
-  
-    <div class="metadata">
-    <span class="date">January 16th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/1/16/using-a-test-database-with-drupal-unit-tests" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>In my last few posts I used Test Driven Development (TDD) to <a href="http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module">write a very simple Drupal module</a> and showed how <a href="http://patshaughnessy.net/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal">TDD helped to keep my custom code decoupled from the Drupal framework</a>. This time I want to take a closer look at the biggest headache I ran into while using TDD with Drupal: handling the test data. When I <a href="http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module">started to write unit tests for my example module</a> I ran into trouble creating test data inside each test, since I found that PHPUnit stopped executing the test each time there was a failing assertion, meaning that test data weren&rsquo;t cleaned up after a test failure. I was able to avoid this problem by creating and deleting the test data before and after each test was run using the setup/teardown methods from PHPUnit. But this solution brings along different problems with it:</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Using a test database with Drupal unit tests - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Using a test database with Drupal unit tests</h1><div class="metadata"><span class="date">January 16th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/1/16/using-a-test-database-with-drupal-unit-tests" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Using a test database with Drupal unit tests">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>In my last few posts I used Test Driven Development (TDD) to <a href="http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module">write a very simple Drupal module</a> and showed how <a href="http://patshaughnessy.net/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal">TDD helped to keep my custom code decoupled from the Drupal framework</a>. This time I want to take a closer look at the biggest headache I ran into while using TDD with Drupal: handling the test data. When I <a href="http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module">started to write unit tests for my example module</a> I ran into trouble creating test data inside each test, since I found that PHPUnit stopped executing the test each time there was a failing assertion, meaning that test data weren&rsquo;t cleaned up after a test failure. I was able to avoid this problem by creating and deleting the test data before and after each test was run using the setup/teardown methods from PHPUnit. But this solution brings along different problems with it:</p>
 <ul>
   <li>In setup() I need to create all of the test data that every test will use since it is called every time, which becomes a performance problem as the number of tests increases.</li>
   <li>Teardown() still won&rsquo;t be called if there are any PHP syntax errors in my test or production code, which happens a lot if I&rsquo;m really using TDD.</li>
   <li>There&rsquo;s no way to create different test data for different tests</li>
   <li>Worst of all, any existing data in my Drupal database might cause the tests to fail, and vice-versa: the test data might interfere with my development work.</li>
 </ul>
-
-
 <p>We need a better approach for handling test data. Rather than reinventing the wheel, let&rsquo;s take a look at the Ruby on Rails framework for some inspiration and see if we can emulate the way Rails handles test data using PHP and Drupal. How does Rails handle test data? First of all, each Rails application has multiple, different databases setup: one for development, one for production, and a third for testing at a minimum. Every time you run a unit test in Rails, the test database is manipulated as follows:</p>
-
-
 <ul>
   <li>Rails deletes the existing contents of the test database, if any.</li>
   <li>Rails loads your test database with an empty copy of your application&rsquo;s database schema (tables, columns, indices, etc.).</li>
   <li>Finally Rails runs each of the unit tests targeting this empty test database, by default each test within a separate database transaction (more on this in <a href="http://patshaughnessy.net/2009/1/19/using-mysql-transactions-with-drupal-unit-tests">my next post</a>).</li>
 </ul>
-
-
 <p>How can we do this with Drupal? If you take a close look at the <a href="http://drupal.org/project/simpletest">SimpleTest module</a>, you&rsquo;ll see that it uses some tricks to create a test copy of the Drupal schema using the &ldquo;database prefix&rdquo; feature of Drupal. While this works fine, I decided to see if I could directly follow the Rails pattern of having a completely separate MySQL database to use for testing. Let&rsquo;s use PHPUnit directly on Drupal from the command line again as I did before. Here&rsquo;s a very simple PHPUnit test:</p>
-
-
 <pre>&lt;?php
 require_once &#x27;./includes/bootstrap.inc&#x27;;
 drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
@@ -90,18 +34,10 @@ class TestDataExampleTest extends PHPUnit_Framework_TestCase
   }
 }
 ?&gt;</pre>
-
-
 <p><a href="http://patshaughnessy.net/2008/12/12/writing-your-first-phpunit-test-in-drupal">As I explained in December</a>, we have to run the unit test from the Drupal root folder as follows (replace &ldquo;modules/test_data_module/TestDataExampleTest.php&rdquo; with the path to the test file):</p>
-
-
 <pre>$ cd /path/to/my-drupal-site
 $ phpunit TestDataExampleTest modules/test_data_module/TestDataExampleTest.php</pre>
-
-
 <p>The &ldquo;test_there_is_one_post&rdquo; unit test will create a test blog post record in the node table, and then count the number of nodes in the database and assert that there is exactly one. Obviously this will fail if there are any existing node records in my Drupal database, or if I even just run the test more than once:</p>
-
-
 <pre>$ phpunit TestDataExampleTest modules/test_data_module/TestDataExampleTest.php
 PHPUnit 3.2.21 by Sebastian Bergmann.
 F
@@ -112,32 +48,16 @@ Failed asserting that &lt;string:6&gt; matches expected value &lt;integer:1&gt;.
 /Users/pat/htdocs/drupal4/TestDataExampleTest.php:19
 FAILURES!
 Tests: 1, Failures: 1.</pre>
-
-
 <p>This failure is actually good: this test is intentionally dependent on the contents of the test database. Later if we can get this test to pass then we know we have properly initialized the contents of the database without resorting to the setup/teardown solution from last time.</p>
-
-
 <p>Let&rsquo;s get started by creating a real test database using the MySQL command line:</p>
-
-
 <pre>mysql&gt; CREATE DATABASE drupal_test DEFAULT CHARACTER SET utf8
        COLLATE utf8_unicode_ci;
 Query OK, 1 row affected (0.00 sec)</pre>
-
-
 <p>Now, how can we get Drupal to use this database instead of the normal one? Let&rsquo;s try converting the $db_url value in settings.php into an array, like this:</p>
-
-
 <pre>$db_url[&quot;default&quot;] = &#x27;mysql://user:password@localhost/drupal;
 $db_url[&quot;test&quot;] = &#x27;mysql://user:password@localhost/drupal_test&#x27;;</pre>
-
-
 <p>Here I&rsquo;ve renamed the original $db_url variable to $db_url[&ldquo;default&rdquo;], and created a new entry for the test database. Now Drupal can run against either the original database, or the test database as we wish.</p>
-
-
 <p>The next step is to load the test database with an empty copy of the Drupal database schema. In the Rails world, there are Ruby functions that export the development database schema, and then reload it into the test database. In Drupal, the database schema is created automatically by PHP functions when you install the application for the first time. The <a href="http://drupal.org/project/simpletest">SimpleTest module</a> also does the same thing before running its tests. Looking at code in install.php from the Drupal installation process, and also in drupal_web_test_case.php from SimpleTest I came up with this solution:</p>
-
-
 <pre>function create_test_drupal_schema()
 {
   include_once &#x27;./includes/install.inc&#x27;;
@@ -148,21 +68,14 @@ $db_url[&quot;test&quot;] = &#x27;mysql://user:password@localhost/drupal_test&#x
   menu_rebuild();
   actions_synchronize();
   _drupal_flush_css_js();
-
-  variable_set(&#x27;user_mail_status_activated_notify&#x27;, FALSE);
-  $account = user_load(1);
-  $merge_data = array(&#x27;name&#x27; =&gt; &#x27;admin&#x27;, &#x27;pass&#x27; =&gt; &#x27;test&#x27;, &#x27;roles&#x27; =&gt; array(),
-                     &#x27;status&#x27; =&gt; 1);
-  user_save($account, $merge_data);  
-}</pre>
-
-
+<p>variable_set('user_mail_status_activated_notify', FALSE);
+$account = user_load(1);
+$merge_data = array('name' =&gt; 'admin', 'pass' =&gt; 'test', 'roles' =&gt; array(),
+'status' =&gt; 1);
+user_save($account, $merge_data);<br />
+}</pre></p>
 <p>Here drupal_install_system() and drupal_install_modules() will create most of the empty tables we need just the way they do when you install Drupal. The other calls I took from DrupalWebTestCase-&gt;setup() in SimpleTest to create some initial data Drupal requires to function properly, like the menu for example. The last few lines I wrote to setup the admin user properly, and to avoid sending emails to the admin during this process.</p>
-
-
 <p>The last piece of the puzzle is to find a way to clear out the test database before each test run. To do that, I wrote this code to iterate over all of the tables in the test database and drop them:</p>
-
-
 <pre>function drop_test_tables()
 {
   each_table(&#x27;drop&#x27;);
@@ -182,25 +95,13 @@ function drop($table)
 {
   db_query(&quot;DROP TABLE $table&quot;);
 }</pre>
-
-
 <p>To put it all together we just need to call db_set_active(&ldquo;test&rdquo;) and call all of this code before our test runs:</p>
-
-
 <pre>db_set_active(&quot;test&quot;);
 drop_test_tables();
 create_test_drupal_schema();</pre>
-
-
 <p>Here db_set_active(&ldquo;test&rdquo;) tells Drupal we want to use the test database instead of the actual database. After switching to the test database we drop any existing tables that may exist there, and then create a new, empty Drupal schema.</p>
-
-
 <p>To avoid cluttering my PHPUnit test file, and to be able to reuse this code in many PHPUnit tests, I moved the test database setup into a new include file called: <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a>. I also added some validation code to <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> to perform a sanity check so you don&rsquo;t accidentally drop all of the tables in your main Drupal database, and to make it easier to avoid mistakes with $db_url in settings.php. The code requires that "test" be present in the test database name. I also added code to enable database transactions in the test database, which I will discuss in <a href="http://patshaughnessy.net/2009/1/19/using-mysql-transactions-with-drupal-unit-tests">my next post</a>.</p>
-
-
 <p>To try this out on your system, just download <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> and then include it at the top of your PHPUnit test file, like this:</p>
-
-
 <pre>&lt;?php
 require_once &#x27;./includes/phpunit_setup.inc&#x27;;
 class TestDataExampleTest extends PHPUnit_Framework_TestCase
@@ -222,117 +123,19 @@ class TestDataExampleTest extends PHPUnit_Framework_TestCase
   }
 }
 ?&gt;</pre>
-
-
 <p>The require_once statement above assumes you downloaded <a href="http://patshaughnessy.net/assets/code/drupal-tdd-4/phpunit_setup.inc">phpunit_setup.inc</a> into the includes folder. If you put it somewhere else, just update require_once as necessary. Now the test passes every time:</p>
-
-
 <pre>$ cd /path/to/my-drupal-site
 $ phpunit TestDataExampleTest modules/test_data_module/TestDataExampleTest.php
 PHPUnit 3.2.21 by Sebastian Bergmann.
 .
 Time: 0 seconds
 OK (1 test)</pre>
-
-
 <p>One important detail I&rsquo;ve glossed over here is that the test only passes because it is the only test I&rsquo;m running at all in this database. If there were a second test with it&rsquo;s own test data and assumptions about what data were present, then there would be failures depending on what data each test expected, and which test ran first. <a href="http://patshaughnessy.net/2009/1/19/using-mysql-transactions-with-drupal-unit-tests">Next time</a>, I&rsquo;ll show how Rails solved this problem using database transactions and show how to use them with Drupal unit tests.</p>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2009/1/16/using-a-test-database-with-drupal-unit-tests';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Using a test database with Drupal unit tests';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2009/1/16/using-a-test-database-with-drupal-unit-tests';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Using a test database with Drupal unit tests';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2009/1/16/using-a-test-database-with-drupal-unit-tests'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Using a test database with Drupal unit tests';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Drupal</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2009/1/19/using-mysql-transactions-with-drupal-unit-tests">Using MySQL transactions with Drupal unit tests</a></li>
-                  
-                    <li><a href="/drupal-test-database">Using transactions in a separate database with Drupal PHPUnit tests</a></li>
-                  
-                    <li><a href="/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal">TDD keeps your PHP code separate from Drupal</a></li>
-                  
-                    <li><a href="/2008/12/19/using-tdd-to-write-a-drupal-module">Using TDD to write a Drupal module</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Drupal</div><div class="links"><ul><li><a href="2009/1/19/using-mysql-transactions-with-drupal-unit-tests">Using MySQL transactions with Drupal unit tests</a></li><li><a href="drupal-test-database">Using transactions in a separate database with Drupal PHPUnit tests</a></li><li><a href="2009/1/9/tdd-keeps-your-php-code-separate-from-drupal">TDD keeps your PHP code separate from Drupal</a></li><li><a href="2008/12/19/using-tdd-to-write-a-drupal-module">Using TDD to write a Drupal module</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

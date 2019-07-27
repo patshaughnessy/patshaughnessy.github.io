@@ -1,69 +1,16 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Trying to Represent a Tree Structure Using Postgres - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Trying to Represent a Tree Structure Using Postgres - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Trying to Represent a Tree Structure Using Postgres</h1>
-  
-    <div class="metadata">
-    <span class="date">December 11th 2017</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Trying to Represent a Tree Structure Using Postgres">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Trying to Represent a Tree Structure Using Postgres - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Trying to Represent a Tree Structure Using Postgres</h1><div class="metadata"><span class="date">December 11th 2017</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Trying to Represent a Tree Structure Using Postgres">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2017/12/11/tree1.jpg">
 </div>
-
-
-<p>Suppose you had a hierarchical data structure in your application &ndash; how would
+<p>Suppose you had a hierarchical data structure in your application - how would
 you save it in a database? How would you represent a complex tree structure
 using flat rows and columns?</p>
-
 <p>There are a few different, equally valid options. In this series of blog posts,
 I’ll take a close look at one option that Postgres provides, the <a href="https://www.postgresql.org/docs/current/static/ltree.html">LTREE extension</a>. If you
 install and enable LTREE on your Postgres server, it will add powerful SQL
 operators and functions that support tree operations.</p>
-
 <p>But what are these new SQL operators, and how do you use them? And how does
 LTREE actually work? What Computer Science does it use behind the scenes to
 enable fast tree operations?</p>
-
 <p>This week I’ll publish a series
 (<a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres">one</a>,
 <a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension">two</a>,
@@ -71,32 +18,24 @@ enable fast tree operations?</p>
 <a href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension">four</a>
 and
 <a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">five</a>)
-of blog posts on the Postgres LTREE extension.  I&rsquo;ll get started today by
+of blog posts on the Postgres LTREE extension.  I'll get started today by
 trying to insert a tree structure into a Postgres table using standard SQL, and
-during the rest of the week I&rsquo;ll take a close look at LTREE: <a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension">how to install
+during the rest of the week I'll take a close look at LTREE: <a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension">how to install
 it</a>,
 <a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">how to use
 it</a>,
 and <a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">how it works</a>.</p>
-
 <div style="clear: both"></div>
-
-
 <h2>An Example Tree</h2>
-
 <p>My actual data set was more complicated, of course, but for the sake of example
 let’s suppose I needed to save this tree in a Postgres table:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png"></p>
-
 <p>There are many different tree-like data structures in Computer Science, but
 this is probably the simplest: no cycles, no ordering of child nodes, and all
 the child nodes are accessible moving down from a single root. Should be easy,
 right?</p>
-
 <p>At first, I thought it would be. I started by creating a table with a
 <span class="code">parent_id</span> foreign key column, like this:</p>
-
 <pre>
 create table tree(
     id serial primary key,
@@ -104,13 +43,10 @@ create table tree(
     parent_id integer references tree (id)
 );
 </pre>
-
-
 <p>The idea was that each row in my table represented a single node or element of
 the tree, and would identify its parent using the <span class="code">parent_id</span> column. My single
 root node, <span class="code">A</span>, had no parent so I saved it first with
 a <span class="code">NULL</span> parent id:</p>
-
 <pre>
 insert into tree (letter, parent_id) values ('A', null);
 
@@ -121,10 +57,7 @@ id  | letter | parent_id
 1   | A      |          
 (1 row)
 </pre>
-
-
 <p>And then I inserted each of its child nodes like this:</p>
-
 <pre>
 insert into tree (letter, parent_id) values ('B', 1);
 insert into tree (letter, parent_id) values ('C', 1);
@@ -138,8 +71,6 @@ id  | letter | parent_id
 3   | C      |         1
 (3 rows)
 </pre>
-
-
 <p>Because <span class="code">A</span> has <span class="code">id</span>=1, I set
 <span class="code">parent_id</span>=1 for <span class="code">B</span> and
 <span class="code">C</span>. This is a simple example of the <em>adjacency list</em>
@@ -147,9 +78,7 @@ algorithm: each row contains a list of its neighbors or adjacent rows. In this
 case I was only recording each row’s parent. And the table is <em>self-referencing</em>
 because it contains a foreign key (<span class="code">parent_id</span>)
 referencing another column in the same table.</p>
-
 <p>I continued to fill out my tree structure with a few more insert statements:</p>
-
 <pre>
 insert into tree (letter, parent_id) values ('D', 3);
 insert into tree (letter, parent_id) values ('E', 3);
@@ -169,13 +98,9 @@ id  | letter | parent_id
 7   | G      |         2
 (7 rows)
 </pre>
-
-
 <h2>Did My Postgres Tree Work?</h2>
-
 <p>At first glance, my data structure worked well. I could easily find the parent
 of <span class="code">E</span>:</p>
-
 <pre>
 select parent_id from tree where letter = 'E'
 
@@ -191,10 +116,7 @@ letter
 C
 (1 row)
 </pre>
-
-
 <p>And the children of <span class="code">C</span> like this:</p>
-
 <pre>
 select letter from tree where parent_id = 3
 
@@ -205,13 +127,9 @@ E
 F
 (3 rows)
 </pre>
-
-
 <h2>Recursive Tree Operations</h2>
-
 <p>And it was also very easy to count how many children each node had, for example
 this SQL statement returns the number of children under <span class="code">A</span>:</p>
-
 <pre>
 select count(*) from tree where parent_id = 1;
 
@@ -220,14 +138,10 @@ count
 2
 (1 row)
 </pre>
-
-
 <p>But what if I needed to know how many children <span class="code">A</span> had,
 recursively? That is, what if I needed to count its children, grandchildren,
 great-grandchildren, etc.?</p>
-
 <p>Well, first I would have to find the direct children of <span class="code">A</span>:</p>
-
 <pre>
 select id from tree where parent_id = 1;
 
@@ -237,11 +151,8 @@ id
 3
 (2 rows)
 </pre>
-
-
 <p>Then to find the grandchildren I would need to query for the children of the
 children, inserting the id values from the previous statement:</p>
-
 <pre>
 select id from tree where parent_id in (2, 3);
 
@@ -253,42 +164,31 @@ id
 7
 (4 rows)
 </pre>
-
-
 <p>And then I would add the child count with the grandchild count: 2 + 4 = 6.</p>
-
 <p>My example tree ends here, so I’m done. But this doesn’t scale; suppose my tree
 had 10, 20 or 100 levels in it. I would have to execute repeated select
 statements, stepping down each level of the tree structure under the parent
 node:</p>
-
 <pre>
 select count(*) from tree where parent_id in (GREAT-GRANDCHILD-IDS);
 select count(*) from tree where parent_id in (GREAT-GREAT-GRANDCHILD-IDS);
 select count(*) from tree where parent_id in (GREAT-GREAT-GREAT-GRANDCHILD-IDS);
 </pre>
-
-
 <p>etc.</p>
-
 <p>In other words, I need to execute <em>n</em>-1 SQL statements, where <em>n</em> is the number of
 levels in the tree under the parent node, each time inserting all of the ids
 returned by the previous query. And to find the total count I would have to sum
 the number of ids returned by each query along the way. Certainly not an
 efficient algorithm!</p>
-
-<p><strong>Update:</strong> As Mengchen Yu pointed out in the comments, I&rsquo;ll need to execute
+<p><strong>Update:</strong> As Mengchen Yu pointed out in the comments, I'll need to execute
 one last additional SQL statement that returns an emtpy set of children ids, in
 order to detect my tree has no further levels. So the total number of SQL
 statements would be <em>n</em>, not <em>n</em>-1.</p>
-
 <h2>There must be a better way</h2>
-
 <p>My <span class="code">parent_id</span> foreign key worked well for very simple
 tree operations, but not for more complex tasks, such as recursively counting
 nodes. If I setup my database schema differently, in a more thoughtful and
 complex way, can I avoid the repeated SQL calls?</p>
-
 <p>Yes! There are a variety of options. One common solution is to use a <a href="https://en.wikipedia.org/wiki/Nested_set_model">nested set</a>
 approach. In this design, each row contains a description of the set of other
 nodes that appear under it in the tree by saving the maximum and minimum id
@@ -296,23 +196,19 @@ values of that subset of rows, the “nested set.” Using this scheme, querying
 children and grandchildren recursively becomes very easy. The drawback is that
 I would have to recalculate these values up and down the tree each time a new
 row was added.</p>
-
 <p>Another solution, <em>path enumeration</em>, involves using a column to save the path or
 position of each node in the tree. This can be a powerful solution, but
 recursive queries and other tree operations require special support to parse
 and manipulate these paths.</p>
-
 <p>A completely different approach would be to use a <a href="https://en.wikipedia.org/wiki/Graph_database">graph-oriented
 database</a>, such as
 <a href="https://neo4j.com">Neo4J</a>. These are database servers designed entirely around
 this problem: saving hierarchical data, or more generally networks of related
 data values.</p>
-
 <p>But I didn’t want to leave Postgres behind: I already had a working, well
 tested application. Why start over from scratch just because I added a single
 tree structure to my app? Why add new infrastructure and complexity to my
 overall system to support a single new data structure?</p>
-
 <p>It turns out I didn’t have to: Postgres itself supports one of the two tree
 algorithms I mentioned above: path enumeration. Bundled inside of the Postgres
 source tree is an “extension,” an optional piece of C code you need compile,
@@ -321,102 +217,11 @@ In my <a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltre
 post</a>,
 I’ll show you how to install and use the <a href="https://www.postgresql.org/docs/current/static/ltree.html">LTREE Postgres
 extension</a>.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Trying to Represent a Tree Structure Using Postgres';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Trying to Represent a Tree Structure Using Postgres';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Trying to Represent a Tree Structure Using Postgres';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on the Postgres LTREE Extension</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2017/12/15/looking-inside-postgres-at-a-gist-index">Looking Inside Postgres at a GiST Index</a></li>
-                  
-                    <li><a href="/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension">Manipulating Trees Using SQL and the Postgres LTREE Extension</a></li>
-                  
-                    <li><a href="/2017/12/13/saving-a-tree-in-postgres-using-ltree">Saving a Tree in Postgres Using LTREE</a></li>
-                  
-                    <li><a href="/2017/12/12/installing-the-postgres-ltree-extension">Installing the Postgres LTREE Extension</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on the Postgres LTREE Extension</div><div class="links"><ul><li><a href="2017/12/15/looking-inside-postgres-at-a-gist-index">Looking Inside Postgres at a GiST Index</a></li><li><a href="2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension">Manipulating Trees Using SQL and the Postgres LTREE Extension</a></li><li><a href="2017/12/13/saving-a-tree-in-postgres-using-ltree">Saving a Tree in Postgres Using LTREE</a></li><li><a href="2017/12/12/installing-the-postgres-ltree-extension">Installing the Postgres LTREE Extension</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

@@ -70,12 +70,7 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
           }
           @if !draft {
             script type="text/javascript" {
-              (PreEscaped(r#"var disqus_identifier = '"#))
-              "http://patshaughnessy.net/"
-              (post.url)
-              (PreEscaped(r#"'; var disqus_shortname = 'patshaughnessy'; var disqus_title = '"#))
-              (post.title)
-              (PreEscaped(r#"';(function () {
+              (PreEscaped(r#"(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';

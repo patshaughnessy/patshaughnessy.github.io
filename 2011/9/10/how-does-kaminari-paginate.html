@@ -1,151 +1,65 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="How does Kaminari paginate? - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>How does Kaminari paginate? - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>How does Kaminari paginate?</h1>
-  
-    <div class="metadata">
-    <span class="date">September 10th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/9/10/how-does-kaminari-paginate" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How does Kaminari paginate?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>How does Kaminari paginate? - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>How does Kaminari paginate?</h1><div class="metadata"><span class="date">September 10th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/9/10/how-does-kaminari-paginate" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How does Kaminari paginate?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/9/8/thunder.jpg"></td></tr>
   <tr><td align="center"><small><i>“Kaminari” means thunder in Japanese</i></small></td></tr>
 </table>
 </div>
-
-
-<p>Kaminari is a popular new gem that provides pagination behavior &ndash; to learn how to use it  see the Railscast <a href="http://railscasts.com/episodes/254-pagination-with-kaminari">Pagination with Kaminari</a>, or just refer to the <a href="https://github.com/amatsuda/kaminari">Github readme page</a>. For me Kaminari is a good example of “Rails magic&hellip;” somehow by just adding the gem to my Rails application all of my models get the Kaminari <span class="code">page</span> method. I don’t have even have to type a single line of code in my model&hellip; it’s just automatically added for me. Then when I call <span class="code">page</span>, it immediately works: returning just the records for a given page, even working in conjunction with other scopes I might have.</p>
-
+<p>Kaminari is a popular new gem that provides pagination behavior - to learn how to use it  see the Railscast <a href="http://railscasts.com/episodes/254-pagination-with-kaminari">Pagination with Kaminari</a>, or just refer to the <a href="https://github.com/amatsuda/kaminari">Github readme page</a>. For me Kaminari is a good example of “Rails magic...” somehow by just adding the gem to my Rails application all of my models get the Kaminari <span class="code">page</span> method. I don’t have even have to type a single line of code in my model... it’s just automatically added for me. Then when I call <span class="code">page</span>, it immediately works: returning just the records for a given page, even working in conjunction with other scopes I might have.</p>
 <p>Today I’m going to take a closer look under the hood at how Kaminari actually works. For me the most beautiful part of the Ruby language is the way it allows talented open source developers like Akira Matsuda to make their code seem elegant, beautiful and magical.</p>
-
 <h2>The Kaminari page scope</h2>
-
-<p>Here’s what a call to the Kaminari <span class="code">page</span> method looks like &ndash; your controller receives the page to display as an HTTP parameter: <span class="code">params[:page]</span>, and passes it into Kaminari. The <span class="code">per(5)</span> call indicates you want to override the default and display five people per page:</p>
-
+<p>Here’s what a call to the Kaminari <span class="code">page</span> method looks like - your controller receives the page to display as an HTTP parameter: <span class="code">params[:page]</span>, and passes it into Kaminari. The <span class="code">per(5)</span> call indicates you want to override the default and display five people per page:</p>
 <div class="CodeRay"> 
   <div class="code"><pre><span class="r">def</span> <span class="fu">index</span> 
   <span class="iv">@people</span> = <span class="co">Person</span>.page(params[<span class="sy">:page</span>]).per(<span class="i">5</span>)
 <span class="r">end</span></pre></div> 
-</div>
-
-
-<p></p></p>
-
+</div></p>
 <p>One reason Kaminari became popular this year is that it cleanly leverages Rails 3 scopes to refine the result set to the specified page. Using ActiveRecord, for example, a call to <span class="code">Person.page(3).per(5)</span> will return an ActiveRecord::Relation scope object that looks something like this:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/8/page_scope.png" alt="page scope" /></p>
-
 <p>An ActiveRecord::Relation object encapsulates some values, saved as instance variables, that will later be used to generate the SQL statement sent to your relational database server. This happens when your view code uses the ActiveRecord::Relation object as an array, for example when you call <span class="code">@people.each</span>. In this diagram I’ve shown just two values that are used by Kaminari for pagination:</p>
-
 <ul>
   <li>@limit_value: how many records to return in total (i.e. one page worth instead of all of them)</li>
   <li>@offset_value: which record to start the result set with (i.e. the record at the top of the specified page)</li>
 </ul>
-
-
 <p>For <span class="code">Person.page(3).per(5)</span> Kaminari will set @limit_value to 5, the number of records per page, and the @offset_value to to 10, which is the zero-based index of the first record on the third page.</p>
-
 <p>The nice thing about scopes is that you can chain them together to create a more complex, refined query. For example, I can display a paginated list of legal drinking age people like this:</p>
-
 <div class="CodeRay"> 
   <div class="code"><pre><span class="co">Person</span>.where(<span class="er">"</span>age &gt;= ?", <span class="i">21</span>).page(params[<span class="sy">:page</span>]).per(<span class="i">5</span>)
 </pre></div>
 </div>
-
-
 <p>Here the <span class="code">where</span> method first returns a scope containing the age filter:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/8/filter_scope.png" alt="filter scope" /></p>
-
 <p>It turns out that filter options set by using the <span class="code">where</span> method are saved as multiple values in an array. You can checkout the <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation.rb">ActiveRecord::Relation source code</a> for more information. Next the call to the <span class="code">page</span> method combines the pagination options with that and a single, more complex scope is returned:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/8/page_scope2.png" alt="page scope 2" /></p>
-
 <h2>Inspecting pagination SQL statements in the console</h2>
-
 <p>The best way to understand how scopes work is to experiment with them in the console, and inspect the SQL statements generated by ActiveRecord using the <span class="code">to_sql</span> method. Let’s give it a try. First, here’s the SQL produced by ActiveRecord and the MySQL database adapter for a call to <span class="code">Person.page(3).per(5)</span>:</p>
-
 <div class="CodeRay"> 
   <div class="code"><pre>$ rails c
 Loading development environment (Rails 3.1.0)
 ruby-1.8.7-p302 :001 &gt; Person.page(3).per(5).to_sql
  =&gt; &quot;SELECT  `people`.* FROM `people`  LIMIT 5 OFFSET 10&quot; </pre></div> 
-</div>
-
-
-<p></p>
-
+</div> 
 <p>Now you can see how the LIMIT and OFFSET values from the page scope are actually used in the SQL statement. Let’s try again but this time include the age filter</p>
-
 <div class="CodeRay"> 
   <div class="code"><pre>ruby-1.8.7-p302 :002 &gt; Person.where(&quot;age &gt; ?&quot;, 21).page(3).per(5).to_sql
  =&gt; &quot;SELECT  `people`.* FROM `people`  WHERE (age &gt; 21) LIMIT 5 OFFSET 10&quot; </pre></div> 
-</div>
-
-
-<p></p>
-
+</div> 
 <p>Here ActiveRecord has just combined the options from the two scopes together and produced a single SQL statement.</p>
-
 <h2>How does Kaminari create the page scope?</h2>
-
 <p>Finally, let’s take a quick look at how Akira Matsuda actually implemented this inside of Kaminari. You can find the code that implements the <span class="code">page</span> method for ActiveRecord models in the <a href="https://github.com/amatsuda/kaminari/blob/master/lib/kaminari/models/active_record_model_extension.rb">active_record_model_extension.rb</a> file inside of the Kaminari gem:</p>
-
 <div class="CodeRay"> 
   <div class="code"><pre>require <span class="co">File</span>.join(<span class="co">File</span>.dirname(<span class="pc">__FILE__</span>), <span class="s"><span class="dl">'</span><span class="k">active_record_relation_methods</span><span class="dl">'</span></span>)
- 
-<span class="r">module</span> <span class="cl">Kaminari</span> 
-  <span class="r">module</span> <span class="cl">ActiveRecordExtension</span> 
-    extend <span class="co">ActiveSupport</span>::<span class="co">Concern</span> 
-    included <span class="r">do</span> 
-      <span class="r">def</span> <span class="pc">self</span>.inherited(kls) <span class="c">#:nodoc:</span> 
-        <span class="r">super</span> 
- 
-        kls.class_eval <span class="r">do</span> 
-          include <span class="co">Kaminari</span>::<span class="co">ConfigurationMethods</span> 
- 
-          <span class="c"># Fetch the values at the specified page number</span> 
-          <span class="c">#   Model.page(5)</span> 
+<p><span class="r">module</span> <span class="cl">Kaminari</span>
+<span class="r">module</span> <span class="cl">ActiveRecordExtension</span>
+extend <span class="co">ActiveSupport</span>::<span class="co">Concern</span>
+included <span class="r">do</span>
+<span class="r">def</span> <span class="pc">self</span>.inherited(kls) <span class="c">#:nodoc:</span>
+<span class="r">super</span></p>
+<pre><code>    kls.class_eval &lt;span class=&quot;r&quot;&gt;do&lt;/span&gt; 
+      include &lt;span class=&quot;co&quot;&gt;Kaminari&lt;/span&gt;::&lt;span class=&quot;co&quot;&gt;ConfigurationMethods&lt;/span&gt; 
+
+      &lt;span class=&quot;c&quot;&gt;# Fetch the values at the specified page number&lt;/span&gt; 
+      &lt;span class=&quot;c&quot;&gt;#   Model.page(5)&lt;/span&gt; 
+</code></pre>
 <div class='container'>          scope <span class="sy">:page</span>, <span class="co">Proc</span>.new {|num|
             limit(default_per_page).offset(default_per_page * ([num.to_i, <span class="i">1</span>].max - <span class="i">1</span>))
           } <span class="r">do</span> <span class='overlay'></span></div>            include <span class="co">Kaminari</span>::<span class="co">ActiveRecordRelationMethods</span> 
@@ -156,13 +70,8 @@ ruby-1.8.7-p302 :001 &gt; Person.page(3).per(5).to_sql
     <span class="r">end</span> 
   <span class="r">end</span> 
 <span class="r">end</span></pre></div> 
-</div>
-
-
-<p></p>
-
+</div> 
 <p>There’s a lot of metaprogramming going on here, so let’s take it one step at a time. The first thing to learn is that the Kaminari::ActiveRecordExtension module uses ActiveRecord::Concern, which provides a standard way to add behavior to some target Ruby class. <a href="http://www.fakingfantastic.com/2010/09/20/concerning-yourself-with-active-support-concern">This well written article</a> does a nice job of explaining how ActiveSupport::Concern works in Rails 3. Elsewhere in the gem source code Kaminari::ActiveRecordExtension is included in ActiveRecord::Base, which becomes the target class in this case. The rest of the code reads something like this:</p>
-
 <ul>
   <li>When Kaminari:: ActiveRecordExtension is included in ActiveRecord::Base...</li>
   <li>Create a class method on ActiveRecord::Base called <span class="code">inherited</span>...</li>
@@ -171,130 +80,28 @@ ruby-1.8.7-p302 :001 &gt; Person.page(3).per(5).to_sql
   <li>Include some new methods in it from Kaminari::ConfigurationMethods...
   <li>And finally call <span class="code">scope</span> to add the page scope.</li>
 </ul>
-
-
 <p>Here’s the most important line of code, which adds the Kaminari page scope to each new ActiveRecord::Base subclass:</p>
-
 <div class="CodeRay"> 
   <div class="code"><pre>scope <span class="sy">:page</span>, <span class="co">Proc</span>.new {|num|
   limit(default_per_page).offset(default_per_page * ([num.to_i, <span class="i">1</span>].max - <span class="i">1</span>))
 }
 </div>
 </div>
-
-
 <p>We call <span class="code">scope</span> and pass in the symbol <span class="code">:page</span> followed by a Proc, which is the scope definition. This means that in fact Kaminari does not actually implement a new method called page, it just creates a scope with that name and adds it to the ActiveRecord::Base class.</p>
-
 <p>In other words, by calling <span class="code">scope :page</span> Kaminari is doing exactly the same thing you would if you had written this code yourself:</p>
-
 <div class="CodeRay"> 
   <div class="code"><pre><span class="r">class</span> <span class="cl">Person</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span> 
   scope <span class="sy">:page</span>, <span class="co">Proc</span>.new {|num|
 <span class="er"> </span><span class="er"> </span><span class="er"> </span><span class="er"> </span><span class="er"> </span><span class="er"> </span><span class="er"> </span><span class="er"> </span>limit(default_per_page).offset(default_per_page * ([num.to_i, <span class="i">1</span>].max - <span class="i">1</span>))
 <span class="er"> </span><span class="er"> </span><span class="er"> </span><span class="er"> </span><span class="er"> </span><span class="er"> </span>}
 etc...</pre></div> 
-</div>
-
-
-<p></p>
-
-<p>Finally, actually reading the Proc&rsquo;s definition, you can see that the limit value is set to the number of records per page <span class="code">default_per_page</span>, the offset value is calculated based on the number of records per page, and the page number passed in <span class="code">num</span>. Since the scope is a Proc, it is evaluated every time it is used, for the given value of <span class="code">num</span>.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2011/9/10/how-does-kaminari-paginate';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'How does Kaminari paginate?';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2011/9/10/how-does-kaminari-paginate';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'How does Kaminari paginate?';
-    (function () {
+</div> 
+<p>Finally, actually reading the Proc's definition, you can see that the limit value is set to the number of records per page <span class="code">default_per_page</span>, the offset value is calculated based on the number of records per page, and the page number passed in <span class="code">num</span>. Since the scope is a Proc, it is evaluated every time it is used, for the given value of <span class="code">num</span>.</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2011/9/10/how-does-kaminari-paginate'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'How does Kaminari paginate?';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

@@ -1,113 +1,50 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Learning Rust: If Let vs. Match - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Learning Rust: If Let vs. Match - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Learning Rust: If Let vs. Match</h1>
-  
-    <div class="metadata">
-    <span class="date">January 18th 2018</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning Rust: If Let vs. Match">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning Rust: If Let vs. Match - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning Rust: If Let vs. Match</h1><div class="metadata"><span class="date">January 18th 2018</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning Rust: If Let vs. Match">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2018/1/18/dictionary.jpg"><br/>
   <i>Human languages have similar words with different<br/> shades of meaning. Some computer languages do too.<br/>
   <small>(from: <a href="https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG">Wikimedia Commons</a>)</small></i> 
 </div>
-
-
 <p>This year I’ve decided to try to learn <a href="https://www.rust-lang.org">Rust</a>. I’m
 fascinated by its ownership model for memory management; I’m curious what the
 claims about safety are all about; and, I love how it incorporates ideas from
-the functional programming world. But I haven’t gotten to all of that yet &ndash; I’m
+the functional programming world. But I haven’t gotten to all of that yet - I’m
 just getting started learning the basic syntax.</p>
-
 <p>Learning a computer language is just like learning a human language. You have
 to try to read and write it everyday, even if just for a few minutes. You need
 to get to know some native speakers. And there’s no way around it: You need to
 learn the basic vocabulary of the language, word by word. To make things worse,
 our human languages usually have several  words that mean the same thing. Which
 one should I use? Sometime only a native speaker will really know.</p>
-
 <p>This week I was reading about <span class="code">if let</span> and <span
 class="code">match</span> in <a href="https://doc.rust-lang.org/book/second-edition/ch06-03-if-let.html">The Rust Programming
 Book</a>
 (TRPL). I read that <span class="code">if let</span> is really syntactic sugar
 for <span class="code">match</span>:</p>
-
 <div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
 <img width="500" src="http://patshaughnessy.net/assets/2018/1/18/trpl-quote.png"/>
 </div>
-
-
 <p>This intrigued me. The phrase “syntactic sugar” implies the two code snippets
 don’t only produce the same results, it means the compiler generates exactly
 the same code in each case.</p>
-
 <p>Does the Rust compiler really generate exactly the same code for <span
 class="code">if let</span> as it does for <span class="code">match</span>? Read
 on to find out. Today I’ll start with a quick review of the syntax and meaning
 of <span class="code">if let</span> and <span class="code">match</span>. Then
 I’ll take a look at how Rust compiles <span class="code">if let</span> and
 <span class="code">match</span>, at what code it produces.</p>
-
 <h2>If Let Compares a Pattern with a Value</h2>
-
 <p>The idea behind <span class="code">if let</span> is that it compares a pattern
 with a value:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2018/1/18/pattern-value.png"/></p>
-
 <p>In this example <span class="code">if let</span> compares the pattern <span
 class="code">Some(3)</span> with the value <span
 class="code">some_u8_value</span>. If there’s a match, <span class="code">if
 let</span> executes the <span class="code">println!</span> code inside the
 block.</p>
-
 <h2>If Let Also Assigns Values</h2>
-
 <p><span class="code">if let</span> assigns a value at the same time, when the
 pattern matches the value. This is the idea behind including the <span class="code">let</span> keyword
 after <span class="code">if</span>. This is more apparent if I rewrite the example using a variable <span class="code">i</span>
-instead of 3. I&rsquo;ll also add a main function so I can execute the code:</p>
-
+instead of 3. I'll also add a main function so I can execute the code:</p>
 <pre>
 fn main() {
   let some_u8_value = Some(3u8);
@@ -116,25 +53,17 @@ fn main() {
   }
 }
 </pre>
-
-
 <p>When I saved this in a file called if-let.rs and ran it, I got:</p>
-
 <pre>
 $ rustc if-let.rs
 $ ./main
 Assigned 3 to i
 </pre>
-
-
 <p><span class="code">if let</span> “unwrapped” the option structure, and assigned
 the value 3 to the identifier <span class="code">i</span>.</p>
-
 <h2>Match: If Let’s Big Brother</h2>
-
 <p>As TRPL explains, I could also have written this using the <span
 class="code">match</span> keyword, as follows:</p>
-
 <pre>
 fn main() {
     let some_u8_value = Some(3u8);
@@ -144,27 +73,18 @@ fn main() {
     }
 }
 </pre>
-
-
 <p>To write this all I had to do was move things around a bit in my <span
 class="code">if let</span> code snippet from above:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2018/1/18/if-let-match.png"/></p>
-
 <p>Because there was no else clause for the <span class="code">if let</span>
-statement, I used <span class="code">None => ()</span> in match.</p>
-
+statement, I used <span class="code">None =&gt; ()</span> in match.</p>
 <p>Saving this code in match.rs and running it I got the same result:</p>
-
 <pre>
 $ rustc match.rs
 $ ./main
 Matched: 3
 </pre>
-
-
 <h2>Mid-Level IR (MIR)</h2>
-
 <p>I was curious though: If these two code snippets are entirely equivalent, then
 the Rust compiler should generate <em>exactly the same executable program</em> when I
 compile them. In theory, therefore, I should be able to compare the two
@@ -173,20 +93,15 @@ accurate. But comparing binary executables might not work. Likely there are
 timestamps or other ephemeral values encoded in the executable that would break
 the comparison. I decided to look for an easier way to test the compiler’s
 output.</p>
-
 <p>Then I came across mid-level intermediate representation (MIR), described <a href="https://blog.rust-lang.org/2016/04/19/MIR.html">here
 on the Rust blog</a>. MIR is an
 internal text language the rust compiler produces when you include the
 <span class="code">—emit-mir</span> flag, like this:</p>
-
 <pre>
 $ rustc --emit mir if-let.rs
 </pre>
-
-
 <p>With this option specified, rust generates a file called if-let.mir. Opening up
 this file, I see:</p>
-
 <pre>
 // WARNING: This output format is intended for human consumers only
 // and is subject to change without notice. Knock yourself out.
@@ -197,21 +112,15 @@ fn main() -> () {
 
 etc…
 </pre>
-
-
 <p>“Knock yourself out;” now I’m really intrigued!</p>
-
 <h2>A First Look at MIR</h2>
-
 <p>I decided to compare the MIR text file the Rust compiler produced for the <span class="code">if
 let</span> snippet vs. the <span class="code">match</span> snippet. If Rust
 considers <span class="code">if let</span> to be syntactic sugar for <span
 class="code">match</span>, then the MIR representation of the two snippets
 should be the same.</p>
-
 <p>But when I started reading the MIR code, I found the call to the <span
 class="code">println!</span> macro generated a lot of verbose text:</p>
-
 <pre>
 let mut _3: isize;
 let mut _4: ();
@@ -229,13 +138,10 @@ let mut _16: std::fmt::ArgumentV1;
 let mut _17: &u8;
 let mut _18: fn(&u8, &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error>;
 </pre>
-
-
 <p>All of this MIR pseudocode might confuse my comparison unnecessarily, so I
 decided to simplify my <span class="code">if let</span> example by removing the
 <span class="code">println!</span> call entirely. I rewrote the <span
 class="code">if let</span> snippet like this (if-let.rs):</p>
-
 <pre>
 fn main() {
     let some_u8_value = Some(3u8);
@@ -244,10 +150,7 @@ fn main() {
     }
 }
 </pre>
-
-
 <p>And the <span class="code">match</span> snippet like this (match.rs):</p>
-
 <pre>
 fn main() {
     let some_u8_value = Some(3u8);
@@ -257,45 +160,31 @@ fn main() {
     }
 }
 </pre>
-
-
 <p>I also noticed the MIR file contained many comments with line numbers:</p>
-
 <pre>
 _2 = ((_1 as Some).0: u8);       // scope 3 at if-let.rs:3:17: 3:18
 StorageLive(_5);                 // scope 3 at <print macros>:2:27: 2:58
 StorageLive(_6);                 // scope 3 at <println macros>:3:18: 3:43
 </pre>
-
-
 <p>I realized the line numbers would likely cause problems comparing one MIR file
 to another, so I removed all of the comments using sed:</p>
-
 <pre>
 $ rustc if-let.rs --emit mir
 $ cat if-let.mir | sed -e 's/\/\/.*$//' > if-let.mir.nocomments
 </pre>
-
-
 <p>This generates a new text file called if-let.mir.nocomments, which contains the
 same content as if-let.mir, but with no comments. And this command processes
 the match.rs file in the same way:</p>
-
 <pre>
 $ rustc match.rs --emit mir
 $ cat match.mir | sed -e 's/\/\/.*$//' > match.mir.nocomments
 </pre>
-
-
 <h2>Comparing MIR Files</h2>
-
 <p>Now I ran a simple diff command on the simplified MIR text files. If the
 compiler considers <span class="code">if let</span> to be exactly the same as
 <span class="code">match</span> then there should be no difference, then the
 output of diff should be empty.</p>
-
 <p>But running diff I saw:</p>
-
 <pre>
 $ diff if-let.mir.nocomments match.mir.nocomments
 19c19
@@ -303,18 +192,14 @@ $ diff if-let.mir.nocomments match.mir.nocomments
 ---
 >         switchInt(_3) -> [0isize: bb1, otherwise: bb2];
 </pre>
-
-
 <p>My two MIR files are <em>almost</em> identical; the MIR text Rust generates for <span
 class="code">if let</span> is exactly the same as the MIR text Rust generates
 for <span class="code">match</span>, except for line 19. I’ve <em>almost</em> proven
 the hypothesis that <span class="code">if let</span> is syntactic sugar for
 <span class="code">match</span>, but not quite.</p>
-
 <p>Let’s take a close look at the MIR code around line 19 and try to understand
 what it means. Here’s a portion of if-let.mir.nocomments, produced by the Rust
 compiler from my <span class="code">if let</span> code above:</p>
-
 <pre>
 bb0: {
     StorageLive(_1);
@@ -335,12 +220,9 @@ bb2: {
     goto -> bb3;
 }
 </pre>
-
-
 <p>I don’t understand MIR syntax, but it’s not hard to guess what’s going on. Each
 of these “bb” blocks of code <span class="code">{ … }</span> probably
 represents a logical piece of my program.</p>
-
 <p>The first block, <span class="code">bb0</span>, seems to assign the value <span class="code">Some(3)</span> to _1, and then calls
 <span class="code">discriminant(_1)</span> and saves the “discriminant,” whatever that is, in _3.
 Finally, it tests whether the discriminant is 1. If the discriminant is 1 it
@@ -348,30 +230,22 @@ jumps to <span class="code">bb2</span>, or otherwise to <span
 class="code">bb1</span>. So <span class="code">bb0</span> likely represents the
 <span class="code">if</span> portion of my <span class="code">if let</span>
 snippet, testing a condition:</p>
-
 <pre>
 if let Some(i) = some_u8_value
 </pre>
-
-
 <p>The <span class="code">bb1</span> block saves <span class="code">()</span> in <span
 class="code">_0</span> and jumps to <span class="code">bb3</span>. This likely represents the
 missing/default else clause of my <span class="code">if let</span> statement.</p>
-
 <p>And the <span class="code">bb2</span> block saves 3, the unwrapped value inside of <span class="code">Some(3)</span>, in <span class="code">_2</span> and
 jumps to <span class="code">bb3</span>. Probably <span class="code">_2</span> is the variable <span class="code">i</span>, and this block of MIR text
 represents the <span class="code">let</span> portion of my <span
 class="code">if let</span> snippet:</p>
-
 <pre>
 let Some(i) = some_u8_value
 let _ = i;
 </pre>
-
-
 <p>Now let’s take a look at the <span class="code">match</span> version, the contents of
 match.mir.nocomments. It’s entirely the same, except for the <span class="code">switchInt</span> line:</p>
-
 <pre>
 bb0: {
     StorageLive(_1);
@@ -380,129 +254,30 @@ bb0: {
     <b>switchInt(_3) -> [0isize: bb1, otherwise: bb2];</b>
 }
 </pre>
-
-
 <p>Reading this carefully, I saw that actually it does mean the same thing: If the
 discriminant is 0, Rust calls the <span class="code">bb1</span> block, or
 otherwise the <span class="code">bb2</span> block.</p>
-
 <p>So, summarizing, the <span class="code">if let</span> snippet ran this
 pseudo-code:</p>
-
 <blockquote>
 If the discriminant is 1, call bb1, else bb2.
 </blockquote>
-
-
 <p>…and the <span class="code">match</span> snippet ran this pseudo-code:</p>
-
 <blockquote>
 If the discriminant is 0, call bb2, else bb1.
 </blockquote>
-
-
 <p>So, in fact, the two versions use the same logic, assuming the value of
 discriminant is either 0 or 1. If discriminant = 0, Rust assumes the comparison
 was true and executes the match clause; if discriminant = 1, Rust executes the
 else clause.</p>
-
-<p>Clearly the discriminant function is crucial &ndash; when I have time next, I’ll
+<p>Clearly the discriminant function is crucial - when I have time next, I’ll
 explore what discriminant means, where it’s implemented and how it works. Or if
 anyone from the Rust teams happens to read this, let us know.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Learning Rust: If Let vs. Match';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Learning Rust: If Let vs. Match';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Learning Rust: If Let vs. Match';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Rust</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2018/10/24/summer-school-with-the-rust-compiler">Summer School With The Rust Compiler</a></li>
-                  
-                    <li><a href="/2018/6/9/from-activerecord-to-diesel">From ActiveRecord to Diesel</a></li>
-                  
-                    <li><a href="/2018/3/15/how-rust-implements-tagged-unions">How Rust Implements Tagged Unions</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Rust</div><div class="links"><ul><li><a href="2018/10/24/summer-school-with-the-rust-compiler">Summer School With The Rust Compiler</a></li><li><a href="2018/6/9/from-activerecord-to-diesel">From ActiveRecord to Diesel</a></li><li><a href="2018/3/15/how-rust-implements-tagged-unions">How Rust Implements Tagged Unions</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

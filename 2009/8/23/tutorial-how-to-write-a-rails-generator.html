@@ -1,63 +1,9 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Tutorial: How to write a Rails generator - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Tutorial: How to write a Rails generator - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Tutorial: How to write a Rails generator</h1>
-  
-    <div class="metadata">
-    <span class="date">August 23rd 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/8/23/tutorial-how-to-write-a-rails-generator" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>I&rsquo;ve been working on a generator called <a href="http://patshaughnessy.net/2009/7/24/generating-view-scaffolding-code-for-existing-models">ViewMapper</a> recently that allows you to create view scaffolding from an existing model. I found writing a Rails generator to be somewhat confusing and hard to do: Where do I need to put my generator class? What does it need to be called? How does it work? This article will show step by step how to write your own Rails generator from scratch &ndash; hopefully it will save you some time if you ever need to write your own.</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Tutorial: How to write a Rails generator - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Tutorial: How to write a Rails generator</h1><div class="metadata"><span class="date">August 23rd 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/8/23/tutorial-how-to-write-a-rails-generator" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Tutorial: How to write a Rails generator">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>I&rsquo;ve been working on a generator called <a href="http://patshaughnessy.net/2009/7/24/generating-view-scaffolding-code-for-existing-models">ViewMapper</a> recently that allows you to create view scaffolding from an existing model. I found writing a Rails generator to be somewhat confusing and hard to do: Where do I need to put my generator class? What does it need to be called? How does it work? This article will show step by step how to write your own Rails generator from scratch &ndash; hopefully it will save you some time if you ever need to write your own.</p>
 <p>First let&#x27;s think of some sample Rails code that I might want to generate as an example. This is admittedly contrived, but it&rsquo;s short and simple enough to show here while still interesting enough to illustrate how a generator would work. Let&rsquo;s suppose my Capistrano deployment scripts wrote the last commit information from Git into a file called &ldquo;version.txt&rdquo; in a folder RAILS_ROOT/../build-info:</p>
-
-
 <pre>commit 217d9bd1d1d508a0f7f1e7afa2b489b130196e33
 Author: Pat Shaughnessy &lt;pat@patshaughnessy.net&gt;
 Date:   Wed Aug 5 07:45:01 2009 -0400</pre>
-
-
 <p>Now with a controller like this I could display the info, helping me keep track of what version is running on a given development development, QA or production server:</p>
-
-
 <pre>class VersionController &lt; ApplicationController
   VERSION_FILE = &#x27;../build-info/version.txt&#x27;
   def display_version
@@ -65,26 +11,12 @@ Date:   Wed Aug 5 07:45:01 2009 -0400</pre>
     render path
   end
 end</pre>
-
-
 <p>If I add a route to this action like this in config/routes.rb:</p>
-
-
 <pre>map.version 'version', :controller => 'version', :action => 'display_version'</pre>
-
-
 <p>&hellip;then I&rsquo;ll get the Git last commit info by just opening http://servername/version in my browser. Obviously it would be simpler to just put the version.txt file under the public folder&hellip; but let&rsquo;s continue with this contrived example for now. Now let&rsquo;s say I have 5 or 10 different Rails apps, and that I&rsquo;d like to add the same controller and route to each one. Let&rsquo;s write a simple Rails generator that would make this easy to do, called the &ldquo;version&rdquo; generator. Here&rsquo;s how to do it&hellip;</p>
-
-
 <p><u>Step 1: A skeleton Rails generator</u></p>
-
-
 <p>All Rails generators are derived from a class called &ldquo;Rails::Generator::Base.&rdquo; You can find the source code for this file in <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/base.rb">vendor/rails/railties/lib/rails_generator/base.rb</a> (link is to the Rails 2.3.3 version). Definately read the source code; there is helpful documentation in the comments and understanding the base class code is indispensible if you plan to use it for your generator.</p>
-
-
 <p>Here&rsquo;s an empty, skeleton Rails generator that we can use as a starting point:</p>
-
-
 <pre>class VersionGenerator &lt; Rails::Generator::Base
   def manifest
     record do |m|
@@ -92,11 +24,7 @@ end</pre>
     end
   end
 end</pre>
-
-
 <p>The name of the class is important: since we want a &ldquo;version&rdquo; generator we need to create a class called &ldquo;VersionGenerator.&rdquo; The other important detail here is where this class is located: we need to put it in lib/generators/version/version_generator.rb. The reason for all of this is that the code called by script/generate takes the generator name and looks for the corresponding generator class in this location. We can check that our class is being found by just running script/generate with no parameters, like this:</p>
-
-
 <pre>$ ./script/generate 
 Usage: ./script/generate generator [options] [args]
 &hellip;etc&hellip;
@@ -104,39 +32,19 @@ Installed Generators
   <b>Lib: version</b>
   Rubygems: cucumber, feature, install_rubigen_scripts, integration_spec, rspec, rspec_controller, rspec_model, rspec_scaffold, session
   Builtin: controller, helper, integration_test, mailer, metal, migration, model, observer, performance_test, plugin, resource, scaffold, session_migration</pre>
-
-
 <p>Note that our new &ldquo;version&rdquo; generator is listed as &ldquo;Lib: version,&rdquo; in bold above. The other generators found on my system were either part of Rails or else part of a gem or plugin. If you don&rsquo;t see your generator in this list, or if it has the wrong name then double check your folder name: it should be lib/generators/XYZ or lib/generators/version in this example. After you finish developing your generator you'll want to move it into a plugin or gem so it can be reused in different apps on your machine; then "version" would appear in the "Rubygems" list for example.</p>
-
-
 <p>If we try running our empty generator, we&rsquo;ll get no output or changes; not a surprise:</p>
-
-
 <pre>$ ./script/generate version</pre>
-
-
 <p>If you see an error like this:</p>
-
-
 <pre>$ ./script/generate version
 /usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:31:
 in `gem_original_require&#x27;: no such file to load --
 /path/to/myapp/lib/generators/version/version_generator.rb (MissingSourceFile)</pre>
-
-
 <p>Then you have the wrong file name&hellip; it needs to be XYZ_generator.rb, or version_generator.rb in this example. Or if you see:</p>
-
-
 <pre>Missing VersionGenerator class in
   /path/to/myapp/lib/generators/version/version_generator.rb</pre>
-
-
 <p>&hellip; then you have the wrong class name inside this file. It needs to be XYZGenerator, or VersionGenerator in this example.</p>
-
-
 <p><u>Step 2: Creating code using an ERB template</u></p>
-
-
 <p>The way Rails generators work is by creating code using ERB, in just the same way that view code generates HTML for a Rails web site. To see how this works and to take the next step towards writing our version generator, let&rsquo;s create a new template file for our version controller. Create a new text file called &ldquo;controller.rb&rdquo; and put it into this folder: lib/generators/version/templates/controller.rb; in other words, into a new subfolder under version called &ldquo;templates.&rdquo; Next, paste in the controller code from above:<p>
 <pre>class VersionController &lt; ApplicationController
   VERSION_FILE = &#x27;../build-info/version.txt&#x27;
@@ -207,103 +115,11 @@ overwrite app/controllers/version_controller.rb? (enter &quot;h&quot; for help) 
    end
 end</pre>
 <p>We&rsquo;ve successfully generated a new VersionController class, based on a parameter passed to our &ldquo;version&rdquo; generator. While this is a good start, to be able to use this action in our app we still need to add a route to config/routes.rb. It turns out this is a lot harder to do with a generator, since we will need to insert a new line of code in an existing file, and not just generate a new routes.rb file. We will also need to worry about how to remove the route line when script/destroy is run. It&rsquo;s possible to do all of this with a Rails generator, but will require a more thorough understanding of how Rails generators actually work. I&rsquo;ll explain all of that in my next post&hellip;</p>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2009/8/23/tutorial-how-to-write-a-rails-generator';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Tutorial: How to write a Rails generator';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2009/8/23/tutorial-how-to-write-a-rails-generator';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Tutorial: How to write a Rails generator';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2009/8/23/tutorial-how-to-write-a-rails-generator'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Tutorial: How to write a Rails generator';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

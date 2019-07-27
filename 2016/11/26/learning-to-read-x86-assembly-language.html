@@ -1,269 +1,164 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Learning to Read x86 Assembly Language - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Learning to Read x86 Assembly Language - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Learning to Read x86 Assembly Language</h1>
-  
-    <div class="metadata">
-    <span class="date">November 26th 2016</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning to Read x86 Assembly Language">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: right; padding: 0px 0px 30px 30px; text-align: center; line-height:16px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning to Read x86 Assembly Language - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning to Read x86 Assembly Language</h1><div class="metadata"><span class="date">November 26th 2016</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning to Read x86 Assembly Language">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 0px 0px 30px 30px; text-align: center; line-height:16px">
   <img src="http://patshaughnessy.net/assets/2016/11/26/8086.jpg"><br/>
   <i>A 16-bit Intel 8086 microprocessor from 1978<br/>
     <small>(source: <a href="https://commons.wikimedia.org/wiki/File:L_intel-c8086.jpg">RodolfoNeres via Wikimedia Commons</a>)</small></i>
 </div>
-
-
 <p>Writing assembly language is something best left for the experts. To write code
 that runs directly on your microprocessor you need to know how memory
 segmentation works, what the intended use of each register is, how codes
 executes in real and protected modes and much, much more. And, of course,
 modern compilers will usually produce faster, more optimized code than you ever
 could, without making any mistakes.</p>
-
 <p><em>Reading</em> assembly language, on the other hand, isn’t nearly as difficult and can
 be a useful skill to have: Someday you might need to debug code without having
 the original source. You’ll begin to understand what a microprocessor can and
 can’t do by reading it’s language directly. And you’ll appreciate and
 understand your favorite programming language even more after seeing your own
 code translated into low level machine instructions.</p>
-
 <p>But most importantly, learning about assembly language can be a lot of fun.</p>
-
 <h2>Usually Reading Assembly Language Is No Fun At All</h2>
-
 <p>Unfortunately, most of us only see assembly language after something has gone
 wrong, terribly wrong, when we encounter something like this:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/segfault.png"/></p>
-
 <p>This is what a segmentation fault looks like in a debugger. The debugger shows
 me assembly language because it doesn’t know what else to show me. A
 “segmentation fault” means one of the assembly language instructions, for
 example the <span class="code">movb $0x6c, 0x1(%rax)</span> line above, has
 tried to write to a portion of memory which it is not allowed to.</p>
-
 <p>It’s no wonder that most of us dislike reading low level code like this. We
 only ever see it when we’re in the midst of debugging something, when the
 language and tools we normally rely on have let us down. We never see assembly
 language under happier circumstances; it is always the bearer of bad news.</p>
-
 <h2>Converting My Own Code to Assembly Language</h2>
-
 <p>This week I had some free time and decided to read some assembly language just
 for fun. I wanted to read low level code that was working properly, not code
-that was overwriting some other process&rsquo;s memory. I wanted to see if I could
+that was overwriting some other process's memory. I wanted to see if I could
 understand it like any other programming language. To make things easier, I
 decided to translate some of my own code into assembly language so I could
 focus on the assembly language syntax. It was easier to figure out what the
 instructions meant because I knew what they were doing.</p>
-
 <p>I’m a Ruby developer, and so I was interested in knowing how my Ruby code would
 look translated into assembly language. Unfortunately, the Ruby interpreter (at
 least the standard “MRI” version of Ruby) never does this. Instead, the Ruby
 interpreter itself is compiled into machine language and runs my code using a
 virtual machine. But I wanted to see what a real machine would do, not a
 virtual one.</p>
-
 <p>Instead I decided to use <a href="https://crystal-lang.org">Crystal</a>, a variation on
 Ruby that uses <a href="http://llvm.org">LLVM</a> to compile Ruby to native machine
 language before running it. And because the LLVM system can also produce an
 assembly language version of the code it produces, using Crystal was the
 perfect way for me to see my Ruby code translated so a microprocessor could
 understand it.</p>
-
 <p>I started by writing an extremely simple program that adds 42 to a given
 integer:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">add_forty_two</span>(n)
-  n+<span class="integer">42</span>  
-<span class="keyword">end</span>
-
-puts add_forty_two(<span class="integer">10</span>)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(n)
+</span><span style="color:#000000;">  n</span><span style="color:#4f5b66;">+</span><span style="color:#d08770;">42  
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">puts add_forty_two(</span><span style="color:#d08770;">10</span><span style="color:#000000;">)
+</span></pre>
 
 <p>This was both Ruby code:</p>
-
 <pre>
 $ ruby add_forty_two.rb 
 52
 </pre>
-
-
 <p>And Crystal code:</p>
-
 <pre>
 $ crystal add_forty_two.rb
 52
 </pre>
-
-
 <p>Both produced the same result, of course. But only Crystal could produce a copy
 in assembly language: </p>
-
 <pre>
 $ crystal build add_forty_two.rb --emit asm
 </pre>
-
-
 <p>This created a file called add_forty_two.s which contained 10,000s of lines of
 assembly language code. (Most of this was the compiled version of the Crystal
 runtime library.) I opened add_forty_two.s in a text editor and searched for
 “add_forty_two,” the name of my function. First I found the call site, the code
 that calls my add_forty_two function:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/></p>
-
 <p>I’ll return to this a bit later. Searching again I found the x86 assembly
 language version of my function:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code1.png"/></p>
-
 <p>Next, I deleted all of the assembler directives, such as <span
 class="code">.globl</span> and <span class="code">.cfi_offset.</span> Someday
 it would be interesting to learn about these, but I wanted to focus on the
 actual machine instructions. And finally I pasted the the remaining code inside
 of my Ruby function.</p>
-
 <p>Then I saw what my computer actually does when it executes <span
 class="code">add_forty_two</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code2.png"/></p>
-
 <h2>x86 Assembly Language: Almost Easy to Read</h2>
-
 <p>This code is <em>almost</em> easy to follow. I can guess what each instruction means:
 push, add, move, etc., but I can’t quite follow what’s going on here. <span
 class="code">mov</span> probably means to move, but what is the computer
 moving? And from where to where?</p>
-
 <div style="float: right; padding: 20px 0px 0px 30px; text-align: center; line-height:16px">
   <img src="http://patshaughnessy.net/assets/2016/11/26/budapest.jpg"><br/>
   <i>Was x86 assembly language designed in Hungary?</i>
 </div>
-
-
 <p>The problem is that x86 assembly language was designed by Hungarians. I don’t
 mean that literally; in fact, I have no idea who designed x86 assembly
 language. I mean that x86 code reminds me of the Hungarian language.</p>
-
 <p>I lived in Budapest for about a year in 1992 and managed to become
 conversational in Hungarian, although I’ve forgotten all of it since. A
 beautiful language, Hungarian is notoriously difficult for foreigners to learn.
 Related only to Finnish and Estonian, its grammar doesn’t resemble Italian,
 French or other romance languages; nor does it resemble Russian or any of the
 other Slavic languages from Eastern Europe.</p>
-
 <p>The one bit of Hungarian grammar I still remember is that instead of using
 separate words for prepositions, such as inside, outside, etc., you append
 different suffixes to the target word. For example “inside the house” would be
 <em>a házban</em>. House is <em>ház</em> while inside is <em>ban</em>. Similarly “in Budapest” would
-be <em>Budapesten</em> &ndash; the <em>en</em> suffix means “in.” x86 assembly language code
+be <em>Budapesten</em> - the <em>en</em> suffix means “in.” x86 assembly language code
 reminds me of Hungarian. You don’t use <span class="code">mov</span> to move
 something; you use <span class="code">movq</span>. You don’t <span
 class="code">add</span> something; you use the <span class="code">addl</span>
 instruction.</p>
-
 <p>It turns out x86 assembly is much simpler than Hungarian; there are only a few
 simple suffixes that refer to the size of the data you are operating on. Here
 are two examples:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/addl1.png"/></p>
-
 <p>The <span class="code">addl</span> instruction really means “add long,” where
 “long” refers to a 4 byte or 32 bit value. In Crystal, it corresponds to the
 <span class="code">Int32</span> type, which is the default integer type and the
 type my <span class="code">add_forty_two</span> method uses.</p>
-
 <p>Here’s another example:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/movq1.png"/></p>
-
 <p>The letter <em>q</em> refers to a “quad” word, or an 8 byte or 64 bit value. Most x86
 code these days works with 64 bit or 32 bit values, so you’ll most often see
 instructions that end with <em>q</em> or <em>l</em>. Other suffixes are <em>w</em> for word (16 bits
 or 2 bytes) or <em>b</em> for 1 byte or 8 bits.</p>
-
 <h2>x86 Registers</h2>
-
 <p>But what about all of the operands of the instructions? Why do they all have a
-&ldquo;%&rdquo; prefix, such as <span class="code">%rsp</span> or <span
+&quot;%&quot; prefix, such as <span class="code">%rsp</span> or <span
 class="code">%edi</span>? Reading x86 assembly language also reminds me of
 reading Perl code. Lots of punctuation symbols for no apparent reason.  Similar
 to Perl, x86 assembly language uses <em>sigils</em> or magical punctuation characters
 to indicate the type of each operand value.</p>
-
 <p>Here are my two example instructions again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/addl2.png"/></p>
-
-<p>Here the &ldquo;$&rdquo; symbol means the 42 is a literal or “immediate” value. As you
+<p>Here the &quot;$&quot; symbol means the 42 is a literal or “immediate” value. As you
 might guess, this is the line of code that adds 42 to something. But what does
-it add it to? From the &ldquo;%&rdquo; character we can see the x86 code is adding 42 to
+it add it to? From the &quot;%&quot; character we can see the x86 code is adding 42 to
 the <span class="code">edi</span> register.</p>
-
 <p>And what is a register? In a nutshell, the microprocessor inside your computer
 uses registers to hold values while your code is running. So the instruction
 above adds 42 to whatever value is contained in the <span
 class="code">edi</span> register, and saves it back into <span
 class="code">edi</span>.</p>
-
 <p>Here’s the second example again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/movq2.png"/></p>
-
 <p>This instruction, <span class="code">movq</span>, refers to two registers:
 <span class="code">rsp</span> and <span class="code">rbp</span>. As you can
 guess, it moves whatever value is found in the <span class="code">rsp</span>
 register to the <span class="code">rbp</span> register.</p>
-
 <p>How many registers are there? What are they called? Let’s look at them using
 LLDB:</p>
-
 <pre>
 (lldb) register read
 General Purpose Registers:
@@ -289,55 +184,55 @@ General Purpose Registers:
         fs = 0x0000000000000000
         gs = 0x0000000000000000
 </pre>
-
-
 <p>You can see there are over 20 registers inside my Mac’s Intel CPU, each
 containing a 64 bit or 8 byte value. LLDB shows the values in hexadecimal. I
 don’t have time today to explain what all of these registers are used for, but
 here are a few highlights:</p>
-
 <ul>
-<li><p><span class="code">rax</span>, <span class="code">rbx</span>, <span
+<li>
+<p><span class="code">rax</span>, <span class="code">rbx</span>, <span
 class="code">rcx</span> and <span class="code">rdx</span> are general purpose
 registers used to hold on to intermediate values loaded from memory or used
-during a calculation of some kind.</p></li>
-<li><p><span class="code">rsp</span> is the stack pointer, which holds the memory
-location of the top of the stack.</p></li>
-<li><p><span class="code">rbp</span> is the base pointer, which holds the memory
-location of the base of the current stack frame</p></li>
-<li><p><span class="code">rip</span> is the instruction pointer, which holds the
-memory location of the next instruction to execute</p></li>
-<li><p>and <span class="code">rflags</span> holds a series of flags, used by
-comparison instructions for example.</p></li>
+during a calculation of some kind.</p>
+</li>
+<li>
+<p><span class="code">rsp</span> is the stack pointer, which holds the memory
+location of the top of the stack.</p>
+</li>
+<li>
+<p><span class="code">rbp</span> is the base pointer, which holds the memory
+location of the base of the current stack frame</p>
+</li>
+<li>
+<p><span class="code">rip</span> is the instruction pointer, which holds the
+memory location of the next instruction to execute</p>
+</li>
+<li>
+<p>and <span class="code">rflags</span> holds a series of flags, used by
+comparison instructions for example.</p>
+</li>
 </ul>
-
-
 <p>In fact, there are many more registers in a modern x86 microprocessor; LLDB is
 only showing me the most commonly used registers. For a complete explanation,
 the definitive guide to all of this is the <a href="http://www.intel.com/content/www/us/en/processors/architectures-software-developer-manuals.html">Intel Software Developer’s
 Manual</a>.
 Fortunately, my function’s assembly language code only uses a few registers. I
 don’t need to understand them all.</p>
-
 <div style="padding: 30px 0px 30px 0px; text-align: center; line-height:16px">
 <img src="http://patshaughnessy.net/assets/2016/11/26/registers.svg"/>
 <i>Registers available in the x86 instruction set<br/>
     <small>(source: <a href="https://commons.wikimedia.org/wiki/File:Table_of_x86_Registers_svg.svg">Immae via Wikimedia Commons</a>)</small></i>
 </div>
-
-
 <p>But wait a minute. Why does my <span class="code">addl</span> instruction refer
 to the <span class="code">edi</span> register? This isn’t in the list of
 registers shown by LLDB. Where does this add operation occur? What register
 does it use?</p>
-
 <p>It’s those Hungarian designers again. It turns out that x86 assembly language
 also decorates the register names to indicate their sizes, similar to what we
 saw above with the instruction name suffixes. But for register names x86 syntax
 uses prefixes, not suffixes. (In C programming <em>Hungarian notation</em> actually
 refers to the practice of using prefixes on variable names to indicate their
 type.)</p>
-
 <p>What? This is a crazy! Why would any programming language use prefixes to
 indicate data size in one place, but then use suffixes to indicate the same
 thing somewhere else?  To understand this, you have to remember that assembly
@@ -354,233 +249,112 @@ class="code">bx</span>, <span class="code">cx</span>, etc., registers to become
 class="code">ecx</span>, etc. These were later renamed again to <span
 class="code">rax</span>, <span class="code">rbx</span> etc. for 64-bit
 processors.</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/register.png"/></p>
-
 <p>As you can see here, even today x86 assembly code can refer to the same
 register using many different names, for example <span class="code">al</span>
 or <span class="code">ah</span> for 8-bits, <span class="code">ax</span> bit 16
 bits, <span class="code">eax</span> for 32 bits and <span
 class="code">rax</span> for 64 bits.</p>
-
 <h2>x86 Assembly Language: Reads Left to Right, Except When It Reads Right to Left</h2>
-
 <p>Returning to the move instruction from above, how do we know which way the move
 happens?</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/movq2.png"/></p>
-
 <p>That is, does this instruction move data from <span class="code">rsp</span> to
 <span class="code">rbp</span>? Or from <span class="code">rbp</span> to <span
 class="code">rsp</span>?  Does it read left to right, or right to left?</p>
-
 <p>It could be either! It turns out there are two versions of x86
-syntax: &ldquo;AT&amp;T or GNU Assembler (GAS)&rdquo; syntax, which I’ve been using until now,
-and also &ldquo;Intel&rdquo; syntax. GAS reads left to right:</p>
-
+syntax: &quot;AT&amp;T or GNU Assembler (GAS)&quot; syntax, which I’ve been using until now,
+and also &quot;Intel&quot; syntax. GAS reads left to right:</p>
 <div style="padding: 30px 0px 30px 0px; line-height:16px; width: 300px">
 <img src="http://patshaughnessy.net/assets/2016/11/26/movq3.png"/><br/>
 <center><i>AT&T/GAS syntax</i></center>
 </div>
-
-
 <p>But equally valid and common is the Intel syntax, which reads right to left:</p>
-
 <div style="padding: 30px 0px 30px 0px; line-height:16p; width: 300px">
 <img src="http://patshaughnessy.net/assets/2016/11/26/movq4.png"/><br/>
 <center><i>Intel syntax</i></center>
 </div>
-
-
 <p>If you see Perl-like sigils (<span class="code">%rsp</span> and <span
 class="code">%rbp</span> for example) then you’re reading GAS syntax and values
-will move from left to right. If you don’t see any &ldquo;%&rdquo; or &ldquo;$&rdquo; signs, then you
+will move from left to right. If you don’t see any &quot;%&quot; or &quot;$&quot; signs, then you
 have Intel syntax and values move right to left. Also notice the Intel syntax
 doesn’t append “q” or “l” on to the instruction names. <a href="http://www.imada.sdu.dk/Courses/DM18/Litteratur/IntelnATT.htm">This
 article</a> does a
 great job explaining the differences between the two styles.</p>
-
 <p>What a train wreck! It’s hard to imagine a more confusing state of affairs. But
 again, remember all of this has evolved over the course of 40 years. It wasn’t
 designed by any single person at any one time. There’s a tremendous amount of
 history behind each x86 assembly language instruction.</p>
-
 <h2>Executing My Simple Program</h2>
-
 <p>Now that I understand the basics of x86 assembly language syntax, I’m ready to
 return to my <span class="code">add_forty_two</span> code and to try to
 understand how it works. Here it is again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code2.png"/></p>
-
 <p>Reading the 6 instructions inside of <span class="code">add_forty_two</span>,
 there are three different operations going on. First, we setup a new stack
 frame for our function:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code3.png"/></p>
-
 <p>The stack frame is an area of memory that my code can use to save local
 variable and other information. I won’t spend time on this today because my
 code is so simple it doesn’t use any local variables. The last two instructions
 clean up this stack frame and return to the calling code:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code4.png"/></p>
-
 <p>I won’t cover this today either. In my next article, I’ll go through a slightly
 more complicated example containing local variables and explain how x86
 assembly code accesses them on the stack.</p>
-
 <p>For today, I want to focus on the two instructions in the middle which actually
 implement <span class="code">add_forty_two</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code5.png"/></p>
-
 <p>We’re down to two assembly language instructions, but it’s still far from
 obvious what this code means! The key to understanding these two instructions
 is to realize that the argument to my function, <span class="code">n</span>, is
 passed in using a register:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code6.png"/></p>
-
 <p>We can see this is true by returning to the call site in the <span
 class="code">add_forty_two.s</span> file, to the code which calls my function:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/></p>
-
 <p>Note how the first <span class="code">movl</span> instruction copies the value
 10 into the <span class="code">edi</span> register (the lower 32 bits of the
 <span class="code">rdi</span> register):</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code7.png"/></p>
-
 <p>Next the <span class="code">callq</span> instruction calls my function with 10
 in <span class="code">edi</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code8.png"/></p>
-
 <p>So when the <span class="code">addl</span> instruction runs, it will add 42 to
 the argument 10.</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code9.png"/></p>
-
 <p>Next, the <span class="code">movl</span> instruction runs and copies the result
 52 from <span class="code">edi</span> to <span class="code">eax</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code10.png"/></p>
-
 <p>This, in turn, becomes the return value from my function:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/code11.png"/></p>
-
 <p>Again, we can see this is the case by reading the call site code again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/></p>
-
 <p>What happens after <span class="code">add_forty_two</span> returns? It moves
 <span class="code">%eax</span>, the return value, to <span
 class="code">%edi</span> where it becomes the argument to a second function
 call, the call to <span class="code">puts</span>.</p>
-
 <p>I’m not sure whether this pattern of using the <span class="code">%edi</span>
 and <span class="code">%eax</span> registers to hold the function arguments and
 return values is a x86 standard convention. My guess is that instead it’s a
 pattern the LLVM code generator uses. It may be that LLVM only uses this
 technique for a single argument and single return value function like <span
 class="code">add_forty_two</span>.</p>
-
 <h2>Next Time</h2>
-
 <p>I haven’t done much, but already I’m beginning to understand x86 assembly
 language. Almost unintelligible when I first saw it, now I can start to follow
 what the machine instructions do when my code is executed. The key was learning
 how the instruction and register names change depending on the size of the
 value they operate on.</p>
-
 <p>There’s much more to learn, of course. In my next article I’ll take a look at
 how an x86 microprocessor uses the stack to save values, and how this maps to
 Ruby using a slightly more complex example. Along the way I’ll learn about a
 few more important syntax rules of x86 assembly language.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Learning to Read x86 Assembly Language';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Learning to Read x86 Assembly Language';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Learning to Read x86 Assembly Language';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="links"><ul><li><a href="2018/10/24/summer-school-with-the-rust-compiler">Summer School With The Rust Compiler</a></li><li><a href="2018/6/9/from-activerecord-to-diesel">From ActiveRecord to Diesel</a></li><li><a href="2018/3/15/how-rust-implements-tagged-unions">How Rust Implements Tagged Unions</a></li><li><a href="2018/1/18/learning-rust-if-let-vs--match">Learning Rust: If Let vs. Match</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

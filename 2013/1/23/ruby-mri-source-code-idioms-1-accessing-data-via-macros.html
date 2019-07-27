@@ -1,60 +1,10 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Ruby MRI Source Code Idioms #1: Accessing Data Via Macros - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Ruby MRI Source Code Idioms #1: Accessing Data Via Macros - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Ruby MRI Source Code Idioms #1: Accessing Data Via Macros</h1>
-  
-    <div class="metadata">
-    <span class="date">January 23rd 2013</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2013/1/23/ruby-mri-source-code-idioms-1-accessing-data-via-macros" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Ruby MRI Source Code Idioms #1: Accessing Data Via Macros">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; margin: 8px 25px 5px 0px; line-height:16px;">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Ruby MRI Source Code Idioms #1: Accessing Data Via Macros - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Ruby MRI Source Code Idioms #1: Accessing Data Via Macros</h1><div class="metadata"><span class="date">January 23rd 2013</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2013/1/23/ruby-mri-source-code-idioms-1-accessing-data-via-macros" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Ruby MRI Source Code Idioms #1: Accessing Data Via Macros">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; margin: 8px 25px 5px 0px; line-height:16px;">
   <table cellpadding="0" cellspacing="0" border="0">
     <tr><td align="center" style="background-color: rgb(248, 248, 255);padding: 5px;"><img
     src="http://patshaughnessy.net/assets/2013/1/23/definition.png"></td></tr>
     <tr><td align="center"><i>From: <a href="http://en.wiktionary.org/wiki/idiom">wiktionary.org</a></i></td></tr>
   </table>
 </div>
-
-
 <p>Don’t be afraid of reading Ruby’s C source code. If you’re a Ruby developer, it
 can be a lot of fun to see how things work “under the hood,” and studying Ruby
 internals can give you a deeper understanding of what Ruby really is and how to
@@ -65,357 +15,196 @@ month</a>. However,
 you might be reluctant to read Ruby’s source code on your own since it’s
 written in C, a verbose, confusing low-level language that most of us don’t
 have time to learn.</p>
-
 <p>But is Ruby really written in C? I find Ruby’s C code to be very <em>idiomatic</em>; at
 times it almost resembles another dialect or language. To see what I mean, take
 a look at this snippet from MRI’s array.c file, which implements the
 <span class="code">Array#compact!</span> method:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/code1.png"/></p>
-
 <p>Most of the code in this function is composed of C macros; these appear in
 capital letters. Macros are text formulas that C developers can use to make
 their code more concise and easier to read. The Ruby core team very often uses
 macros to access data, which is what most of the code in the function above is
 doing. This is an example of what I call an “MRI idiom.”</p>
-
 <p>Today I’m going to take a close look at this method, <span
-  class="code">Array#compact!</span>, and explain how it works at a C
+class="code">Array#compact!</span>, and explain how it works at a C
 programming level. I’ll do this by explaining what these different macros do.
 Beyond understanding this one method, learning this MRI idiom of accessing data
 via macros will help you understand many, many different functions in the Ruby
 C source code. In a series of upcoming blog posts, I’ll look at some different
 MRI idioms as well.</p>
-
 <h2>Array#compact!</h2>
-
 <p>Before we get to the C code, let’s review what the <span
-  class="code">compact!</span> method does in Ruby. Here’s the example used in
+class="code">compact!</span> method does in Ruby. Here’s the example used in
 the Ruby docs, the C comment that appears just above this code in array.c:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/code-comment1.png"/></p>
-
 <p>The <span class="code">rb_ary_compact_bang</span> C function I showed above
 actually implements this behavior. Whenever you use the <span
-  class="code">compact!</span> method in your code, Ruby internally calls this
+class="code">compact!</span> method in your code, Ruby internally calls this
 function and passes in the target array. Somehow it has to identify and remove
 the <span class="code">nil</span> values. Also, it has to update the target
-array, or the receiver of the <span class="code">compact!</span> message &ndash; the
+array, or the receiver of the <span class="code">compact!</span> message - the
 normal <span class="code">compact</span> method would return a new array
 instead and leave the original unchanged. Finally, it should return nil if
 there were no changes made to the array.</p>
-
 <h2>Array data in MRI</h2>
-
 <p>To understand how MRI accesses data via macros, let’s first look at how it
 stores data, at least for array objects. Ruby stores all arrays and their
 contents using the <span class="code">RArray</span> C struct, like this:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/rarray1.png"/></p>
-
 <p>I won’t cover all the details here today; in fact, you can see some other MRI
 idioms at work here, such as the <span
-  class="code">ary[RARRY_EMBED_LEN_MAX]</span> struct member which is used for
+class="code">ary[RARRY_EMBED_LEN_MAX]</span> struct member which is used for
 space optimization, or the <span class="code">shared</span> value, which is
 used for copy-on-write optimization. I wrote about these how these idioms work
 in the String class last year; see: <a href="http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23
 characters</a>,
 and <a href="http://patshaughnessy.net/2012/1/18/seeing-double-how-ruby-shares-string-values">Seeing double: how Ruby shares string
 values</a>.</p>
-
 <p>The details to learn for today are that: Ruby stores the Array data values in a
 C memory array, tracked by the <span class="code">VALUE *ptr</span> pointer.  Ruby (usually) tracks the
 length of the array in <span class="code">len</span>, and Ruby keeps a capacity
 value in <span class="code">capa</span>. The capacity records the size of the
 allocated C memory array (as a count of VALUEs, not as bytes). Ruby frequently
 allocates more memory for an array than what is actually needed.</p>
-
 <p>By taking some time to first study the <span class="code">RArray</span> C structure, you can quite easily
 understand large parts of the Ruby C source code in the array.c file… and
 understand how Ruby arrays actually work!</p>
-
 <h2>Accessing array data via macros</h2>
-
 <p>However, as I explained above if you read array.c you’ll immediately notice
 that Ruby doesn’t use the <span class="code">RArray</span> struct directly. Instead, it accesses values
 such as <span class="code">ptr</span>, <span class="code">len</span> and <span
-  class="code">capa</span> using macros. If you’re not a C programmer, macros
+class="code">capa</span> using macros. If you’re not a C programmer, macros
 are formulas that the C “pre-processor” evaluates and substitutes into the C
 code just before the C compiler runs.</p>
-
-<p>So let’s just take a look at these macros and see what they do &ndash; should be simple,
+<p>So let’s just take a look at these macros and see what they do - should be simple,
 right?</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/gibberish.png"/></p>
-
 <p>Oops! C programming isn’t that simple! One of the most challenging parts of
 reading and understanding Ruby’s code is figuring out what these macros mean
 and do. But this is essential, since they are used so frequently across the
 code base. Most of the complexity in these particular formulas has to do with
 Ruby’s embedded data idiom, which I’ll cover in one of my upcoming blog
 posts.</p>
-
 <p>But don’t despair, normally these macros just boil down to something very
 simple:</p>
-
 <ol>
-
 <li><span class="code">RARRAY_PTR(ary)</span> - this returns a pointer to the array’s actual data,
 normally the same as the <span class="code">ptr</span> value. In <span
   class="code">rb_ary_compact_bang</span>, Ruby initializes the <span
   class="code">p</span> and <span class="code">t</span> pointers using <span
   class="code">RARRAY_PTR</span>:
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/rarray2.png"/></p></li>
-
 <li><span class="code">RARRAY_LEN(ary)</span> - this returns the length of the array, normally just the
 <span class="code">len</span> value. <span class="code">rb_ary_compact_bang</span> initializes the <span class="code">end</span> pointer using
 <span class="code">RARRAY_LEN,</span> by adding the length to <span class="code">p</span>:
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/rarray3.png"/></p>
-
 <p>In this diagram, I assume the length of the array is 3, and the
 capacity of the array is 5.</p><br/></li>
-
 <li><span class="code">ARY_CAPA(ary)</span> - the returns the capacity of the array, or the amount of memory Ruby
 actually allocated for the array’s elements. Ruby allocates more memory than
 necessary to avoid repeated memory allocations when an array changes size. This
 normally just returns <span class="code">capa</span> (except when Ruby is using certain optimizations):
-
 <p/>
-
-<img src="http://patshaughnessy.net/assets/2013/1/23/rarray4.png"/></li>
-
+<p><img src="http://patshaughnessy.net/assets/2013/1/23/rarray4.png"/></li></p>
 <li><span class="code">ARY_SET_LEN(ary, n)</span> - this updates the array length, which is normally the <span class="code">len</span>
 value:
-
 <p/>
-
-<img src="http://patshaughnessy.net/assets/2013/1/23/rarray5.png"/></li>
-
+<p><img src="http://patshaughnessy.net/assets/2013/1/23/rarray5.png"/></li></p>
 </ol>
-
-
 <h2>Putting it all together</h2>
-
 <p>Now that we understand how MRI accesses data values via macros, it’s not hard
 to follow most of the code in <span class="code">rb_ary_compact_bang</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/rb_ary_compact_bang.png"/></p>
-
 <p>Let’s walk through it, starting with this loop:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/compact-loop.png"/></p>
-
-<p>This C pointer arithmetic loop actually does the compact operation &ndash; if
+<p>This C pointer arithmetic loop actually does the compact operation - if
 you’re not familiar with C, here’s a 5 second lesson on how pointers work:</p>
-
 <ul>
-<li><p>If <span class="code">p</span> is a pointer, then <span
+<li>
+<p>If <span class="code">p</span> is a pointer, then <span
 class="code">*p</span> means to return the value that <span
-class="code">p</span> points to, and:</p></li>
-<li><p><span class="code">*p++</span> means return the value <span
+class="code">p</span> points to, and:</p>
+</li>
+<li>
+<p><span class="code">*p++</span> means return the value <span
 class="code">p</span> points to, but also increment <span
 class="code">p</span> by one after obtaining this value, so it points to the
-next value.</p></li>
+next value.</p>
+</li>
 </ul>
-
-
 <p>Let’s walk through this loop visually, to get a sense of how it works. I’ll use
 the example from the Ruby docs:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/ruby-example.png"/></p>
-
 <p>First, Ruby checks whether the first value in the array is nil, using another
 macro: <span class="code">NIL_P(*t)</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/compacting1.png"/></p>
-
 <p>Since it is not nil, Ruby copies the “a” onto itself:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/else.png"/></p>
-
 <p>This has no effect, but both <span class="code">p</span> and <span class="code">t</span> move forward to the next element:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/compacting2.png"/></p>
-
 <p>Now <span class="code">NIL_P(*t)</span> is true, so Ruby just increments <span class="code">t</span> and not <span class="code">p</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/if.png"/></p>
-
 <p>Now <span class="code">t</span> points to the “b”, while <span class="code">p</span> remains the same:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/compacting3.png"/></p>
-
 <p>This time, <span class="code">NIL_P(*t)</span> is false, so Ruby copies the value “b” back, and
 increments both pointers:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/else.png"/></p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/compacting4.png"/></p>
-
 <p>Continuing through the loop again, <span class="code">NIL_P(*t)</span> will be true this time:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/if.png"/></p>
-
 <p>And Ruby will again only increment <span class="code">t</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/compacting5.png"/></p>
-
 <p>Iterating again, <span class="code">t</span> points to the “c”, and so Ruby will copy it back:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/else.png"/></p>
-
 <p>And again now both pointers will be incremented:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/compacting6.png"/></p>
-
 <p>Finally, Ruby increments <span class="code">t</span> past the last nil value,
 and exits the loop when <span class="code">t == end</span>. This leaves us with
 the compacted array, which ends at the current location of <span
-  class="code">p</span>.</p>
-
+class="code">p</span>.</p>
 <h2>Wrapping up</h2>
-
 <p>Now the compacting operation is done, and Ruby just needs to wrap things up and
 leave the array’s internal values in a self consistent state.</p>
-
 <p>First, Ruby calculates the new length, using the <span class="code">p</span>
 pointer and <span class="code">RARRAY_PTR</span> which returns the start of the
 array again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/calc-length.png"/></p>
-
 <p>You can see if the new length is the same as the original length was Ruby will
 return <span class="code">nil</span> and exit immediately. Otherwise, Ruby uses
 <span class="code">ARY_SET_LEN</span> to save the new length back in the <span
-  class="code">RArray</span> struct. In the example above, the new length would
+class="code">RArray</span> struct. In the example above, the new length would
 be 3.</p>
-
 <p>The last bit of confusing code in <span class="code">rb_ary_compact_bang</span>
 updates the array’s capacity, using the <span class="code">ARY_CAPA</span>
 macro:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/reset-capacity.png"/></p>
-
 <p>This code is still very confusing, but at least we know now that <span
-  class="code">ARY_CAPA(ary)</span> returns the current capacity of the array.
+class="code">ARY_CAPA(ary)</span> returns the current capacity of the array.
 Remember the capacity is the actual size of the memory allocated to hold the
 array data, measured as an element count. Here Ruby calls the <span
-  class="code">ary_resize_capa</span> method if the new size of the smaller,
+class="code">ary_resize_capa</span> method if the new size of the smaller,
 compacted  array is less than half of the current capacity, which will free up
 some memory. The condition about <span class="code">ARY_DEFAULT_SIZE</span>
-enforces a minimum capacity &ndash; this constant is set to 16 at the top of array.c:</p>
-
+enforces a minimum capacity - this constant is set to 16 at the top of array.c:</p>
 <p><img src="http://patshaughnessy.net/assets/2013/1/23/default-size.png"/></p>
-
 <p>Note: this doesn’t mean that all new, empty arrays allocate enough memory to have a
 capacity of at least 16; things aren’t so simple. I’ll explain how new arrays
 look in my next post.</p>
-
 <h2>Loose ends</h2>
-
 <p>I glossed over a few details here. First of all, as I said above sometimes
 <span class="code">RARRAY_PTR</span> and <span class="code">RARRY_LEN</span>
 sometimes work differently. I’ll cover this in my next blog post, on Ruby’s
 “embedded data” idiom. Second, I didn’t explain the call to <span
-  class="code">rb_ary_modify</span>, which is used for Ruby’s copy-on-write
+class="code">rb_ary_modify</span>, which is used for Ruby’s copy-on-write
 optimization, another MRI idiom. While these are optimizations Ruby uses
 internally to speed up your programs, I consider them to be idioms also since
 they have a broad, widespread impact on the way MRI’s C code was
 written.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2013/1/23/ruby-mri-source-code-idioms-1-accessing-data-via-macros';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Ruby MRI Source Code Idioms #1: Accessing Data Via Macros';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2013/1/23/ruby-mri-source-code-idioms-1-accessing-data-via-macros';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Ruby MRI Source Code Idioms #1: Accessing Data Via Macros';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2013/1/23/ruby-mri-source-code-idioms-1-accessing-data-via-macros'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Ruby MRI Source Code Idioms #1: Accessing Data Via Macros';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on MRI Idioms</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2013/2/8/ruby-mri-source-code-idioms-3-embedded-objects">Ruby MRI Source Code Idioms #3: Embedded Objects</a></li>
-                  
-                    <li><a href="/2013/1/31/ruby-mri-source-code-idioms-2-c-that-resembles-ruby">Ruby MRI Source Code Idioms #2: C That Resembles Ruby</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on MRI Idioms</div><div class="links"><ul><li><a href="2013/2/8/ruby-mri-source-code-idioms-3-embedded-objects">Ruby MRI Source Code Idioms #3: Embedded Objects</a></li><li><a href="2013/1/31/ruby-mri-source-code-idioms-2-c-that-resembles-ruby">Ruby MRI Source Code Idioms #2: C That Resembles Ruby</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

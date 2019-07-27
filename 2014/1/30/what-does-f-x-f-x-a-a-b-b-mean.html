@@ -1,52 +1,4 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean? - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean? - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</h1>
-  
-    <div class="metadata">
-    <span class="date">January 30th 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>This week I’ve been spending some free time between projects working on my
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean? - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?</h1><div class="metadata"><span class="date">January 30th 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>This week I’ve been spending some free time between projects working on my
 function programming skills. I’m a Ruby developer but have always been
 fascinated by functional languages such as Haskell, Clojure and of course Lisp.
 I was excited this morning when I stumbled across a fascinating article called
@@ -55,270 +7,130 @@ author, <a href="https://twitter.com/mattmight">Matthew Might</a>, touches on La
 a simple interpreter for Lambda Calculus using just seven lines of Scheme code.
 He later proceeds to write a Scheme interpreter in about 100 lines of code,
 using a dialect of Scheme called <a href="http://racket-lang.org">Racket</a>.</p>
-
 <p>Matthew starts by introducing the basics of Lambda Calculus notation like this:</p>
-
 <div style="margin: 20px 0 0 100px">
   <img src="http://patshaughnessy.net/assets/2014/1/30/basics.png"><br/>
 </div>
-
-
 <p>Matthew explains that all of Lambda Calculus is based on these two simple
 concepts, along with variable references. He then shows a couple of simple examples:</p>
-
 <div style="margin: 20px 0 0 100px">
   <img src="http://patshaughnessy.net/assets/2014/1/30/examples.png"><br/>
 </div>
-
-
-<p>&hellip;and then asks the reader this simple question:</p>
-
+<p>...and then asks the reader this simple question:</p>
 <div style="margin: 20px 0 0 100px">
   <img src="http://patshaughnessy.net/assets/2014/1/30/question.png"><br/>
 </div>
-
-
 <p>In this post I’ll try to answer this question using a series of diagrams. I’m a
 visual learner, and teacher. For me drawing something makes it much easier to
 understand and to explain to someone else. Lambda Calculus experts (“Lambda
 Mathematicians?”) probably have accepted styles for drawing these concepts
 which I’m not aware of. I’ll just draw what comes naturally to me.</p>
-
 <h2>Getting Rid of All Those Parentheses</h2>
-
 <p>If I had a whiteboard, I’d rewrite the complex Lambda Calculus expression above
 with circles instead of parentheses. This makes it much easier for me to see
-the nesting and order of operations. An even better visualization might be a tree structure, but I&rsquo;ll keep things inline with cirlces today.</p>
-
+the nesting and order of operations. An even better visualization might be a tree structure, but I'll keep things inline with cirlces today.</p>
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/one.png"><br/></p>
-
 <p>For me, the biggest challenge to understanding Lisp or Scheme has always been
 all the nested parentheses. This picture is still cryptic and meaningless, but
 now at least I can see the order of operations and nesting more easily.</p>
-
 <h2>Start From the Inside and Work Your Way Out</h2>
-
 <p>To understand what’s going on here, I started with the innermost lambda
 expression:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/two.png"><br/></p>
-
 <p>Referring to Matthew’s explanation above, <span class="code">(f x)</span> means evaluate the function <span class="code">f</span>
 on the argument <span class="code">x</span>. Therefore, this expression represents an anonymous function
 that applies some function <span class="code">f</span> to its argument, <span class="code">x</span>. The oval on the left is the
 function and I’ve written this explanation on the right: what the function
 does.</p>
-
 <p>I usually visualize functions with inputs and outputs, like this:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/three.png"><br/></p>
-
 <p>Here you can see the input <span class="code">x</span> comes from the left, and I’ve shown the anonymous
 function in the center using a half-oval. It applies a function <span class="code">f</span>, which is
 almost like a second input value, to <span class="code">x</span> and returns an output value on the
 right.</p>
-
 <h2>Higher Order Functions</h2>
-
 <p>Now let’s substitute this simple function back into the complex expression:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/four.png"><br/></p>
-
 <p>You can see I’ve pasted the text “Apply f to my argument” into the center of
 the expression where the previous lambda was located. Working my way out, let’s
 take a look at what the next lambda expression means:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/five.png"><br/></p>
-
 <p>Here you can see a definition for another anonymous function, another lambda
 expression, which takes <span class="code">f</span> as an argument. The body of the function is our
 previous expression.</p>
-
 <p>What this boils down to, therefore, is a function that takes a function as an
 argument and returns a second function as a result. Here’s what this might look
 like using my input/output diagram style:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/six.png"><br/></p>
-
 <p>On the left you can see the function takes a function, <span class="code">f</span>, as input. On the
 right the dashed rectangle represents a single output value: another function.
 This is an example of a higher order function, a function that can use other
 functions as inputs or outputs.</p>
-
 <p>In this example, the output is a new function which applies <span class="code">f</span>, the input of the
 higher order function, to its argument <span class="code">x</span>. We don’t have a value for <span class="code">x</span> yet, but
 we have a new function which later can take an input <span class="code">x</span>. It will apply the
 present input, <span class="code">f</span>, to whatever argument it receives later, <span class="code">x</span>.</p>
-
 <p>The other subtle detail to think about here is that above, when we looked at
 the innermost lambda expression, the value <span class="code">f</span> was undefined. The inner lambda
 applied <span class="code">f</span> to its input <span class="code">x</span>, not knowing what <span class="code">f</span> was. Now <span class="code">f</span> has been provided by
 the surrounding expression, the outer lambda. <span class="code">f</span> is the input to the outer
 lambda. I’m not sure about this, but I suspect lambda mathematicians would say
 the outer lambda is a closure around the free variable, <span class="code">f</span>.</p>
-
 <h2>Identity Functions</h2>
-
 <p>Substituting again, here’s the entire expression simplified:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/seven.png"><br/></p>
-
 <p>The two lambdas on the right are easier to follow. These are examples of the
 identity function, a function that returns its argument. Matthew showed this
 syntax as one of his examples.</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/eight.png"><br/></p>
-
 <p>You can see here the identity function simply passes its input along as an
 output:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/nine.png"><br/></p>
-
 <h2>Evaluating a Function</h2>
-
 <p>Substituting again, here’s what we have now:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/ten.png"><br/></p>
-
 <p>Earlier we saw the higher order function on the left returns a function that
 will later operate on an argument, which I showed as <span class="code">x</span>. Now its time has come.
 Recall that <span class="code">(f x)</span> in Lambda Calculus means “evaluate the function <span class="code">f</span> on the
 argument <span class="code">x</span>.”</p>
-
 <p>In other words, this expression:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/eleven.png"><br/></p>
-
 <p>… means: “evaluate the higher order function on the left, providing the
 function on the right as an argument.”</p>
-
 <p>The higher order function will take one function (the identity function) and
 return another:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/twelve.png"><br/></p>
-
 <p>The output is a new function which will apply the identity function (the
 argument) to its own argument <span class="code">x</span>. Of course, this is equivalent to the identity
 function itself!</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/thirteen.png"><br/></p>
-
 <p>There must be some Lambda Calculus axiom (the “lambda identity axiom?”) behind
 this deduction, but I’m not sure. I’ll consider it obvious and just move on.</p>
-
 <h2>The Result</h2>
-
 <p>Substituting this result back into the original expression, we’re left with
 this:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/fourteen.png"><br/></p>
-
 <p>Reapplying the “lambda identity axiom” again it’s
 obvious this is equivalent to the identity function:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/1/30/fifteen.png"><br/></p>
-
 <p>That is, the identity function is also a higher order function. It returns the
 same functions you pass to it, unchanged.</p>
-
 <p>Stepping back and taking stock, we’ve deduced that:</p>
-
 <p><span class="code">(((λ f . (λ x . (f x))) (λ a . a)) (λ b . b))</span></p>
-
 <p>Is equivalent to:</p>
-
 <p><span class="code">(λ x . x)</span></p>
-
 <p>Or the identity function.</p>
-
 <h2>What Did I Get Wrong?</h2>
-
 <p>As I mentioned, I’m just learning about functional programming and lambda
 calculus. If you have some computer science training and see something wrong
 here, let me know. Or if you know the real name for the “lambda identity axiom”
 or have examples of better diagrams for representing lambda expressions, please
 pass along a link.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2014/1/30/what-does-f-x-f-x-a-a-b-b-mean'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'What does (((λ f . (λ x . (f x))) (λ a . a)) (λ b . b)) mean?';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="links"><ul><li><a href="2018/10/24/summer-school-with-the-rust-compiler">Summer School With The Rust Compiler</a></li><li><a href="2018/6/9/from-activerecord-to-diesel">From ActiveRecord to Diesel</a></li><li><a href="2018/3/15/how-rust-implements-tagged-unions">How Rust Implements Tagged Unions</a></li><li><a href="2018/1/18/learning-rust-if-let-vs--match">Learning Rust: If Let vs. Match</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

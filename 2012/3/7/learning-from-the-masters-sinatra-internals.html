@@ -1,462 +1,235 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Learning From the Masters: Sinatra Internals - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Learning From the Masters: Sinatra Internals - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Learning From the Masters: Sinatra Internals</h1>
-  
-    <div class="metadata">
-    <span class="date">March 7th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/3/7/learning-from-the-masters-sinatra-internals" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning From the Masters: Sinatra Internals">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning From the Masters: Sinatra Internals - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning From the Masters: Sinatra Internals</h1><div class="metadata"><span class="date">March 7th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/3/7/learning-from-the-masters-sinatra-internals" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning From the Masters: Sinatra Internals">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra1.jpg"></td></tr>
   <tr><td align="center"><small><i>More than a web framework, Sinatra is an elegant,<br/>stylish Ruby program we can all learn from<br/></i></small></td></tr>
 </table>
 </div>
-
-
 <p>We all know <a href="http://www.sinatrarb.com">Sinatra</a> as a lightweight alternative to Rails. I find using it is a real pleasure. Sinatra’s helper methods, template support and routing provide just enough to get a simple web site running quickly, but then immediately get out of your way. Years after it was introduced Sinatra remains one of the most popular Ruby web frameworks out there.</p>
-
-<p>This week I decided to take a look inside of Sinatra to see what I could learn from the way it was written. I expected to find sophisticated, well written code that effectively implemented Sinatra’s API. What I didn’t expect to see was code written with a real sense of style and polish&hellip; Sinatra’s internals live up to the name!</p>
-
-<p>Today I’ll show you three examples of this: how Sinatra calls your code via <span class="code">throw</span> and <span class="code">catch</span>, how Sinatra uses Test::Unit in a very readable and DRY manner, and how it uses metaprogramming in an elegant way that makes it easier for client code to use. Read on to learn more&hellip;</p>
-
+<p>This week I decided to take a look inside of Sinatra to see what I could learn from the way it was written. I expected to find sophisticated, well written code that effectively implemented Sinatra’s API. What I didn’t expect to see was code written with a real sense of style and polish... Sinatra’s internals live up to the name!</p>
+<p>Today I’ll show you three examples of this: how Sinatra calls your code via <span class="code">throw</span> and <span class="code">catch</span>, how Sinatra uses Test::Unit in a very readable and DRY manner, and how it uses metaprogramming in an elegant way that makes it easier for client code to use. Read on to learn more...</p>
 <h2>Using throw/catch to control program flow</h2>
-
 <p>If you’ve ever used or read about Sinatra, you’ll remember that you provide code to handle HTTP requests using a series of blocks and route patterns. Here’s the basic example from the <a href="http://www.sinatrarb.com">Sinatra web site</a>:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-get <span class="string"><span class="delimiter">'</span><span class="content">/hi</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-  <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World!</span><span class="delimiter">&quot;</span></span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">get </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/hi</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Hello World!</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Looking at Sinatra’s internals, the first thing I wanted to find out was how it called these code blocks. I expected to see some sort of loop, checking whether the current HTTP request path matched each route’s pattern, and indeed you can find this loop in the <a href="https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb#L796">Sinatra::Base.route! method</a>. But what I didn’t expect to see was how Sinatra implemented the actual call to the client’s route code block. This happens in a method called <span class="code">route_eval</span> in <span class="code">Sinatra::Base</span>:</p>
-
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra3.jpg"></td></tr>
 </table>
 </div>
-
-
-
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="comment"># Run a route block and throw :halt with the result.</span>
-<span class="keyword">def</span> <span class="function">route_eval</span>
-  throw <span class="symbol">:halt</span>, <span class="keyword">yield</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a7adba;"># Run a route block and throw :halt with the result.
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">route_eval
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">throw </span><span style="color:#008080;">:halt</span><span style="color:#000000;">, </span><span style="color:#a71d5d;">yield
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Huh? What’s going on here? The <span class="code">yield</span> statement makes sense: since the client provides the route code as a block, Sinatra needs to yield to it. But what is the <span class="code">throw</span> statement doing? And what does <span class="code">:halt</span> mean? Is my route block somehow returning an error or exception? And where is it thrown to?</p>
-
 <p>Before understanding what <span class="code">throw</span> is doing here, we need to review how <span class="code">throw</span> and <span class="code">catch</span> work in Ruby, and how they are different from <span class="code">raise</span> and <span class="code">rescue</span>. I won’t spend time here today explaining that since <a href="http://about.avdi.org/">Avdi Grimm</a> wrote a fantastic article about exactly this question last Summer: <a href="http://rubylearning.com/blog/2011/07/12/throw-catch-raise-rescue-im-so-confused/">Throw, Catch, Raise, Rescue… I’m so confused!</a> He even used Sinatra as one of his examples. In a nutshell, Avdi explained that despite the different names, <span class="code">raise</span>/<span class="code">rescue</span> should be used to handle exceptions, similar to <span class="code">try</span>/<span class="code">throw</span>/<span class="code">catch</span> in C++, Java and other languages. In Ruby, on the other hand, <span class="code">throw</span> and <span class="code">catch</span> are intended to be used as another program control structure.</p>
-
 <p>Let’s take a look at how Sinatra uses <span class="code">throw</span> and <span class="code">catch</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/3/7/route-eval.png" alt="throw/catch used in Sinatra" /></p>
-
 <p>Here you can see that after one of your route code blocks returns a value to <span class="code">route_eval</span>, Sinatra jumps back up the call stack to a method called <span class="code">invoke</span>, where it had actually started processing the current request earlier:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a7adba;"># Run the block with &#39;throw :halt&#39; support and apply result to the response.
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">invoke
+</span><span style="color:#000000;">  res </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">catch</span><span style="color:#000000;">(</span><span style="color:#008080;">:halt</span><span style="color:#000000;">) { </span><span style="color:#a71d5d;">yield </span><span style="color:#000000;">}
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">...</span><span style="color:#000000;"> etc </span><span style="color:#4f5b66;">...
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="comment"># Run the block with 'throw :halt' support and apply result to the response.</span>
-<span class="keyword">def</span> <span class="function">invoke</span>
-  res = catch(<span class="symbol">:halt</span>) { <span class="keyword">yield</span> }
-
-  ... etc ...
-
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
-
-<p>Ruby sets the catch block’s return value to the second argument passed to <span class="code">throw</span> &ndash; your route code block’s return value in this case, or <span class="code">res</span> in the diagram.</p>
-
-<p>This is just the simplest example of throw in Sinatra &ndash; it turns out that many of the helper methods like <span class="code">last_modified</span>, <span class="code">redirect</span>, <span class="code">error</span>, etc., all use <span class="code">throw</span> to jump back to the invoke in a similar way, providing the appropriate return value. Here’s another example showing how Sinatra’s <span class="code">redirect</span> helper method works:</p>
-
+<p>Ruby sets the catch block’s return value to the second argument passed to <span class="code">throw</span> - your route code block’s return value in this case, or <span class="code">res</span> in the diagram.</p>
+<p>This is just the simplest example of throw in Sinatra - it turns out that many of the helper methods like <span class="code">last_modified</span>, <span class="code">redirect</span>, <span class="code">error</span>, etc., all use <span class="code">throw</span> to jump back to the invoke in a similar way, providing the appropriate return value. Here’s another example showing how Sinatra’s <span class="code">redirect</span> helper method works:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/3/7/redirect.png" alt="throw used by redirect" /></p>
-
-<p>The big benefit here is that when the client code decides to call <span class="code">redirect</span>, Sinatra avoids the need to execute everything following the <span class="code">redirect</span> call (“&hellip; lots of code here&hellip;”) &ndash; or the need for the client code itself to have to use an if/else statement to avoid executing it. Sinatra has taken what should be a normal, mundane Ruby programming task &ndash; calling a code block &ndash; and done it in a stylish, elegant way. The result is faster, cleaner code, both for Sinatra’s internals and for you!</p>
-
+<p>The big benefit here is that when the client code decides to call <span class="code">redirect</span>, Sinatra avoids the need to execute everything following the <span class="code">redirect</span> call (“... lots of code here...”) - or the need for the client code itself to have to use an if/else statement to avoid executing it. Sinatra has taken what should be a normal, mundane Ruby programming task - calling a code block - and done it in a stylish, elegant way. The result is faster, cleaner code, both for Sinatra’s internals and for you!</p>
 <h2>A readable and maintainable test suite</h2>
-
 <p>Something else in Sinatra’s internals that caught my eye was the way it used Test::Unit. Many Ruby developers today prefer to use <a href="http://rspec.info/">RSpec</a> or <a href="https://github.com/seattlerb/minitest">Minitest</a> instead of Test::Unit to get a more powerful and readable DSL for unit tests and BDD. But Sinatra, like the Rails core team, uses plain old Test::Unit for its test suite.</p>
+<p>But what a minute... let’s take a look at some of Sinatra’s tests:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">BaseTest </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">Test::Unit::TestCase
+</span><span style="color:#000000;">
+</span><span style="color:#4f5b66;">...</span><span style="color:#000000;"> etc </span><span style="color:#4f5b66;">...
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  describe </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Sinatra::Base subclasses</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">class </span><span style="color:#008080;">TestApp </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">Sinatra::Base
+</span><span style="color:#000000;">      get </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">        </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Hello World</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    it </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">include Rack::Utils</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">      assert </span><span style="color:#008080;">TestApp</span><span style="color:#000000;">.included_modules.include?(</span><span style="color:#008080;">Rack</span><span style="color:#000000;">::Utils)
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    it </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">processes requests with #call</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">      assert </span><span style="color:#008080;">TestApp</span><span style="color:#000000;">.respond_to?(</span><span style="color:#008080;">:call</span><span style="color:#000000;">)
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">      request </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Rack</span><span style="color:#000000;">::</span><span style="color:#008080;">MockRequest</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(TestApp)
+</span><span style="color:#000000;">      response </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> request.get(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">      assert response.ok?
+</span><span style="color:#000000;">      assert_equal </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Hello World</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, response.body
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span></pre>
 
-<p>But what a minute&hellip; let’s take a look at some of Sinatra’s tests:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">BaseTest</span> &lt; <span class="constant">Test</span>::<span class="constant">Unit</span>::<span class="constant">TestCase</span>
-
-... etc ...
-
-  describe <span class="string"><span class="delimiter">'</span><span class="content">Sinatra::Base subclasses</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-    <span class="keyword">class</span> <span class="class">TestApp</span> &lt; <span class="constant">Sinatra</span>::<span class="constant">Base</span>
-      get <span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-        <span class="string"><span class="delimiter">'</span><span class="content">Hello World</span><span class="delimiter">'</span></span>
-      <span class="keyword">end</span>
-    <span class="keyword">end</span>
-
-    it <span class="string"><span class="delimiter">'</span><span class="content">include Rack::Utils</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-      assert <span class="constant">TestApp</span>.included_modules.include?(<span class="constant">Rack</span>::<span class="constant">Utils</span>)
-    <span class="keyword">end</span>
-
-    it <span class="string"><span class="delimiter">'</span><span class="content">processes requests with #call</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-      assert <span class="constant">TestApp</span>.respond_to?(<span class="symbol">:call</span>)
-
-      request = <span class="constant">Rack</span>::<span class="constant">MockRequest</span>.new(<span class="constant">TestApp</span>)
-      response = request.get(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
-      assert response.ok?
-      assert_equal <span class="string"><span class="delimiter">'</span><span class="content">Hello World</span><span class="delimiter">'</span></span>, response.body
-    <span class="keyword">end</span>
-</pre></div>
-</div>
-
-
-
-<p>This doesn’t look like Test::Unit at all! Instead, it seems like Sinatra is using RSpec &ndash; why do I see the <span class="code">describe</span> and <span class="code">it</span> keywords here? Well it turns out that Sinatra has employed a neat little library called <a href="https://github.com/citrusbyte/contest">contest</a>, which is adds support for <span class="code">describe</span>/<span class="code">context</span> blocks in Test::Unit, like you would see with RSpec or Shoulda. Sinatra has also defined the <span class="code">it</span> keyword as an alias for <span class="code">test</span> like this:</p>
-
+<p>This doesn’t look like Test::Unit at all! Instead, it seems like Sinatra is using RSpec - why do I see the <span class="code">describe</span> and <span class="code">it</span> keywords here? Well it turns out that Sinatra has employed a neat little library called <a href="https://github.com/citrusbyte/contest">contest</a>, which is adds support for <span class="code">describe</span>/<span class="code">context</span> blocks in Test::Unit, like you would see with RSpec or Shoulda. Sinatra has also defined the <span class="code">it</span> keyword as an alias for <span class="code">test</span> like this:</p>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra2.jpg"></td></tr>
 </table>
 </div>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Test::Unit::TestCase
+</span><span style="color:#343d46;">  </span><span style="color:#795da3;">include </span><span style="color:#008080;">Rack</span><span style="color:#000000;">::</span><span style="color:#008080;">Test</span><span style="color:#000000;">::Methods
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">class </span><span style="color:#4f5b66;">&lt;&lt; </span><span style="color:#000000;">self
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">alias_method </span><span style="color:#008080;">:it</span><span style="color:#000000;">, </span><span style="color:#008080;">:test
+</span><span style="color:#000000;">
+</span><span style="color:#4f5b66;">...</span><span style="color:#000000;"> etc </span><span style="color:#4f5b66;">...
+</span></pre>
 
-
-
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Test::Unit::TestCase</span>
-  include <span class="constant">Rack</span>::<span class="constant">Test</span>::<span class="constant">Methods</span>
-
-  <span class="keyword">class</span> &lt;&lt; <span class="class">self</span>
-    alias_method <span class="symbol">:it</span>, <span class="symbol">:test</span>
-
-... etc ...
-</pre></div>
-</div>
-
-
-
-<p>These two changes to Test::Unit have made Sinatra’s test suite much more readable&hellip; more stylish! But there’s also substance to the style: for example, notice the nice way that Sinatra created an entire test app right inside a describe block:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-describe <span class="string"><span class="delimiter">'</span><span class="content">Sinatra::Base subclasses</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-  <span class="keyword">class</span> <span class="class">TestApp</span> &lt; <span class="constant">Sinatra</span>::<span class="constant">Base</span>
-    get <span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-      <span class="string"><span class="delimiter">'</span><span class="content">Hello World</span><span class="delimiter">'</span></span>
-    <span class="keyword">end</span>
-  <span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<p>These two changes to Test::Unit have made Sinatra’s test suite much more readable... more stylish! But there’s also substance to the style: for example, notice the nice way that Sinatra created an entire test app right inside a describe block:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">describe </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Sinatra::Base subclasses</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">class </span><span style="color:#008080;">TestApp </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">Sinatra::Base
+</span><span style="color:#000000;">    get </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">      </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Hello World</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Now subsequent tests can refer to this test application and see if Sinatra is handling things correctly; for example:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">it </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">processes requests with #call</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  assert </span><span style="color:#008080;">TestApp</span><span style="color:#000000;">.respond_to?(</span><span style="color:#008080;">:call</span><span style="color:#000000;">)
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  request </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Rack</span><span style="color:#000000;">::</span><span style="color:#008080;">MockRequest</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(TestApp)
+</span><span style="color:#000000;">  response </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> request.get(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">  assert response.ok?
+</span><span style="color:#000000;">  assert_equal </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Hello World</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, response.body
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-it <span class="string"><span class="delimiter">'</span><span class="content">processes requests with #call</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-  assert <span class="constant">TestApp</span>.respond_to?(<span class="symbol">:call</span>)
-
-  request = <span class="constant">Rack</span>::<span class="constant">MockRequest</span>.new(<span class="constant">TestApp</span>)
-  response = request.get(<span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>)
-  assert response.ok?
-  assert_equal <span class="string"><span class="delimiter">'</span><span class="content">Hello World</span><span class="delimiter">'</span></span>, response.body
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
-
-<p>Wow &ndash; that’s so simple and easy to read. Here Sinatra is also taking advantage of the excellent <a href="https://github.com/brynary/rack-test">Rack::Test</a> library by <a href="http://twitter.com/brynary">Bryan Helmkamp</a>, which provides the <span class="code">Rack::MockRequest</span> object.</p>
-
-<p>I was also impressed with the way Sinatra’s test suite was very DRY &ndash; here’s are some more tests from the erb_test.rb file:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-it <span class="string"><span class="delimiter">'</span><span class="content">renders inline ERB strings</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-  erb_app { erb <span class="string"><span class="delimiter">'</span><span class="content">&lt;%= 1 + 1 %&gt;</span><span class="delimiter">'</span></span> }
-  assert ok?
-  assert_equal <span class="string"><span class="delimiter">'</span><span class="content">2</span><span class="delimiter">'</span></span>, body
-<span class="keyword">end</span>
-
-it <span class="string"><span class="delimiter">'</span><span class="content">renders .erb files in views path</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-  erb_app { erb <span class="symbol">:hello</span> }
-  assert ok?
-  assert_equal <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="char">\n</span><span class="delimiter">&quot;</span></span>, body
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<p>Wow - that’s so simple and easy to read. Here Sinatra is also taking advantage of the excellent <a href="https://github.com/brynary/rack-test">Rack::Test</a> library by <a href="http://twitter.com/brynary">Bryan Helmkamp</a>, which provides the <span class="code">Rack::MockRequest</span> object.</p>
+<p>I was also impressed with the way Sinatra’s test suite was very DRY - here’s are some more tests from the erb_test.rb file:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">it </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">renders inline ERB strings</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  erb_app { erb </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">&lt;%= 1 + 1 %&gt;</span><span style="color:#4f5b66;">&#39; </span><span style="color:#000000;">}
+</span><span style="color:#000000;">  assert ok?
+</span><span style="color:#000000;">  assert_equal </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">2</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, body
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">it </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">renders .erb files in views path</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  erb_app { erb </span><span style="color:#008080;">:hello </span><span style="color:#000000;">}
+</span><span style="color:#000000;">  assert ok?
+</span><span style="color:#000000;">  assert_equal </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Hello World</span><span style="color:#96b5b4;">\n</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, body
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>These two tests and many other tests in the same file use the <span class="code">erb_app</span> method to create a test Sinatra app and yield to the provided block in that app’s context. Sinatra achieves that by using a helper method at the top of erb_test.rb:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">erb_app</span>(&amp;block)
-  mock_app {
-    set <span class="symbol">:views</span>, <span class="constant">File</span>.dirname(<span class="predefined-constant">__FILE__</span>) + <span class="string"><span class="delimiter">'</span><span class="content">/views</span><span class="delimiter">'</span></span>
-    get <span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>, &amp;block
-  }
-  get <span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">erb_app</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">  mock_app {
+</span><span style="color:#000000;">    set </span><span style="color:#008080;">:views</span><span style="color:#000000;">, </span><span style="color:#008080;">File</span><span style="color:#000000;">.dirname(__FILE__) </span><span style="color:#4f5b66;">+ &#39;</span><span style="color:#008080;">/views</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    get </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block
+</span><span style="color:#000000;">  }
+</span><span style="color:#000000;">  get </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>And Sinatra defines <span class="code">mock_app</span> in the helper.rb file:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a7adba;"># Sets up a Sinatra::Base subclass defined with the block
+</span><span style="color:#a7adba;"># given. Used in setup or individual spec methods to establish
+</span><span style="color:#a7adba;"># the application.
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">mock_app</span><span style="color:#000000;">(base</span><span style="color:#4f5b66;">=</span><span style="color:#008080;">Sinatra</span><span style="color:#000000;">::Base, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">app </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Sinatra</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(base, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="comment"># Sets up a Sinatra::Base subclass defined with the block</span>
-<span class="comment"># given. Used in setup or individual spec methods to establish</span>
-<span class="comment"># the application.</span>
-<span class="keyword">def</span> <span class="function">mock_app</span>(base=<span class="constant">Sinatra</span>::<span class="constant">Base</span>, &amp;block)
-  <span class="instance-variable">@app</span> = <span class="constant">Sinatra</span>.new(base, &amp;block)
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
-
-<p>Sinatra has DRY-ed up its test suite substantially using these two helper methods, along with other, similar methods. Not only is Sinatra’s test suite easier to read for this reason, but it’s also easier to maintain. In my own personal projects I often don’t apply the same amount of love and attention to my test code as I do to my production code &ndash; there’s definitely a lesson to learn here!</p>
-
+<p>Sinatra has DRY-ed up its test suite substantially using these two helper methods, along with other, similar methods. Not only is Sinatra’s test suite easier to read for this reason, but it’s also easier to maintain. In my own personal projects I often don’t apply the same amount of love and attention to my test code as I do to my production code - there’s definitely a lesson to learn here!</p>
 <h2>Metaprogramming with style</h2>
-
 <p>One Sinatra feature you may not be familiar with is registering extensions to Sinatra’s standard DSL. Here’s the example they use in their documentation on <a href="http://www.sinatrarb.com/extensions.html">Writing Extensions</a>:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-require <span class="string"><span class="delimiter">'</span><span class="content">sinatra/base</span><span class="delimiter">'</span></span>
-
-<span class="keyword">module</span> <span class="class">Sinatra</span>
-  <span class="keyword">module</span> <span class="class">LinkBlocker</span>
-    <span class="keyword">def</span> <span class="function">block_links_from</span>(host)
-      before {
-        halt <span class="integer">403</span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Go Away!</span><span class="delimiter">&quot;</span></span> <span class="keyword">if</span> request.referer.match(host)
-      }
-    <span class="keyword">end</span>
-  <span class="keyword">end</span>
-
-  register <span class="constant">LinkBlocker</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">sinatra/base</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">module </span><span style="color:#000000;">Sinatra
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">module </span><span style="color:#000000;">LinkBlocker
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">block_links_from</span><span style="color:#000000;">(host)
+</span><span style="color:#000000;">      before {
+</span><span style="color:#000000;">        halt </span><span style="color:#d08770;">403</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Go Away!</span><span style="color:#4f5b66;">&quot; </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> request.referer.match(host)
+</span><span style="color:#000000;">      }
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  register LinkBlocker
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Once you’ve registered an extension module like this, you can use it from your Sinatra app like this:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-require <span class="string"><span class="delimiter">'</span><span class="content">sinatra</span><span class="delimiter">'</span></span>
-require <span class="string"><span class="delimiter">'</span><span class="content">sinatra/linkblocker</span><span class="delimiter">'</span></span>
-
-block_links_from <span class="string"><span class="delimiter">'</span><span class="content">digg.com</span><span class="delimiter">'</span></span>
-
-get <span class="string"><span class="delimiter">'</span><span class="content">/</span><span class="delimiter">'</span></span> <span class="keyword">do</span>
-  <span class="string"><span class="delimiter">&quot;</span><span class="content">Hello World</span><span class="delimiter">&quot;</span></span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">sinatra</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">sinatra/linkblocker</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">block_links_from </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">digg.com</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">get </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Hello World</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>What interested me about this was the way Sinatra implemented the <span class="code">register</span> method internally. Let’s take a look at that:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="comment"># Register an extension. Alternatively take a block from which an</span>
-<span class="comment"># extension will be created and registered on the fly.</span>
-<span class="keyword">def</span> <span class="function">register</span>(*extensions, &amp;block)
-  extensions &lt;&lt; <span class="constant">Module</span>.new(&amp;block) <span class="keyword">if</span> block_given?
-  <span class="instance-variable">@extensions</span> += extensions
-  extensions.each <span class="keyword">do</span> |extension|
-    extend extension
-    extension.registered(<span class="predefined-constant">self</span>) <span class="keyword">if</span> extension.respond_to?(<span class="symbol">:registered</span>)
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a7adba;"># Register an extension. Alternatively take a block from which an
+</span><span style="color:#a7adba;"># extension will be created and registered on the fly.
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">register</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">*</span><span style="color:#000000;">extensions, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">  extensions </span><span style="color:#4f5b66;">&lt;&lt; </span><span style="color:#008080;">Module</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block) </span><span style="color:#a71d5d;">if block_given?
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">extensions </span><span style="color:#4f5b66;">+=</span><span style="color:#000000;"> extensions
+</span><span style="color:#000000;">  extensions.each </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">extension</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">    </span><span style="color:#795da3;">extend</span><span style="color:#000000;"> extension
+</span><span style="color:#000000;">    extension.registered(self) </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> extension.respond_to?(</span><span style="color:#008080;">:registered</span><span style="color:#000000;">)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>While this might be a bit hard to understand at first, it’s actually fairly straightforward. The client code (your Sinatra app) passes in an extension, like the call to <span class="code">register LinkBlocker</span> we saw above. Next this extension module is added to an array called <span class="code">@extensions</span> and then Sinatra iterates over the array and extends itself with each extension.</p>
-
-<p>This sounds fairly mundane and simple &ndash; I would have used much simpler code than this to do that same thing! What else is going on here?</p>
-
+<p>This sounds fairly mundane and simple - I would have used much simpler code than this to do that same thing! What else is going on here?</p>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra4.jpg"></td></tr>
 </table>
 </div>
-
-
-<p>Like a lot of the code inside Sinatra, the <span class="code">register</span> method was not just implemented in a straightforward way &ndash; it was done with a real sense of style! Let’s take a closer look at some of the details here:</p>
-
+<p>Like a lot of the code inside Sinatra, the <span class="code">register</span> method was not just implemented in a straightforward way - it was done with a real sense of style! Let’s take a closer look at some of the details here:</p>
 <ul>
   <li>First, the use of <span class="code">*extensions</span> instead of just <span class="code">extension</span>. This allows the client code to pass in a single extension, or a list of extensions as desired. This is a very common Ruby idiom, and Sinatra makes good use of it here.</li>
   <li>Next, notice the line of code containing the call to <span class="code">Module.new</span>. This is more subtle and interesting. Here Sinatra is allowing the client code to pass in a block instead of, or in addition to, actual modules. If a block is given by the client code (<span class="code">block_given?</span>) then Sinatra creates a new, anonymous module right on the spot with the block! Then it adds the anonymous module to the <span class="code">extensions</span> array. This gives the client code the flexibility to pass in actual modules and/or anonymous blocks of code.</li>
   <li>Finally, notice the line near the end that calls <span class="code">respond_to?</span>. What’s this all about? Well, here Sinatra checks whether the new extension module contains a method called <span class="code">registered</span>. If it does, it calls that after applying the extension. This gives the client code the option of implementing the <span class="code">registered</span> method if it needs to take some action at this point.</li>
 </ul>
-
-
 <p>By paying attention to these minor metaprogramming details, Sinatra has added a lot of flexibility to the <span class="code">register</span> method and made the client code’s job easier. You can find similar examples of this in other metaprogramming employed elsewhere in Sinatra’s code base.</p>
-
 <h2>Conclusion</h2>
-
-<p>All of these are all fairly minor details, but in my mind they raise Sinatra’s internal code from something normal and ordinary up to a higher level &ndash; to be something stylish and exceptional. The Sinatra developers weren’t satisfied with building just another web framework. They wanted to build something special that people would love to use. And the way they achieved this was by paying attention to the small design and code details that most Ruby developers &ndash; like me &ndash; would probably ignore.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2012/3/7/learning-from-the-masters-sinatra-internals';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Learning From the Masters: Sinatra Internals';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2012/3/7/learning-from-the-masters-sinatra-internals';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Learning From the Masters: Sinatra Internals';
-    (function () {
+<p>All of these are all fairly minor details, but in my mind they raise Sinatra’s internal code from something normal and ordinary up to a higher level - to be something stylish and exceptional. The Sinatra developers weren’t satisfied with building just another web framework. They wanted to build something special that people would love to use. And the way they achieved this was by paying attention to the small design and code details that most Ruby developers - like me - would probably ignore.</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2012/3/7/learning-from-the-masters-sinatra-internals'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Learning From the Masters: Sinatra Internals';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

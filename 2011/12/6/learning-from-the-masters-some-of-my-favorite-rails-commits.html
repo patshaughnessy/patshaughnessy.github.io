@@ -1,116 +1,42 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Learning from the masters: some of my favorite Rails commits - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Learning from the masters: some of my favorite Rails commits - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Learning from the masters: some of my favorite Rails commits</h1>
-  
-    <div class="metadata">
-    <span class="date">December 6th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning from the masters: some of my favorite Rails commits">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning from the masters: some of my favorite Rails commits - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning from the masters: some of my favorite Rails commits</h1><div class="metadata"><span class="date">December 6th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning from the masters: some of my favorite Rails commits">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/bach.jpg"></td></tr>
   <tr><td align="center"><small><i>Reading the Rails source code is like looking<br/>at the score of a Bach sonata or partita</i></small></td></tr>
 </table>
 </div>
-
-
-<p>In the last month or two, there have been many great commits to Rails. Last week alone we saw: <a href="https://github.com/rails/rails/commit/0306f82e0c3cda3aad1b45eb0c3a359c254b62cc">0306f82 &ndash; implements automatic EXPLAIN logging for slow queries</a> and <a href="https://github.com/rails/rails/commit/a382d60f6abc94b6a965525872f858e48abc00de">a382d60 &ndash; ActiveRecord::Relation#pluck method</a>. There were also many other useful commits that didn&rsquo;t get so much attention, such as <a href="https://github.com/rails/rails/commit/562583c7667f508493ab8c5b1a4215087fafd22d">562583c</a>, <a href="https://github.com/rails/rails/commit/85b64f98d100d37b3a232c315daa10fad37dccdc">85b64f9</a>, etc., etc. Hearing about all this great work inspired me to take a closer look at the Rails github repo history, to see which commits were the most interesting or creative &ndash; commits that would teach me something and help me improve as a Rails developer.</p>
-
+<p>In the last month or two, there have been many great commits to Rails. Last week alone we saw: <a href="https://github.com/rails/rails/commit/0306f82e0c3cda3aad1b45eb0c3a359c254b62cc">0306f82 - implements automatic EXPLAIN logging for slow queries</a> and <a href="https://github.com/rails/rails/commit/a382d60f6abc94b6a965525872f858e48abc00de">a382d60 - ActiveRecord::Relation#pluck method</a>. There were also many other useful commits that didn't get so much attention, such as <a href="https://github.com/rails/rails/commit/562583c7667f508493ab8c5b1a4215087fafd22d">562583c</a>, <a href="https://github.com/rails/rails/commit/85b64f98d100d37b3a232c315daa10fad37dccdc">85b64f9</a>, etc., etc. Hearing about all this great work inspired me to take a closer look at the Rails github repo history, to see which commits were the most interesting or creative - commits that would teach me something and help me improve as a Rails developer.</p>
 <p>I ended up being surprised! There are plenty of examples of elegant code, cool testing techniques and great new features in Rails if you go and look for them, but what impressed me the most were the small things. Like the small, in-between notes and simple harmonies in the midst of a large symphony, the Rails commits that caught my eye were tiny changes made by the Rails core team that were easy to miss, but that showed their real passion and love for Rails.</p>
-
-<p>Read on to find out more about some of my favorite Rails commits&hellip; and then let me know what you think! Which are your favorites?</p>
-
+<p>Read on to find out more about some of my favorite Rails commits... and then let me know what you think! Which are your favorites?</p>
 <h2>Taking the time to make small improvements</h2>
-
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/polishing.jpg"></td></tr>
   <tr><td align="center"><small><i>No, this is not DHH</i></small></td></tr>
 </table>
 </div>
-
-
 <p><a href="http://david.heinemeierhansson.com/">David Heinemeier Hansson (DHH)</a>, as we all know, created Rails back in 2004. It’s hard to believe, but that’s almost eight years ago now! But even after all these years, DHH is still making commits to Rails code. And looking at some of his recent commits DHH seems just as interested in and passionate about Rails as he must have been back in 2004 when he created it.</p>
-
-<p>One recent ActiveSupport commit from DHH that caught my eye, <a href="https://github.com/rails/rails/commit/9482554f31f3ac7f941e6239890c60fcc01975e1">9482554 &ndash; Added Array#prepend as an alias for Array#unshift and Array#append as an alias for Array</a>, might not seem interesting at all at first glance. Let’s take a look:</p>
-
+<p>One recent ActiveSupport commit from DHH that caught my eye, <a href="https://github.com/rails/rails/commit/9482554f31f3ac7f941e6239890c60fcc01975e1">9482554 - Added Array#prepend as an alias for Array#unshift and Array#append as an alias for Array</a>, might not seem interesting at all at first glance. Let’s take a look:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/12/6/9482554.png" alt="9482554" /></p>
-
-<p>Here DHH has added a couple of new aliases &ndash; or alternative method names &ndash; for the commonly used Array operations of <span class="code">&lt;&lt;</span> and <span class="code">unshift</span>, which have somewhat confusing names in core Ruby. His code comments say it all: “The human way of thinking about&hellip;” He felt these aliases better reflected the way developers &ndash; humans &ndash; think about these Array operations and made the change in ActiveSupport to allow Rails apps, at least, to be more readable.</p>
-
-<p>Yes, all there is to this commit are a couple calls to <span class="code">alias_method</span> and nothing more. What real value is there here? It seems like a minor detail not worth mentioning at all &ndash; in fact, if you open the <a href="https://github.com/rails/rails/commit/9482554f31f3ac7f941e6239890c60fcc01975e1">git commit page</a> you’ll see a small debate about whether or not “append” and “prepend” are actually a good idea at all, since they probably belong in Rails core, and not just in ActiveSupport. Wow &ndash; DHH can’t even make a tiny change without sparking a minor debate! However, the point is: why in the world have I selected to highlight this small Rails commit among all the other thousands of commits DHH has made over the years?</p>
-
+<p>Here DHH has added a couple of new aliases - or alternative method names - for the commonly used Array operations of <span class="code">&lt;&lt;</span> and <span class="code">unshift</span>, which have somewhat confusing names in core Ruby. His code comments say it all: “The human way of thinking about...” He felt these aliases better reflected the way developers - humans - think about these Array operations and made the change in ActiveSupport to allow Rails apps, at least, to be more readable.</p>
+<p>Yes, all there is to this commit are a couple calls to <span class="code">alias_method</span> and nothing more. What real value is there here? It seems like a minor detail not worth mentioning at all - in fact, if you open the <a href="https://github.com/rails/rails/commit/9482554f31f3ac7f941e6239890c60fcc01975e1">git commit page</a> you’ll see a small debate about whether or not “append” and “prepend” are actually a good idea at all, since they probably belong in Rails core, and not just in ActiveSupport. Wow - DHH can’t even make a tiny change without sparking a minor debate! However, the point is: why in the world have I selected to highlight this small Rails commit among all the other thousands of commits DHH has made over the years?</p>
 <p>Well, to me it shows his passion: 8 years later DHH still cares enough about Rails to think of, write, test and commit a change this small. In my mind DHH invented the fastest race car on the block, and he seems to be the sort of guy you would see out there on a Summer weekend afternoon shining up the chrome on his front bumper or hubcap! I ask myself: “Do I treat my code with the same amount of love and care?” “Have I gone back to an app I wrote years ago to make a change this simple, just for the sake of readability?”</p>
-
-<p>The accompanying test code is also super simple &ndash; but at the same time very readable and explanatory:</p>
-
+<p>The accompanying test code is also super simple - but at the same time very readable and explanatory:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/12/6/9482554_tests.png" alt="9482554 tests" /></p>
-
-<p> Reading this I know exactly what “append” and “prepend” do, and how to use them. No documentation needed; end of story.</p>
-
+<p>Reading this I know exactly what “append” and “prepend” do, and how to use them. No documentation needed; end of story.</p>
 <h2>Code Gardening</h2>
-
 <div style="float: right; padding: 15px 0px 10px 15px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/weeding.jpg"></td></tr>
 </table>
 </div>
-
-
-<p>Another Rails commit that I came across this week is <a href="https://github.com/rails/rails/commit/fb6b80562041e8d2378cad1b51f8c234fe76fd5e">fb6b805 &ndash; code gardening: we have assert_(nil|blank|present), more concise, with better default failure messages &ndash; let&rsquo;s use them</a>, made by <a href="http://hashref.com/">Xavier Noria (@fxn)</a>, back in August of 2010. The commit message is certainly memorable: “code gardening&hellip;” what could Xavier be talking about? When I saw this commit message I just had to take a closer look. When I looked at the changes, at first glance they appeared to be nothing&hellip; just a few minor changes to a test file (I&rsquo;m showing two here &ndash; there are more similar changes in the commit):</p>
-
+<p>Another Rails commit that I came across this week is <a href="https://github.com/rails/rails/commit/fb6b80562041e8d2378cad1b51f8c234fe76fd5e">fb6b805 - code gardening: we have assert_(nil|blank|present), more concise, with better default failure messages - let's use them</a>, made by <a href="http://hashref.com/">Xavier Noria (@fxn)</a>, back in August of 2010. The commit message is certainly memorable: “code gardening...” what could Xavier be talking about? When I saw this commit message I just had to take a closer look. When I looked at the changes, at first glance they appeared to be nothing... just a few minor changes to a test file (I'm showing two here - there are more similar changes in the commit):</p>
 <p><img src="http://patshaughnessy.net/assets/2011/12/6/fb6b805.png" alt="fb6b805" /></p>
-
-<p>What? Yes, I know; now you’re thinking: “Pat is completely nuts.” This is a trivial change that adds no value whatsoever to Rails at all! Just last week Xavier made the fantastic change to ActiveRecord that I mentioned above, git commit <a href="https://github.com/rails/rails/commit/0306f82e0c3cda3aad1b45eb0c3a359c254b62cc">0306f82</a>, that implements automatic explain plans for slow queries&hellip; doesn’t this creative, useful change from Xavier deserve more attention than a very minor refactor that no one even noticed from 2010? Commit <a href="https://github.com/rails/rails/commit/fb6b80562041e8d2378cad1b51f8c234fe76fd5e">fb6b805</a> does nothing more than change a few lines of test code &ndash; what’s the value in that? With this commit he hasn’t added even a single feature or bug fix to Rails. Not only that, the tests don’t run faster or work any better than they did before his change, except possibly they might display a more helpful error message.</p>
-
-<p>But I found Xavier’s commit message to be noteworthy &ndash; more than that &ndash; profound. I think it’s a fascinating analogy: he views his role as a Rails core committer to be similar to that of a gardener. He has something beautiful and alive that he’s been trusted to take care of. Like a real garden, the Rails source code would become full of weeds, grow out of control, or worse yet actually die, if it weren’t for the constant attention and care he and the rest of the core team give to the Rails code base. In addition to adding new features to Rails, Xavier also takes the time to keep a close eye on the small details that most people wouldn’t even notice. Seeing this commit, I asked myself: “When was the last time I went through my test code, looking for places where things weren’t quite right, or as clean as they could be?”</p>
-
+<p>What? Yes, I know; now you’re thinking: “Pat is completely nuts.” This is a trivial change that adds no value whatsoever to Rails at all! Just last week Xavier made the fantastic change to ActiveRecord that I mentioned above, git commit <a href="https://github.com/rails/rails/commit/0306f82e0c3cda3aad1b45eb0c3a359c254b62cc">0306f82</a>, that implements automatic explain plans for slow queries... doesn’t this creative, useful change from Xavier deserve more attention than a very minor refactor that no one even noticed from 2010? Commit <a href="https://github.com/rails/rails/commit/fb6b80562041e8d2378cad1b51f8c234fe76fd5e">fb6b805</a> does nothing more than change a few lines of test code - what’s the value in that? With this commit he hasn’t added even a single feature or bug fix to Rails. Not only that, the tests don’t run faster or work any better than they did before his change, except possibly they might display a more helpful error message.</p>
+<p>But I found Xavier’s commit message to be noteworthy - more than that - profound. I think it’s a fascinating analogy: he views his role as a Rails core committer to be similar to that of a gardener. He has something beautiful and alive that he’s been trusted to take care of. Like a real garden, the Rails source code would become full of weeds, grow out of control, or worse yet actually die, if it weren’t for the constant attention and care he and the rest of the core team give to the Rails code base. In addition to adding new features to Rails, Xavier also takes the time to keep a close eye on the small details that most people wouldn’t even notice. Seeing this commit, I asked myself: “When was the last time I went through my test code, looking for places where things weren’t quite right, or as clean as they could be?”</p>
 <p>Another example of Xavier serving as a “code gardener” is commit <a href="https://github.com/rails/rails/commit/d352e0dff2c88bc1519ee7040b8381231b2b2fac">d352e0d</a>. In this case, the commit message is again the most interesting part of the commit! Take a look:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 commit d352e0dff2c88bc1519ee7040b8381231b2b2fac
-Author: Xavier Noria &lt;fxn@hashref.com&gt;
+Author: Xavier Noria <fxn@hashref.com>
 Date:   Sat Jul 23 14:41:30 2011 +0200
 
     checked all .rb files in the project tree for missing magic comments, one was missing
@@ -124,207 +50,73 @@ Date:   Sat Jul 23 14:41:30 2011 +0200
         xargs -n1 ruby -0777 -ne 'puts $FILENAME if $_ !~ /#.*coding:\s*utf/i'
     
     Welcome $_.
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>If you <a href="https://github.com/rails/rails/commit/d352e0dff2c88bc1519ee7040b8381231b2b2fac">open the commit</a> in github, you’ll see:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/12/6/d352e0d.png" alt="d352e0d" /></p>
-
-<p>In this example, there aren’t even any Ruby code changes at all!  What Xavier has done here is run a search through the Rails source tree to find Ruby code files that were  missing the UTF-8 encoding comment at the top. Whatever you think of this style and the need to include this comment in every file, what impresses me about this is that Xavier, in his code gardener role, took the time to write a shell script to search for this mistake. He showed interest, concern, initiative, and passion &ndash; like a gardener would have while removing weeds from a flower bed.</p>
-
+<p>In this example, there aren’t even any Ruby code changes at all!  What Xavier has done here is run a search through the Rails source tree to find Ruby code files that were  missing the UTF-8 encoding comment at the top. Whatever you think of this style and the need to include this comment in every file, what impresses me about this is that Xavier, in his code gardener role, took the time to write a shell script to search for this mistake. He showed interest, concern, initiative, and passion - like a gardener would have while removing weeds from a flower bed.</p>
 <p>If you’re interested, there’s another similar commit, <a href="https://github.com/rails/rails/commit/b451de0d6de4df6bc66b274cec73b919f823d5ae">b451de0</a>, made by <a href="https://github.com/spastorino">Santiago Pastorino</a> also in August 2010, that removed extra, trailing whitespace. Like Xavier, he also saved the shell script he used in the commit message:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 commit b451de0d6de4df6bc66b274cec73b919f823d5ae
-Author: Santiago Pastorino &lt;santiago@wyeworks.com&gt;
+Author: Santiago Pastorino <santiago@wyeworks.com>
 Date:   Sat Aug 14 02:13:00 2010 -0300
 
     Deletes trailing whitespaces (over text files only find * -type f -exec sed 's/[ \t]*$//' -i {} \;)
-</pre></div>
-</div>
-
-
-
+</pre>
 <h2>Code that teaches you something</h2>
-
 <div style="float: right; padding: 15px 0px 10px 15px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/chalkboard.jpg"></td></tr>
 </table>
 </div>
-
-
 <p>The last Rails code commit I’ll talk about today is also in ActiveSupport, and has to do with the ActiveSupport::Concern module. For some background on what it does refer to the <a href="http://api.rubyonrails.org/classes/ActiveSupport/Concern.html">Ruby on Rails API docs page</a>. In a nutshell, ActiveSupport::Concern makes it easier to write a module that extends the class methods and/or the instance methods of another module. This is used extensively in ActiveRecord, among many other places in Rails, and is a great tool for gem authors to use while overriding existing behavior.</p>
-
 <p>To repeat some of the info from the docs page, the way you typically use ActiveSupport::Concern would be to write a module like this:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">module</span> <span class="class">MyModule</span>
-  extend <span class="constant">ActiveSupport</span>::<span class="constant">Concern</span>
-  <span class="keyword">module</span> <span class="class">ClassMethods</span>
-    ...
-  <span class="keyword">end</span>
-  <span class="keyword">module</span> <span class="class">InstanceMethods</span>
-    ...
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">module </span><span style="color:#000000;">MyModule
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">extend </span><span style="color:#008080;">ActiveSupport</span><span style="color:#000000;">::Concern
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">module </span><span style="color:#000000;">ClassMethods
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">...
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">module </span><span style="color:#000000;">InstanceMethods
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">...
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Now if you include “MyModule” in some other module, for example in “Host” to use the same name as the API docs page, like this:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Host
+</span><span style="color:#343d46;">  </span><span style="color:#795da3;">include </span><span style="color:#000000;">MyModule
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Host</span>
-  include <span class="constant">MyModule</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
-
-<p>&hellip;ActiveSupport::Concern will add all the methods in MyModule::ClassMethods to Host as new class methods, and the methods in MyModule::InstanceMethods to Host as new instance methods.</p>
-
-<p>Now let&rsquo;s take a look at commit <a href="https://github.com/rails/rails/commit/401393b6561adc1ce7101945163c9601257c057a">401393b</a> made by José Valim just last month:</p>
-
+<p>...ActiveSupport::Concern will add all the methods in MyModule::ClassMethods to Host as new class methods, and the methods in MyModule::InstanceMethods to Host as new instance methods.</p>
+<p>Now let's take a look at commit <a href="https://github.com/rails/rails/commit/401393b6561adc1ce7101945163c9601257c057a">401393b</a> made by José Valim just last month:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/12/6/401393b_message.png" alt="d352e0d" /></p>
-
 <p>I love the commit message, but what I like more is that this commit helps me be a better Rails developer. It turns out the InstanceMethods module is unnecessary. Simply adding methods to MyModule is sufficient; any methods in MyModule will be included in Host because of the call to include (class methods, however, still work the same way as before). Let’s take a look at José’s code changes:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/12/6/401393b.png" alt="d352e0d" /></p>
-
 <p>There are more changes I’m not showing here; <a href="https://github.com/rails/rails/commit/401393b6561adc1ce7101945163c9601257c057a">refer to github</a> for the complete commit. What’s interesting and helpful about this is that José deprecates the behavior related to the InstanceMethods module: that is, he leaves it in, but takes the time to add a line of code that displays this message whenever a developer uses InstanceMethods:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 The InstanceMethods module inside ActiveSupport::Concern will be no longer included automatically. Please
 define instance methods directly in #{base} instead.
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>For me this is a masterful commit. José has:</p>
-
 <ul>
   <li>Found something verbose and unnecessary in a pattern Rails developers typically use,</li>
   <li>Developed a plan to remove it, and:</li>
   <li>Made a change that informs other developers what they are doing wrong and how they could improve, while retaining the existing API contract so Rails apps don't break unnecessarily.</li>
 </ul>
-
-
 <p>In other words, José has written code that can teach us all something! Fantastic! On my projects, I’m content with just getting something to work; if I work hard then I can usually manage to write something in a test driven manner and be sure it works. However, I’ve never written code that would anticipate what other developers who are using my code would do wrong and teach them something! In fact, until seeing this commit I don’t think I could ever have even imagined trying to do this!</p>
-
 <p>There are many other examples of this sort of deprecation message in Rails; this is just one of the latest. The Rails core team is not only concerned with their code, but our code!</p>
-
 <h2>Which are your favorite Rails commits?</h2>
-
 <p>I hope the Rails commits I’ve highlighted here today will inspire you to be a better developer! Beyond just showing coding talent, these commits speak to a philosophy and mindset that I think we can all learn from.</p>
-
 <p>However, there are thousands and thousands of commits in Rails: lots of other good examples of great code,  elegant solutions to difficult problems, sophisticated testing techniques, etc., etc. Which are you favorites? Where should we all look in Rails to learn something? Leave a comment and let all of us know!</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Learning from the masters: some of my favorite Rails commits';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Learning from the masters: some of my favorite Rails commits';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Learning from the masters: some of my favorite Rails commits';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

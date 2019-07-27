@@ -1,144 +1,69 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Contributing a new scaffold to ScaffoldHub - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Contributing a new scaffold to ScaffoldHub - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Contributing a new scaffold to ScaffoldHub</h1>
-  
-    <div class="metadata">
-    <span class="date">April 30th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/4/30/contributing-a-new-scaffold-to-scaffoldhub" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Contributing a new scaffold to ScaffoldHub">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>Last month I launched <a href="http://scaffoldhub.org">http://scaffoldhub.org</a>, a gallery of different Rails scaffolding generators. Initially I posted three scaffolds myself to get the site started.</p>
-
-<p>I just updated the site now to allow anyone to login and contribute new scaffolds&hellip; if you like the idea please think about contributing a scaffold! I hope it can someday become a helpful resource for the Rails community. If you do decide to try to write and contribute a scaffold: thanks! Please contact me anytime and I’ll try my best to answer any questions, improve the process or fix bugs.</p>
-
-<p>To lower the bar for contributing, I looked for a design that hopefully makes it very easy to write and post a new scaffold generator; in fact, you don’t even need to write a generator at all. Read on to learn more&hellip;</p>
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Contributing a new scaffold to ScaffoldHub - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Contributing a new scaffold to ScaffoldHub</h1><div class="metadata"><span class="date">April 30th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/4/30/contributing-a-new-scaffold-to-scaffoldhub" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Contributing a new scaffold to ScaffoldHub">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>Last month I launched <a href="http://scaffoldhub.org">http://scaffoldhub.org</a>, a gallery of different Rails scaffolding generators. Initially I posted three scaffolds myself to get the site started.</p>
+<p>I just updated the site now to allow anyone to login and contribute new scaffolds... if you like the idea please think about contributing a scaffold! I hope it can someday become a helpful resource for the Rails community. If you do decide to try to write and contribute a scaffold: thanks! Please contact me anytime and I’ll try my best to answer any questions, improve the process or fix bugs.</p>
+<p>To lower the bar for contributing, I looked for a design that hopefully makes it very easy to write and post a new scaffold generator; in fact, you don’t even need to write a generator at all. Read on to learn more...</p>
 <h2>Step 1: Create an account on scaffoldhub.org</h2>
-
 <p>You can create a new account on ScaffoldHub by clicking the “sign up” link on the top left:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/4/30/sign_up.png" alt="sign up" /></p>
-
 <p>The site will take a username and password, and optionally an email address and home page URL:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/4/30/sign_up_form.png" alt="sign up form" /></p>
-
 <p>If you provide an email address, ScaffoldHub will display your gravatar next to all the scaffolds that you create. And if you have a blog or home page, enter that URL and ScaffoldHub will display your username as a link to that site.</p>
-
 <p>Later you provide your credentials on the command line when you push your new scaffold up to ScaffoldHub using the scaffoldhub gem.</p>
-
 <h2>Step 2: Write your new scaffold</h2>
-
 <p>To write a new scaffold for ScaffoldHub, you first need to write a Ruby code file called a “scaffold spec.” Here’s an example:</p>
-
 <div class="CodeRay">
   <div class="code"><pre><span class="co">Scaffoldhub</span>::<span class="co">Specification</span>.new <span class="r">do</span> 
- 
-  <span class="c"># Github URL where you will post your scaffold - the specified folder must contain this file</span> 
-  base_url  <span class="s"><span class="dl">'</span><span class="k">https://github.com/your_name/your_repo</span><span class="dl">'</span></span> 
- 
-  <span class="c"># The name of your new scaffold: should be a single word</span> 
-  name <span class="s"><span class="dl">'</span><span class="k">example</span><span class="dl">'</span></span> 
- 
-  <span class="c"># Metadata about this scaffold - these values are only used for display on scaffoldhub.org:</span> 
-  metadata <span class="r">do</span> 
- 
-    <span class="c"># A short paragraph describing what this scaffold does</span> 
-    description <span class="s"><span class="dl">'</span><span class="k">The example scaffold.</span><span class="dl">'</span></span> 
- 
-    <span class="c"># 4x3 aspect ratio screen shot</span> 
-    screenshot <span class="s"><span class="dl">'</span><span class="k">example_screenshot.png</span><span class="dl">'</span></span> 
- 
-    <span class="c"># Tag(s) to help scaffoldhub.org users find your scaffold</span> 
-    tag <span class="s"><span class="dl">'</span><span class="k">jquery</span><span class="dl">'</span></span> 
-    tag <span class="s"><span class="dl">'</span><span class="k">autocomplete</span><span class="dl">'</span></span> 
- 
-    <span class="c"># Optionally specify an example of a scaffold parameter</span> 
-    parameter_example <span class="s"><span class="dl">'</span><span class="k">FIELD_NAME</span><span class="dl">'</span></span> 
- 
-    <span class="c"># Optionally post a link to an article you write explaining how the scaffold works.</span> 
-    blog_post <span class="s"><span class="dl">'</span><span class="k">http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub</span><span class="dl">'</span></span> 
-  <span class="r">end</span> 
- 
-  <span class="c"># Define a model template - this ERB file will be used to generate a new</span> 
-  <span class="c"># model class with this path &amp; filename: app/models/NAME.rb</span> 
-  model <span class="s"><span class="dl">'</span><span class="k">templates/model.rb</span><span class="dl">'</span></span> 
- 
-  <span class="c"># Define an ActiveRecord migration template - this ERB file will be used to generate a new</span> 
-  <span class="c"># migration class with this path &amp; filename: db/migrate/TIMESTAMP_create_PLURAL_NAME.rb</span> 
-  migration <span class="s"><span class="dl">'</span><span class="k">templates/migration.rb</span><span class="dl">'</span></span> 
- 
-  <span class="c"># Define a controller template - this ERB file will be used to generate a new</span> 
-  <span class="c"># controller class with this path &amp; filename: app/controllers/PLURAL_NAME.rb</span> 
-  controller <span class="s"><span class="dl">'</span><span class="k">templates/controller.rb</span><span class="dl">'</span></span> 
- 
-  <span class="c"># You can use &quot;with_options&quot; to specify the same source folder for a series of templates.</span> 
-  <span class="c"># You can also specify the same destination folder using the :dest option,</span> 
-  <span class="c"># or just use the :src and :dest options separately on each keyword.</span> 
-  with_options <span class="sy">:src</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">templates</span><span class="dl">'</span></span> <span class="r">do</span> 
-    view <span class="s"><span class="dl">'</span><span class="k">_form.html.erb</span><span class="dl">'</span></span> 
-    view <span class="s"><span class="dl">'</span><span class="k">new.html.erb</span><span class="dl">'</span></span> 
-    view <span class="s"><span class="dl">'</span><span class="k">edit.html.erb</span><span class="dl">'</span></span> 
-    view <span class="s"><span class="dl">'</span><span class="k">index.html.erb</span><span class="dl">'</span></span> 
-    view <span class="s"><span class="dl">'</span><span class="k">show.html.erb</span><span class="dl">'</span></span> 
-  <span class="r">end</span> 
- 
-  <span class="c"># Other keywords available are:</span> 
- 
-  <span class="c"># Define any other generic template - this ERB file will be used to generate</span> 
-  <span class="c"># a new file - the dest option is required to indicate where to put the new file</span> 
-  <span class="c"># template 'xyz.html.erb', :dest =&gt; 'path/to/xyz.html'</span> 
- 
-  <span class="c"># Copy any file without running an ERB transformation</span> 
-  <span class="c"># file 'xyz.html', :dest =&gt; 'path/to/xyz.html'</span> 
- 
-<span class="r">end</span></pre></div>
+<p><span class="c"># Github URL where you will post your scaffold - the specified folder must contain this file</span>
+base_url  <span class="s"><span class="dl">'</span><span class="k">https://github.com/your_name/your_repo</span><span class="dl">'</span></span></p>
+<p><span class="c"># The name of your new scaffold: should be a single word</span>
+name <span class="s"><span class="dl">'</span><span class="k">example</span><span class="dl">'</span></span></p>
+<p><span class="c"># Metadata about this scaffold - these values are only used for display on scaffoldhub.org:</span>
+metadata <span class="r">do</span></p>
+<pre><code>&lt;span class=&quot;c&quot;&gt;# A short paragraph describing what this scaffold does&lt;/span&gt; 
+description &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;The example scaffold.&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
+
+&lt;span class=&quot;c&quot;&gt;# 4x3 aspect ratio screen shot&lt;/span&gt; 
+screenshot &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;example_screenshot.png&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
+
+&lt;span class=&quot;c&quot;&gt;# Tag(s) to help scaffoldhub.org users find your scaffold&lt;/span&gt; 
+tag &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;jquery&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
+tag &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;autocomplete&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
+
+&lt;span class=&quot;c&quot;&gt;# Optionally specify an example of a scaffold parameter&lt;/span&gt; 
+parameter_example &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;FIELD_NAME&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
+
+&lt;span class=&quot;c&quot;&gt;# Optionally post a link to an article you write explaining how the scaffold works.&lt;/span&gt; 
+blog_post &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
+</code></pre>
+<p><span class="r">end</span></p>
+<p><span class="c"># Define a model template - this ERB file will be used to generate a new</span>
+<span class="c"># model class with this path &amp; filename: app/models/NAME.rb</span>
+model <span class="s"><span class="dl">'</span><span class="k">templates/model.rb</span><span class="dl">'</span></span></p>
+<p><span class="c"># Define an ActiveRecord migration template - this ERB file will be used to generate a new</span>
+<span class="c"># migration class with this path &amp; filename: db/migrate/TIMESTAMP_create_PLURAL_NAME.rb</span>
+migration <span class="s"><span class="dl">'</span><span class="k">templates/migration.rb</span><span class="dl">'</span></span></p>
+<p><span class="c"># Define a controller template - this ERB file will be used to generate a new</span>
+<span class="c"># controller class with this path &amp; filename: app/controllers/PLURAL_NAME.rb</span>
+controller <span class="s"><span class="dl">'</span><span class="k">templates/controller.rb</span><span class="dl">'</span></span></p>
+<p><span class="c"># You can use &quot;with_options&quot; to specify the same source folder for a series of templates.</span>
+<span class="c"># You can also specify the same destination folder using the :dest option,</span>
+<span class="c"># or just use the :src and :dest options separately on each keyword.</span>
+with_options <span class="sy">:src</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">templates</span><span class="dl">'</span></span> <span class="r">do</span>
+view <span class="s"><span class="dl">'</span><span class="k">_form.html.erb</span><span class="dl">'</span></span>
+view <span class="s"><span class="dl">'</span><span class="k">new.html.erb</span><span class="dl">'</span></span>
+view <span class="s"><span class="dl">'</span><span class="k">edit.html.erb</span><span class="dl">'</span></span>
+view <span class="s"><span class="dl">'</span><span class="k">index.html.erb</span><span class="dl">'</span></span>
+view <span class="s"><span class="dl">'</span><span class="k">show.html.erb</span><span class="dl">'</span></span>
+<span class="r">end</span></p>
+<p><span class="c"># Other keywords available are:</span></p>
+<p><span class="c"># Define any other generic template - this ERB file will be used to generate</span>
+<span class="c"># a new file - the dest option is required to indicate where to put the new file</span>
+<span class="c"># template 'xyz.html.erb', :dest =&gt; 'path/to/xyz.html'</span></p>
+<p><span class="c"># Copy any file without running an ERB transformation</span>
+<span class="c"># file 'xyz.html', :dest =&gt; 'path/to/xyz.html'</span></p>
+<p><span class="r">end</span></pre></div></p>
 </div>
-
-
-<p>As you can see, this file describes in a simple way what files your scaffold will generate on the end user&rsquo;s machine. It refers to a series of ERB templates that you would write also. In the “metadata” section, the scaffold spec provides some additional info that is only used for display purposes on scaffoldhub.org.</p>
-
+As you can see, this file describes in a simple way what files your scaffold will generate on the end user's machine. It refers to a series of ERB templates that you would write also. In the “metadata” section, the scaffold spec provides some additional info that is only used for display purposes on scaffoldhub.org.
 <p>The scaffoldhub gem provides a generator called “new_scaffold” to help save you some typing; run it inside of any Rails 3 app to generate the scaffold spec above along with a copy of the standard Rails scaffold generator ERB templates that are mentioned in the example spec:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>
 $ rails generate new_scaffold example
@@ -154,16 +79,10 @@ $ rails generate new_scaffold example
       <span class="s">create</span>  example_scaffold/templates/controller.rb
 </pre></div>
 </div>
-
-
 <p>This example screenshot image is also generated:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/4/30/example_screenshot.png" alt="example screenshot" /></p>
-
 <h2>Step 3: Test your new scaffold locally</h2>
-
-<p>Before pushing your new scaffold to ScaffoldHub, you should test that it works locally. To do this, run the scaffoldhub generator with the “&mdash;local” option set, and specify the local path of the scaffold spec file as the scaffold, for example like this:</p>
-
+<p>Before pushing your new scaffold to ScaffoldHub, you should test that it works locally. To do this, run the scaffoldhub generator with the “--local” option set, and specify the local path of the scaffold spec file as the scaffold, for example like this:</p>
 <div class="CodeRay">
   <div class="code"><pre>
 $ rails generate scaffoldhub person name:string --scaffold example_scaffold/scaffold_spec.rb --local
@@ -193,136 +112,32 @@ $ rails generate scaffoldhub person name:string --scaffold example_scaffold/scaf
       <span class="s">create</span>    public/stylesheets/scaffold.css
 </pre></div>
 </div>
-
-
 <p>You might get errors here if there are mistakes in the scaffold spec file, or in one of the ERB templates, for example. Fix and repeat as necessary. Once the scaffoldhub generator runs cleanly, then you can test that your generated scaffolding code also works.</p>
-
 <p>Also be sure to take a screen shot so people can see what your new scaffolding will look like on scaffoldhub.org, even before they run it. On a Mac you can use Cmd-Shift-F4 to capture part of your screen; try to capture or crop your screen shot image so that it uses a 4x3 aspect ratio. Then save this image into your new scaffold folder and reference it the scaffold spec, similar to the example_screenshot.png file generated above.</p>
-
 <h2>Step 4: Push your new scaffold code to github</h2>
-
 <p>The ScaffoldHub generator works by downloading your ERB template files onto the end user’s machine. To make this possible you need to post your scaffold template files somewhere online; github is the natural choice for this. Posting your ERB template files on github also allows end users to see what code will be run when they install your scaffold.</p>
-
 <p>To do this, type in your github repo’s URL into the scaffold spec file as the value for “base_url,” like this:</p>
-
 <div class="CodeRay">
   <div class="code"><pre><span class="c"># Github URL where you will post your scaffold - the specified folder must contain this file</span> 
 base_url  <span class="s"><span class="dl">'</span><span class="k">https://github.com/your_name/your_repo</span><span class="dl">'</span></span></pre></div>
 </div>
-
-
 <p>Then push your scaffold spec file along with your ERB templates to this repo. Be sure that the relative location of each of the ERB templates specified in the scaffold spec is correct, and that the base_url indicates the github repo folder that contains the scaffold spec file.</p>
-
 <p>As an example, the three scaffolds I’ve posted so far on ScaffoldHub are located on github here: <a href="https://github.com/patshaughnessy/scaffolds">https://github.com/patshaughnessy/scaffolds</a>. You could even just fork my scaffolds repo and use that as a starting point for writing a new scaffold.</p>
-
 <h2>Step 5: Push your new scaffold to scaffoldhub.org</h2>
-
 <p>Finally, you can push the new scaffold to scaffoldhub.org by using a single command:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>$ scaffoldhub push example_scaffold/scaffold_spec.rb</pre></div>
 </div>
-
-
 <p>When you run this command, you will have to provide your scaffoldhub.org credentials. Also, the scaffoldhub gem will validate that all of the ERB templates and the screen shot image file specified in the scaffold spec are present on github in the correct locations relative to the base_url you indicated.</p>
-
 <p>If everything looks good, then the ScaffoldHub gem will compile your scaffold spec and post it to the site, and you should be able to see your new scaffold at this URL:</p>
-
 <p>http://scaffoldhub.org/scaffolds/[NAME]</p>
-
-<p>&hellip; and end users will immediately be able to use it in their apps!</p>
-
-<p>If you later discover a mistake, or just decide to change how the scaffold works or looks, then you just need to update the ERB templates in your github repo&hellip; no need to re-push the scaffold. If you make a change to the scaffold spec or screenshot image file, just repeat the “scaffoldhub push” command to recompile it and update the info on scaffoldhub.org immediately.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2011/4/30/contributing-a-new-scaffold-to-scaffoldhub';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Contributing a new scaffold to ScaffoldHub';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2011/4/30/contributing-a-new-scaffold-to-scaffoldhub';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Contributing a new scaffold to ScaffoldHub';
-    (function () {
+<p>... and end users will immediately be able to use it in their apps!</p>
+<p>If you later discover a mistake, or just decide to change how the scaffold works or looks, then you just need to update the ERB templates in your github repo... no need to re-push the scaffold. If you make a change to the scaffold spec or screenshot image file, just repeat the “scaffoldhub push” command to recompile it and update the info on scaffoldhub.org immediately.</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2011/4/30/contributing-a-new-scaffold-to-scaffoldhub'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Contributing a new scaffold to ScaffoldHub';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on ScaffoldHub</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2011/3/13/view-mapper-for-rails-3-scaffoldhub">View Mapper for Rails 3: ScaffoldHub</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on ScaffoldHub</div><div class="links"><ul><li><a href="2011/3/13/view-mapper-for-rails-3-scaffoldhub">View Mapper for Rails 3: ScaffoldHub</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

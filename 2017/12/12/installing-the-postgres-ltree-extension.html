@@ -1,56 +1,6 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Installing the Postgres LTREE Extension - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Installing the Postgres LTREE Extension - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Installing the Postgres LTREE Extension</h1>
-  
-    <div class="metadata">
-    <span class="date">December 12th 2017</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Installing the Postgres LTREE Extension">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Installing the Postgres LTREE Extension - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Installing the Postgres LTREE Extension</h1><div class="metadata"><span class="date">December 12th 2017</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Installing the Postgres LTREE Extension">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2017/12/12/tree2.jpg">
 </div>
-
-
 <p>Hidden inside of your Postgres server is code that provides special SQL
 operators and functions designed to support tree operations. It’s called the
 <a href="https://www.postgresql.org/docs/current/static/ltree.html">LTREE extension</a>.
@@ -58,39 +8,27 @@ I’m guessing this stands for <em>left-tree</em>. In <a href="http://patshaughn
 post</a>, I’ll
 write about some of these functions and operators: what they do and how to use
 them.</p>
-
 <p>But first, where is the LTREE extension? How can you install and start using it? Read on to
 find out.</p>
-
 <h2>Testing Whether the LTREE Extension is Installed</h2>
-
 <p>Depending on where you downloaded Postgres from and how you installed it, you
 may have already installed LTREE with Postgres. To find out, execute this SQL
 statement:</p>
-
 <pre>
 => create extension ltree;
 CREATE EXTENSION
 </pre>
-
-
 <p>If you see the “CREATE EXTENSION” message like this, then you’re all set! LTREE
 was already installed and you just enabled it. Skip to my next post to find out
 what it can do and how to use it.</p>
-
 <p>Or if you see:</p>
-
 <pre>
 => create extension ltree;
 ERROR:  extension "ltree" already exists
 </pre>
-
-
 <p>…then your Postgres server already had LTREE enabled.</p>
-
 <p>FYI The <span class="code">pg_available_extensions</span> table will show you
 all the Postgres extensions that are available and installed in your server:</p>
-
 <pre>
 select * from pg_available_extensions;
 
@@ -100,60 +38,43 @@ select * from pg_available_extensions;
  plpgsql | 1.0             | 1.0               | PL/pgSQL procedural language
 (2 rows)
 </pre>
-
-
 <p>As you can see, “ltree” already appears in my server’s list. The value “1.1”
 for <span class="code">installed_version</span> indicates that I’ve already
 enabled it too. This would have been blank before running the <span
 class="code">create extension ltree</span> command above.</p>
-
 <p>I originally installed a local copy of Postgres on my Mac using Homebrew, and I
 was happy to find that the Homebrew Postgres formula does include steps to
 build and install LTREE, after building the rest of the Postgres server. But I
 still needed to enable it using <span class="code">create extension</span>.</p>
-
 <h2>Using LTREE on a Shared Postgres Server</h2>
-
 <p>Running the <span class="code">create extension ltree</span> command may fail
 with this error message:</p>
-
 <pre>
 => create extension ltree;
 ERROR:  permission denied to create extension "ltree"
 HINT:  Must be superuser to create this extension.
 </pre>
-
-
 <p>Enabling Postgres extensions requires super user access. If you’re using a
 shared Postgres server and don’t have super-user access, you’ll need to find
 someone who does. Or you may just need to login to Postgres using the proper
 Postgres user account.</p>
-
 <h2>How to Install the LTREE Extension</h2>
-
 <p>Running the <span class="code">create extension</span> command may also fail
 with this error message:</p>
-
 <pre>
 => create extension ltree;
 ERROR:  could not open extension control file "/usr/local/pgsql/share/extension/ltree.control": No such file or directory
 </pre>
-
-
 <p>This error means the LTREE code isn’t even installed on your Postgres server.
 If you’re running on Linux and installed Postgres using a package manager, you
 may have to install a second package called “postgresql-contrib.”</p>
-
 <p>If you installed Postgres from source yourself, then you will see this error
 message because the Postgres Makefile doesn’t compile and install LTREE by
 default. Don’t worry! It turns out the Postgres source tree already contains
 the code for LTREE and many other extensions in a subdirectory called
 “contrib.”</p>
-
 <p><img src="http://patshaughnessy.net/assets/2017/12/12/ltree-source.png"></p>
-
 <p>Compile it as follows:</p>
-
 <pre>
 $ cd /path/to/postgres-9.6.5/contrib/ltree
 $ make
@@ -171,113 +92,19 @@ $ sudo make install
 /usr/bin/install -c -m 644 ./ltree.control '/usr/local/pgsql/share/extension/'
 /usr/bin/install -c -m 644 ./ltree--1.1.sql ./ltree--1.0--1.1.sql ./ltree--unpackaged--1.0.sql  ‘/usr/local/pgsql/share/extension/'
 </pre>
-
-
 <p>You can see above the install step copied the ltree.so library into my Postgres
 server’s lib directory: /usr/local/pgsql/lib, and ran a couple other commands
 as well. Now I can run the <span class="code">create extension ltree</span>
 command as shown above. I don’t even need to restart Postgres; it will find and
 load ltree.so automatically.</p>
-
 <p>Now that you have LTREE installed and enabled, you can read <a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">my next
 post</a>, I’ll
 to learn how to use it.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Installing the Postgres LTREE Extension';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Installing the Postgres LTREE Extension';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Installing the Postgres LTREE Extension';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on the Postgres LTREE Extension</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2017/12/15/looking-inside-postgres-at-a-gist-index">Looking Inside Postgres at a GiST Index</a></li>
-                  
-                    <li><a href="/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension">Manipulating Trees Using SQL and the Postgres LTREE Extension</a></li>
-                  
-                    <li><a href="/2017/12/13/saving-a-tree-in-postgres-using-ltree">Saving a Tree in Postgres Using LTREE</a></li>
-                  
-                    <li><a href="/2017/12/11/trying-to-represent-a-tree-structure-using-postgres">Trying to Represent a Tree Structure Using Postgres</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on the Postgres LTREE Extension</div><div class="links"><ul><li><a href="2017/12/15/looking-inside-postgres-at-a-gist-index">Looking Inside Postgres at a GiST Index</a></li><li><a href="2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension">Manipulating Trees Using SQL and the Postgres LTREE Extension</a></li><li><a href="2017/12/13/saving-a-tree-in-postgres-using-ltree">Saving a Tree in Postgres Using LTREE</a></li><li><a href="2017/12/11/trying-to-represent-a-tree-structure-using-postgres">Trying to Represent a Tree Structure Using Postgres</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

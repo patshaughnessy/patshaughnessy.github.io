@@ -1,471 +1,244 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Getting started with Ruby metaprogramming - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Getting started with Ruby metaprogramming - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Getting started with Ruby metaprogramming - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Getting started with Ruby metaprogramming</h1><div class="metadata"><span class="date">February 20th 2010</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2010/2/20/getting-started-with-ruby-metaprogramming" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Getting started with Ruby metaprogramming">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>The <a href="http://github.com/rails/auto_complete">Rails auto_complete plugin</a> was my first exposure to Ruby metaprogramming. It&rsquo;s code was simple enough for a Rails beginner like me to understand, but also just complex enough for me to learn something new. Specifically, I ran into metaprogramming when I took a close look at the &ldquo;auto_complete_for&rdquo; method and tried to figure out how it worked. I won&rsquo;t spend any time here explaining what the auto_complete plugin does or what it&rsquo;s used for, beyond to say that if you add this line to one of your controllers:</p>
+  <div class="CodeRay">
+    <div class="code"><pre><span class="r">class</span> <span class="cl">CategoriesController</span> &lt; <span class="co">ApplicationController</span>&#x000A;&#x000A;  auto_complete_for <span class="sy">:category</span>, <span class="sy">:name</span>&#x000A;&#x000A;  etc…</pre></div>
   </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Getting started with Ruby metaprogramming</h1>
-  
-    <div class="metadata">
-    <span class="date">February 20th 2010</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2010/2/20/getting-started-with-ruby-metaprogramming" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>The <a href="http://github.com/rails/auto_complete">Rails auto_complete plugin</a> was my first exposure to Ruby metaprogramming. It&rsquo;s code was simple enough for a Rails beginner like me to understand, but also just complex enough for me to learn something new. Specifically, I ran into metaprogramming when I took a close look at the &ldquo;auto_complete_for&rdquo; method and tried to figure out how it worked. I won&rsquo;t spend any time here explaining what the auto_complete plugin does or what it&rsquo;s used for, beyond to say that if you add this line to one of your controllers:</p>
-
-
-<p>  <div class="CodeRay"></p>
-
-<pre><code>&lt;div class="code"&gt;&lt;pre&gt;&lt;span class="r"&gt;class&lt;/span&gt; &lt;span class="cl"&gt;CategoriesController&lt;/span&gt; &amp;lt; &lt;span class="co"&gt;ApplicationController&lt;/span&gt;&amp;#x000A;&amp;#x000A;  auto_complete_for &lt;span class="sy"&gt;:category&lt;/span&gt;, &lt;span class="sy"&gt;:name&lt;/span&gt;&amp;#x000A;&amp;#x000A;  etc…&lt;/pre&gt;&lt;/div&gt;
-</code></pre>
-
-<p>  </div></p>
-
 <p><br>&hellip; a method called &ldquo;auto_complete_for_category_name&rdquo; will be automatically generated in that controller that will return a list of category records that have a name matching a given search query. This is very cool, and is a typical example of Ruby on Rails magic: you add one line to a class in your application and suddenly an entire feature or behavior is added, customized to the data and objects in your app!</p>
-
-
 <p>This sort of thing is really what makes Ruby on Rails so amazing&hellip; but how does it work? Let&rsquo;s take a look at the implementation of auto_complete_for method:</p>
-
-
-<p><a name='code_snippet0'></p>
-
+<a name='code_snippet0'>
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
-      
-      
-    </div>
-    <div id='header_right'>
-      <a href="#code_snippet1" title="Next code snippet">replace object with :category</a>
-      <a href="#code_snippet1" class="icon" title="Next code snippet"></a>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  &lt;a href=&quot;#code_snippet1&quot; title=&quot;Next code snippet&quot;&gt;replace object with :category&lt;/a&gt;
+  &lt;a href=&quot;#code_snippet1&quot; class=&quot;icon&quot; title=&quot;Next code snippet&quot;&gt;&lt;/a&gt;
 
-    </div>
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class="r">def</span> <span class="fu">auto_complete_for</span>(object, method, options = {})&#x000A;  define_method(<span class="s"><span class="dl">&quot;</span><span class="k">auto_complete_for_</span><span class="il"><span class="idl">#{</span>object<span class="idl">}</span></span><span class="k">_</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="dl">&quot;</span></span>) <span class="r">do</span>&#x000A;    find_options = { &#x000A;      <span class="sy">:conditions</span> =&gt; [&#x000A;                       <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                       <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[object][method].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                     ],&#x000A;      <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k"> ASC</span><span class="dl">&quot;</span></span>,&#x000A;      <span class="sy">:limit</span> =&gt; <span class="i">10</span> }.merge!(options)&#x000A;&#x000A;    <span class="iv">@items</span> = object.to_s.camelize.constantize.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;    render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, '</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;  <span class="r">end</span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
   <p>You can find this code in the <a href="http://github.com/rails/auto_complete/blob/master/lib/auto_complete.rb">lib/auto_complete.rb</a> file inside the <a href="http://github.com/rails/auto_complete">rails/auto_complete</a> repository on github</a>. So what the heck does all of this mean? Let&rsquo;s take a step-by-step look at this code, and see if we can figure it out.</p>
   <p>To get started, let&rsquo;s use the category/name example I used in <a href="http://patshaughnessy.net/2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">my last article</a>, and also that Ryan Bates used in his <a href="http://railscasts.com/episodes/102-auto-complete-association">Auto-Complete Association screencast</a> on the auto_complete plugin:</p>
     <div class="CodeRay">
       <div class="code"><pre>auto_complete_for <span class="sy">:category</span>, <span class="sy">:name</span></pre></div>
-
-    </div>
+<pre><code>&lt;/div&gt;
+</code></pre>
   <p><br>Here we are passing &ldquo;:category&rdquo; into auto_complete_for as the value for &ldquo;object,&rdquo; and &ldquo;:name&rdquo; as the value for &ldquo;method.&rdquo; Now let&rsquo;s repeat the auto_complete_for code, but substitute object with :category:</p>
-
 </p>
-
-
-<p><a name='code_snippet1'></p>
-
+<a name='code_snippet1'>
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
       <a href="#code_snippet0" class="icon" title="Previous code snippet"></a>
       <a href="#code_snippet0" title="Previous code snippet">original code from rails auto_complete plugin</a>
-
-    </div>
-    <div id='header_right'>
-      <a href="#code_snippet2" title="Next code snippet">evaluate :category.to_s</a>
-      <a href="#code_snippet2" class="icon" title="Next code snippet"></a>
-    </div>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  &lt;a href=&quot;#code_snippet2&quot; title=&quot;Next code snippet&quot;&gt;evaluate :category.to_s&lt;/a&gt;
+  &lt;a href=&quot;#code_snippet2&quot; class=&quot;icon&quot; title=&quot;Next code snippet&quot;&gt;&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class="r">def</span> <span class="fu">auto_complete_for</span>(<span class="sy"><span class='container'>:category<span class='overlay'></span></span></span>, method, options = {})&#x000A;  define_method(<span class="s"><span class="dl">&quot;</span><span class="k">auto_complete_for_</span><span class="il"><span class="idl">#{</span><span class="sy"><span class='container'>:category<span class='overlay'></span></span></span><span class="idl">}</span></span><span class="k">_</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="dl">&quot;</span></span>) <span class="r">do</span>&#x000A;    find_options = { &#x000A;      <span class="sy">:conditions</span> =&gt; [&#x000A;                       <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                       <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[<span class="sy"><span class='container'>:category<span class='overlay'></span></span></span>][method].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                     ],&#x000A;      <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k"> ASC</span><span class="dl">&quot;</span></span>,&#x000A;      <span class="sy">:limit</span> =&gt; <span class="i">10</span> }.merge!(options)&#x000A;&#x000A;    <span class="iv">@items</span> = <span class="sy"><span class='container'>:category<span class='overlay'></span></span></span>.to_s.camelize.constantize.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;    render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, '</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;  <span class="r">end</span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
   <p>In the code snippet above I&rsquo;ve highlighted the places where the symbol :category appears. You can see that it&rsquo;s used in a few different places, but the most important line is near the bottom: @items = :category.to_s.camelize.constantize&hellip; etc. Let&rsquo;s evaluate each of the method calls on this one line, one at a time. The first call is &ldquo;:category.to_s&rdquo;. The &ldquo;to_s&rdquo; method name means &ldquo;to string&rdquo; and will convert the target object (the object you call to_s on) to a string. This means that the :category symbol will be converted to a string. So now let&rsquo;s display the string &lsquo;category&rsquo; in place and see what we are left with:</p>
-
 </p>
-
-
-<p><a name='code_snippet2'></p>
-
+<a name='code_snippet2'>
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
       <a href="#code_snippet1" class="icon" title="Previous code snippet"></a>
       <a href="#code_snippet1" title="Previous code snippet">replace object with :category</a>
-
-    </div>
-    <div id='header_right'>
-      <a href="#code_snippet3" title="Next code snippet">evaluate 'category'.camelize</a>
-      <a href="#code_snippet3" class="icon" title="Next code snippet"></a>
-    </div>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  &lt;a href=&quot;#code_snippet3&quot; title=&quot;Next code snippet&quot;&gt;evaluate 'category'.camelize&lt;/a&gt;
+  &lt;a href=&quot;#code_snippet3&quot; class=&quot;icon&quot; title=&quot;Next code snippet&quot;&gt;&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class="r">def</span> <span class="fu">auto_complete_for</span>(<span class="sy">:category</span>, method, options = {})&#x000A;  define_method(<span class="s"><span class="dl">&quot;</span><span class="k">auto_complete_for_</span><span class="il"><span class="idl">#{</span><span class="sy">:category</span><span class="idl">}</span></span><span class="k">_</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="dl">&quot;</span></span>) <span class="r">do</span>&#x000A;    find_options = { &#x000A;      <span class="sy">:conditions</span> =&gt; [&#x000A;                       <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                       <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[<span class="sy">:category</span>][method].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                     ],&#x000A;      <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k"> ASC</span><span class="dl">&quot;</span></span>,&#x000A;      <span class="sy">:limit</span> =&gt; <span class="i">10</span> }.merge!(options)&#x000A;&#x000A;    <span class="iv">@items</span> = <span class='container'><span class="s"><span class="dl">'</span><span class="k">category</span><span class="dl">'</span></span><span class='overlay'></span></span>.camelize.constantize.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;    render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, '</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;  <span class="r">end</span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
   <p>You can see &lsquo;category&rsquo; highlighted above where I&rsquo;ve evaluated the to_s method. Now the next method call is &ldquo;camelize&rdquo; &ndash; what does this mean? The <a href="http://api.rubyonrails.org/classes/Inflector.html">camelize method</a> is one of a series of functions that Rails provides in the &ldquo;ActiveSupport&rdquo; gem, one of the components of the Rails framework. It converts the given string to camel case, for example &ldquo;office_code&rdquo; to &ldquo;OfficeCode.&rdquo; Since Ruby class names are written using camel case, this is often very useful for obtaining a class name from a string. In our example, the string &ldquo;category&rdquo; is converted into &ldquo;Category&rdquo; with an upper case &ldquo;C&rdquo;&nbsp;&hellip;</p>
-
 </p>
-
-
-<p><a name='code_snippet3'></p>
-
+<a name='code_snippet3'>
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
       <a href="#code_snippet2" class="icon" title="Previous code snippet"></a>
       <a href="#code_snippet2" title="Previous code snippet">evaluate :category.to_s</a>
-
-    </div>
-    <div id='header_right'>
-      <a href="#code_snippet4" title="Next code snippet">evaluate 'Category'.constantize</a>
-      <a href="#code_snippet4" class="icon" title="Next code snippet"></a>
-    </div>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  &lt;a href=&quot;#code_snippet4&quot; title=&quot;Next code snippet&quot;&gt;evaluate 'Category'.constantize&lt;/a&gt;
+  &lt;a href=&quot;#code_snippet4&quot; class=&quot;icon&quot; title=&quot;Next code snippet&quot;&gt;&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class="r">def</span> <span class="fu">auto_complete_for</span>(<span class="sy">:category</span>, method, options = {})&#x000A;  define_method(<span class="s"><span class="dl">&quot;</span><span class="k">auto_complete_for_</span><span class="il"><span class="idl">#{</span><span class="sy">:category</span><span class="idl">}</span></span><span class="k">_</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="dl">&quot;</span></span>) <span class="r">do</span>&#x000A;    find_options = { &#x000A;      <span class="sy">:conditions</span> =&gt; [&#x000A;                       <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                       <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[<span class="sy">:category</span>][method].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                     ],&#x000A;      <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k"> ASC</span><span class="dl">&quot;</span></span>,&#x000A;      <span class="sy">:limit</span> =&gt; <span class="i">10</span> }.merge!(options)&#x000A;&#x000A;    <span class="iv">@items</span> = <span class="s"><span class='container'><span class="dl">'</span><span class="k">Category</span><span class="dl">'</span><span class='overlay'></span></span></span>.constantize.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;    render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, '</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;  <span class="r">end</span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
   <p>Now let&rsquo;s take a look at the next method call on that same line of code: &ldquo;<a href="http://api.rubyonrails.org/classes/Inflector.html">constantize</a>.&rdquo; This converts a string into an actual Ruby constant, and returns an error if that constant doesn&rsquo;t exist. In our example, the string &ldquo;Category&rdquo; is converted into the Ruby class Category:</p>
-
 </p>
-
-
-<p><a name='code_snippet4'></p>
-
+<a name='code_snippet4'>
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
       <a href="#code_snippet3" class="icon" title="Previous code snippet"></a>
       <a href="#code_snippet3" title="Previous code snippet">evaluate 'category'.camelize</a>
-
-    </div>
-    <div id='header_right'>
-      <a href="#code_snippet5" title="Next code snippet">substitute :name for method</a>
-      <a href="#code_snippet5" class="icon" title="Next code snippet"></a>
-    </div>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  &lt;a href=&quot;#code_snippet5&quot; title=&quot;Next code snippet&quot;&gt;substitute :name for method&lt;/a&gt;
+  &lt;a href=&quot;#code_snippet5&quot; class=&quot;icon&quot; title=&quot;Next code snippet&quot;&gt;&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class="r">def</span> <span class="fu">auto_complete_for</span>(<span class="sy">:category</span>, method, options = {})&#x000A;  define_method(<span class="s"><span class="dl">&quot;</span><span class="k">auto_complete_for_</span><span class="il"><span class="idl">#{</span><span class="sy">:category</span><span class="idl">}</span></span><span class="k">_</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="dl">&quot;</span></span>) <span class="r">do</span>&#x000A;    find_options = { &#x000A;      <span class="sy">:conditions</span> =&gt; [&#x000A;                       <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                       <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[<span class="sy">:category</span>][method].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                     ],&#x000A;      <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k"> ASC</span><span class="dl">&quot;</span></span>,&#x000A;      <span class="sy">:limit</span> =&gt; <span class="i">10</span> }.merge!(options)&#x000A;&#x000A;    <span class="iv">@items</span> = <span class='container'><span class="co">Category</span><span class='overlay'></span></span>.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;    render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, '</span><span class="il"><span class="idl">#{</span>method<span class="idl">}</span></span><span class="k">' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;  <span class="r">end</span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
   <p>Now we can see that the complex line above evaluates to a simple ActiveRecord find call. The power of Ruby metaprogramming has enabled us to write a single helper function &ldquo;auto_complete_for&rdquo; that takes any symbol or string as an argument (e.g. :category), and performs a SQL query on the corresponding ActiveRecord class. The amazing part of this for me is how flexible and easy to use Ruby is: helper methods like camelize and constantize make it very easy to extract common bits of code you might write over and over again in your app, and generalize them into a single method that will apply to any target class. This would be possible in any programming language but it&rsquo;s amazing just how easy it is to do with Ruby.</p>
   <p>Let&rsquo;s continue to simplify the auto_complete_for code by substituting a value for the &ldquo;method&rdquo; parameter &ndash; in our example method will become the symbol &ldquo;:name&rdquo; :</p>
-
 </p>
-
-
-<p><a name='code_snippet5'></p>
-
+<a name='code_snippet5'>
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
       <a href="#code_snippet4" class="icon" title="Previous code snippet"></a>
       <a href="#code_snippet4" title="Previous code snippet">evaluate 'Category'.constantize</a>
-
-    </div>
-    <div id='header_right'>
-      <a href="#code_snippet6" title="Next code snippet">evaluate #{:category} and #{:name}</a>
-      <a href="#code_snippet6" class="icon" title="Next code snippet"></a>
-    </div>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  &lt;a href=&quot;#code_snippet6&quot; title=&quot;Next code snippet&quot;&gt;evaluate #{:category} and #{:name}&lt;/a&gt;
+  &lt;a href=&quot;#code_snippet6&quot; class=&quot;icon&quot; title=&quot;Next code snippet&quot;&gt;&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class="r">def</span> <span class="fu">auto_complete_for</span>(<span class="sy">:category</span>, <span class="sy"><span class='container'>:name<span class='overlay'></span></span></span>, options = {})&#x000A;  define_method(<span class="s"><span class="dl">&quot;</span><span class="k">auto_complete_for_</span><span class="il"><span class="idl">#{</span><span class="sy">:category</span><span class="idl">}</span></span><span class="k">_</span><span class="il"><span class="idl">#{</span><span class="sy"><span class='container'>:name<span class='overlay'></span></span></span><span class="idl">}</span></span><span class="dl">&quot;</span></span>) <span class="r">do</span>&#x000A;    find_options = { &#x000A;      <span class="sy">:conditions</span> =&gt; [&#x000A;                       <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(</span><span class="il"><span class="idl">#{</span><span class="sy"><span class='container'>:name<span class='overlay'></span></span></span><span class="idl">}</span></span><span class="k">) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                       <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[<span class="sy">:category</span>][<span class="sy"><span class='container'>:name<span class='overlay'></span></span></span>].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                     ],&#x000A;      <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">#{</span><span class="sy"><span class='container'>:name<span class='overlay'></span></span></span><span class="idl">}</span></span><span class="k"> ASC</span><span class="dl">&quot;</span></span>,&#x000A;      <span class="sy">:limit</span> =&gt; <span class="i">10</span> }.merge!(options)&#x000A;&#x000A;    <span class="iv">@items</span> = <span class="co">Category</span>.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;    render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, '</span><span class="il"><span class="idl">#{</span><span class="sy"><span class='container'>:name<span class='overlay'></span></span></span><span class="idl">}</span></span><span class="k">' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;  <span class="r">end</span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
   <p>Again you can see that the :name symbol is used in a few different places. Most commonly here the symbol is inserted in a string using this syntax: &ldquo;#{:name}&rdquo;. This is the standard Ruby #{} string interpolation operator, which is also implicitly converting the symbol into a string before inserting it into the surrounding string value, just as if we called to_s as above. So let&rsquo;s replace &ldquo;#{:name}&rdquo; and &ldquo;#{:category}&rdquo; with the strings &ldquo;name&rdquo; and &ldquo;category,&rdquo; and then also insert them into the surrounding string values:</p>
-
 </p>
-
-
-<p><a name='code_snippet6'></p>
-
+<a name='code_snippet6'>
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
       <a href="#code_snippet5" class="icon" title="Previous code snippet"></a>
       <a href="#code_snippet5" title="Previous code snippet">substitute :name for method</a>
-
-    </div>
-    <div id='header_right'>
-      <a href="#code_snippet7" title="Next code snippet">substitute {} for options</a>
-      <a href="#code_snippet7" class="icon" title="Next code snippet"></a>
-    </div>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  &lt;a href=&quot;#code_snippet7&quot; title=&quot;Next code snippet&quot;&gt;substitute {} for options&lt;/a&gt;
+  &lt;a href=&quot;#code_snippet7&quot; class=&quot;icon&quot; title=&quot;Next code snippet&quot;&gt;&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class="r">def</span> <span class="fu">auto_complete_for</span>(<span class="sy">:category</span>, <span class="sy">:name</span>, options = {})&#x000A;  define_method(<span class="s"><span class="dl">&quot;</span><span class="k">auto_complete_for_<span class='container'>category<span class='overlay'></span></span>_<span class='container'>name<span class='overlay'></span></span></span><span class="dl">&quot;</span></span>) <span class="r">do</span>&#x000A;    find_options = { &#x000A;      <span class="sy">:conditions</span> =&gt; [&#x000A;                       <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(<span class='container'>name<span class='overlay'></span></span>) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                       <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[<span class="sy">:category</span>][<span class="sy">:name</span>].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                     ],&#x000A;      <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k"><span class='container'>name<span class='overlay'></span></span> ASC</span><span class="dl">&quot;</span></span>,&#x000A;      <span class="sy">:limit</span> =&gt; <span class="i">10</span> }.merge!(options)&#x000A;&#x000A;    <span class="iv">@items</span> = <span class="co">Category</span>.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;    render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, '<span class='container'>name<span class='overlay'></span></span>' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;  <span class="r">end</span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
   <p>And now let&rsquo;s replace the last parameter to auto_complete_for &ldquo;options&rdquo; with it&rsquo;s default value since we aren&rsquo;t providing that in our auto_complete_for :category, :name call:</p>
-
 </p>
-
-
-<p><a name='code_snippet7'></p>
-
+<a name='code_snippet7'>
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
       <a href="#code_snippet6" class="icon" title="Previous code snippet"></a>
       <a href="#code_snippet6" title="Previous code snippet">evaluate #{:category} and #{:name}</a>
-
-    </div>
-    <div id='header_right'>
-      <a href="#code_snippet8" title="Next code snippet">remove merge!({})</a>
-      <a href="#code_snippet8" class="icon" title="Next code snippet"></a>
-    </div>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  &lt;a href=&quot;#code_snippet8&quot; title=&quot;Next code snippet&quot;&gt;remove merge!({})&lt;/a&gt;
+  &lt;a href=&quot;#code_snippet8&quot; class=&quot;icon&quot; title=&quot;Next code snippet&quot;&gt;&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class="r">def</span> <span class="fu">auto_complete_for</span>(<span class="sy">:category</span>, <span class="sy">:name</span>, <span class='container'>{}<span class='overlay'></span></span>)&#x000A;  define_me thod(<span class="s"><span class="dl">&quot;</span><span class="k">auto_complete_for_category_name</span><span class="dl">&quot;</span></span>) <span class="r">do</span>&#x000A;    find_options = { &#x000A;      <span class="sy">:conditions</span> =&gt; [&#x000A;                       <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(name) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                       <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[<span class="sy">:category</span>][<span class="sy">:name</span>].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                     ],&#x000A;      <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">name ASC</span><span class="dl">&quot;</span></span>,&#x000A;      <span class="sy">:limit</span> =&gt; <span class="i">10</span> }.merge!(<span class='container'>{}<span class='overlay'></span></span>)&#x000A;&#x000A;    <span class="iv">@items</span> = <span class="co">Category</span>.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;    render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, 'name' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;  <span class="r">end</span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
   <p>You can see that options was used in only one place: &hellip;merge!(options). Using merge with hashes is another extremely common technique in Ruby coding; it adds the key/value pairs from the hash you provide as a parameter to the hash you call merge on. Merge! is a variation on this which directly modifies the target object, as opposed to only returning the merged hash. Merge is very useful for metaprogramming because, as in this example, it makes it easy to allow the user/client code of a method to customize a hash of options that is passed into some other function. Here merge was used to allow the caller of auto_complete_for to pass in additional find options to the Category.find call. In our case since we didn&rsquo;t pass in a value for options, it is set to {} and then has no effect on the find_options hash. So let&rsquo;s just remove the call to merge!({}), which is a NOP anyway:</p>
 </p>
-
-
 <p><a name='code_snippet8'></p>
-
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
       <a href="#code_snippet7" class="icon" title="Previous code snippet"></a>
       <a href="#code_snippet7" title="Previous code snippet">substitute {} for options</a>
-
-    </div>
-    <div id='header_right'>
-      <a href="#code_snippet9" title="Next code snippet">define method</a>
-      <a href="#code_snippet9" class="icon" title="Next code snippet"></a>
-    </div>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  &lt;a href=&quot;#code_snippet9&quot; title=&quot;Next code snippet&quot;&gt;define method&lt;/a&gt;
+  &lt;a href=&quot;#code_snippet9&quot; class=&quot;icon&quot; title=&quot;Next code snippet&quot;&gt;&lt;/a&gt;
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class="r">def</span> <span class="fu">auto_complete_for</span>(<span class="sy">:category</span>, <span class="sy">:name</span>, {})&#x000A;  define_method(<span class="s"><span class="dl">&quot;</span><span class="k">auto_complete_for_category_name</span><span class="dl">&quot;</span></span>) <span class="r">do</span>&#x000A;    find_options = { &#x000A;      <span class="sy">:conditions</span> =&gt; [&#x000A;                       <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(name) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                       <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[<span class="sy">:category</span>][<span class="sy">:name</span>].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                     ],&#x000A;      <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">name ASC</span><span class="dl">&quot;</span></span>,&#x000A;      <span class='container'><span class="sy">:limit</span> =&gt; <span class="i">10</span> }<span class='overlay'></span></span>&#x000A;&#x000A;    <span class="iv">@items</span> = <span class="co">Category</span>.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;    render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, 'name' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;  <span class="r">end</span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
   <p>Now the code is looking simpler and simpler. Let&rsquo;s finish this example by evaluating the &ldquo;define_method&rdquo; call at the top. As you might guess, define_method is how you can dynamically create a new method in a class in Ruby. In auto_complete_for it&rsquo;s used to add a new method to the controller in which you included the call to auto_complete_for, called &ldquo;auto_complete_for_category_name.&rdquo; In other words, adding the auto_complete_for :category, :name line to the CategoriesController was equivalent to adding this method definition to the class:</p>
-
 </p>
-
-
-<p><a name='code_snippet9'></p>
-
+<a name='code_snippet9'>
 <p></a></p>
-
 <div id='frame'>
   <div id='header'>
     <div id='header_left'>
       <a href="#code_snippet8" class="icon" title="Previous code snippet"></a>
       <a href="#code_snippet8" title="Previous code snippet">remove merge!({})</a>
-
-    </div>
-    <div id='header_right'>
-      
-      
-    </div>
+<pre><code>&lt;/div&gt;
+&lt;div id='header_right'&gt;
+  
+  
+&lt;/div&gt;
+</code></pre>
   </div>
   <div class="CodeRay">
     <div class="code"><pre><span class='container'><span class="r">def</span> <span class="fu">auto_complete_for_category_name</span><span class='overlay'></span></span>&#x000A;  find_options = { &#x000A;    <span class="sy">:conditions</span> =&gt; [&#x000A;                     <span class="s"><span class="dl">&quot;</span><span class="k">LOWER(name) LIKE ?</span><span class="dl">&quot;</span></span>,&#x000A;                     <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span> + params[<span class="sy">:category</span>][<span class="sy">:name</span>].downcase + <span class="s"><span class="dl">'</span><span class="k">%</span><span class="dl">'</span></span>&#x000A;                   ],&#x000A;    <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">name ASC</span><span class="dl">&quot;</span></span>,&#x000A;    <span class="sy">:limit</span> =&gt; <span class="i">10</span> }&#x000A;&#x000A;  <span class="iv">@items</span> = <span class="co">Category</span>.find(<span class="sy">:all</span>, find_options)&#x000A;&#x000A;  render <span class="sy">:inline</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">&lt;%= auto_complete_result @items, 'name' %&gt;</span><span class="dl">&quot;</span></span>&#x000A;<span class="r">end</span></pre></div>
-
   </div>
 </div>
-
-
 <p>
-  
   <p>Now we&rsquo;ve seen the real value of metaprogramming: the author of the auto_complete plugin was able to provide a simple helper method, auto_complete_for, which dynamically added this fairly complex method to your controller. The beauty and power of Ruby and Rails is just how easy this was to do: the generated function is tailored to use the Category model just as if you had written it yourself. When I first came across this code I was impressed not only by the power that this sort of metaprogramming provided, but also by how easy it was to do this using Ruby on Rails. Helper modules and methods, such as constantize in ActiveSupport, make it very, very easy to convert from symbols to strings to constants and back again&hellip; which is exactly what you need to do to write a general method that can be dynamically generated in this way.</p>
   <p><a href="http://patshaughnessy.net/2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">Last week I asserted</a> that calling auto_complete_for in your controller like this was equivalent to this code from Ryan Bates&rsquo; <a href="http://railscasts.com/episodes/102-auto-complete-association">Auto-Complete Association screencast</a>:</p>
+<pre><code>&lt;div class=&quot;CodeRay&quot;&gt;
+  &lt;div class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;r&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;cl&quot;&gt;CategoriesController&lt;/span&gt; &amp;lt; &lt;span class=&quot;co&quot;&gt;ApplicationController&lt;/span&gt;&amp;#x000A;&amp;#x000A;  &lt;span class=&quot;r&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;fu&quot;&gt;index&lt;/span&gt;&amp;#x000A;    &lt;span class=&quot;iv&quot;&gt;@categories&lt;/span&gt; =&amp;#x000A;      &lt;span class=&quot;co&quot;&gt;Category&lt;/span&gt;.find(&lt;span class=&quot;sy&quot;&gt;:all&lt;/span&gt;, &lt;span class=&quot;sy&quot;&gt;:conditions&lt;/span&gt; =&amp;gt; [&lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;name LIKE ?&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt;, &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;il&quot;&gt;&lt;span class=&quot;idl&quot;&gt;#{&lt;/span&gt;params[&lt;span class=&quot;sy&quot;&gt;:search&lt;/span&gt;]&lt;span class=&quot;idl&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;])&amp;#x000A;  &lt;span class=&quot;r&quot;&gt;end&lt;/span&gt;&amp;#x000A;&amp;#x000A;etc...&lt;/pre&gt;&lt;/div&gt;
 
-    <div class="CodeRay">
-      <div class="code"><pre><span class="r">class</span> <span class="cl">CategoriesController</span> &lt; <span class="co">ApplicationController</span>&#x000A;&#x000A;  <span class="r">def</span> <span class="fu">index</span>&#x000A;    <span class="iv">@categories</span> =&#x000A;      <span class="co">Category</span>.find(<span class="sy">:all</span>, <span class="sy">:conditions</span> =&gt; [<span class="s"><span class="dl">'</span><span class="k">name LIKE ?</span><span class="dl">'</span></span>, <span class="s"><span class="dl">&quot;</span><span class="k">%</span><span class="il"><span class="idl">#{</span>params[<span class="sy">:search</span>]<span class="idl">}</span></span><span class="k">%</span><span class="dl">&quot;</span></span>])&#x000A;  <span class="r">end</span>&#x000A;&#x000A;etc...</pre></div>
-
-    </div>
+&lt;/div&gt;
+</code></pre>
   <p><br>Now you can see how this is true: the code Ryan wrote was a simple call to Category.find, with conditions that search for a name like the name provided in the &ldquo;search&rdquo; parameter. Looking at the simplified auto_complete_for_category_name method above, you can see that it calls Category.find in the same way. However, the auto_complete_for version is a bit different in that it:
     <ul>
-
-      <li>Looks for a parameter called &ldquo;category[name]&rdquo; instead of &ldquo;search,&rdquo; and</li>
-      <li>Converts it to lower case, and</li>
-      <li>Passes a couple of other SQL options into Category.find:  order by name ascending, and limit 10, and</li>
-      <li>Makes a call to render :inline to return the result to the browser without the need for a normal view code file.</li></ul></p>
-
+<pre><code>  &lt;li&gt;Looks for a parameter called &amp;ldquo;category[name]&amp;rdquo; instead of &amp;ldquo;search,&amp;rdquo; and&lt;/li&gt;
+  &lt;li&gt;Converts it to lower case, and&lt;/li&gt;
+  &lt;li&gt;Passes a couple of other SQL options into Category.find:  order by name ascending, and limit 10, and&lt;/li&gt;
+  &lt;li&gt;Makes a call to render :inline to return the result to the browser without the need for a normal view code file.&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;
+</code></pre>
   <p>Auto_complete_for does essentially the same thing that Ryan explained in his screen cast, but the elegance of Ruby metaprogramming allows the users of the auto_complete plugin to implement this search feature without writing any code at all.</p>
 </p>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2010/2/20/getting-started-with-ruby-metaprogramming';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Getting started with Ruby metaprogramming';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2010/2/20/getting-started-with-ruby-metaprogramming';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Getting started with Ruby metaprogramming';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2010/2/20/getting-started-with-ruby-metaprogramming'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Getting started with Ruby metaprogramming';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

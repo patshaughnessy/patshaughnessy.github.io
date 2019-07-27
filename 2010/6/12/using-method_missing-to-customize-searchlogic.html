@@ -1,60 +1,6 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Using method_missing to customize SearchLogic - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Using method_missing to customize SearchLogic - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Using method_missing to customize SearchLogic</h1>
-  
-    <div class="metadata">
-    <span class="date">June 12th 2010</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Using method_missing to customize SearchLogic">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>The Ruby interpreter calls method_missing on a Ruby object whenever it receives a message (method call) that it cannot handle. One of the best examples of using method_missing that I&rsquo;ve come across is in the SearchLogic plugin, which allows you to dynamically create named scopes. Today I&rsquo;m going to take some time to explain how method_missing works, show how it&rsquo;s used by SearchLogic, and finally show how you can use method_missing yourself to customize SearchLogic&rsquo;s behavior.</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Using method_missing to customize SearchLogic - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Using method_missing to customize SearchLogic</h1><div class="metadata"><span class="date">June 12th 2010</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Using method_missing to customize SearchLogic">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>The Ruby interpreter calls method_missing on a Ruby object whenever it receives a message (method call) that it cannot handle. One of the best examples of using method_missing that I&rsquo;ve come across is in the SearchLogic plugin, which allows you to dynamically create named scopes. Today I&rsquo;m going to take some time to explain how method_missing works, show how it&rsquo;s used by SearchLogic, and finally show how you can use method_missing yourself to customize SearchLogic&rsquo;s behavior.</p>
 <p><b>Simple sorting with SearchLogic</b></p>
-
-
 <p>Suppose I have an ActiveRecord model called &ldquo;book&rdquo; with a &ldquo;title&rdquo; attribute:</p>
-
-
 <div class="CodeRay">
   <div class="code"><pre>$ rails books
 $ cd books
@@ -62,25 +8,13 @@ $ script/generate model book title:string
 $ rake db:migrate
 $ script/console
 &gt;&gt; [&quot;one&quot;, &quot;two&quot;, &quot;three&quot;].each { |title| Book.create :title =&gt; title }</pre></div>
-</div>
-
-
-<br>
-
-
+</div><br>
 <p>The best way in Rails to display the books sorted by title would be to use a named scope like this in my model:</p>
-
-
 <div class="CodeRay">
   <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
   named_scope <span class="sy">:sorted_by_title</span>, { <span class="sy">:order</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">title</span><span class="dl">'</span></span> }
 <span class="r">end</span></pre></div>
-</div>
-
-
-<br>
-
-
+</div><br>
 <p>If I use <a href="http://niranjansarade.blogspot.com/2009/12/display-sql-queries-in-ruby.html">a trick my colleague Niranjan Sarade</a> showed me, we can see the SQL produced by ActiveRecord for the named scope in the console, like this:
 <div class="CodeRay">
   <div class="code"><pre>$ script/console
@@ -318,103 +252,11 @@ This method is missing: ascend_by_title_nulls_last
 <br>
 <p>Note that I need to use ActiveRecord::Base.extend and not ActiveRecord::Base.include here, since my method_missing code calls &ldquo;super&rdquo; if the missing method does not match the pattern. &ldquo;Extend&rdquo; means that the methods of ActiveRecord::Base, including method_missing, will be overridden by the methods of the SearchLogicExtensions module, but will still be present and available via a call to &ldquo;super.&rdquo; Another important detail here is that I removed the &ldquo;class &lt;&lt; self&rdquo; syntax. Since this is a module and not a class like Book was, I just define method_missing directly. My method_missing will be added as a class method to Book and all of my other models by the last line, when we extend ActiveRecord::Base. In my application I put this code into a file called &ldquo;config/initializers/search_logic_extensions.rb,&rdquo; which caused it to be loaded during the Rails initialization process. I could have also packaged the code up as a separate plugin.</p>
 <p>That&rsquo;s it for today; next time I&rsquo;ll continue this discussion of metaprogramming with SearchLogic by showing how to sort with NULL values in an associated database table, using a LEFT OUTER JOIN query.</p>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Using method_missing to customize SearchLogic';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Using method_missing to customize SearchLogic';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Using method_missing to customize SearchLogic';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

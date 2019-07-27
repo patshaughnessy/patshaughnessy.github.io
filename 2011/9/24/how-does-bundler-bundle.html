@@ -1,178 +1,80 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="How does Bundler bundle? - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>How does Bundler bundle? - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>How does Bundler bundle?</h1>
-  
-    <div class="metadata">
-    <span class="date">September 24th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/9/24/how-does-bundler-bundle" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How does Bundler bundle?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>How does Bundler bundle? - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>How does Bundler bundle?</h1><div class="metadata"><span class="date">September 24th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/9/24/how-does-bundler-bundle" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How does Bundler bundle?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/9/24/bundle.jpeg"></td></tr>
 </table>
 </div>
-
-
-<p>Every time you start a new Ruby project, probably one of the first things you do is write a Gemfile and then run <span class="code">bundle install</span>. Bundler has truly made all of our lives much easier&hellip; we know it will install the proper version of all the gems we need. But how does it actually work? This week I decided to take a closer look at the Bundler code itself to find out. How does it know which gems to install? How does it guarantee each gem’s dependencies will be satisfied? How do I get just the right “bundle” my app needs?</p>
-
-<p></p>
-
+<p>Every time you start a new Ruby project, probably one of the first things you do is write a Gemfile and then run <span class="code">bundle install</span>. Bundler has truly made all of our lives much easier... we know it will install the proper version of all the gems we need. But how does it actually work? This week I decided to take a closer look at the Bundler code itself to find out. How does it know which gems to install? How does it guarantee each gem’s dependencies will be satisfied? How do I get just the right “bundle” my app needs?</p>
+<p>
 <br/>
-
-
-<p>Today I’m going to explain how Bundler’s “resolver” algorithm works using a series of conceptual diagrams. This is the code that determines exactly which set of gems to install on your laptop or server&hellip; i.e. what your “bundle” should be.</p>
-
+Today I’m going to explain how Bundler’s “resolver” algorithm works using a series of conceptual diagrams. This is the code that determines exactly which set of gems to install on your laptop or server... i.e. what your “bundle” should be.</p>
 <h2>Running Bundler with DEBUG_RESOLVER=1</h2>
-
 <p>To keep things simple, let’s suppose I have this small Gemfile in my Ruby app:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-source <span class="string"><span class="delimiter">'</span><span class="content">http://rubygems.org</span><span class="delimiter">'</span></span>
-gem <span class="string"><span class="delimiter">'</span><span class="content">uglifier</span><span class="delimiter">'</span></span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">source </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">http://rubygems.org</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">uglifier</span><span style="color:#4f5b66;">&#39;
+</span></pre>
 
 <p>I chose uglifier as an example not only because of its cool name, but also because it has a fairly simple set of dependencies, which will make it easier to follow how Bundler’s resolver code is working. Now instead of just running <span class="code">bundle install</span> as usual, let’s first set an environment variable that will cause Bundler’s resolver code to write out some debugging information as it runs:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ export DEBUG_RESOLVER=1
-$ bundle install 2&gt; output.txt
+$ bundle install 2> output.txt
 Fetching source index for http://rubygems.org/
 Using multi_json (1.0.3) 
 Using execjs (1.2.8) 
 Using uglifier (1.0.3) 
 Using bundler (1.0.18) 
 Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>If you run this you should now have a text file called “output.txt” which will contain some information about how Bundler resolved the gem dependencies.</p>
-
 <h2>Visualizing Bundler’s resolver algorithm using GraphViz</h2>
-
 <p>To make this debug text file easier to understand, I decided to write some Ruby code to parse it and then use <a href="http://www.graphviz.org/">GraphViz</a> to output a graphical representation of the information there. <a href="http://patshaughnessy.net/2011/9/17/bundlers-best-kept-secret">As I discussed last week</a>, GraphViz is the library that Bundler uses to implement the <span class="code">bundle viz</span> command, which displays a graphical chart showing your gem dependencies.</p>
-
 <p>Now let’s take a look at how Bundler’s resolver code actually works. We’ll start the process with two lists:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/simple1.png" alt="step 1" /></p>
-
 <p>On the left are the gems activated so far, which is an empty list at first. This will eventually be the return value of the resolver algorithm. On the right are the requirements from the Gemfile, which in my simple example is just the single uglifier gem.</p>
-
-<p>The resolver algorithm’s first step is to take the requirement, uglifier >=0, and see whether it is satisfied by any of the gems already activated. It also checks whether any of the activated gems conflict with the requirement. Since there are no activated gems yet, Bundler looks for the latest version of uglifier that matches the requirement from rubygems.org; here it is:</p>
-
+<p>The resolver algorithm’s first step is to take the requirement, uglifier &gt;=0, and see whether it is satisfied by any of the gems already activated. It also checks whether any of the activated gems conflict with the requirement. Since there are no activated gems yet, Bundler looks for the latest version of uglifier that matches the requirement from rubygems.org; here it is:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/simple2.png" alt="step 2" /></p>
-
 <p>As I wrote this, the latest version of uglifier was 1.0.3. Bundler also downloads uglifier’s dependencies from rubygems. Now it “activates” uglifier 1.0.3, adding it to the list of activated gems:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/simple3.png" alt="step 3" /></p>
-
 <p>Bundler also adds the dependencies for the new gem to the list of requirements, as if they were written in the Gemfile directly. You can see here that multi_json and execjs were added to the list on the right.</p>
-
 <p>Now Bundler simply iterates and repeats the same process. The next requirement is popped off the top of the list on the right, checked against the activated gems, and a matching gem is found in the source index that was downloaded from rubygems.org. It turns out that the latest version of multi_json is 1.0.3 and has no dependencies at all. Also since there is no other version of multi_json already activated, Bundler just activates it:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/simple4.png" alt="step 4" /></p>
-
-<p>And now we repeat the process again, fetching a gem that matches the execjs >= 0.3.0 requirement on rubygems.org:</p>
-
+<p>And now we repeat the process again, fetching a gem that matches the execjs &gt;= 0.3.0 requirement on rubygems.org:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/simple5.png" alt="step 5" /></p>
-
-<p>This turns out to be execjs 1.2.8, again the latest version at the time I wrote this. It has a single dependency on multi_json ~> 1.0. Now repeating the process, Bundler activates execjs 1.2.8, which didn’t appear in the activated list yet, and adds multi_json ~> 1.0 to the requirements list:</p>
-
+<p>This turns out to be execjs 1.2.8, again the latest version at the time I wrote this. It has a single dependency on multi_json ~&gt; 1.0. Now repeating the process, Bundler activates execjs 1.2.8, which didn’t appear in the activated list yet, and adds multi_json ~&gt; 1.0 to the requirements list:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/simple6.png" alt="step 6" /></p>
-
-<p>Finally Bundler checks the latest requirement and finds that there is a gem that was activated that already matches this requirement: multi_json 1.0.3. So there’s no need to download a new version of multi_json &ndash; this requirement is already satisfied.</p>
-
-<p>Now Bundler is done &ndash; the list on the left becomes our “bundle,” and the list is written out to a file called Gemfile.lock, along with dependency information:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<p>Finally Bundler checks the latest requirement and finds that there is a gem that was activated that already matches this requirement: multi_json 1.0.3. So there’s no need to download a new version of multi_json - this requirement is already satisfied.</p>
+<p>Now Bundler is done - the list on the left becomes our “bundle,” and the list is written out to a file called Gemfile.lock, along with dependency information:</p>
+<pre>
 $ cat Gemfile.lock
 GEM
   remote: http://rubygems.org/
   specs:
     execjs (1.2.8)
-      multi_json (~&gt; 1.0)
+      multi_json (~> 1.0)
     multi_json (1.0.3)
     uglifier (1.0.3)
-      execjs (&gt;= 0.3.0)
-      multi_json (&gt;= 1.0.2)
+      execjs (>= 0.3.0)
+      multi_json (>= 1.0.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   uglifier
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>The information here is used by bundler when your app is deployed onto different servers or laptops to insure that Bundler activates the exact same list of gems.</p>
-
 <h2>But what if there’s a conflict?</h2>
-
 <p>The example above is the best case scenario: there was a very simple Gemfile with just a single gem and only a few dependencies that didn’t conflict. To make things more interesting, let’s add a new requirement to my example Gemfile:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-source <span class="string"><span class="delimiter">'</span><span class="content">http://rubygems.org</span><span class="delimiter">'</span></span>
-gem <span class="string"><span class="delimiter">'</span><span class="content">multi_json</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">1.0.1</span><span class="delimiter">'</span></span>
-gem <span class="string"><span class="delimiter">'</span><span class="content">uglifier</span><span class="delimiter">'</span></span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">source </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">http://rubygems.org</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">multi_json</span><span style="color:#4f5b66;">&#39;</span><span style="color:#795da3;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">1.0.1</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">uglifier</span><span style="color:#4f5b66;">&#39;
+</span></pre>
 
 <p>And now I’ll run <span class="code">bundle install</span> again:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ bundle install
 Fetching source index for http://rubygems.org/
 You have requested:
@@ -180,164 +82,43 @@ You have requested:
 
 The bundle currently has multi_json locked at 1.0.3.
 Try running `bundle update multi_json`
-</pre></div>
-</div>
-
-
-
-<p>Oops &ndash; what happened here was that my bundle was already locked, and used multi_json 1.0.3. That is to say, Bundler loaded the Gemfile.lock file I showed above and found that it contained a different version of multi_json than what I added to the Gemfile.</p>
-
+</pre>
+<p>Oops - what happened here was that my bundle was already locked, and used multi_json 1.0.3. That is to say, Bundler loaded the Gemfile.lock file I showed above and found that it contained a different version of multi_json than what I added to the Gemfile.</p>
 <p>Let’s try again, but this time use <span class="code">bundle update</span> instead, so that the Gemfile.lock is discarded and recreated after the resolver code is done:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-$ bundle update 2&gt; output2.txt
+<pre>
+$ bundle update 2> output2.txt
 Fetching source index for http://rubygems.org/
 Using multi_json (1.0.1) 
 Using execjs (1.2.8) 
 Using uglifier (0.5.2) 
 Using bundler (1.0.18) 
 Your bundle is updated! Use `bundle show [gemname]` to see where a bundled gem is installed.
-</pre></div>
-</div>
-
-
-
-<p>Here you can see that I got a different set of gems&hellip; Bundler was able to resolve the request for multi_json 1.0.1 by downloading and activating a different, older version of uglifier (0.5.2 vs. 1.0.3) &ndash; very cool! But how does this work? How does Bundler know to do this?</p>
-
+</pre>
+<p>Here you can see that I got a different set of gems... Bundler was able to resolve the request for multi_json 1.0.1 by downloading and activating a different, older version of uglifier (0.5.2 vs. 1.0.3) - very cool! But how does this work? How does Bundler know to do this?</p>
 <p>Let’s repeat the same process again by starting with the same two columns, the activated gems on the left and the requirements on the right:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict1.png" alt="step 1" /></p>
-
 <p>Now my Gemfile has two requirements, so you see two entries on the right to start with. Repeating the same resolver algorithm, Bundler finds a matching version of multi_json on rubygems.org. This has to be version multi_json 1.0.1, since I specified that exact version in the Gemfile’s requirement.</p>
-
 <p>Since this is the first gem to be processed, Bundler just activates it immediately. There are also no dependencies, so the list of requirements just gets smaller.</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict2.png" alt="step 2" /></p>
-
-<p>Uglifier >= 0 is the next requirement so Bundler will find the latest version of this gem available on rubygems.org:</p>
-
+<p>Uglifier &gt;= 0 is the next requirement so Bundler will find the latest version of this gem available on rubygems.org:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict3.png" alt="step 3" /></p>
-
 <p>Just as above, Bundler finds there are two dependencies on execjs and multi_json. Now it activates uglifier 1.0.3 and adds it to the activated gems, and also adds the two dependencies to the requirements list:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict4.png" alt="step 4" /></p>
-
-<p>This leaves multi_json >= 1.0.2 as the next requirement, but before Bundler checks for the latest version on rubygems.org, it will first check the list of gems that were already activated: uglifier 1.0.3 and multi_json 1.0.1. Now Bundler has a conflict! It can’t activate any version of multi_json >= 1.0.2 since multi_json 1.0.1, was already activated.</p>
-
-<p>To resolve the conflict, Bundler now returns to the gem which depended on multi_json >= 1.0.2, in this case uglifier 1.0.3. Discarding uglifier 1.0.3, Bundler uses the source index from rubygems.org to iterate through the older versions of the problem gem (uglifier) in descending order, running the same process with each one. To keep things simple I’ll skip a couple of intermediate versions and jump to this one next:</p>
-
+<p>This leaves multi_json &gt;= 1.0.2 as the next requirement, but before Bundler checks for the latest version on rubygems.org, it will first check the list of gems that were already activated: uglifier 1.0.3 and multi_json 1.0.1. Now Bundler has a conflict! It can’t activate any version of multi_json &gt;= 1.0.2 since multi_json 1.0.1, was already activated.</p>
+<p>To resolve the conflict, Bundler now returns to the gem which depended on multi_json &gt;= 1.0.2, in this case uglifier 1.0.3. Discarding uglifier 1.0.3, Bundler uses the source index from rubygems.org to iterate through the older versions of the problem gem (uglifier) in descending order, running the same process with each one. To keep things simple I’ll skip a couple of intermediate versions and jump to this one next:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict5.png" alt="step 5" /></p>
-
 <p>Now Bundler tries the same process with this older version of the gem: it activates it and adds its dependencies to the list of requirements:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict6.png" alt="step 6" /></p>
-
-<p>Next Bundler returns to the same process as usual, and checks whether the next requirement conflicts with any previously activated gems. Multi_json 1.0.1 meets the multi_json >= 0 requirement and doesn’t conflict.</p>
-
+<p>Next Bundler returns to the same process as usual, and checks whether the next requirement conflicts with any previously activated gems. Multi_json 1.0.1 meets the multi_json &gt;= 0 requirement and doesn’t conflict.</p>
 <p>Now Bundler is free to continue the process, finding the newest version of execjs, and getting its dependencies.</p>
-
-<h2>To learn more&hellip;</h2>
-
+<h2>To learn more...</h2>
 <p>In today’s example, I simplified the resolver algorithm somewhat; to see the actual code Bundler uses for resolving gem dependencies just go to <a href="https://github.com/carlhuda/bundler/blob/master/lib/bundler/resolver.rb">resolver.rb on github</a>. In a real world resolver task, the dependency graph can be much more complex; for example it can be a deeply nested tree of gems that depend on gems that depend on other gems. If there’s a conflict in a more complex scenario, Bundler might have to iterate through a series of parent gems to find which gem needs to be replaced to resolve the conflict. Bundler has other features, such as being able to specify different gem sets and requirements for different environments, that make the actual code more complicated also.</p>
-
-<p>I hope this exercise was a fun way to get a glimpse into the “magic” behind Bundler&hellip; giving you some understanding of what’s really happening the next time you run <span class="code">bundle install</span>.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2011/9/24/how-does-bundler-bundle';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'How does Bundler bundle?';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2011/9/24/how-does-bundler-bundle';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'How does Bundler bundle?';
-    (function () {
+<p>I hope this exercise was a fun way to get a glimpse into the “magic” behind Bundler... giving you some understanding of what’s really happening the next time you run <span class="code">bundle install</span>.</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2011/9/24/how-does-bundler-bundle'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'How does Bundler bundle?';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

@@ -1,323 +1,102 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="How Ruby Executes Your Code - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>How Ruby Executes Your Code - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>How Ruby Executes Your Code</h1>
-  
-    <div class="metadata">
-    <span class="date">June 29th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How Ruby Executes Your Code">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p><b>This is an excerpt from the second chapter of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.</p>
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>How Ruby Executes Your Code - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>How Ruby Executes Your Code</h1><div class="metadata"><span class="date">June 29th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How Ruby Executes Your Code">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p><b>This is an excerpt from the second chapter of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.</p>
 <p>If you’re interested in Ruby internals you can <a href="http://patshaughnessy.net/ruby-under-a-microscope">sign up here</a> and I’ll send you an email when the eBook is finished.  I also posted <a href="http://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope">one entire chapter</a> in May, and <a href="http://patshaughnessy.net/2012/6/18/the-start-of-a-long-journey-how-ruby-parses-and-compiles-your-code">an excerpt from the first chapter</a> last week.</b></p>
-
-<br/>
-
-
-
-
+<p><br/></p>
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
     <tr><td><img src="http://patshaughnessy.net/assets/2012/6/29/gears.jpg"></td></tr>
   </table>
 </div>
-
-
 <p>Now that Ruby has tokenized, parsed and compiled your code, Ruby is finally ready to execute it. But exactly how does it do this? We’ve seen how the Ruby compiler creates YARV (“Yet Another Ruby Virtual Machine”) instructions, but how does YARV actually run them? How does it keep track of variables, return values and arguments? How does it implement <span class="code">if</span> statements and other control structures?</p>
-
-<p>Just like your computer’s actual microprocessor hardware, Koichi Sasada and the Ruby core team designed YARV to use a stack pointer and a program counter. In this chapter, I’ll start by looking at the basics of YARV instructions: how they pop arguments off the stack and push return values onto the stack. I’ll continue by explaining how Ruby accesses variables in two different ways: locally and dynamically. Then I’ll show you how YARV implements Ruby control structures &ndash; including a look at how Ruby implements the <span class="code">break</span> keyword internally by throwing an exception! Finally, I’ll compare the instruction sets used by the JRuby and Rubinius virtual machines to YARV’s instruction set.</p>
-
+<p>Just like your computer’s actual microprocessor hardware, Koichi Sasada and the Ruby core team designed YARV to use a stack pointer and a program counter. In this chapter, I’ll start by looking at the basics of YARV instructions: how they pop arguments off the stack and push return values onto the stack. I’ll continue by explaining how Ruby accesses variables in two different ways: locally and dynamically. Then I’ll show you how YARV implements Ruby control structures - including a look at how Ruby implements the <span class="code">break</span> keyword internally by throwing an exception! Finally, I’ll compare the instruction sets used by the JRuby and Rubinius virtual machines to YARV’s instruction set.</p>
 <h2>YARV’s internal stack and your Ruby stack</h2>
-
 <p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
-
 <h2>Experiment 2-1: Benchmarking Ruby 1.9 vs. Ruby 1.8</h2>
-
 <p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
-
 <h2>Local and dynamic access of Ruby variables</h2>
-
 <p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
-
 <h2>Experiment 2-2: Exploring scope and variables using the binding object</h2>
-
 <p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
-
 <h2>How YARV controls your program’s execution flow</h2>
-
 <div style="float: left; padding: 17px 30px 10px 0px">
   <img src="http://patshaughnessy.net/assets/2012/6/29/railroad.jpg">
 </div>
-
-
 <p>We’ve seen how YARV uses a stack while executing its instruction set and how it can access variables locally or dynamically, but what about control structures? Controlling the flow of execution is a fundamental requirement for any programming language, and Ruby has a rich set of control structures. How does YARV implement them?</p>
-
-<p>Just like Ruby itself, YARV has it own control structures, albeit at a much lower level. Instead of <span class="code">if</span> or <span class="code">unless</span> statements, YARV uses two low level instructions called <span class="code">branchif</span> and <span class="code">branchunless</span>. And instead of using control structures such as <span class="code">while&hellip;end</span> or <span class="code">until&hellip;end</span> loops, YARV has a single low level function called <span class="code">jump</span> that allows it to change the program counter and move from one place to another in your compiled program. By combining the <span class="code">branchif</span> or <span class="code">branchunless</span> instruction with the <span class="code">jump</span> instruction YARV is able to execute most of Ruby’s simple control structures.</p>
-
+<p>Just like Ruby itself, YARV has it own control structures, albeit at a much lower level. Instead of <span class="code">if</span> or <span class="code">unless</span> statements, YARV uses two low level instructions called <span class="code">branchif</span> and <span class="code">branchunless</span>. And instead of using control structures such as <span class="code">while...end</span> or <span class="code">until...end</span> loops, YARV has a single low level function called <span class="code">jump</span> that allows it to change the program counter and move from one place to another in your compiled program. By combining the <span class="code">branchif</span> or <span class="code">branchunless</span> instruction with the <span class="code">jump</span> instruction YARV is able to execute most of Ruby’s simple control structures.</p>
 <p>A good way to understand how YARV controls execution flow is to take a look at how the if/else statement works. Here’s a simple Ruby script that uses both <span class="code">if</span> and <span class="code">else</span>:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/6/29/if-statement.png"/></p>
-
 <p>On the right you can see the corresponding snippet of compiled YARV instructions. I’ve simplified the YARV instructions a bit by removing the <span class="code">trace</span> commands and a couple of other things. Reading the YARV instructions, you can see Ruby follows this pattern for implementing if/else statements:</p>
-
 <ul>
   <li>evaluate condition</li>
   <li>jump to false code if condition is false</li>
   <li>true code; jump to end</li>
   <li>false code</li>
 </ul>
-
-
 <p>This is a bit easier to follow if I paste the instructions into a flowchart:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/6/29/if-flowchart.png"/></p>
-
 <p>You can see how the <span class="code">branchunless</span> instruction is the key to how Ruby implements <span class="code">if</span> statements; here’s how it works:</p>
-
 <ul>
   <li>First at the top Ruby evaluates the condition of my <span class="code">if</span> statement, <span class="code">i &lt; 10,</span> using the <span class="code">opt_lt</span> (optimized less-than) instruction. This will leave either a true or false value on the stack.</li>
   <li>Then <span class="code">branchunless</span> will jump down to the false/else condition if the condition is false. That is, it “branches unless” the condition is true. Ruby uses <span class="code">branchunless</span> and not <span class="code">branchif</span> for if/else conditions since the positive case, the code that immediately follows the if statement, is compiled to appear right after the condition code. Therefore YARV needs to jump if the condition is false.</li>
   <li>Or if the condition is true Ruby will not branch and will just continue to execute the positive case code. After finishing the positive code Ruby will then jump down to the instructions following the if/else statement using the <span class="code">jump</span> instruction.</li>
   <li>Finally either way Ruby will continue to execute the subsequent code.</li>
 </ul>
-
-
-<p>YARV implements the <span class="code">unless</span> statement in a similar way using the same <span class="code">branchunless</span> instruction, except the positive and negative code snippets are in reverse order. For looping control structures like <span class="code">while&hellip;end</span> and <span class="code">until&hellip;end</span> YARV uses the <span class="code">branchif</span> instruction instead. But the idea is the same: calculate the loop condition, then execute <span class="code">branchif</span> to jump as necessary, and finally use <span class="code">jump</span> statements to implement the loop.</p>
-
+<p>YARV implements the <span class="code">unless</span> statement in a similar way using the same <span class="code">branchunless</span> instruction, except the positive and negative code snippets are in reverse order. For looping control structures like <span class="code">while...end</span> and <span class="code">until...end</span> YARV uses the <span class="code">branchif</span> instruction instead. But the idea is the same: calculate the loop condition, then execute <span class="code">branchif</span> to jump as necessary, and finally use <span class="code">jump</span> statements to implement the loop.</p>
 <p>One of the challenges YARV has implementing some control structures is that, similar to dynamic variable access, Ruby sometimes can jump from one scope to another. The simplest example of this is the <span class="code">break</span> statement. <span class="code">break</span> can be used both to exit a simple loop like this:</p>
+<p></p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">i </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">0
+</span><span style="color:#a71d5d;">while</span><span style="color:#000000;"> i</span><span style="color:#4f5b66;">&lt;</span><span style="color:#d08770;">10
+</span><span style="color:#000000;">  puts i
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">break
+</span><span style="color:#000000;">  i </span><span style="color:#4f5b66;">+= </span><span style="color:#d08770;">1
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">continue from here</span><span style="color:#4f5b66;">&quot;
+</span></pre>
 
 <p></p>
-
-
-
-
-<div class="CodeRay">
-  <div class="code"><pre>
-i = <span class="integer">0</span>
-<span class="keyword">while</span> i&lt;<span class="integer">10</span>
-  puts i
-  <span class="keyword">break</span>
-  i += <span class="integer">1</span>
-<span class="keyword">end</span>
-puts <span class="string"><span class="delimiter">&quot;</span><span class="content">continue from here</span><span class="delimiter">&quot;</span></span>
-</pre></div>
-</div>
-
-
-
-
-
-<p></p>
-
-
 <p>… or from a block iteration like this:</p>
+<p></p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#d08770;">10</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">n</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">  puts n
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">break
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">continue from here</span><span style="color:#4f5b66;">&quot;
+</span></pre>
 
 <p></p>
-
-
-
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="integer">10</span>.times <span class="keyword">do</span> |n|
-  puts n
-  <span class="keyword">break</span>
-<span class="keyword">end</span>
-puts <span class="string"><span class="delimiter">&quot;</span><span class="content">continue from here</span><span class="delimiter">&quot;</span></span>
-</pre></div>
-</div>
-
-
-
-
-
-<p></p>
-
-
 <p>In the first case, YARV can exit the while loop using simple <span class="code">jump</span> instructions like we saw above in the if/else example. However, exiting a block is not so simple: in this case YARV needs to jump to the parent scope and continue execution after the call to <span class="code">10.times</span>. How does it do this? How does it know where to jump to? And how does it adjust both it’s internal stack and your Ruby call stack to be able to continue execution properly in the parent scope?</p>
-
-<p>To implement jumping from one place to another in the Ruby call stack &ndash; that is, outside of the current scope &ndash; Ruby uses the <span class="code">throw</span> YARV instruction. That’s right: internally Ruby implements <span class="code">break</span> from within a block by throwing an exception!</p>
-
+<p>To implement jumping from one place to another in the Ruby call stack - that is, outside of the current scope - Ruby uses the <span class="code">throw</span> YARV instruction. That’s right: internally Ruby implements <span class="code">break</span> from within a block by throwing an exception!</p>
 <p>Let’s take a look at how that works; here’s the compiled code for the block above containing the <span class="code">break</span> statement:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/6/29/break-code.png"/></p>
-
 <p>You can see a <span class="code">throw 2</span> instruction appears in the compiled code for the block. <span class="code">Throw</span> implements throwing an exception at the YARV instruction level by using something called a “catch table.” A catch table is a table of pointers optionally attached to any YARV code snippet. Conceptually, a catch table might look like this:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/6/29/catch-table.png"/></p>
-
 <p>Here, the catch table from my example contains just a single pointer to the <span class="code">pop</span> statement, which is where execution would continue after an exception. Whenever you use a break statement in a block, Ruby not only compiles the <span class="code">throw</span> instruction into the block’s code, but it also adds the BREAK entry into the catch table of the parent scope. For a <span class="code">break</span> within a series of nested blocks, Ruby would add the BREAK entry to a catch table even farther down the rb_control_frame stack.</p>
-
 <p>Later, when YARV executes the <span class="code">throw</span> instruction it checks to see whether there’s a catch table containing a BREAK pointer for the current YARV instruction sequence:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/6/29/catch1.png"/></p>
-
-<p>If there isn’t, Ruby will start to iterate down through the stack of rb_control_frame structures looking for a catch table containing a BREAK pointer&hellip;</p>
-
+<p>If there isn’t, Ruby will start to iterate down through the stack of rb_control_frame structures looking for a catch table containing a BREAK pointer...</p>
 <p><img src="http://patshaughnessy.net/assets/2012/6/29/catch2.png"/></p>
-
 <p>… and continue to iterate until it finds one:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/6/29/catch3.png"/></p>
-
 <p>In my simple example, there is only one level of block nesting, so Ruby will find the catch table and BREAK pointer after just one iteration:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/6/29/caught.png"/></p>
-
 <p>Once Ruby finds the catch table pointer, it resets both the Ruby call stack (the CFP pointer) and the internal YARV stack to reflect the new program execution point. Then YARV continues to execute your code from there. That is, YARV resets the internal PC and SP pointers as needed.</p>
-
-<p>What is interesting to me about this is how Ruby uses exceptions internally to implement a very commonly used control structure: the <span class="code">break</span> keyword. In other words, what in more verbose languages is an exceptional occurrence becomes in Ruby a common, everyday action. Ruby has wrapped up a confusing, unusual syntax &ndash; throwing/catching of exceptions &ndash; into a simple keyword, <span class="code">break</span>, and made it very easy to understand and use. Of course, Ruby needs to use exceptions because of the way blocks work: they are on one hand like separate functions or subroutines, but on the other hand just part of the surrounding code. For this reason Ruby needs a keyword like <span class="code">break</span> that seems simple at first glance but internally is quite complex.</p>
-
+<p>What is interesting to me about this is how Ruby uses exceptions internally to implement a very commonly used control structure: the <span class="code">break</span> keyword. In other words, what in more verbose languages is an exceptional occurrence becomes in Ruby a common, everyday action. Ruby has wrapped up a confusing, unusual syntax - throwing/catching of exceptions - into a simple keyword, <span class="code">break</span>, and made it very easy to understand and use. Of course, Ruby needs to use exceptions because of the way blocks work: they are on one hand like separate functions or subroutines, but on the other hand just part of the surrounding code. For this reason Ruby needs a keyword like <span class="code">break</span> that seems simple at first glance but internally is quite complex.</p>
 <p>Another commonplace, ordinary Ruby control structure that also uses catch tables is the <span class="code">return</span> keyword. Whenever you call <span class="code">return</span> from inside a block Ruby internally throws an exception and catches it with a catch table pointer like this. In fact, <span class="code">break</span> and <span class="code">return</span> are implemented with exactly the same YARV instructions; the only difference is that for <span class="code">return</span> Ruby passes a 1 to the <span class="code">throw</span> instruction (e.g. <span class="code">throw 1</span>), while for <span class="code">break</span> it passes a 2 as we saw above. The <span class="code">return</span> and <span class="code">break</span> keywords are really two sides of the same coin.</p>
-
 <p>Finally, besides BREAK there are other types of pointers that Ruby can use in the catch table. The others are used to implement different control structures: <span class="code">rescue</span>, <span class="code">ensure</span>, <span class="code">retry</span>, <span class="code">redo</span> and <span class="code">next</span>. For example, when you explicitly raise an exception in your Ruby code using the <span class="code">raise</span> keyword, Ruby implements the <span class="code">rescue</span> block in a similar way by using the catch table, but this time with a RESCUE pointer. The catch table is simply a list of event types that can be caught and handled by that sequence of YARV instructions, similar to how you would use a rescue block in your Ruby code.</p>
-
 <h2>Experiment 2-3: How Ruby compiles different control structures into YARV instructions</h2>
-
 <p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
-
-<h2>High level vs. low level VM instructions &ndash; comparing how JRuby and Ruby 1.9 compile your code</h2>
-
+<h2>High level vs. low level VM instructions - comparing how JRuby and Ruby 1.9 compile your code</h2>
 <p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
-
-<h2>Comparing Rubinius high level instructions with LLVM&rsquo;s low level instructions</h2>
-
+<h2>Comparing Rubinius high level instructions with LLVM's low level instructions</h2>
 <p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'How Ruby Executes Your Code';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'How Ruby Executes Your Code';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'How Ruby Executes Your Code';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

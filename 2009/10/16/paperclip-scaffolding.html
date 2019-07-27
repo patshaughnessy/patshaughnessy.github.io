@@ -1,75 +1,13 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Paperclip scaffolding - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Paperclip scaffolding - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Paperclip scaffolding</h1>
-  
-    <div class="metadata">
-    <span class="date">October 16th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/10/16/paperclip-scaffolding" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>I just updated the <a href="http://patshaughnessy.net/view_mapper">View Mapper gem</a> to support Paperclip. You can use it to generate scaffolding code that supports uploading and downloading Paperclip file attachments.</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Paperclip scaffolding - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Paperclip scaffolding</h1><div class="metadata"><span class="date">October 16th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/10/16/paperclip-scaffolding" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Paperclip scaffolding">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>I just updated the <a href="http://patshaughnessy.net/view_mapper">View Mapper gem</a> to support Paperclip. You can use it to generate scaffolding code that supports uploading and downloading Paperclip file attachments.</p>
 <p><b>Creating a view for an existing model</b></p>
-
-
 <p>If you have a model like this:</p>
-
-
 <pre>class Song &lt; ActiveRecord::Base
   has_attached_file :mp3
 end</pre>
-
-
 <p>&hellip; you can generate a &ldquo;Paperclip view&rdquo; for this model like this:</p>
-
-
 <pre>script/generate view_for song --view paperclip</pre>
-
-
 <p>This will generate a controller, view and other code files that support uploading and downloading files. If you run your app you&rsquo;ll see the typical scaffolding user interface but with a file field for the &ldquo;mp3&rdquo; Paperclip attachment:</p>
-
-
 <p><img src="http://patshaughnessy.net/assets/2009/10/16/new_song.png"/></p>
-
-
 <p>View Mapper has:
 <ul>
   <li>inspected your model (&ldquo;Song&rdquo; in this example) and found its Paperclip attachments and other standard ActiveRecord attributes</li>
@@ -127,141 +65,42 @@ etc&hellip;</pre>
 <p>Now you can run your app and see the scaffolding UI I showed above, and will be able to upload and download MP3 files using Paperclip.</p>
 <p>Let&rsquo;s take a quick look at exactly what is different about the scaffolding code View Mapper generated vs. the standard Rails scaffolding code:</p>
 <pre>&lt;h1&gt;New song&lt;/h1&gt;
-
-&lt;% form_for(@song<b>, :html =&gt; { :multipart =&gt; true }</b>) do |f| %&gt;
-  &lt;%= f.error_messages %&gt;
-  &lt;p&gt;
-    &lt;%= f.label :name %&gt;&lt;br /&gt;
-    &lt;%= f.text_field :name %&gt;
-  &lt;/p&gt;
-
-&hellip; etc &hellip;
-
-<b>  &lt;p&gt;
-    &lt;%= f.label :mp3 %&gt;&lt;br /&gt;
-    &lt;%= f.file_field :mp3 %&gt;
-  &lt;/p&gt;</b>
-  &lt;p&gt;
-    &lt;%= f.submit &#x27;Create&#x27; %&gt;
-  &lt;/p&gt;
-&lt;% end %&gt;
-
-&lt;%= link_to &#x27;Back&#x27;, songs_path %&gt;</pre>
+<p>&lt;% form_for(@song<b>, :html =&gt; { :multipart =&gt; true }</b>) do |f| %&gt;
+&lt;%= f.error_messages %&gt;
+&lt;p&gt;
+&lt;%= f.label :name %&gt;&lt;br /&gt;
+&lt;%= f.text_field :name %&gt;
+&lt;/p&gt;</p>
+<p>… etc …</p>
+<p><b>  &lt;p&gt;
+&lt;%= f.label :mp3 %&gt;&lt;br /&gt;
+&lt;%= f.file_field :mp3 %&gt;
+&lt;/p&gt;</b>
+&lt;p&gt;
+&lt;%= f.submit 'Create' %&gt;
+&lt;/p&gt;
+&lt;% end %&gt;</p>
+<p>&lt;%= link_to 'Back', songs_path %&gt;</pre></p>
 <p>The code in bold was generated by View Mapper specifically to support Paperclip since we used the &ldquo;--view paperclip&rdquo; command line option. You can see that &ldquo;:html =&gt; { :multipart =&gt; :true }&rdquo; was added to form_for to allow for file uploads, and also a file_field was added for the mp3 Paperclip attachment.</p>
 <p>If you take a look at the show view, you&rsquo;ll see:</p>
 <pre>&lt;p&gt;
   &lt;b&gt;Name:&lt;/b&gt;
   &lt;%=h @song.name %&gt;
 &lt;/p&gt;
-
-&hellip; etc &hellip;
-
-<b>&lt;p&gt;
-  &lt;b&gt;Mp3:&lt;/b&gt;
-  &lt;%= link_to @song.mp3_file_name, @song.mp3.url %&gt;&lt;br&gt;
-&lt;/p&gt;</b>
-
-&lt;%= link_to &#x27;Edit&#x27;, edit_song_path(@song) %&gt; |
-&lt;%= link_to &#x27;Back&#x27;, songs_path %&gt;</pre>
+<p>… etc …</p>
+<p><b>&lt;p&gt;
+&lt;b&gt;Mp3:&lt;/b&gt;
+&lt;%= link_to @song.mp3_file_name, @song.mp3.url %&gt;&lt;br&gt;
+&lt;/p&gt;</b></p>
+<p>&lt;%= link_to 'Edit', edit_song_path(@song) %&gt; |
+&lt;%= link_to 'Back', songs_path %&gt;</pre></p>
 <p>Here a link to the file attachment was added, using Paperclip to provide the name and URL of the attachment.</p>
 <p>Next I&rsquo;ll be adding support for nested attributes and complex forms to View Mapper.</p>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2009/10/16/paperclip-scaffolding';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Paperclip scaffolding';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2009/10/16/paperclip-scaffolding';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Paperclip scaffolding';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2009/10/16/paperclip-scaffolding'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Paperclip scaffolding';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on View Mapper</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2010/4/4/creating-associations-to-existing-data-part-3-has_many-through-scaffolding">Creating associations to existing data part 3: has_many :through scaffolding</a></li>
-                  
-                    <li><a href="/2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">Creating associations to existing data part 2: belongs_to with auto_complete</a></li>
-                  
-                    <li><a href="/2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding">Creating associations to existing data part 1: belongs_to scaffolding</a></li>
-                  
-                    <li><a href="/2009/11/25/scaffolding-for-auto-complete-on-a-complex-nested-form">Scaffolding for auto complete on a complex, nested form</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on View Mapper</div><div class="links"><ul><li><a href="2010/4/4/creating-associations-to-existing-data-part-3-has_many-through-scaffolding">Creating associations to existing data part 3: has_many :through scaffolding</a></li><li><a href="2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">Creating associations to existing data part 2: belongs_to with auto_complete</a></li><li><a href="2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding">Creating associations to existing data part 1: belongs_to scaffolding</a></li><li><a href="2009/11/25/scaffolding-for-auto-complete-on-a-complex-nested-form">Scaffolding for auto complete on a complex, nested form</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

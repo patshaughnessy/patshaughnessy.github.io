@@ -1,142 +1,56 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Is Ruby interpreted or compiled? - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Is Ruby interpreted or compiled? - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Is Ruby interpreted or compiled?</h1>
-  
-    <div class="metadata">
-    <span class="date">February 15th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/2/15/is-ruby-interpreted-or-compiled" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Is Ruby interpreted or compiled?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Is Ruby interpreted or compiled? - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Is Ruby interpreted or compiled?</h1><div class="metadata"><span class="date">February 15th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/2/15/is-ruby-interpreted-or-compiled" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Is Ruby interpreted or compiled?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2012/2/15/binary-data.jpg"></td></tr>
   <tr><td align="center"><small><i>Both JRuby and Rubinius can compile your<br/>Ruby code into machine language!</i></small></td></tr>
 </table>
 </div>
-
-
-<p>Ever since I started to work with Ruby in 2008, I’ve always assumed that it was an interpreted language like PHP or Javascript &ndash; in other words, that Ruby read in, parsed and executed my code all at runtime, at the moment my program was run. This seemed especially obvious since the default and most popular implementation of Ruby is called “MRI,” short for “Matz’s Ruby Interpreter.” I always thought it was necessary to use an interpreter to make all of the dynamic features of the language possible.</p>
-
+<p>Ever since I started to work with Ruby in 2008, I’ve always assumed that it was an interpreted language like PHP or Javascript - in other words, that Ruby read in, parsed and executed my code all at runtime, at the moment my program was run. This seemed especially obvious since the default and most popular implementation of Ruby is called “MRI,” short for “Matz’s Ruby Interpreter.” I always thought it was necessary to use an interpreter to make all of the dynamic features of the language possible.</p>
 <p>However, it turns out that both JRuby and Rubinius, two other popular implementations of Ruby, support using a compiler the same way you would with a statically typed language like C or Java. Both JRuby and Rubinius first compile your Ruby code to byte code, and later execute it.</p>
-
 <p>Today I’m going to show you how to use these Ruby compilers, and I’ll also take a peek under the hood to see what they produce internally. Possibly you’ll rethink some of your assumptions about how Ruby works along the way.</p>
-
 <div style="clear: left"/></div>
-
-
 <h2>Using the Rubinius compiler</h2>
-
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2012/2/15/rubinius-compiler.png"></td></tr>
 </table>
 </div>
-
-
 <p>Using the Rubinius compiler is as simple as running any Ruby script. Here’s a very silly but simple Ruby program I’ll use as an example today:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Adder</span>
-  <span class="keyword">def</span> <span class="function">add_two</span>(x)
-    x+<span class="integer">2</span>
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-puts <span class="constant">Adder</span>.new.add_two(<span class="integer">3</span>)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Adder
+</span><span style="color:#343d46;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">add_two</span><span style="color:#000000;">(x)
+</span><span style="color:#000000;">    x</span><span style="color:#4f5b66;">+</span><span style="color:#d08770;">2
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">puts </span><span style="color:#008080;">Adder</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">.add_two(</span><span style="color:#d08770;">3</span><span style="color:#000000;">)
+</span></pre>
 
 <p>Now if I save that into a file called “simple.rb,” switch to Rubinius using RVM, and run the script I’ll get the number “5” as expected:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ rvm rbx-1.2.4-20110705
 $ ruby simple.rb
 5
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>Not very interesting, I know. But what is interesting is that when I ran simple.rb Rubinius created a new, hidden directory called “.rbx” with a strange, cryptically named file in it:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ ls -a
 .         ..        .rbx      simple.rb
 $ find .rbx
 .rbx
 .rbx/a7
 .rbx/a7/a7fc1eb2edc84efed8db760d37bee43753483f41
-</pre></div>
-</div>
-
-
-
-<p>This vaguely reminds me of how git saves the git repository data in a hidden folder called “.git,” also using cryptic hexadecimal names. What we are looking at here is a compiled version of simple.rb: the “a7fc1eb2e&hellip;” file contains my Ruby code converted into Rubinius byte code.</p>
-
+</pre>
+<p>This vaguely reminds me of how git saves the git repository data in a hidden folder called “.git,” also using cryptic hexadecimal names. What we are looking at here is a compiled version of simple.rb: the “a7fc1eb2e...” file contains my Ruby code converted into Rubinius byte code.</p>
 <p>Whenever you run a Ruby script, Rubinius uses a two step process to compile and run your code:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/2/15/rubinius-diagram.png" alt="Rubinius compiler" /></p>
-
 <p>On the top you can see that first Rubinius compiles your code into byte code, and then below later executes it using the Rubinius Virtual Machine, which can compile the byte code into native machine language. Rubinius also caches the byte code using the hexadecimal naming scheme I showed above, avoiding the need for the compile step entirely if the Ruby source code file didn’t change.</p>
-
 <p>As <a href="http://rubini.us/2011/03/17/running-ruby-with-no-ruby/">Brian Ford explained on the Rubinius blog</a>, you can actually run the Rubinius compiler directly like this:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ rbx compile simple.rb -o simple.bytecode
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>This compiles my Ruby code and saves the byte code in the specified file. If we look at the simple.bytecode file, we’ll see a series of alphanumeric tokens that don’t make any sense. But if you run the compiler using the “-B” option you can see an annotated version of the Rubinius byte code:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ rbx compile simple.rb -o simple.bytecode -B
 ============= :__script__ ==============
 Arguments:   0 required, 0 post, 0 total
@@ -166,69 +80,40 @@ Lines to IP: 2: -1..-1, 3: 0..5
 0005:  ret                        
 
 ... etc ...
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>At the bottom here we can see the compiled version of my silly <span class="code">add_two</span> method. It’s actually somewhat easy to understand the byte code, since it’s annotated so well:</p>
-
 <ul>
   <li>First “push_local” saves the value of the “x” parameter on the virtual machine stack.</li>
   <li>Then it pushes the literal value 2.</li>
   <li>Then it executes the + operation.</li>
   <li>And finally it returns.</li>
 </ul>
-
-
 <p>The Rubinius virtual machine reminds me of those old “reverse polish” calculators from the 1980s, in which you would enter values on a stack in a similar way. <a href="http://patshaughnessy.net/2012/1/25/my-first-impression-of-rubinius-internals">As I discussed 3 weeks ago</a>, the Rubinius source code is actually quite easy to understand since a large portion of it is actually written in Ruby, while the rest is written in well documented C++. The Rubinius compiler is no exception: it’s actually written in Ruby too! If you’re interested, you can see how the Rubinius compiler works without having to understand C++ at all. To get started take a look in the “lib/compiler” directory.</p>
-
 <p>The Rubinius virtual machine, which runs the Rubinius byte code, is implemented in C++ and leverages an open source project called <a href="http://llvm.org/">LLVM</a>. Like JRuby, it uses a “Just In Time” compiler to convert the byte code to machine language at runtime. This means that your Ruby code, for example the <span class="code">add_two</span> method above, ends up being converted into native machine language and run directly by your computer’s hardware!</p>
-
 <h2>Using the JRuby compiler</h2>
-
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2012/2/15/jruby-compiler.png"></td></tr>
 </table>
 </div>
-
-
 <p>Now let’s take a look at how JRuby compiles Ruby code; I’ll start by using RVM to switch over to JRuby, and then I’ll run the same simple.rb script:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ rvm jruby-head
 $ ruby simple.rb
 5
-</pre></div>
-</div>
-
-
-
-<p>No surprise: we get the same result. At a high level, JRuby uses the same two step process to run your script &ndash; first it compiles the Ruby code into byte code, and then executes the byte code using the Java Virtual Machine (JVM). See my post last week called <a href="http://patshaughnessy.net/2012/2/7/journey-to-the-center-of-jruby">Journey to the center of JRuby</a> to learn more about this.</p>
-
-<p>Here&rsquo;s another diagram showing the two step process, this time for JRuby:</p>
-
+</pre>
+<p>No surprise: we get the same result. At a high level, JRuby uses the same two step process to run your script - first it compiles the Ruby code into byte code, and then executes the byte code using the Java Virtual Machine (JVM). See my post last week called <a href="http://patshaughnessy.net/2012/2/7/journey-to-the-center-of-jruby">Journey to the center of JRuby</a> to learn more about this.</p>
+<p>Here's another diagram showing the two step process, this time for JRuby:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/2/15/jruby-diagram.png" alt="JRuby compiler" /></p>
-
-<p>Like with Rubinius, it’s possible to run the JRuby compiler directly using the “jrubyc” command&hellip; following the Java executable naming pattern (“java” &ndash;> “javac”). Thanks to my friend <a href="http://www.alexrothenberg.com/">Alex Rothenberg</a> for pointing this out. Running “jrubyc” will create a Java .class file, which we can inspect using the Java decompiler like I did last week:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<p>Like with Rubinius, it’s possible to run the JRuby compiler directly using the “jrubyc” command... following the Java executable naming pattern (“java” -&gt; “javac”). Thanks to my friend <a href="http://www.alexrothenberg.com/">Alex Rothenberg</a> for pointing this out. Running “jrubyc” will create a Java .class file, which we can inspect using the Java decompiler like I did last week:</p>
+<pre>
 $ jrubyc simple.rb
 $ ls
 simple.class simple.rb
-$ javap -c simple.class &gt; simple.bytecode
-</pre></div>
-</div>
-
-
-
+$ javap -c simple.class > simple.bytecode
+</pre>
 <p>Now the simple.bytecode file will contain an annotated version of the Java byte code the  JVM will execute. Unlike Rubinius, which creates byte code that is fairly clean, simple and easy to understand, Java byte code is much more cryptic and confusing. Searching through the simple.bytecode file for my method <span class="code">add_two</span>, I found the following snippet of byte code:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
   public static org.jruby.runtime.builtin.IRubyObject method__1$RUBY$add_two(simple, org.jruby.runtime.Thread...
     Code:
        0: aload_3       
@@ -236,122 +121,21 @@ $ javap -c simple.class &gt; simple.bytecode
        3: aload_1       
        4: aload_2       
        5: aload         9
-       7: invokedynamic #80,  0             // InvokeDynamic #1:&quot;fixnumOperator:+&quot;:(Lorg/jruby/runtime/Thread...
+       7: invokedynamic #80,  0             // InvokeDynamic #1:"fixnumOperator:+":(Lorg/jruby/runtime/Thread...
       12: areturn       
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>Although quite difficult to understand, there are a couple of important details to notice:</p>
-
 <p>First, JRuby has compiled my Ruby <span class="code">add_two</span> method into a byte code method called <span class="code">method__1$RUBY$add_two</span>. This proves that my Ruby script has been compiled! That is, when JRuby ran simple.rb above, it did not read the Ruby code, interpret it and just follow the instructions like the MRI interpreter would do. Instead, it converted my Ruby script into byte code, and specifically my <span class="code">add_two</span> method into the byte code snippet above.</p>
-
 <p>Second, notice the use of the “invokedynamic” byte code instruction. This is a new innovation of the Java Virtual Machine, making it easier for the JVM to support dynamic languages like Ruby. Here you can see it’s used by the <span class="code">add_two</span> method to call the <span class="code">+</span> operator of the Ruby Fixnum class, for my <span class="code">x+2</span> Ruby code. If you’re interested in what invokedynamic actually means, be sure to check out <a href="http://blog.headius.com/2008/09/first-taste-of-invokedynamic.html">a very detailed post Charles Nutter wrote</a> about it back in 2008. This use of invokedynamic is actually new for Java 1.7 and JRuby 1.7, so if you’re using the current release version of JRuby (1.6.4) or earlier you won’t see it appear in the byte code.</p>
-
-<p>Finally, as I explained last week since the JVM uses a Just In Time (JIT) compiler, all of the byte code you see above &ndash; in other words my Ruby script including the <span class="code">add_two</span> method &ndash; will be compiled directly into native machine language if the JVM notices that it is called enough times, that it’s in a “hotspot.”</p>
-
+<p>Finally, as I explained last week since the JVM uses a Just In Time (JIT) compiler, all of the byte code you see above - in other words my Ruby script including the <span class="code">add_two</span> method - will be compiled directly into native machine language if the JVM notices that it is called enough times, that it’s in a “hotspot.”</p>
 <h2>Why look under the hood? Who cares how Ruby works?</h2>
-
 <p>Today I’ve shown you some of the internal, technical details of Rubinius and JRuby. Many of you might find this boring and unimportant: who cares how Ruby works internally? All I care about is that my Ruby program works. And from one point of view that is all that really matters.</p>
-
-<p>However, I find Ruby internals to be fascinating&hellip; I really do like having at least a small understanding of what’s going on inside of Ruby while it’s running my code. I also believe it will help me to become a more effective and knowledgeable Ruby developer, even if I never contribute a line of internal code to Rubinius, JRuby or MRI. And studying Ruby internals has definitely lead me to a number of surprising discoveries, and forced me to rethink the mental model I have always had of the Ruby interpreter&hellip; or should I say, the Ruby compiler!</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2012/2/15/is-ruby-interpreted-or-compiled';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Is Ruby interpreted or compiled?';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2012/2/15/is-ruby-interpreted-or-compiled';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Is Ruby interpreted or compiled?';
-    (function () {
+<p>However, I find Ruby internals to be fascinating... I really do like having at least a small understanding of what’s going on inside of Ruby while it’s running my code. I also believe it will help me to become a more effective and knowledgeable Ruby developer, even if I never contribute a line of internal code to Rubinius, JRuby or MRI. And studying Ruby internals has definitely lead me to a number of surprising discoveries, and forced me to rethink the mental model I have always had of the Ruby interpreter... or should I say, the Ruby compiler!</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2012/2/15/is-ruby-interpreted-or-compiled'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Is Ruby interpreted or compiled?';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

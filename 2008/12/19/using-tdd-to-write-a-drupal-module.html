@@ -1,83 +1,21 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Using TDD to write a Drupal module - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Using TDD to write a Drupal module - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Using TDD to write a Drupal module</h1>
-  
-    <div class="metadata">
-    <span class="date">December 19th 2008</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>Last time <a href="http://patshaughnessy.net/2008/12/12/writing-your-first-phpunit-test-in-drupal">I wrote my first PHPUnit test for Drupal</a>. Now I&rsquo;d like to continue writing my new Drupal module using Test Driven Development (TDD). Here are links to the finished test code and production code files that I&rsquo;ll write below: <a href="http://patshaughnessy.net/assets/code/drupal-tdd-2/TddTests.php.txt">TddTests.php</a> and <a href="http://patshaughnessy.net/assets/code/drupal-tdd-2/tdd.module">tdd.module</a>, in case you want to download and try these tests yourself.</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Using TDD to write a Drupal module - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Using TDD to write a Drupal module</h1><div class="metadata"><span class="date">December 19th 2008</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Using TDD to write a Drupal module">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>Last time <a href="http://patshaughnessy.net/2008/12/12/writing-your-first-phpunit-test-in-drupal">I wrote my first PHPUnit test for Drupal</a>. Now I&rsquo;d like to continue writing my new Drupal module using Test Driven Development (TDD). Here are links to the finished test code and production code files that I&rsquo;ll write below: <a href="http://patshaughnessy.net/assets/code/drupal-tdd-2/TddTests.php.txt">TddTests.php</a> and <a href="http://patshaughnessy.net/assets/code/drupal-tdd-2/tdd.module">tdd.module</a>, in case you want to download and try these tests yourself.</p>
 <p>With TDD the first step is always to write a failing unit test. But, which test to write first? What should I try to test? Since the demonstration module I&rsquo;m writing will display a series of nodes on the screen containing a certain word in their title, let&rsquo;s try to test that behavior directly, right away:</p>
-
-
 <pre>public function test_search_for_titles()
 {
   $query = &#x27;FindMe&#x27;;
   $titles = tdd_search_for_titles($query);
 }</pre>
-
-
 <p>This doesn&rsquo;t actually test anything, but it calls a function that will return the titles. Now if we run this test, it will obviously fail since &ldquo;tdd_search_for_titles&rdquo; is not defined. Let&rsquo;s write that. Another rule of TDD is to write just enough production code to get the failing unit test to pass. The simplest way to get this test to pass is to just return a hard coded title like this:</p>
-
-
 <pre>function tdd_search_for_titles($query) {
   return array(&#x27;Hard coded title with the word FindMe&#x27;);
 }</pre>
-
-
 <p>Now the test above passes, along with the first test I wrote in <a href="http://patshaughnessy.net/2008/12/12/writing-your-first-phpunit-test-in-drupal">my last post</a>:</p>
-
-
 <pre>$ phpunit TddTests modules/tdd/TddTests.php 
 PHPUnit 3.2.21 by Sebastian Bergmann.
 ..
 Time: 0 seconds
 OK (2 tests)</pre>
-
-
 <p>This seems silly, but at least we&rsquo;ve started writing and executing code in our new module. Since our test is not actually testing anything, let&rsquo;s add some real test code to it by checking that the titles returned actually contain the query string:</p>
-
-
 <pre>public function test_search_for_titles()
 {
   $query = &#x27;FindMe&#x27;;
@@ -86,19 +24,11 @@ OK (2 tests)</pre>
     $this-&gt;assertTrue(stripos($title, $query) &gt; 0);
   }
 }</pre>
-
-
 <p>Run the test again: it still passes. It&rsquo;s important when using TDD to continuously run your tests as you write code, as often as every 30 seconds or 1-2 minutes. That way as soon as your tests fail, you know immediately what caused the problem: whatever code you changed during the past 1-2 minutes. One benefit of TDD is that you rarely need to use a debugger to figure out what is wrong since you execute and test your changes so frequently. Next, as a sanity check, let&rsquo;s try breaking the code on purpose and checking if our test is really working or not:</p>
-
-
 <pre>function tdd_search_for_titles($query) {
   return array(&#x27;Hard coded title with the word FindXYZMe&#x27;);
 }</pre>
-
-
 <p>Now the test fails (good!):</p>
-
-
 <pre>$ phpunit TddTests modules/tdd/TddTests.php
 PHPUnit 3.2.21 by Sebastian Bergmann.
 .F
@@ -109,34 +39,23 @@ Failed asserting that &lt;boolean:false&gt; is true.
 /Users/pat/htdocs/drupal3/modules/tdd/TddTests.php:15
 FAILURES!
 Tests: 2, Failures: 1.</pre>
-
-
 <p>I frequently do something like this when some new tests pass for the first time, just to be sure they are really executing and calling the code I intended them to. Sometimes trusting your tests too much can be dangerous! If we remove the &ldquo;XYZ&rdquo; change the test will pass again. Once the test is passing again we can move on.</p>
-
-
 <p>So far we haven&rsquo;t done much. All we have done is to prove that we can write a function to return a hard-coded string. Let&rsquo;s continue by testing that we can query actual data in the MySQL database. But first we need to create some data for our function to look for. The simplest way to do that would be to open Drupal in a web browser and to create some nodes (web pages) that have the query string in their title. This is a good way to get started, but can lead to trouble down the road since our test will now rely on someone having created these pages manually. If we run the tests using a different database or on someone else&rsquo;s machine they will fail. A better approach would be to have the test itself create the data it expects. Here&rsquo;s how to do that:</p>
-
-
 <pre>public function test_search_for_titles()
 {
   $login_form = array(&#x27;name&#x27; =&gt; &#x27;admin&#x27;, &#x27;pass&#x27; =&gt; &#x27;adminpassword&#x27;);
   user_authenticate($login_form);
-  
-  $node = new stdClass();
-  $node-&gt;title = &#x27;This title contains the word FindSomethingElse&#x27;;
-  $node-&gt;body = &#x27;This is the body of the node&#x27;;
-  node_save($node);
-
-  $query = &#x27;FindSomethingElse&#x27;;
-  $titles = tdd_search_for_titles($query);
-  foreach ($titles as $title) {
-    $this-&gt;assertTrue(stripos($title, $query) &gt; 0);
-  }
-  
-  node_delete($node-&gt;nid);    
-}</pre>
-
-
+<p>$node = new stdClass();
+$node-&gt;title = 'This title contains the word FindSomethingElse';
+$node-&gt;body = 'This is the body of the node';
+node_save($node);</p>
+<p>$query = 'FindSomethingElse';
+$titles = tdd_search_for_titles($query);
+foreach ($titles as $title) {
+$this-&gt;assertTrue(stripos($title, $query) &gt; 0);
+}</p>
+<p>node_delete($node-&gt;nid);<br />
+}</pre></p>
 <p>There are a few different things going on here:
   <ul>
     <li>Most importantly we have created a node object in memory, loaded it with some test values, and then saved it into the database using node_save(). This means that every time the test is run, it will create the node that the test code expects to find.</li>
@@ -144,11 +63,7 @@ Tests: 2, Failures: 1.</pre>
     <li>Finally, at the bottom of the test we are calling node_delete(), and passing the node id of the node we created earlier. This is how the test cleans up after itself. Without this our Drupal database would begin to fill up with test records, one new record each time we run the test.</li>
   </ul>
 </p>
-
-
 <p>If we run the test it will fail, of course, since our hard coded title does not contain &ldquo;FindSomethingElse.&rdquo; Instead of changing the hard coded string to make the test pass, let&rsquo;s actually do some real coding and write a SQL statement to get the titles from MySQL:</p>
-
-
 <pre>function tdd_search_for_titles($query) {
   $titles = array();
   $result = db_query(&quot;SELECT title FROM {node}&quot;);
@@ -157,168 +72,44 @@ Tests: 2, Failures: 1.</pre>
   }
   return $titles;
 }</pre>
-
-
 <p>Finally we have started writing code that our module will actually use. Here we take the query string, construct a select statement and execute it using db_query(). Once we have the results, we return the titles as an array of strings. Let&rsquo;s run our test and see what happens:</p>
-
-
 <pre>$ phpunit TddTests modules/tdd/TddTests.php
 Failed asserting that &lt;boolean:false&gt; is true.</pre>
-
-
 <p>Oops &mdash; it failed! What went wrong? If we add another check to the test, we can get some more information:</p>
-
-
 <pre>$this-&gt;assertEquals(count($titles), 1);</pre>
-
-
 <p>And if we run again:</p>
-
-
 <pre>$ phpunit TddTests modules/tdd/TddTests.php
 Failed asserting that &lt;integer:1&gt; matches expected value &lt;integer:27&gt;.</pre>
-
-
 <p>The problem is that there are 27 titles returned, instead of just the one we created. If we take a second look at the SQL statement we see right away that there is no WHERE clause, causing all of the titles in the database to be returned. Now, if we fix the SQL statement, the test should pass:</p>
-
-
 <pre>$result = db_query(
   &quot;SELECT title FROM {node} WHERE title LIKE &#x27;%%%s%%&#x27;&quot;, $query);</pre>
-
-
 <p>Let&rsquo;s see:</p>
-
-
 <pre>phpunit TddTests modules/tdd/TddTests.php
 Failed asserting that &lt;integer:1&gt; matches expected value &lt;integer:3&gt;</pre>
-
-
 <p>Now what&rsquo;s the problem?? It turns out that both the test and production functions are working properly, and there really are 3 nodes in the database with &ldquo;FindSomethingElse&rdquo; in the title. The reason why is that our call to node_delete() was not executed when we ran our test above and it failed (twice). We&rsquo;ll fix that below. For now, let&rsquo;s just clean up the database and remove the extra test records. The best thing to do is just to delete them from the Drupal admin console (Administer-&gt;Content management-&gt;Content). Now when you are sure no other nodes exist with &ldquo;FindSomethingElse&rdquo; in the title run the test again and it will pass.</p>
-
-
 <p>Now&hellip; why were extra test node records created when the test failed? What happened is that the call to node_delete() is never executed if any of the asserts fail. That is, the test execution stops as soon as there is a failing assert statement. I suppose this makes sense; we know the overall test will fail if there is even one failing assert statement, and so there&rsquo;s no need to continue executing the test code.</p>
-
-
 <p>The solution is to refactor the test code and use two new functions called setup() and teardown(), as follows:</p>
-
-
 <pre>public function setup()
   {
     $login_form = array(&#x27;name&#x27; =&gt; &#x27;admin&#x27;, &#x27;pass&#x27; =&gt; &#x27;adminpassword&#x27;);
     user_authenticate($login_form);
-
-    $this-&gt;node = new stdClass();
-    $this-&gt;node-&gt;title = &#x27;This title contains the word FindSomethingElse&#x27;;
-    $this-&gt;node-&gt;body = &#x27;This is the body of the node&#x27;;
-    node_save($this-&gt;node);    
-  }
+<pre><code>$this-&amp;gt;node = new stdClass();
+$this-&amp;gt;node-&amp;gt;title = &amp;#x27;This title contains the word FindSomethingElse&amp;#x27;;
+$this-&amp;gt;node-&amp;gt;body = &amp;#x27;This is the body of the node&amp;#x27;;
+node_save($this-&amp;gt;node);    
+</code></pre>
+<p>}
 public function teardown()
-  {
-    node_delete($this-&gt;node-&gt;nid);  
-  }</pre>
-
-
+{
+node_delete($this-&gt;node-&gt;nid);<br />
+}</pre></p>
 <p>The way this works is that setup() is called once for each test in the test class, just before the test function is called. In our case it will be called twice: once for test_tdd_help() and once for test_search_for_titles(). This gives us a chance to create test data and perform other setup tasks before each test is executed. As you might guess, teardown() is called once for each test also, right after the test function finishes. This gives us a chances to remove our test data, even if the test fails. One thing to note about this: you have to save the $node object inside the test class so that it can be accessed from teardown() and from the tests themselves if necessary; so &ldquo;$node&rdquo; becomes &ldquo;$this-&gt;node&rdquo;.</p>
-
-
 <p>Here are the links again to the final test and code files: <a href="http://patshaughnessy.net/assets/code/drupal-tdd-2/TddTests.php.txt">TddTests.php</a> and <a href="http://patshaughnessy.net/assets/code/drupal-tdd-2/tdd.module">tdd.module</a>. In my next post I&rsquo;ll finish up the code for tdd.module and TddTests.php without providing as much detail, and then move quickly to a discussion of how this code can be integrated with Drupal and included in a working web site.</p>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Using TDD to write a Drupal module';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Using TDD to write a Drupal module';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Using TDD to write a Drupal module';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Drupal</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2009/1/19/using-mysql-transactions-with-drupal-unit-tests">Using MySQL transactions with Drupal unit tests</a></li>
-                  
-                    <li><a href="/drupal-test-database">Using transactions in a separate database with Drupal PHPUnit tests</a></li>
-                  
-                    <li><a href="/2009/1/16/using-a-test-database-with-drupal-unit-tests">Using a test database with Drupal unit tests</a></li>
-                  
-                    <li><a href="/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal">TDD keeps your PHP code separate from Drupal</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Drupal</div><div class="links"><ul><li><a href="2009/1/19/using-mysql-transactions-with-drupal-unit-tests">Using MySQL transactions with Drupal unit tests</a></li><li><a href="drupal-test-database">Using transactions in a separate database with Drupal PHPUnit tests</a></li><li><a href="2009/1/16/using-a-test-database-with-drupal-unit-tests">Using a test database with Drupal unit tests</a></li><li><a href="2009/1/9/tdd-keeps-your-php-code-separate-from-drupal">TDD keeps your PHP code separate from Drupal</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

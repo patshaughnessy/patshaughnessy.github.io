@@ -1,97 +1,27 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="TDD keeps your PHP code separate from Drupal - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>TDD keeps your PHP code separate from Drupal - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>TDD keeps your PHP code separate from Drupal</h1>
-  
-    <div class="metadata">
-    <span class="date">January 9th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>Many Drupal projects that I&rsquo;ve been involved with during the past few years have all suffered from different variations on the same problem: the custom PHP code added by me and the development team I was in has ended up being highly coupled with the Drupal framework. At best, our code was hard to understand without knowing a lot about Drupal internals and could never run on its own outside of Drupal. At worst, our code changes were made right inside Drupal core functions and needed to be identified, reimplemented and merged into every newer version of Drupal whenever we decided to upgrade.</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>TDD keeps your PHP code separate from Drupal - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>TDD keeps your PHP code separate from Drupal</h1><div class="metadata"><span class="date">January 9th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="TDD keeps your PHP code separate from Drupal">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>Many Drupal projects that I&rsquo;ve been involved with during the past few years have all suffered from different variations on the same problem: the custom PHP code added by me and the development team I was in has ended up being highly coupled with the Drupal framework. At best, our code was hard to understand without knowing a lot about Drupal internals and could never run on its own outside of Drupal. At worst, our code changes were made right inside Drupal core functions and needed to be identified, reimplemented and merged into every newer version of Drupal whenever we decided to upgrade.</p>
 <p>In hindsight, I believe that we could have avoided all of these problems if we had only used Test Driven Development (TDD). Using TDD has a lot of benefits for any software project which I won&rsquo;t go into here (see <a href="http://en.wikipedia.org/wiki/Test-driven_development#Benefits">Wikipedia</a> or <a href="http://butunclebob.com/ArticleS.UncleBob.TheThreeRulesOfTdd">Bob Martin&#x27;s explanation</a> for more information) but I believe the biggest benefit of using TDD specifically on a Drupal development project is that it makes it easy to write PHP code that is not highly coupled with Drupal, is easy to distinguish from Drupal&rsquo;s core modules, and can even run on its own outside of Drupal entirely.</p>
-
-
 <p>The same is probably true while developing inside any application development framework.</p>
-
-
 <p>To explore this topic in detail and find out whether I was right about this, in December I started experimenting with Drupal and TDD. After <a href="http://patshaughnessy.net/2008/12/12/writing-your-first-phpunit-test-in-drupal">I wrote my first Drupal PHPUnit test</a>, I started to <a href="http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module">write a simple example module using TDD</a>, showing how the test first thought process can work with PHP and Drupal. Below I&rsquo;ll take a look at the finished example module to see whether the module&rsquo;s code is any less coupled to Drupal, and whether it&rsquo;s any easier to identify and maintain.</p>
-
-
 <p>But first let&rsquo;s take a closer look at the 3 types of PHP code any Drupal web site will contain:</p>
-
-
 <ol>
   <li><b>Drupal Code</b>: This is the PHP code you download from <a href="http://drupal.org">drupal.org</a>: files such as node.module, common.include, index.php, etc. You can assume it all works properly, was tested by the Drupal community and is used in thousands of other web sites successfully.</li>
   <li><b>Custom Code</b>: This is code you write to actually implement the special behavior your business or community needs in its web site. You need to write and maintain this, and you need to test that it works properly since no one else will use it.</li>
   <li><b>Connection Code</b>: This is code you have to write to connect your custom code to Drupal. Unfortunately, there&rsquo;s no way to magically drop your business logic into a Drupal site and see it appear in a web page, ready for users. You need to know something about how Drupal actually works, and you need to connect your Custom Code with the Drupal Code properly.</li>
 </ol>
-
-
 <p>A good way to understand better the difference between Drupal, Custom and Connection code is to imagine that next year you decide to upgrade your site from Drupal 6.x to Drupal 7, or that you decide to rebuild your site with Ruby on Rails or some other new technology. What you would have to do is:</p>
-
-
 <ul>
   <li>Discard the Drupal Code, and replace it with the new framework.</li>
   <li>Discard your Connection Code, and write the necessary new code required to connect to the new framework.</li>
   <li>Take your Custom Code with you, possibly retaining the PHP unchanged for Drupal 7, or else rewriting it using Ruby or some other language.</li>
 </ul>
-
-
 <p>Clearly you need to know which code is which or else you&rsquo;ll discard code you really need! TDD can make this easy; the reason why is that using PHPUnit forces you to structure your Custom Code so that it can run outside of Drupal from the command line. Knowing that your Custom Code can run outside of Drupal inside of a unit test suite guarantees that you will be able to take the code with you and later connect it to another framework.</p>
-
-
 <p>Let&rsquo;s see how my example module turned out; see <a href="http://patshaughnessy.net/2008/12/9/example-drupal-module-to-use-for-tdd-demonstration">one of my previous posts</a> for more background on what this module does and how to set it up. Here&rsquo;s the finished code:</p>
-
-
 <ul>
   <li>My Custom Code: <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/Tdd.php.txt">Tdd.php</a> and <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/TddTests.php.txt">TddTests.php</a></li>
   <li>My Connection Code: <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/tdd.module">tdd.module</a></li>
   <li>And the Drupal “info” file: <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/tdd.info">tdd.info</a></li>
 </ul>
-
-
 <p>What I&rsquo;ve done since <a href="http://patshaughnessy.net/2008/12/19/using-tdd-to-write-a-drupal-module">my last post</a> while finishing up this simple example is to separate the Custom Code and Connection Code into two separate files. First, here&rsquo;s my finished Custom Code:</p>
-
-
 <pre>&lt;?php
 function tdd_search_for_titles($query, $ascending, $from, $count) {
   $titles = array();
@@ -116,11 +46,7 @@ function tdd_search_for_titles($query, $ascending, $from, $count) {
   return $titles;
 }
 ?&gt;</pre>
-
-
 <p>This probably could be refactored even more into 2 or 3 simpler methods, but the question here is whether this is Custom Code, or Connection Code. I know this is my Custom Code because:</p>
-
-
 <ul>
   <li>This is the code that actually implements the behavior I am trying to achieve. In this simple example the code is searching for nodes by words in their titles.</li>
   <li>This code is not at all coupled to the Drupal framework. This function is easy to understand for any PHP developer, even someone who knows nothing about Drupal. The only minor exception here is that it uses 3 simple utility Drupal functions: db_query(), db_query_range() and db_fetch_object(). However, these are self-explanatory; If I were a purist, I could have used the mysql_query() function instead, and have eliminated all of my dependencies on Drupal entirely. The code also assumes the presence of the node table and the title column within it, but the same code would work on any database table containing web pages and their titles with only trivial changes. The point is that the code is easy to understand and would be easy to migrate to another framework.</li>
@@ -131,24 +57,14 @@ PHPUnit 3.2.21 by Sebastian Bergmann.
 Time: 0 seconds
 OK (12 tests)</pre></li>
 </ul>
-
-
 <p>The <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/TddTests.php.txt">test code</a>, which I won&rsquo;t repeat here, is also an essential part of my Custom Code, since it is the only way I have to prove that my function is working properly. It also documents my code&rsquo;s the desired behavior, and finally will allow me to validate that the code is working if I ever move it to a newer version of Drupal or to some other technology. Also, if you take a look at <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/TddTests.php.txt">TddTests.php</a>, you&rsquo;ll see that the test code is also not highly coupled to Drupal. There are a few references to node_save() and drupal_bootstrap() for example, but most of the test code is pure PHPUnit and has nothing to do with Drupal.</p>
-
-
 <p>Let&rsquo;s take a look at my Connection Code, which is in the <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/tdd.module">tdd.module</a> file. I won&rsquo;t repeat all of it here in this page,  but if you look at <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/tdd.module">tdd.module</a> you can see the code does not have these 3 qualities:</p>
-
-
 <ul>
   <li>This code has nothing to do with the behavior I&rsquo;m trying to implement. It simply provides URL parameters from the user&rsquo;s request to tdd_search_for_titles(), and displays the results from tdd_search_for_titles() in a web page. It also handles the complexity around the Drupal Form API.</li>
   <li>This code is very coupled to the Drupal framework. For someone who doesn&rsquo;t understand Drupal internals <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/tdd.module">tdd.module</a> is very hard to understand &ndash; even for developers with years of PHP experience.</li>
   <li>This code could never run outside of the Drupal framework. This is because it uses functions such as drupal_get_form() and theme() that would be impossible  - and pointless - to implement outside of Drupal. More importantly, the functions in <a href="http://patshaughnessy.net/assets/code/drupal-tdd-3/tdd.module">tdd.module</a> are called by Drupal at certain times during its processing; none of this would make any sense outside of Drupal.</li>
 </ul>
-
-
 <p>Here&rsquo;s the only interesting snippet from my Connection Code:</p>
-
-
 <pre>...
 $sortAscending = true;
 if (isset($_GET[&#x27;sort&#x27;]) &amp;&amp; $_GET[&#x27;sort&#x27;] == &#x27;desc&#x27;) {
@@ -160,111 +76,13 @@ foreach ($titles as $title) {
   $rows[] = array($title);
 }
 ...</pre>
-
-
 <p>This is the actual location in the code where we &ldquo;connect&rdquo; from Drupal to my Custom Code, and vice-versa. This few lines are actually passing (connecting) the request parameters onto my Custom Code, and later saving the results in $titles which is parsed and returned to Drupal in the required format.</p>
-
-
 <p>In my next post I&rsquo;ll try using TDD again to write a more complex and interesting Drupal module: one that will display monthly archive links - e.g. January 2009 (23) - for a Drupal blog, similar to what you would see in a standard <a href="http://wordpress.org/">WordPress</a> or <a href="http://b2evolution.net/">B2Evolution</a> blog site.</p>
-
-
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'TDD keeps your PHP code separate from Drupal';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'TDD keeps your PHP code separate from Drupal';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2009/1/9/tdd-keeps-your-php-code-separate-from-drupal'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'TDD keeps your PHP code separate from Drupal';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Drupal</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2009/1/19/using-mysql-transactions-with-drupal-unit-tests">Using MySQL transactions with Drupal unit tests</a></li>
-                  
-                    <li><a href="/drupal-test-database">Using transactions in a separate database with Drupal PHPUnit tests</a></li>
-                  
-                    <li><a href="/2009/1/16/using-a-test-database-with-drupal-unit-tests">Using a test database with Drupal unit tests</a></li>
-                  
-                    <li><a href="/2008/12/19/using-tdd-to-write-a-drupal-module">Using TDD to write a Drupal module</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Drupal</div><div class="links"><ul><li><a href="2009/1/19/using-mysql-transactions-with-drupal-unit-tests">Using MySQL transactions with Drupal unit tests</a></li><li><a href="drupal-test-database">Using transactions in a separate database with Drupal PHPUnit tests</a></li><li><a href="2009/1/16/using-a-test-database-with-drupal-unit-tests">Using a test database with Drupal unit tests</a></li><li><a href="2008/12/19/using-tdd-to-write-a-drupal-module">Using TDD to write a Drupal module</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

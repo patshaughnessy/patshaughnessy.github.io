@@ -1,112 +1,37 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Paperclip sample app part 3: saving file attachments in a database BLOB column - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Paperclip sample app part 3: saving file attachments in a database BLOB column - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Paperclip sample app part 3: saving file attachments in a database BLOB column</h1>
-  
-    <div class="metadata">
-    <span class="date">May 29th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/5/29/paperclip-sample-app-part-3-saving-file-attachments-in-a-database-blob-column" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p><a href="http://patshaughnessy.net/2009/4/30/paperclip-sample-app">In part 1 of this series</a>, I showed how to create a simple Rails web site that uses the Paperclip plugin from Thoughtbot to upload and display image files. <a href="http://patshaughnessy.net/2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">Then in part 2</a>, I went on to change the sample app to download the image files through a Rails controller and not just through a direct call to Apache. This would be useful if you wanted to implement security for file attachments or for a variety of other reasons.</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Paperclip sample app part 3: saving file attachments in a database BLOB column - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Paperclip sample app part 3: saving file attachments in a database BLOB column</h1><div class="metadata"><span class="date">May 29th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/5/29/paperclip-sample-app-part-3-saving-file-attachments-in-a-database-blob-column" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Paperclip sample app part 3: saving file attachments in a database BLOB column">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p><a href="http://patshaughnessy.net/2009/4/30/paperclip-sample-app">In part 1 of this series</a>, I showed how to create a simple Rails web site that uses the Paperclip plugin from Thoughtbot to upload and display image files. <a href="http://patshaughnessy.net/2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">Then in part 2</a>, I went on to change the sample app to download the image files through a Rails controller and not just through a direct call to Apache. This would be useful if you wanted to implement security for file attachments or for a variety of other reasons.</p>
 <p>This time I&rsquo;d like to show how to modify the same sample application to save the file attachments in a database BLOB column, instead of on your web server&rsquo;s file system. To jump ahead and just get the working code, look at the &ldquo;part3&rdquo; folder in the github repo: <a href="http://github.com/patshaughnessy/paperclip-sample-app">http://github.com/patshaughnessy/paperclip-sample-app</a>.</p>
-
-
 <p>But before we actually work on the sample app, a disclaimer: Don&rsquo;t try this at home! Serving file content directly from the file system via Apache or some other web server will always be faster and simpler than loading the file attachments from a database table&hellip; Apache and other web servers were designed to load and serve files quickly, and there&rsquo;s normally no need to issue an expensive SQL query or to make another network connection to a database server just to send files to a web browser.</p>
-
-
 <p>So why in the world would you ever want to pay the extra performance penalty and move the files into a database table? Here are a couple of reasons:
   <ol>
     <li>Your client or employer wants you to. Some companies insist on using a commercial, &ldquo;enterprise&rdquo; RDMS system to save file contents for one reason or another. My employer, for example, has many years of experience using Oracle and is comfortable managing large numbers of files that are stored in an Oracle table, while the thought of managing, replicating, backing up, etc., files that are simply saved on a Linux file system seems much more complex and unfamiliar.</li>
     <li>Security. If you need to encrypt the contents of super-secret file attachments, storing them in a database might be an easier solution if you&rsquo;re willing to spend money on a database server like Oracle. And database encryption aside, generally information in a database server can be more easily protected and audited than files on your web server's file system can be.</li>
   </ol>
 </p>
-
-
 <p>Anyway, let&rsquo;s move on and actually change the sample app to save the files in a BLOB column. The first thing we will need to do is to use the version of Paperclip that I modified; the actual Paperclip plugin from Thoughtbot does not support storing files in a BLOB column. I added some code to Paperclip &ndash; a new &ldquo;storage module&rdquo; &ndash; to make this possible. See <a href="http://github.com/patshaughnessy/paperclip/blob/9556fab3e1659a5c8690db82394cea55714b5da4/lib/paperclip/storage.rb#L236">my code changes</a> to learn more.</p>
-
-
 <p>So let&rsquo;s delete the original plugin and install my version:</p>
-
-
 <pre>$ cd /path/to/paperclip-sample-app
 $ rm -rf vendor/plugins/paperclip
 $ ./script/plugin install git://github.com/patshaughnessy/paperclip.git</pre>
-
-
 <p>Now that we have the modified plugin installed, let&rsquo;s go ahead and create the BLOB columns that we will use to save the files. I tried to design the database storage module to be easy to use; one of the decisions I made was around what these BLOB columns should be called. I decided by default to use &ldquo;[attachment]_file&rdquo; as the name for the primary file attachment, and &ldquo;[attachment]_[style]_file&rdquo; for the other styles. If you want to use other column names, you just need to specify the names in the call to &ldquo;has_attached_file&rdquo; in the model. See <a href="http://patshaughnessy.net/2009/4/14/database-storage-for-paperclip-rewritten-to-use-a-single-table">my usage post</a> for more info.</p>
-
-
 <p>For this sample app I&rsquo;ll go ahead and use the default column names: &ldquo;avatar_file,&rdquo; &ldquo;avatar_small_file&rdquo; and &ldquo;avatar_thumb_file.&rdquo; Here&rsquo;s how to create those columns for a MySQL database. First create a new migration as usual:</p>
-
-
 <pre>$ ./script/generate migration add_attachments_blob_avatar_to_user
 exists  db/migrate
 create  db/migrate/20090528173400_add_attachments_blob_avatar_to_user.rb</pre>
-
-
 <p>&hellip; and then edit the new migration file and add the bolded code to it:</p>
-
-
 <pre>class AddAttachmentsBlobAvatarToUser &lt; ActiveRecord::Migration
   def self.up<b>
     execute &#x27;ALTER TABLE users ADD COLUMN avatar_file LONGBLOB&#x27;
     execute &#x27;ALTER TABLE users ADD COLUMN avatar_small_file LONGBLOB&#x27;
     execute &#x27;ALTER TABLE users ADD COLUMN avatar_thumb_file LONGBLOB&#x27;</b>
   end
-
-  def self.down<b>
-    remove_column :users, :avatar_file
-    remove_column :users, :avatar_small_file
-    remove_column :users, :avatar_thumb_file</b>
-  end
-end</pre>
-
-
+<p>def self.down<b>
+remove_column :users, :avatar_file
+remove_column :users, :avatar_small_file
+remove_column :users, :avatar_thumb_file</b>
+end
+end</pre></p>
 <p>Normally to create a BLOB column you would use &ldquo;add_column :users, :avatar_file, :binary.&rdquo; This would work fine for Oracle and other database servers. MySQL, however, supports four different types of BLOBs: TINYBLOB (256 bytes), BLOB (64k bytes), MEDIUMBLOB (16MB) and LONGBLOB (4GB). (See <a href="http://dev.mysql.com/doc/refman/5.0/en/storage-requirements.html">http://dev.mysql.com/doc/refman/5.0/en/storage-requirements.html</a> for more information.) If we used the Rails migrations :binary column type, then we would get normal BLOBs and have an upper limit for the file attachment size of 64k, which is not normally enough. Unfortunately, there&rsquo;s no way to specify LONGBLOB for MySQL using Rails migrations, so you have to use the &ldquo;execute&rdquo; migration and write an actual SQL statement to add the column.</p>
-
-
 <p>Next go ahead and run your migrations and create the new columns:</p>
-
-
 <pre>$ rake db:migrate
 (in /path/to/paperclip-sample-app)
 ==  AddAttachmentsBlobAvatarToUser: migrating =================================
@@ -117,32 +42,20 @@ end</pre>
 -- execute(&quot;ALTER TABLE users ADD COLUMN avatar_thumb_file LONGBLOB&quot;)
    -&gt; 0.0116s
 ==  AddAttachmentsBlobAvatarToUser: migrated (0.0973s) ========================</pre>
-
-
 <p>Now we just need to tell Paperclip to use database storage instead of the default file system storage and we&rsquo;re ready to try our app and see if it saves the files into the new BLOB columns. Add the bolded parameter to has_attached_file in the User model:</p>
-
-
 <pre>class User &lt; ActiveRecord::Base
   has_attached_file :avatar,
                     <b>:storage =&gt; :database,</b>
                     :styles =&gt; { :thumb =&gt; &quot;75x75&gt;&quot;, :small =&gt; &quot;150x150&gt;&quot; },
                     :url =&gt; &#x27;/:class/:id/:attachment?style=:style&#x27;
 end</pre>
-
-
 <p>Note that I also removed the &ldquo;:path&rdquo; parameter; this value would be ignored by the database storage module anyway since the files will be stored in the DB. Let&rsquo;s try it out! Start up the sample app, and re-edit a user record to upload a new image file:<br/>
   <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-edit.png">
 </p>
-
-
 <p>Select a file, click &ldquo;Update&rdquo; to submit the form and the file will be processed by ImageMagick, and saved into our new BLOB columns by the database storage module in Paperclip&hellip;<br/>
   <img src="http://patshaughnessy.net/assets/2009/5/29/mickey-missing.png">
 </p>
-
-
 <p>What? Where&rsquo;s the image? It turns out that we still need to make a code change to the UsersController to download the image file from the BLOB column instead of from the file system. I&rsquo;ll get to this in a moment. But first, let&rsquo;s look at the console and see if the new files were saved into the database properly:</p>
-
-
 <pre>$ ./script/console 
 Loading development environment (Rails 2.3.2)
 &gt;&gt; User.first
@@ -153,28 +66,16 @@ avatar_file_size: 137233, avatar_updated_at: &quot;2009-05-28 17:37:42&quot;,
 avatar_file: &quot;\377???JFIF\000\001\002\001\001h\001h\000\000\377?\021\b\002\210\001?\001\021\000\002\021\001\003\021\001\377?\204\000\001\001\001\001\001\001\001...&quot;,
 avatar_small_file: &quot;\377???JFIF\000\001\001\001\001h\001h\000\000\377?C\000\003\002\002\002\002\002\003\002\002\002\003\003\003\003\004\006\004\004\004\004\004\b\006\006\005\006...&quot;,
 avatar_thumb_file: &quot;\377???JFIF\000\001\001\001\001h\001h\000\000\377?C\000\003\002\002\002\002\002\003\002\002\002\003\003\003\003\004\006\004\004\004\004\004\b\006\006\005\006...&quot;&gt;</pre>
-
-
 <p>Here you can see the three new BLOB columns, avatar_file, avatar_small_file and avatar_medium_file, and the first few bytes of each column&rsquo;s value. In fact, if you&rsquo;re a real geek you&rsquo;ll notice that the first few bytes contain &ldquo;JFIF,&rdquo; which is probably the image file type specification (not sure)&hellip; so we know we are seeing the binary contents of the three versions of the Mickey image here. Great!</p>
-
-
 <p>Actually, not so great: there&rsquo;s a subtle problem here we need to worry about. I actually typed in a very simple ActiveRecord command, &ldquo;User.first,&rdquo; and it loaded all three of the image files&rsquo; contents into memory just so that I could inspect the value of the user record in the console. This was convenient now, since I was actually interested in knowing whether or not each of the files was saved properly in the DB. However, this is potentially a big performance problem in general. Imagine if the files were very large&hellip; it could take a long time for all 3 of the files to be fetched by a SQL query and returned to the Rails ActiveRecord object. Do I really want or need this to happen every time I access a User record? Usually when I load a User record it&rsquo;s just because I need to check the value of one of the metadata columns, like the user&rsquo;s name, email address or something else. And if I do need one of the files, why should I have to load all three files? Spending the time required to load the file contents for each image style is a big performance penalty that isn&rsquo;t usually necessary.</p>
-
-
 <p>The solution I came up for this problem was to enable Paperclip to add a method to your model class called &ldquo;select_without_file_columns_for&rdquo; that you can use as a named scope or, even better, a default scope. It returns a :select scope hash that will exclude the BLOB columns from the SQL query that ActiveRecord issues to load each record. If you&rsquo;re using Rails 2.3 or higher, you can use select_without_file_columns_for as a default scope in your model like this:</p>
-
-
 <pre>class User &lt; ActiveRecord::Base
   has_attached_file :avatar, :storage =&gt; :database,
                     :styles =&gt; { :thumb =&gt; &quot;75x75&gt;&quot;, :small =&gt; &quot;150x150&gt;&quot; },
                     :url =&gt; &#x27;/:class/:id/:attachment?style=:style&#x27;
   <b>default_scope select_without_file_columns_for(:avatar)</b>
 end</pre>
-
-
 <p>To learn more about default scopes and to see a couple of other examples, read this: <a href="http://ryandaigle.com/articles/2008/11/18/what-s-new-in-edge-rails-default-scoping">http://ryandaigle.com/articles/2008/11/18/what-s-new-in-edge-rails-default-scoping</a>   &hellip; or <a href="http://m.onkey.org/2009/3/24/default-scopes-and-inheritance-to-the-rescue">http://m.onkey.org/2009/3/24/default-scopes-and-inheritance-to-the-rescue</a>. Let&rsquo;s see how this works in the console again after adding the default scope:</p>
-
-
 <pre>$ ./script/console 
 Loading development environment (Rails 2.3.2)
 &gt;&gt; User.first
@@ -182,22 +83,12 @@ Loading development environment (Rails 2.3.2)
 created_at: &quot;2009-05-28 17:27:00&quot;, updated_at: &quot;2009-05-28 17:37:42&quot;,
 avatar_file_name: &quot;mickey-mouse.jpg&quot;, avatar_content_type: &quot;image/jpeg&quot;,
 avatar_file_size: 137233, avatar_updated_at: &quot;2009-05-28 17:37:42&quot;&gt;</pre>
-
-
 <p>Cool. Now the BLOB columns are not displayed. &ldquo;Default scope&rdquo; refers to the fact that the SQL used by ActiveRecord by default to load records is automatically changed. I didn&rsquo;t have to pay the price of loading each of the files, and I was still able to load all of the other User columns using ActiveRecord the way I normally would. To see what happened, execute the &ldquo;select_without_file_columns_for&rdquo; method directly in the console:</p>
-
-
 <pre>&gt;&gt; User.select_without_file_columns_for :avatar
 =&gt; {:select=&gt;&quot;id,name,email,created_at,updated_at,avatar_file_name,
   avatar_content_type,avatar_file_size,avatar_updated_at&quot;}</pre>
-
-
 <p>It&lsquo;s a lot more common to use a default or named scope with :conditions (to modify the WHERE clause) or :order (to modify the ORDER BY clause) but in this case I&rsquo;ve used :select to specify which columns should be loaded by ActiveRecord (the SELECT portion of the SQL). If you look at the hash, you&rsquo;ll see all of the User columns listed, except for avatar_file, avatar_small_file and avatar_thumb_file.</p>
-
-
 <p>If you&rsquo;re using Rails 2.2 or earlier default scope is not available yet, and you will need to use a named scope, like this:</p>
-
-
 <pre>class User &lt; ActiveRecord::Base
   has_attached_file :avatar,
                     :storage =&gt; :database,
@@ -205,11 +96,7 @@ avatar_file_size: 137233, avatar_updated_at: &quot;2009-05-28 17:37:42&quot;&gt;
                     :url =&gt; &#x27;/:class/:id/:attachment?style=:style&#x27;
   <b>named_scope :without_file_data, select_without_file_columns_for(:avatar)</b>
 end</pre>
-
-
 <p>And you will need to use the named scope explicitly to avoid loading the files, like this:</p>
-
-
 <pre>$ ./script/console 
 Loading development environment (Rails 2.3.2)
 &gt;&gt; User.without_file_data.first
@@ -217,11 +104,7 @@ Loading development environment (Rails 2.3.2)
 created_at: &quot;2009-05-30 12:14:03&quot;, updated_at: &quot;2009-05-30 12:14:03&quot;,
 avatar_file_name: &quot;mickey-mouse.jpg&quot;, avatar_content_type: &quot;image/jpeg&quot;,
 avatar_file_size: 137233, avatar_updated_at: &quot;2009-05-30 12:14:03&quot;&gt;</pre>
-
-
 <p>A good way to understand exactly what ActiveRecord is doing is to use a Ruby trick and open up the User class and add some debug code to it. Try entering this code into your console:</p>
-
-
 <pre>&gt;&gt; class User &lt; ActiveRecord::Base
 &gt;&gt;   def self.find_by_sql(sql)
 &gt;&gt;     puts &quot;DEBUG: #{sql}&quot;
@@ -229,12 +112,8 @@ avatar_file_size: 137233, avatar_updated_at: &quot;2009-05-30 12:14:03&quot;&gt;
 &gt;&gt;   end
 &gt;&gt; end
 =&gt; nil</pre>
-
-
 <p>What this code does is open up our User model class, and override the &ldquo;find_by_sql&rdquo; ActiveRecord method to display the SQL statement before calling the original base class method to execute it. Find_by_sql is the method that the various different ActiveRecord find methods all call once they have constructed a SQL statement. For example, find :first,  find :all, first, last&hellip; all of these eventually call find_by_sql.
 Assuming we have the version of User with the named_scope, we can see what SQL statements are issued with or without the select_without_file_columns_for scope:</p>
-
-
 <pre>&gt;&gt; User.first
 <b>DEBUG: SELECT * FROM `users`  LIMIT 1</b>
 =&gt; #&lt;User id: 1, name: &quot;Mickey Mouse&quot;, email: &quot;mickey@disney.com&quot;,
@@ -251,153 +130,39 @@ avatar_thumb_file: &quot;\377???JFIF\000\001\001\001\001h\001h\000\000\377?C\000
 created_at: &quot;2009-05-28 17:27:00&quot;, updated_at: &quot;2009-05-28 17:37:42&quot;,
 avatar_file_name: &quot;mickey-mouse.jpg&quot;, avatar_content_type: &quot;image/jpeg&quot;,
 avatar_file_size: 137233, avatar_updated_at: &quot;2009-05-28 17:37:42&quot;&gt;</pre>
-
-
 <p>Here we can see that ActiveRecord will load all of the User columns that are listed above in the hash we pass to named_scope&hellip; all of the columns except for the BLOB columns. This is different from what ActiveRecord does by default, which is a simple SELECT * FROM &hellip;. statement.</p>
-
-
 <p>Enough about ActiveRecord internals&hellip; let&rsquo;s get back to the sample app and finish it up:<br/>
     <img src="http://patshaughnessy.net/assets/2009/5/29/mickey-missing.png">
   </p>
-
-
 <p>So why didn&rsquo;t the image appear here properly? The reason is that in UsersController I&rsquo;m still using the code that accesses the file on the file system and streams it to the client using send_file (see <a href="http://patshaughnessy.net/2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">my last post</a> for more info):</p>
-
-
 <pre>def avatars
     user = User.find(params[:id])
     style = params[:style] ? params[:style] : &#x27;original&#x27;
     send_file user.avatar.path(style),
               :type =&gt; user.avatar_content_type
   end</pre>
-
-
 <p>Obviously send_file is no longer going to work for us. Instead we need to use a similar function in ActionController::Streaming called send_data, which takes the binary data directly as a parameter instead of a file. And to access the file&rsquo;s contents, I&rsquo;ve added a method called &ldquo;file_contents&rdquo; to Paperclip that returns the actual file contents for the given style, or for the original style by default. Here&rsquo;s how to put it all together; replace the &ldquo;avatars&rdquo; method in UsersController with this new version instead:</p>
-
-
 <pre>def avatars
     user = User.find(params[:id])
     style = params[:style] ? params[:style] : &#x27;original&#x27;
     <b>send_data user.avatar.file_contents(style),
               :type =&gt; user.avatar_content_type</b>
   end</pre>
-
-
 <p>  Only the line in bold has changed. We just call user.avatar.file_contents, pass in the specified style and then pass along the data to send_data.
   If you restart the app and refresh your browser, now you should see the image again:<br/>
       <img src="http://patshaughnessy.net/assets/2009/5/29/mickey-small2.png">
     </p>
-
-
 <p>Now we are seeing the binary image file data loaded from the BLOB column by ActiveRecord and streamed down to the browser by send_data.</p>
-
-
 <p>One last detail about this: since usually everyone will use the same controller code to load the file contents for a given style from the BLOB, and then pass it along to send_data, I enabled Paperclip to add another utility method, this time to your controller, to make this even easier:</p>
-
-
 <pre>class UsersController &lt; ApplicationController
   <b>downloads_files_for :user, :avatar</b>
 etc&hellip;</pre>
-
-
 <p>If you call &ldquo;downloads_files_for&rdquo; from your controller like this and specify the model and file attachment, it will automatically generate the correct controller method for you, and call it &ldquo;avatars&rdquo; or whatever the plural version of your attachment name is. I chose the name to make it easy and natural to create a route to it in routes.rb. No need to even think about send_data or how to get the file contents from Paperclip at all! Nothing could be simpler. However, if you need to implement security or some other business rules around downloading files, then you might need to add that business logic to the &ldquo;avatars&rdquo; method above. Either way, it&rsquo;s very simple.</p>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2009/5/29/paperclip-sample-app-part-3-saving-file-attachments-in-a-database-blob-column';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Paperclip sample app part 3: saving file attachments in a database BLOB column';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2009/5/29/paperclip-sample-app-part-3-saving-file-attachments-in-a-database-blob-column';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Paperclip sample app part 3: saving file attachments in a database BLOB column';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2009/5/29/paperclip-sample-app-part-3-saving-file-attachments-in-a-database-blob-column'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Paperclip sample app part 3: saving file attachments in a database BLOB column';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Paperclip</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2010/5/23/how-to-install-paperclip-in-a-rails-3-app">How to install Paperclip in a Rails 3 app</a></li>
-                  
-                    <li><a href="/2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">Paperclip sample app part 2: downloading files through a controller</a></li>
-                  
-                    <li><a href="/2009/4/30/paperclip-sample-app">Paperclip sample app</a></li>
-                  
-                    <li><a href="/paperclip-database-storage">Database storage for Paperclip: rewritten to use a single table</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Paperclip</div><div class="links"><ul><li><a href="2010/5/23/how-to-install-paperclip-in-a-rails-3-app">How to install Paperclip in a Rails 3 app</a></li><li><a href="2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">Paperclip sample app part 2: downloading files through a controller</a></li><li><a href="2009/4/30/paperclip-sample-app">Paperclip sample app</a></li><li><a href="paperclip-database-storage">Database storage for Paperclip: rewritten to use a single table</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

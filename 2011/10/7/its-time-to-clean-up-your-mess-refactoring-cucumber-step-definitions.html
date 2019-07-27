@@ -1,412 +1,177 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="It’s time to clean up your mess: refactoring Cucumber step definitions - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>It’s time to clean up your mess: refactoring Cucumber step definitions - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>It’s time to clean up your mess: refactoring Cucumber step definitions</h1>
-  
-    <div class="metadata">
-    <span class="date">October 7th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/10/7/its-time-to-clean-up-your-mess-refactoring-cucumber-step-definitions" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="It’s time to clean up your mess: refactoring Cucumber step definitions">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>It’s time to clean up your mess: refactoring Cucumber step definitions - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>It’s time to clean up your mess: refactoring Cucumber step definitions</h1><div class="metadata"><span class="date">October 7th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/10/7/its-time-to-clean-up-your-mess-refactoring-cucumber-step-definitions" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="It’s time to clean up your mess: refactoring Cucumber step definitions">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/10/7/mess.jpg"></td></tr>
   <tr><td align="center"><small><i>My step_definitions folder looks like this...</i></small></td></tr>
 </table>
 </div>
-
-
 <p>This week I decided to look through my features/step_definitions folder after reading <a href="http://aslakhellesoy.com/post/11055981222/the-training-wheels-came-off">Aslak Hellesøy’s post from Wednesday</a> about removing web_steps.rb. I was worried that I might need to write many more custom steps since web_steps.rb will disappear the next time I upgrade Cucumber.</p>
-
 <p>What I found was a mess! First of all, there were a lot of step files and no naming convention that might help me find a particular step, and each step file was a loose collection of step definitions that weren’t organized or DRY. Worse than this, many of my Cucumber steps were written with unmaintainable code that didn’t properly use the Capybara DSL.</p>
-
 <p>Today I’m going to show how you can refactor and improve your Cucumber step definitions by:</p>
-
 <ul>
 <li>Taking more advantage of the Capybara DSL, and</li>
 <li> DRYing up your step code so you have fewer UI dependencies</li>
 </ul>
-
-
 <h2>My dirty laundry</h2>
-
 <p>At risk of personal embarrassment and professional suicide, here’s an actual Cucumber step definition from a project I’m working on now:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^the share first file button should not appear$</span><span class="delimiter">/</span></span> <span class="keyword">do</span>
-    page.should_not have_css(<span class="string"><span class="delimiter">&quot;</span><span class="content">input[value='right click on first file']</span><span class="delimiter">&quot;</span></span>)
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">    page.should_not have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">input[value=&#39;right click on first file&#39;]</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>This step definition isn’t all that bad; at least I’ve written a custom step using business domain language instead of calling one of the steps from web_steps.rb. However, the CSS selector string I’m using here is a bit verbose and could be improved.</p>
-
 <p>Here’s a worse example:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">  page.should have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">#file_access_container .per_file_container:nth-child(2):contains(&#39;</span><span style="color:#000000;">#{text}</span><span style="color:#008080;">&#39;)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span class="delimiter">/</span></span> <span class="keyword">do</span> |text|
-  page.should have_css(<span class="string"><span class="delimiter">&quot;</span><span class="content">#file_access_container .per_file_container:nth-child(2):contains('</span><span class="inline"><span class="inline-delimiter">#{</span>text<span class="inline-delimiter">}</span></span><span class="content">')</span><span class="delimiter">&quot;</span></span>)
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
-
-<p>Look at that crazy CSS selector string! I wrote this myself a week or two ago and even I have no idea what it really means now&hellip; clearly it needs to be refactored.</p>
-
+<p>Look at that crazy CSS selector string! I wrote this myself a week or two ago and even I have no idea what it really means now... clearly it needs to be refactored.</p>
 <h2>Using Capybara finder methods and RSpec matchers</h2>
-
 <p>Capybara has a fairly complex and sophisticated DSL that can help you simplify or even remove some of your CSS selector strings. In my first example above, I can replace the <span class="code">page.have_css</span> call with <span class="code">page.find_button</span>:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-button = page.find_button(<span class="string"><span class="delimiter">'</span><span class="content">right click on first file</span><span class="delimiter">'</span></span>)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">button </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> page.find_button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
+</span></pre>
 
 <p>Here I’m just passing the value or visible text of the button and Capybara will return the button element to me. Then I can continue to test it’s attributes or contents further. To see a list of all the available finder methods, just look at the <a href="https://github.com/jnicklas/capybara/blob/master/lib/capybara/node/finders.rb">lib/capbyara/node/finders.rb</a> file in the Capybara source code. There are finder methods such as find_field, find_link, find_by_id, etc.</p>
-
 <p>One catch here is that if the button doesn’t exist Capybara will raise an exception which can prevent you from testing the negative case: that the button doesn’t exist. Instead, you can use the <span class="code">first</span> method like this:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^the share first file button should not appear$</span><span class="delimiter">/</span></span> <span class="keyword">do</span>
-  page.first(<span class="symbol">:xpath</span>, <span class="constant">XPath</span>::<span class="constant">HTML</span>.button(<span class="string"><span class="delimiter">'</span><span class="content">right click on first file</span><span class="delimiter">'</span></span>)).should be_nil
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  page.first(</span><span style="color:#008080;">:xpath</span><span style="color:#000000;">, </span><span style="color:#008080;">XPath</span><span style="color:#000000;">::</span><span style="color:#008080;">HTML</span><span style="color:#000000;">.button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)).should be_nil
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Here I’m using a gem called <a href="https://github.com/jnicklas/xpath">XPath</a>, also developed by <a href="http://elabs.se/blog">Jonas Nicklas</a> the author of Capybara, that contains a series of XPath related utilities. If you use XPath a lot, you may want to take the time to check that gem out.</p>
-
 <p>There’s a related method called <span class="code">all</span> which returns all of the matching objects found on the page; for example:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">page.all(</span><span style="color:#008080;">:xpath</span><span style="color:#000000;">, </span><span style="color:#008080;">XPath</span><span style="color:#000000;">::</span><span style="color:#008080;">HTML</span><span style="color:#000000;">.button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">))
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-page.all(<span class="symbol">:xpath</span>, <span class="constant">XPath</span>::<span class="constant">HTML</span>.button(<span class="string"><span class="delimiter">'</span><span class="content">right click on first file</span><span class="delimiter">'</span></span>))
-</pre></div>
-</div>
-
-
-
-<p>&hellip; would return all the buttons with this value, name or id. Then you could test things like how many there were, or iterate through them and test each one in turn.</p>
-
+<p>... would return all the buttons with this value, name or id. Then you could test things like how many there were, or iterate through them and test each one in turn.</p>
 <p>If you’re using RSpec in your proejct, then Capybara automatically provides you with a series of matchers which are very readable and useful. For example, I can just write:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^the share first file button should not appear$</span><span class="delimiter">/</span></span> <span class="keyword">do</span>
-  page.should_not have_button(<span class="string"><span class="delimiter">'</span><span class="content">right click on first file</span><span class="delimiter">'</span></span>)
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  page.should_not have_button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>To browse through all of the available Capybara Rspec matches, just take a look at <a href="https://github.com/jnicklas/capybara/blob/master/lib/capybara/rspec/matchers.rb">lib/capbyara/rspec/matchers.rb</a>. Here are some examples: have_checkbox, have_field, have_table, have_selector, etc.</p>
-
 <p><span class="reminder"><img class="tip-image" src="/assets/images/tip.png">Tip: remember to DRY up your step code</span></p>
-
 <p>Another good way to improve your step code is to move commonly used selectors into shared utility methods. That way you can DRY up the step code and reduce the number of place where you depend on CSS class names or other user interface details. In my example, I might want to refer to the “right click” button in a few different steps. In that case I could just write a new method like this:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">share_button
+</span><span style="color:#000000;">  page.first(</span><span style="color:#008080;">:xpath</span><span style="color:#000000;">, </span><span style="color:#008080;">XPath</span><span style="color:#000000;">::</span><span style="color:#008080;">HTML</span><span style="color:#000000;">.button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">))
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  share_button.should be_nil
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">share_button</span>
-  page.first(<span class="symbol">:xpath</span>, <span class="constant">XPath</span>::<span class="constant">HTML</span>.button(<span class="string"><span class="delimiter">'</span><span class="content">right click on first file</span><span class="delimiter">'</span></span>))
-<span class="keyword">end</span>
-
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^the share first file button should not appear$</span><span class="delimiter">/</span></span> <span class="keyword">do</span>
-  share_button.should be_nil
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
-
-<h2>Scoping your selectors using &ldquo;Within&rdquo;</h2>
-
+<h2>Scoping your selectors using &quot;Within&quot;</h2>
 <p>Here’s my other ugly Cucumber step definition again:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">  page.should have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">#file_access_container .per_file_container:nth-child(2):contains(&#39;</span><span style="color:#000000;">#{text}</span><span style="color:#008080;">&#39;)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span class="delimiter">/</span></span> <span class="keyword">do</span> |text|
-  page.should have_css(<span class="string"><span class="delimiter">&quot;</span><span class="content">#file_access_container .per_file_container:nth-child(2):contains('</span><span class="inline"><span class="inline-delimiter">#{</span>text<span class="inline-delimiter">}</span></span><span class="content">')</span><span class="delimiter">&quot;</span></span>)
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
-
-<p>Wow &ndash; I can’t believe I wrote this; how embarrassing! I suppose I’m just copying the CSS selector info straight from the Chrome console into my Ruby step file&hellip; I need to train myself to stop and think about writing better step code.</p>
-
+<p>Wow - I can’t believe I wrote this; how embarrassing! I suppose I’m just copying the CSS selector info straight from the Chrome console into my Ruby step file... I need to train myself to stop and think about writing better step code.</p>
 <p>Anyway, the real problem here is the cryptic CSS selector string. There must be a way to break this down and make it more understandable using the Capybara DSL. First let’s examine what it means in more detail:</p>
-
 <ul>
   <li>Look for an element with an id of “file_access_container”</li>
   <li>Then look for an element inside that element with a class of “per_file_container”</li>
   <li>Then get the 2nd child element of that inner element and test whether it contains the given text</li>
 </ul>
-
-
 <p>The first thing we can do here is to separate the first part into a separate method call, using Capybara’s <span class="code">within</span> method:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span class="delimiter">/</span></span> <span class="keyword">do</span> |text|
-  within(<span class="string"><span class="delimiter">'</span><span class="content">#file_access_container</span><span class="delimiter">'</span></span>) <span class="keyword">do</span>
-    page.should have_css(<span class="string"><span class="delimiter">&quot;</span><span class="content">.per_file_container:nth-child(2):contains('</span><span class="inline"><span class="inline-delimiter">#{</span>text<span class="inline-delimiter">}</span></span><span class="content">')</span><span class="delimiter">&quot;</span></span>)
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">  within(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">#file_access_container</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">    page.should have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">.per_file_container:nth-child(2):contains(&#39;</span><span style="color:#000000;">#{text}</span><span style="color:#008080;">&#39;)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>This allows you to scope your CSS or XPath selectors to a specified area of the HTML page you’re testing. It’s a great way to break up complex CSS selector strings like this.</p>
-
 <p><span class="reminder"><img class="tip-image" src="/assets/images/tip.png">Tip: remember to DRY up your step code</span></p>
-
 <p>We can DRY this up a bit more by writing a custom “within” method. If and when the HTML ID attribute changes, I’ll just need to update one line of code. It’s likely that I’m going to write a few different steps to test this content area in different ways, all in the same step file. For example, I could write a method called “within_the_file_container:”</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">within_the_file_container</span>(&amp;block)
-  within(<span class="string"><span class="delimiter">'</span><span class="content">#file_access_container</span><span class="delimiter">'</span></span>, &amp;block)
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">within_the_file_container</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">  within(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">#file_access_container</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <h2>Custom selectors</h2>
-
 <p>Now my step is a lot easier to understand, but clearly still can be improved:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span class="delimiter">/</span></span> <span class="keyword">do</span> |text|
-  within_the_file_container <span class="keyword">do</span>
-    page.should have_css(<span class="string"><span class="delimiter">&quot;</span><span class="content">.per_file_container:nth-child(2):contains('</span><span class="inline"><span class="inline-delimiter">#{</span>text<span class="inline-delimiter">}</span></span><span class="content">')</span><span class="delimiter">&quot;</span></span>)
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">  within_the_file_container </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">    page.should have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">.per_file_container:nth-child(2):contains(&#39;</span><span style="color:#000000;">#{text}</span><span style="color:#008080;">&#39;)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Next let’s look at a little known feature of the Capybara DSL:  the <span class="code">add_selector</span> method. This allows you to add special, custom selectors to your app that your step definitions can refer to. You can use them just as utilities for dealing with complex HTML patterns, or you can even tie them to business or domain concepts from the page you’re trying to test. For more details on <span class="code">add_selector</span> and for more examples, check out the nice article Plataforma wrote about this a few months ago: <a href="http://blog.plataformatec.com.br/2011/02/improving-your-tests-with-capybara-custom-selectors/">Improving your tests with Capybara custom selectors</a>.</p>
-
 <p>You define a custom selector like this:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Capybara</span>.add_selector(<span class="symbol">:file</span>) <span class="keyword">do</span>
-  xpath { |num| <span class="constant">XPath</span>.css(<span class="string"><span class="delimiter">&quot;</span><span class="content">.per_file_container:nth-child(</span><span class="inline"><span class="inline-delimiter">#{</span>num<span class="inline-delimiter">}</span></span><span class="content">)</span><span class="delimiter">&quot;</span></span>) }
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#008080;">Capybara</span><span style="color:#000000;">.add_selector(</span><span style="color:#008080;">:file</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  xpath { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">num</span><span style="color:#4f5b66;">| </span><span style="color:#008080;">XPath</span><span style="color:#000000;">.css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">.per_file_container:nth-child(</span><span style="color:#000000;">#{num}</span><span style="color:#008080;">)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">) }
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>What this means is that I’m defining a new type of Capybara selector called “file” that will apply the given number to the given XPath selector. Now I don’t need to repeat this XPath code over and over again throughout my step code. For example, now I can write:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span class="delimiter">/</span></span> <span class="keyword">do</span> |text|
-  within_the_file_container <span class="keyword">do</span>
-    find(<span class="symbol">:file</span>, <span class="integer">2</span>).should have_content(text)
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">  within_the_file_container </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">    find(</span><span style="color:#008080;">:file</span><span style="color:#000000;">, </span><span style="color:#d08770;">2</span><span style="color:#000000;">).should have_content(text)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Or I can even use:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="constant">Then</span> <span class="regexp"><span class="delimiter">/</span><span class="content">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span class="delimiter">/</span></span> <span class="keyword">do</span> |text|
-  within_the_file_container <span class="keyword">do</span>
-    within(<span class="symbol">:file</span>, <span class="integer">2</span>) { page.should have_content(text) }
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">  within_the_file_container </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">    within(</span><span style="color:#008080;">:file</span><span style="color:#000000;">, </span><span style="color:#d08770;">2</span><span style="color:#000000;">) { page.should have_content(text) }
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Note that right now the code inside the <span class="code">add_selector</span> definitions must be expressed as XPath expressions, and not as CSS. But using the <span class="code">XPath.css</span> function like I did above we can easily convert my CSS to XPath, and then pass it along to Capybara.</p>
-
 <p>A nice side benefit here is that I get a more readable error message if there’s a Cucumber failure:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-{^error:And I should see &quot;Things.txt&quot; in the second file section
+<pre>
+{^error:And I should see "Things.txt" in the second file section
   Unable to find file 3 (Capybara::ElementNotFound)^}
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>Instead of:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-{^error:And I should see &quot;Things.txt&quot; in the second file section
-  expected css &quot;.per_file_container:nth-child(3):contains('Things.txt')&quot; to return something
+<pre>
+{^error:And I should see "Things.txt" in the second file section
+  expected css ".per_file_container:nth-child(3):contains('Things.txt')" to return something
 (RSpec::Expectations::ExpectationNotMetError)^}
-</pre></div>
-</div>
-
-
-
+</pre>
 <h2>Conclusion</h2>
-
 <p>Aslak Hellesøy’s made a lot of great points in <a href="http://aslakhellesoy.com/post/11055981222/the-training-wheels-came-off">his article explaining why the Cucumber team removed web_steps.rb</a>. In a nutshell the reason is that your step definitions should reflect the business domain of your application, and therefore be less dependent on the user interface details. After sorting through the dirty laundry in my step code, I’ve realized it is equally important to pay close attention to <em>how your step code is written</em> and not just to which steps you are writing.</p>
-
 <p>One of the benefits of using TDD is that once you get to green you can easily refactor your code to DRY it up, make it more readable or just work better. Remember to refactor your Cucumber step definition code the same way you refactor your production code or specs. And take the time to learn a bit about the Capybara DSL; using it properly can make things a lot easier to read and maintain.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2011/10/7/its-time-to-clean-up-your-mess-refactoring-cucumber-step-definitions';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'It’s time to clean up your mess: refactoring Cucumber step definitions';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2011/10/7/its-time-to-clean-up-your-mess-refactoring-cucumber-step-definitions';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'It’s time to clean up your mess: refactoring Cucumber step definitions';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2011/10/7/its-time-to-clean-up-your-mess-refactoring-cucumber-step-definitions'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'It’s time to clean up your mess: refactoring Cucumber step definitions';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

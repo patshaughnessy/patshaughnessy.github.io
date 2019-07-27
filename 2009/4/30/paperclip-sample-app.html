@@ -1,61 +1,7 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Paperclip sample app - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Paperclip sample app - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Paperclip sample app</h1>
-  
-    <div class="metadata">
-    <span class="date">April 30th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/4/30/paperclip-sample-app" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>(Update October 2009)<br/>I just updated a gem I wrote called <a href="http://patshaughnessy.net/view_mapper">View Mapper</a> that will generate all of the code I describe below&hellip; you can use View Mapper to generate working scaffolding code that uploads/downloads files using Paperclip, or only view scaffolding code that works with an existing model in your app; for more details see: <a href="http://patshaughnessy.net/2009/10/16/paperclip-scaffolding">http://patshaughnessy.net/2009/10/16/paperclip-scaffolding</a></p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Paperclip sample app - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Paperclip sample app</h1><div class="metadata"><span class="date">April 30th 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/4/30/paperclip-sample-app" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Paperclip sample app">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>(Update October 2009)<br/>I just updated a gem I wrote called <a href="http://patshaughnessy.net/view_mapper">View Mapper</a> that will generate all of the code I describe below&hellip; you can use View Mapper to generate working scaffolding code that uploads/downloads files using Paperclip, or only view scaffolding code that works with an existing model in your app; for more details see: <a href="http://patshaughnessy.net/2009/10/16/paperclip-scaffolding">http://patshaughnessy.net/2009/10/16/paperclip-scaffolding</a></p>
 <p>&nbsp;</p>
-
-
 <p>I love scaffolding. Many experienced Rails developers scoff at the idea of using scaffolding to generate Rails code: it&rsquo;s ugly; it probably means you don&rsquo;t understand how to write the code yourself; it generates a lot more code than you need, etc., etc. However, for a beginning Rails developer working on her/his own like me who isn&rsquo;t surrounded by a team of Ruby experts, scaffolding is an essential tool and can help to get started in the right direction. Also, even for experienced Rubyists scaffolding can be a great way to quickly (minutes, not hours or days) get a simple app up and running to use for demos, UI wireframes, spiking some technical issue, etc.</p>
-
-
 <p>This post will demonstrate how to use scaffolding to create a new Rails app from scratch that uses the Paperclip plugin to upload and display an image file. Feel free to copy/paste pieces of code from the narrative below and use them in your app, or you can just skip to the chase and <a href="http://github.com/patshaughnessy/paperclip-sample-app">get the finished version from github</a> and run that on your machine.</p>
-
-
 <p>There are a lot of other good tutorials out there about this; see:
   <ul>
     <li><a href="http://burm.net/2008/10/07/the-ruby-on-rails-paperclip-plugin-tutorial-easy-image-attachments">http://burm.net/2008/10/07/the-ruby-on-rails-paperclip-plugin-tutorial-easy-image-attachments</a>, or</li>
@@ -63,21 +9,11 @@
     <li>and of course Ryan Bates has a <a href="http://railscasts.com/episodes/134-paperclip">screen cast on this topic also</a>.</li>
   </ul>
 </p>
-
-
 <p>I&rsquo;ll take on the risk of repeating material that&rsquo;s already out there in order to show how easy it is to get a working Paperclip application up and running using scaffolding. The fact that just a few commands and lines of code are required illustrates just how simple and powerful Paperclip&rsquo;s design is. In my next post, I&rsquo;ll proceed to change this sample app to demonstrate how to save the uploaded files in a database column instead of on the web server&rsquo;s file system, using <a href="http://github.com/patshaughnessy/paperclip">my modified version of Paperclip</a>.</p>
-
-
 <p>FYI At the time I wrote this, Rails was at version 2.3.2:</p>
-
-
 <pre>$ rails --version
 Rails 2.3.2</pre>
-
-
 <p>Let&rsquo;s get started by creating a new Rails application:</p>
-
-
 <pre>$ rails paperclip-sample-app
       create  
       create  app/controllers
@@ -93,30 +29,18 @@ Rails 2.3.2</pre>
       create  lib/tasks
       create  log
       etc...</pre>
-
-
 <p>Before we go any farther, let&rsquo;s setup our database.yml file and create a new MySQL database to use with the sample app. Replace the contents of config/database.yml with this:</p>
-
-
 <pre>development:
     adapter: mysql
     database: paperclip_sample_app_development
     username: root
     password: 
     host: localhost</pre>
-
-
 <p>Enter the proper username and password for MySQL if they are not &ldquo;root&rdquo; and null. And then run this from the command line:</p>
-
-
 <pre>$ cd paperclip-sample-app
 $ rake db:create
 (in /Users/pat/rails-apps/paperclip-sample-app)</pre>
-
-
 <p>Ok, now we have a MySQL database to work with. Next, let&rsquo;s go ahead and install the Paperclip plugin. The best thing to do is just to get the latest version from github; Thoughtbot frequently updates it with bug fixes, enhancements, etc.:</p>
-
-
 <pre>$ ./script/plugin install git://github.com/thoughtbot/paperclip.git
 Initialized empty Git repository in /Users/pat/rails-apps/paperclip-sample-app/vendor/plugins/paperclip/.git/
 remote: Counting objects: 62, done.
@@ -125,11 +49,7 @@ remote: Total 62 (delta 6), reused 39 (delta 4)
 Unpacking objects: 100% (62/62), done.
 From git://github.com/thoughtbot/paperclip
  * branch            HEAD       -&gt; FETCH_HEAD</pre>
-
-
 <p>Now that we have an empty, shell application created and the Paperclip plugin installed, we can use scaffolding to add some working code to it. Let&rsquo;s use the same &ldquo;user&rdquo; and &ldquo;avatar&rdquo; example Thoughtbot does on the <a href="http://thoughtbot.com/projects/paperclip">Paperclip project page</a>. The idea is that the sample will contain a table of users, and each user will have an avatar image displayed in the web site. So to get started, I&rsquo;ll just create a new &ldquo;user&rdquo; model with string columns for the name and email address:</p>
-
-
 <pre>$ ./script/generate scaffold user name:string email:string
       exists  app/models/
       exists  app/controllers/
@@ -143,127 +63,82 @@ From git://github.com/thoughtbot/paperclip
       create  app/views/users/index.html.erb
       create  app/views/users/show.html.erb
       etc...</pre>
-
-
 <p>Now we need to generate the database columns necessary for Paperclip on our new model object using script/generate:</p>
-
-
 <pre>$ ./script/generate paperclip user avatar
       exists  db/migrate
       create  db/migrate/20090430084151_add_attachments_avatar_to_user.rb</pre>
-
-
 <p>And let&rsquo;s go ahead and create the users table using db:migrate:</p>
-
-
 <pre>$ rake db:migrate
 (in /Users/pat/rails-apps/paperclip-sample-app)
 ==  CreateUsers: migrating ====================================================
 -- create_table(:users)
    -&gt; 0.0031s
 ==  CreateUsers: migrated (0.0032s) ===========================================
-
-==  AddAttachmentsAvatarToUser: migrating =====================================
+<p>==  AddAttachmentsAvatarToUser: migrating =====================================
 -- add_column(:users, :avatar_file_name, :string)
-   -&gt; 0.0063s
+-&gt; 0.0063s
 -- add_column(:users, :avatar_content_type, :string)
-   -&gt; 0.0069s
+-&gt; 0.0069s
 -- add_column(:users, :avatar_file_size, :integer)
-   -&gt; 0.0085s
+-&gt; 0.0085s
 -- add_column(:users, :avatar_updated_at, :datetime)
-   -&gt; 0.0081s
-==  AddAttachmentsAvatarToUser: migrated (0.0311s) ============================</pre>
-
-
+-&gt; 0.0081s
+==  AddAttachmentsAvatarToUser: migrated (0.0311s) ============================</pre></p>
 <p>You can see that the Paperclip generator created columns in the users table called &ldquo;avatar_file_name,&rdquo; &ldquo;avatar_content_type,&rdquo; &ldquo;avatar_file_size&rdquo; and &ldquo;avatar_updated_at.&rdquo; Now we have our database schema setup. The next step is to just modify the code that was generated for us by the scaffolding and make the changes necessary for Paperclip. The first thing to do is to add a line to the user model and indicate that it has a file attachment called &ldquo;avatar.&rdquo; To do this, open app/models/user.rb and just add this one line:</p>
-
-
 <pre>class User &lt; ActiveRecord::Base
   has_attached_file :avatar
 end</pre>
-
-
 <p>And then edit the new user form (app/views/users/new.html.erb) and add a file field to use to upload files. There are actually two code changes you need to make: first you need to set the HTML form to encode the uploaded file data (and other fields) using MIME multiple part syntax, and then second you need to actually add the file upload field. Here&rsquo;s the finished new.html.erb file with these two changes in bold:</p>
-
-
 <pre>&lt;h1&gt;New user&lt;/h1&gt;
-
-&lt;% form_for(@user<b>, :html =&gt; { :multipart =&gt; true }</b>) do |f| %&gt;
-  &lt;%= f.error_messages %&gt;
-
-  &lt;p&gt;
-    &lt;%= f.label :name %&gt;&lt;br /&gt;
-    &lt;%= f.text_field :name %&gt;
-  &lt;/p&gt;
-  &lt;p&gt;
-    &lt;%= f.label :email %&gt;&lt;br /&gt;
-    &lt;%= f.text_field :email %&gt;
-  &lt;/p&gt;
-  <b>&lt;p&gt;
-    &lt;%= f.label :avatar %&gt;&lt;br /&gt;
-    &lt;%= f.file_field :avatar %&gt;
-  &lt;/p&gt;</b>
-  &lt;p&gt;
-    &lt;%= f.submit &#x27;Create&#x27; %&gt;
-  &lt;/p&gt;
-&lt;% end %&gt;
-
-&lt;%= link_to &#x27;Back&#x27;, users_path %&gt;</pre>
-
-
+<p>&lt;% form_for(@user<b>, :html =&gt; { :multipart =&gt; true }</b>) do |f| %&gt;
+&lt;%= f.error_messages %&gt;</p>
+<p>&lt;p&gt;
+&lt;%= f.label :name %&gt;&lt;br /&gt;
+&lt;%= f.text_field :name %&gt;
+&lt;/p&gt;
+&lt;p&gt;
+&lt;%= f.label :email %&gt;&lt;br /&gt;
+&lt;%= f.text_field :email %&gt;
+&lt;/p&gt;
+<b>&lt;p&gt;
+&lt;%= f.label :avatar %&gt;&lt;br /&gt;
+&lt;%= f.file_field :avatar %&gt;
+&lt;/p&gt;</b>
+&lt;p&gt;
+&lt;%= f.submit 'Create' %&gt;
+&lt;/p&gt;
+&lt;% end %&gt;</p>
+<p>&lt;%= link_to 'Back', users_path %&gt;</pre></p>
 <p>Also make the same changes to the edit form that was generated by the scaffolding: app/views/users/edit.html.erb. The best thing to do would be to include the same ERB file (maybe called &ldquo;_form.html.erb&rdquo;) in both the new and edit form files. Ideally the scaffolding generator would have done this for us&hellip;</p>
-
-
 <p>Now if we run our application we can upload an image file and attach it to a user:<br/>
 <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-new.png"/></p>
-
-
 <p>If you submit this form, the image file will be uploaded to the server and saved on the file system. By default, Paperclip saves files inside a &ldquo;system&rdquo; folder it creates in your Rails app&rsquo;s public folder. Let&rsquo;s take a look at my public folder and see where the file went:</p>
-
-
 <pre>$ find public/system
 public/system
 public/system/avatars
 public/system/avatars/1
 public/system/avatars/1/original
 public/system/avatars/1/original/mickey-mouse.jpg</pre>
-
-
 <p>This is one of the nice things about Paperclip: it just works. I don&rsquo;t have to think about or worry about where the files are going to go; Thoughtbot has chosen simple default values that make sense. Here we can see that there are a series of folders created that correspond to the attachment name, model primary key and also the &ldquo;style&rdquo; of the attachment (more on that below).</p>
-
-
 <p>If you want to or need to save the files in some other place on your server&rsquo;s file system you can specify different options to has_attached_file in your model; see this write up for an example: <a href="http://travisonrails.com/2009/01/11/Changing-Paperclip-File-Storage-Location">http://travisonrails.com/2009/01/11/Changing-Paperclip-File-Storage-Location</a>. Paperclip also supports saving the files in Amazon&rsquo;s S3 storage service, and in my next post I&rsquo;ll demonstrate how to save the file data inside the database itself, right in the users table in this example.</p>
-
-
 <p>I&rsquo;m almost done; now I just need to display the uploaded image somewhere; the simplest thing to do is just to add an image tag to the users show page. Again, my changes to the standard scaffolding code are in bold:</p>
-
-
 <pre>&lt;p&gt;
   &lt;b&gt;Name:&lt;/b&gt;
   &lt;%=h @user.name %&gt;
 &lt;/p&gt;
-
-&lt;p&gt;
-  &lt;b&gt;Email:&lt;/b&gt;
-  &lt;%=h @user.email %&gt;
-&lt;/p&gt;
-
-<b>&lt;p&gt;
-  &lt;b&gt;Avatar:&lt;/b&gt;
-  &lt;%= image_tag @user.avatar.url %&gt;
-&lt;/p&gt;</b>
-
-&lt;%= link_to &#x27;Edit&#x27;, edit_user_path(@user) %&gt; |
-&lt;%= link_to &#x27;Back&#x27;, users_path %&gt;</pre>
-
-
+<p>&lt;p&gt;
+&lt;b&gt;Email:&lt;/b&gt;
+&lt;%=h @user.email %&gt;
+&lt;/p&gt;</p>
+<p><b>&lt;p&gt;
+&lt;b&gt;Avatar:&lt;/b&gt;
+&lt;%= image_tag @user.avatar.url %&gt;
+&lt;/p&gt;</b></p>
+<p>&lt;%= link_to 'Edit', edit_user_path(@user) %&gt; |
+&lt;%= link_to 'Back', users_path %&gt;</pre></p>
 <p>Now we can see the image for our new user:<br/>
 <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-large.png"></p>
-
-
 <p>Since this image is bigger that what I would like, I can take advantage of Paperclip &ldquo;styles&rdquo; feature to generate a smaller version of it. To do that you will need to be sure you have ImageMagick installed on your server, which is what Paperclip uses behind the scenes to modify image files. Then all you need to do is just add two &ldquo;styles&rdquo; to your model, like this:</p>
-
-
 <pre>class User &lt; ActiveRecord::Base
   has_attached_file :avatar,
                     :styles =&gt; {
@@ -271,24 +146,13 @@ public/system/avatars/1/original/mickey-mouse.jpg</pre>
                       :small =&gt; &quot;150x150&gt;&quot;
                     }
 end</pre>
-
-
 <p>The strings we pass in are actually options for ImageMagick's "convert" command; see <a href="http://www.imagemagick.org/script/convert.php">it&rsquo;s documentation</a> for more details. And now in the show ERB we can just specify the &ldquo;small&rdquo; style in the image tag instead:</p>
-
-
 <pre>&lt;%= image_tag @user.avatar.url(:small) %&gt;</pre>
-
-
 <p>To see it, first I need to re-edit and re-upload the image (remember to add the file field code to edit.html.erb just like for new.html.erb):<br/>
 <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-edit.png"></p>
-
-
 <p>Now when this form is submitted we will see the smaller image:<br/>
   <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-small.png"></p>
-
-
-<p>And let&rsquo;s take another look at the public/system folder and see what Paperclip and ImageMagick have done for us:</p></p>
-
+And let&rsquo;s take another look at the public/system folder and see what Paperclip and ImageMagick have done for us:</p>
 <pre>$ find public/system
 public/system
 public/system/avatars
@@ -299,133 +163,32 @@ public/system/avatars/1/small
 public/system/avatars/1/small/mickey-mouse.jpg
 public/system/avatars/1/thumb
 public/system/avatars/1/thumb/mickey-mouse.jpg</pre>
-
-
 <p>Again, this is very simple and just works! As a last step, let&rsquo;s add the thumbnail image to the users index page so we can see Mickey without even clicking on that user record. This is as simple as editing app/views/users/index.html.erb and adding a new table column:</p>
-
-
 <pre>&lt;table&gt;
   &lt;tr&gt;
     <b>&lt;th&gt;Photo&lt;/th&gt;</b>
     &lt;th&gt;Name&lt;/th&gt;
     &lt;th&gt;Email&lt;/th&gt;
   &lt;/tr&gt;
-
-&lt;% @users.each do |user| %&gt;
-  &lt;tr&gt;
-    <b>&lt;td&gt;&lt;%= image_tag user.avatar.url(:thumb) %&gt;&lt;/td&gt;</b>
-    &lt;td&gt;&lt;%=h user.name %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%=h user.email %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to &#x27;Show&#x27;, user %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to &#x27;Edit&#x27;, edit_user_path(user) %&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;%= link_to &#x27;Destroy&#x27;, user, :confirm =&gt; &#x27;Are you sure?&#x27;, :method =&gt; :delete %&gt;&lt;/td&gt;
-  &lt;/tr&gt;
+<p>&lt;% @users.each do |user| %&gt;
+&lt;tr&gt;
+<b>&lt;td&gt;&lt;%= image_tag user.avatar.url(:thumb) %&gt;&lt;/td&gt;</b>
+&lt;td&gt;&lt;%=h user.name %&gt;&lt;/td&gt;
+&lt;td&gt;&lt;%=h user.email %&gt;&lt;/td&gt;
+&lt;td&gt;&lt;%= link_to 'Show', user %&gt;&lt;/td&gt;
+&lt;td&gt;&lt;%= link_to 'Edit', edit_user_path(user) %&gt;&lt;/td&gt;
+&lt;td&gt;&lt;%= link_to 'Destroy', user, :confirm =&gt; 'Are you sure?', :method =&gt; :delete %&gt;&lt;/td&gt;
+&lt;/tr&gt;
 &lt;% end %&gt;
-&lt;/table&gt;</pre>
-
-
+&lt;/table&gt;</pre></p>
 <p>And now we just need to refresh the index page since the thumb image file was already generated:<br/>
   <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-index.png"></p>
-
-
 <p>And there you have it: a working file upload web site written in minutes. This was made possible by Rails scaffolding, and Paperclip's simple, elegant design.</p>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2009/4/30/paperclip-sample-app';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Paperclip sample app';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2009/4/30/paperclip-sample-app';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Paperclip sample app';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2009/4/30/paperclip-sample-app'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Paperclip sample app';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Paperclip</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2010/5/23/how-to-install-paperclip-in-a-rails-3-app">How to install Paperclip in a Rails 3 app</a></li>
-                  
-                    <li><a href="/2009/5/29/paperclip-sample-app-part-3-saving-file-attachments-in-a-database-blob-column">Paperclip sample app part 3: saving file attachments in a database BLOB column</a></li>
-                  
-                    <li><a href="/2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">Paperclip sample app part 2: downloading files through a controller</a></li>
-                  
-                    <li><a href="/paperclip-database-storage">Database storage for Paperclip: rewritten to use a single table</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Paperclip</div><div class="links"><ul><li><a href="2010/5/23/how-to-install-paperclip-in-a-rails-3-app">How to install Paperclip in a Rails 3 app</a></li><li><a href="2009/5/29/paperclip-sample-app-part-3-saving-file-attachments-in-a-database-blob-column">Paperclip sample app part 3: saving file attachments in a database BLOB column</a></li><li><a href="2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">Paperclip sample app part 2: downloading files through a controller</a></li><li><a href="paperclip-database-storage">Database storage for Paperclip: rewritten to use a single table</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

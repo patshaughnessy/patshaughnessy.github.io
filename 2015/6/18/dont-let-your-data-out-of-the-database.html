@@ -1,241 +1,133 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Don’t Let Your Data Out of the Database - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Don’t Let Your Data Out of the Database - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Don’t Let Your Data Out of the Database</h1>
-  
-    <div class="metadata">
-    <span class="date">June 18th 2015</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Don’t Let Your Data Out of the Database">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Don’t Let Your Data Out of the Database - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Don’t Let Your Data Out of the Database</h1><div class="metadata"><span class="date">June 18th 2015</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Don’t Let Your Data Out of the Database">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2015/6/18/escape.png"><br/>
   <i>Don’t let your data escape from your database<br/>
   and cause unintended performance mistakes.</i>
 </div>
-
-
 <p>Keep your data in the database, not for security reasons but to avoid
 performance mistakes. Often the best way to speed up your application is to let
 your database server do what it was designed to do: operate on data.</p>
-
 <p>Most modern programming languages and frameworks hide databases behind an
 elegant, beautiful layer of abstraction. Developers today don’t need to write
 or even understand Structured Query Language (SQL), the native language of
 database servers. We view SQL as a low-level, technical relic of 1970s Computer
 Science, best left behind in academic journals and college classrooms.</p>
-
 <p>However, not learning and thoroughly understanding SQL would be a tremendous
 mistake. In fact, many data related performance problems are a result of using
 a high level language, such as Ruby or Python, to work with data instead of
 SQL. Keep your data where it belongs… in the database. Use your database server
 to operate on your data in place, and then fetch the result your application
 actually needs.</p>
-
 <p>Let me show you what I mean with a simple example.</p>
-
 <div style="clear: both"></div>
-
-
 <h2>Posts and Comments</h2>
-
 <p>Suppose I have data in a one-many relationship: one post has many comments.
 Using ActiveRecord, the popular Ruby ORM, I implement a one-many association by
 writing:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Post</span> &lt; <span class="constant">ActiveRecord</span>::<span class="constant">Base</span>
-  has_many <span class="symbol">:comments</span>
-<span class="keyword">end</span>
-
-<span class="keyword">class</span> <span class="class">Comment</span> &lt; <span class="constant">ActiveRecord</span>::<span class="constant">Base</span>
-  belongs_to <span class="symbol">:post</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Post </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
+</span><span style="color:#000000;">  has_many </span><span style="color:#008080;">:comments
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Comment </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
+</span><span style="color:#000000;">  belongs_to </span><span style="color:#008080;">:post
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Ruby’s powerful dynamic behavior allows me to query the comments for a given
 post in a very natural, human way:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-post = <span class="constant">Post</span>.find(<span class="integer">1</span>)
-post.comments
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">post </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Post</span><span style="color:#000000;">.find(</span><span style="color:#d08770;">1</span><span style="color:#000000;">)
+</span><span style="color:#000000;">post.comments
+</span></pre>
 
 <p>But remember ActiveRecord isn’t a magic framework. It doesn’t have a secret
 connection to the tables in my database. It has to speak to the database server
 like everyone else, using the server’s language: SQL. Reading my log file, I
 can see how ActiveRecord translates <span class="code">post.comments</span> into SQL:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="class">select</span> comments.* <span class="keyword">from</span> comments <span class="keyword">where</span> comments.post_id = <span class="integer">1</span>
-</pre></div>
-</div>
-
-
-
+<pre>
+select comments.* from comments where comments.post_id = 1
+</pre>
 <p>After executing this SQL statement, ActiveRecord converts the result set into
 an array of Ruby objects which I can then use in my code. For example, if I
 want the latest comment for a post I can write:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Post</span>
-  <span class="keyword">def</span> <span class="function">latest_comment</span>
-    comments.max {|a, b| a.updated_at &lt;=&gt; b.updated_at }
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Post
+</span><span style="color:#343d46;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">latest_comment
+</span><span style="color:#000000;">    comments.max {</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">a, b</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> a.updated_at </span><span style="color:#4f5b66;">&lt;=&gt;</span><span style="color:#000000;"> b.updated_at }
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Here I ask Ruby to sort the comment objects and return the latest one, the
 comment with the maximum <span class="code">updated_at</span> value. Now I can
 find the person who wrote the latest comment for a post just by writing:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-post.latest_comment.author
-</pre></div>
-</div>
-
-
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">post.latest_comment.author
+</span></pre>
 
 <div style="float: right; padding: 7px 0px 50px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2015/6/18/open-cell.jpg"><br/>
 </div>
-
-
 <h2>Where Is My Data?</h2>
-
 <p>The problem with this approach is that it doesn’t scale. Suppose this post has
 hundreds or even thousands of comments; in this case, ActiveRecord will convert
 them all into Ruby objects just so I can iterate through them in the
 <span class="code">latest_comment</span> method.</p>
-
 <p>My mistake was to let my data out of the database. Instead, I should have asked
 the database do the work for me.</p>
-
 <p>Let’s take a closer look at how <span class="code">latest_comment</span> works:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2015/6/18/filter-sort.png"/></p>
-
 <p>On the right, I start with all of the comments in the database, tens of
 thousands of them let’s say. Next, I need to search for the comments associated
 with my post, filtering on the <span class="code">post_id</span> column. This
 yields a subset, hundreds of comments for example. Finally, I sort these
 filtered comments and take the last one, yielding the latest one on the left.</p>
-
 <p>The problem with my Ruby solution is that I perform the filtering in the
 database, but the sorting in Ruby. In between, the entire subset of comments
 for a post have to be transmitted from the database server to my Ruby
 application server:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2015/6/18/ruby-sort.png"/></p>
-
 <p>To transmit all of these records, the database needs to serialize them to some
 binary format, which my Ruby code (or my DB driver actually) later needs to
 unpack. Finally, ActiveRecord has to convert this binary data into Ruby
 objects.</p>
-
 <p>This process takes time; in particular, creating hundreds or thousands of Ruby
 objects involves allocating a series of memory structures and placing them into
 a large array. Using a process called “garbage collection,” Ruby might even
 have to find and recycle older unused Ruby objects to hold the comments, which
 would take even more time.</p>
-
 <h2>Databases Are Faster Than You Are</h2>
-
 <p>The solution is obvious: perform the search inside the database and only return
 the latest comment. But how do I ask my database server to search for the
 latest comment? By using ActiveRecord methods such as <span class="code">where</span>,
 <span class="code">order</span> and <span class="code">first</span> to describe
 what I want, instead of writing my own code in Ruby. This line will do the
 trick:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-post.comments.order(<span class="key">updated_at</span>: <span class="symbol">:desc</span>).first
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">post.comments.order(</span><span style="color:#008080;">updated_at: :desc</span><span style="color:#000000;">).first
+</span></pre>
 
 <p>ActiveRecord translates this into SQL code as follows:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="class">select</span> comments.* <span class="keyword">from</span> comments
-<span class="keyword">where</span> comments.post_id = <span class="integer">1</span>
-<span class="keyword">order</span> <span class="keyword">by</span> comments.updated_at <span class="directive">desc</span> limit <span class="integer">1</span>
-</pre></div>
-</div>
-
-
-
+<pre>
+select comments.* from comments
+where comments.post_id = 1
+order by comments.updated_at desc limit 1
+</pre>
 <p>This will run much faster than my previous solution, because my database only
 transmits one comment record over the network to my Ruby server: the latest
 one. And Ruby only creates one Ruby object, for the latest comment:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2015/6/18/db-sort.png"/></p>
-
 <p>Now highly optimized C code, running on the same server that holds the comments
 table data, filters the comments by post, and sorts the matches by timestamp.
 This code has been used and tested by millions of developers around the world
 for years; don’t try to reinvent the wheel by rewriting the sort yourself using
 Ruby.</p>
-
 <h2>Caching the Latest Comment</h2>
-
 <p>Suppose in my user interface I always show the author of the latest comment
 next to each post. Now to display my page, I need to perform this comment
 search over and over again for every post. One way to avoid the comment query
@@ -243,77 +135,59 @@ altogether would be to cache the latest comment’s author right inside the post
 table. That way I’ll get the latest comment’s author automatically when I load
 the posts. No need for repeated searches, or any queries on the comments table
 at all!</p>
-
 <p>In practice, if I’ve remembered to create indexes on the <span
 class="code">post_id</span> and <span class="code">updated_at</span> columns,
 the comment search SQL above will run very quickly, even if I execute it many
 times. I could even load the latest comments for all the posts using single SQL
 query, but for the sake of argument today, let’s explore a caching solution anyway.</p>
-
 <p>Again ActiveRecord makes this easy. All I need to do is write a migration like
 this:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">AddLatestCommentAuthorToPosts</span> &lt; <span class="constant">ActiveRecord</span>::<span class="constant">Migration</span>
-  <span class="keyword">def</span> <span class="function">change</span>
-    add_column <span class="symbol">:posts</span>, <span class="symbol">:latest_comment_author</span>, <span class="symbol">:string</span>
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">AddLatestCommentAuthorToPosts </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Migration
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">change
+</span><span style="color:#000000;">    add_column </span><span style="color:#008080;">:posts</span><span style="color:#000000;">, </span><span style="color:#008080;">:latest_comment_author</span><span style="color:#000000;">, </span><span style="color:#008080;">:string
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Now I just need to be sure to update the post each time a user writes a new
 comment:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-post.update_attribute(<span class="symbol">:latest_comment_author</span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">user name</span><span class="delimiter">&quot;</span></span>)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">post.update_attribute(</span><span style="color:#008080;">:latest_comment_author</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">user name</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
+</span></pre>
 
 <h2>Data Migration Using Ruby</h2>
-
 <p>Of course, I forgot something important. Using <span
 class="code">update_attribute</span> I save the author for any new comments,
 but what about all of the existing comments? How do I set this column’s initial
 value for all the comments already in my database?</p>
-
 <p>Simple enough: I just add a method to my migration that calls <span class="code">update_attribute</span>.
 Here’s how to do it:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">AddLatestCommentAuthorToPosts</span> &lt; <span class="constant">ActiveRecord</span>::<span class="constant">Migration</span>
-  <span class="keyword">def</span> <span class="function">change</span>
-    add_column <span class="symbol">:posts</span>, <span class="symbol">:latest_comment_author</span>, <span class="symbol">:string</span>
-    populate_latest_comment_authors
-  <span class="keyword">end</span>
-
-  <span class="keyword">def</span> <span class="function">populate_latest_comment_authors</span>
-   <span class="constant">Post</span>.all.each <span class="keyword">do</span> |post|
-      latest_author = post.comments.order(<span class="key">updated_at</span>: <span class="symbol">:desc</span>).first.author
-      post.update_attribute(<span class="symbol">:latest_comment_author</span>, latest_author)
-    <span class="keyword">end</span>
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">AddLatestCommentAuthorToPosts </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Migration
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">change
+</span><span style="color:#000000;">    add_column </span><span style="color:#008080;">:posts</span><span style="color:#000000;">, </span><span style="color:#008080;">:latest_comment_author</span><span style="color:#000000;">, </span><span style="color:#008080;">:string
+</span><span style="color:#000000;">    populate_latest_comment_authors
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">populate_latest_comment_authors
+</span><span style="color:#000000;">   </span><span style="color:#008080;">Post</span><span style="color:#000000;">.all.each </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">post</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">      latest_author </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> post.comments.order(</span><span style="color:#008080;">updated_at: :desc</span><span style="color:#000000;">).first.author
+</span><span style="color:#000000;">      post.update_attribute(</span><span style="color:#008080;">:latest_comment_author</span><span style="color:#000000;">, latest_author)
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Because you write migrations in Ruby, ActiveRecord makes it simple to perform
 complex transformations in a simple, elegant way. Using Ruby I get all the
 posts, iterate over each one, lookup the latest comment for that post, and
 update the latest comment author field.</p>
-
 <p>But I’ve made the same performance mistake as before! Looking at my Rails log
 after running this migration, I find a series of repeated SQL statements:</p>
-
 <pre>
 SELECT  "comments".* FROM "comments"  WHERE "comments"."post_id" = $1  ORDER BY "comments"."updated_at" DESC LIMIT 1  [["post_id", 2]]
 UPDATE "posts" SET "latest_comment_author" = $1, "updated_at" = $2 WHERE "posts"."id" = 2  [["latest_comment_author", "Harry"], ["updated_at", "2015-06-17 13:58:42.512160"]]
@@ -322,71 +196,50 @@ UPDATE "posts" SET "latest_comment_author" = $1, "updated_at" = $2 WHERE "posts"
 SELECT  "comments".* FROM "comments"  WHERE "comments"."post_id" = $1  ORDER BY "comments"."updated_at" DESC LIMIT 1  [["post_id", 1]]
 UPDATE "posts" SET "latest_comment_author" = $1, "updated_at" = $2 WHERE "posts"."id" = 1  [["latest_comment_author", "Harry"], ["updated_at", "2015-06-17 13:58:42.516071"]]
 </pre>
-
-
 <p>Again, I’ve let my data out of the database. By loading all of the posts using
 <span class="code">Post.all</span>, and iterating over them using <span
 class="code">each</span>, I’ve triggered this series of repeated SQL commands.
 Now I’m transmitting all of the post data, and then more data back and forth
 for each post between my database and my Ruby application:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2015/6/18/ruby-iterate.png"/></p>
-
 <p>Just like my previous code, this migration will perform poorly. If I have just
 a few posts it probably doesn’t matter. But imagine if there are thousands or
 even 100,000s of post records: This migration might take minutes or even hours
 to complete! My database server and Ruby need to serialize, transmit and
 deserialize data for each one of these SQL commands.</p>
-
 <p>There must be a better way.</p>
-
 <h2>Data Migration Using SQL</h2>
-
 <p>The solution is the same as before: Don’t let your data out of the database.
 Instead of writing Ruby code to update each post record, ask the database
 server to do it. My database server already has all my post data in an
 optimized format, likely loaded into memory. It can iterate over the posts and
 update them very quickly.</p>
-
 <div style="float: right; padding: 17px 0px 10px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2015/6/18/prison.jpg"><br/>
 </div>
-
-
 <p>But how? How do I ask the database server to update all the posts? I need to
 speak the database’s language: SQL. By writing SQL directly, I can be sure the
 database is doing exactly what I want, that it’s using the most efficient
 algorithm possible. I can be sure my database and I understand each other.</p>
-
 <p>Here’s one way to update all the posts using SQL:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="class">update</span> posts <span class="class">set</span> latest_comment_author = (
-  <span class="class">select</span> author <span class="keyword">from</span> comments
-  <span class="keyword">where</span> comments.post_id = posts.id
-  <span class="keyword">order</span> <span class="keyword">by</span> comments.updated_at <span class="directive">desc</span>
-  limit <span class="integer">1</span>
+<pre>
+update posts set latest_comment_author = (
+  select author from comments
+  where comments.post_id = posts.id
+  order by comments.updated_at desc
+  limit 1
 )
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>This tiny SQL program actually uses SQL commands similar to the what I found
 repeated in my log file. But there’s an important difference: This SQL code
 doesn’t refer to hard coded post id values, such as 1 or 2. Here I’ve updated
 all of the posts with a single command!</p>
-
 <p>How does this work? Let’s take a look:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2015/6/18/db-iterate.png"/></p>
-
 <p>Using a SQL migration, my Ruby code sends a single SQL command to the database
 server, which is transmitted over the network to the database. Then, on the
 right, my database server performs the same iteration over the posts table,
 selecting the latest comment for each one.</p>
-
 <p>This looks similar, but there’s a crucial difference: The iteration happens
 entirely inside the database server. No data needs to be packed, transmitted to
 the Ruby server and unpacked again. In fact, the C code performing the repeated
@@ -394,21 +247,16 @@ the Ruby server and unpacked again. In fact, the C code performing the repeated
 language and will run very quickly. Once it fetches the latest comment, it can
 directly update each post because the posts table is stored nearby on the same
 server’s hard drive, or even in memory.</p>
-
 <h2>Why Does the SQL Code Iterate?</h2>
-
 <p>You might wonder why I drew an iteration inside the database server above.
 After all, I sent the database a simple command containing 1 <span
 class="code">UPDATE</span> statement and 1 <span class="code">SELECT</span>
 statement. Why does my database need to execute the select over and over again?</p>
-
 <p>The reason why is that my SQL code uses a <a href="https://en.wikipedia.org/wiki/Correlated_subquery">correlated
 subquery</a>, because the inner
 <span class="code">SELECT</span> uses a value from the outer query. Here’s the
 SQL again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2015/6/18/correlated-subquery.png"/></p>
-
 <p>Notice the inner <span class="code">SELECT</span> statement refers to <span
 class="code">posts.id</span>, a value from the surrounding <span
 class="code">UPDATE</span> statement.  This requires the database server to
@@ -417,15 +265,12 @@ leave it as an exercise for the reader to rewrite this using an <span
 class="code">UPDATE-FROM</span> statement, a <span class="code">JOIN</span> or
 even Postgres window functions, which would avoid the repeated <span
 class="code">SELECT</span>s.</p>
-
 <p>However, remember if there are indexes on the columns in the comments table,
 the iteration selecting the latest comment for each post will be very fast. It
 will certainly be thousands of times faster than sending repeated <span
 class="code">SELECT</span> and <span class="code">UPDATE</span> SQL statements
 from your Ruby server over the network.</p>
-
 <h2>Do You Need to Learn SQL?</h2>
-
 <p>In reality I could have written this data migration using Ruby code.
 ActiveRecord provides a rich set of methods, even allowing for sophisticated
 queries employing subselects. And in the rare case when
@@ -433,116 +278,22 @@ ActiveRecord can’t generate the SQL I need, I can always resort to using the
 underlying <a href="https://github.com/rails/arel">Arel</a> Ruby library. In practice,
 it’s rare that you will actually need to write SQL code inside a Rails
 application.</p>
-
 <p>Then why learn SQL? You should learn SQL because it will give you tremendous
 insight into how database servers actually work. You’ll learn what database
 servers can really do, and what they can’t. You won’t try to reinvent the wheel
 when you already have a server that uses algorithms more powerful and
 sophisticated that any you could write.</p>
-
 <p>Use the database server for what it was designed to do: to solve your data
 problems. Whether you write SQL directly or use a tool like ActiveRecord to
 generate SQL automatically, perform the search, sort, or calculation you need
 right inside the database.</p>
-
 <p>Don’t let your data out of the database until you need to… until you have just
 the values your application really needs.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Don’t Let Your Data Out of the Database';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Don’t Let Your Data Out of the Database';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2015/6/18/dont-let-your-data-out-of-the-database'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Don’t Let Your Data Out of the Database';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                    <li><a href="/2015/1/8/using-rake-to-generate-a-blog">Using Rake to Generate a Blog</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li><li><a href="2015/1/8/using-rake-to-generate-a-blog">Using Rake to Generate a Blog</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

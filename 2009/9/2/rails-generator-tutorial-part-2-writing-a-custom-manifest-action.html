@@ -1,52 +1,4 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Rails generator tutorial part 2: writing a custom manifest action - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Rails generator tutorial part 2: writing a custom manifest action - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Rails generator tutorial part 2: writing a custom manifest action</h1>
-  
-    <div class="metadata">
-    <span class="date">September 2nd 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/9/2/rails-generator-tutorial-part-2-writing-a-custom-manifest-action" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>In <a href="http://patshaughnessy.net/2009/8/23/tutorial-how-to-write-a-rails-generator">part one of this tutorial</a> I wrote a simple rails generator that creates a controller code file in app/controllers. This time I want to finish up my simple &ldquo;VersionGenerator&rdquo; example by enabling it to add a line to the routes.rb file. In other words, I want to be able to use a manifest action called &ldquo;route&rdquo; like this:</p>
-
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Rails generator tutorial part 2: writing a custom manifest action - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Rails generator tutorial part 2: writing a custom manifest action</h1><div class="metadata"><span class="date">September 2nd 2009</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2009/9/2/rails-generator-tutorial-part-2-writing-a-custom-manifest-action" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Rails generator tutorial part 2: writing a custom manifest action">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>In <a href="http://patshaughnessy.net/2009/8/23/tutorial-how-to-write-a-rails-generator">part one of this tutorial</a> I wrote a simple rails generator that creates a controller code file in app/controllers. This time I want to finish up my simple &ldquo;VersionGenerator&rdquo; example by enabling it to add a line to the routes.rb file. In other words, I want to be able to use a manifest action called &ldquo;route&rdquo; like this:</p>
 <pre>def manifest
     record do |m|
       m.template(&#x27;controller.rb&#x27;, &#x27;app/controllers/version_controller.rb&#x27;)
@@ -55,39 +7,21 @@
               :action =&gt; &#x27;display_version&#x27;</b>
     end
   end</pre>
-
-
 <p>The problem for today is how to implement the &ldquo;route&rdquo; action, which is not supported by Rails by default. The Rails generator base class code does provide a few other actions you can use in your manifest, like &ldquo;file&rdquo; or &ldquo;directory,&rdquo; which create a file or directory. Rails even provides a method called &ldquo;route_resources&rdquo; to add a &ldquo;map.resources&rdquo; line to routes.rb, but not a simple named route line like what we need for this example.</p>
-
-
 <p>This specific action might be useful for you, but my real goal is to explore how Rails generators work in general and discuss some of the issues you might run into if you need a custom manifest action like this for any purpose. Let&rsquo;s get started by just adding the new action method we need right inside our generator class&hellip;</p>
-
-
 <pre>def route(route_options)
   puts &quot;This will create a new route!&quot;
 end</pre>
-
-
 <p>&hellip;and see what happens when we run script/generate with manifest method above:</p>
-
-
 <pre>$ ./script/generate version ../build-info/version.txt 
    identical  app/controllers/version_controller.rb
 This will create a new route!</pre>
-
-
 <p>Very promising! All we need to do is add the necessary code here and we&rsquo;ll be all set. But first let&rsquo;s take a closer look at what&rsquo;s happening by adding a call to &ldquo;caller&rdquo; inside this new method and see how it&rsquo;s being called by the Rails generator system:</p>
-
-
 <pre>def route(route_options)
   puts &quot;This will create a new route!&quot;
   puts caller
 end</pre>
-
-
 <p>Here&rsquo;s what is displayed when we run this (paths shortened for readability):</p>
-
-
 <pre>$ ./script/generate version ../build-info/version.txt
    identical  app/controllers/version_controller.rb
 This will create a new route!
@@ -104,52 +38,24 @@ This will create a new route!
 /usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:31:in `gem_original_require&#x27;
 /usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:31:in `require&#x27;
 ./script/generate:3</pre>
-
-
 <p>There&rsquo;s a lot going on here; in fact, when I started to learn more about Rails generators and how they work I was shocked at how complicated their object model and design are. I won&rsquo;t try to explain all of it here, but let&rsquo;s take a closer look at the one line I bolded above: line 31 of <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/scripts.rb#L31">lib/rails_generator/scripts.rb</a></p>
-
-
 <pre>Rails::Generator::Base.instance(options[:generator], args, options)
                       .command(options[:command]).invoke!</pre>
-
-
 <p>This is called when you run script/generate, by the &ldquo;Rails::Generator::Scripts::Generate&rdquo; class. Translating this line of Ruby into English, we get: &ldquo;Create an instance of the specified generator, passing in the arguments and options provided on the command line; then create an instance of the specified command that uses that generator; then invoke the command.&rdquo;</p>
-
-
 <p>What this means is that actually Rails generator classes do not do the real work of generating code &ndash; Rails generator &ldquo;commands&rdquo; do! The <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/commands.rb">lib/rails_generator/commands.rb</a> file defines a series of command objects inside the Rails::Generator::Commands module. The two most important command classes are Create and Destroy.  The &ldquo;Create&rdquo; command is called when you execute script/generate, like what happened in the stack trace above. This class contains the implementation of the &ldquo;template&rdquo; method we used before, plus various other methods like &ldquo;file&rdquo; and &ldquo;directory&rdquo; that create files and directories, etc.</p>
-
-
 <p>The &ldquo;Destroy&rdquo; command is called when you execute script/destroy from the command line (I removed &ldquo;puts caller&rdquo; first before running this):</p>
-
-
 <pre>$ ./script/destroy version ../build-info/version.txt 
 This will create a new route!
           rm  app/controllers/version_controller.rb</pre>
-
-
 <p>This class has all of the same methods that the Create class does, except that they perform the opposite action: instead of creating a file or directory, they delete them. The Destroy class also executes the actions in the opposite order, by looping backwards through the manifest that we recorded in our generator. Here the destroy command has deleted our version_controller.rb file we generated earlier. Note that it still displays &ldquo;This will create a new route!&rdquo;</p>
-
-
 <p>If you&rsquo;re interesting in diving into the real details about how Rails generators work, then read the code in <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/commands.rb">commands.rb</a> very carefully. In particular, look at how the &ldquo;self.included&rdquo; and &ldquo;self.instance&rdquo; methods at the top work; these methods are used in the line I showed above to create the specified command, supplying the specified generator as an argument to the command constructor. The &ldquo;invoke!&rdquo; method on commands actually plays back the recorded manifest. Also all of the actions that are available to your generator's manifest method are defined in this file. One other interesting detail I don&rsquo;t have space to explain carefully here is that the command objects contain the corresponding generator class as a delegate object; in other words they contain an instance of the generator as a member variable:</p>
-
-
 <pre># module Rails::Generator::Commands...
 class Base &lt; DelegateClass(Rails::Generator::Base)</pre>
-
-
 <p>This explains the top two lines in the stack trace above:</p>
-
-
 <pre>/usr/local/lib/ruby/1.8/delegate.rb:270:in `__send__&#x27;
 /usr/local/lib/ruby/1.8/delegate.rb:270:in `method_missing&#x27;</pre>
-
-
 <p>&ldquo;DelegateClass&rdquo; is defined by delegate.rb, which is a <a href="http://www.ruby-doc.org/stdlib/libdoc/delegate/rdoc/index.html">Ruby library that implements the delegate pattern</a>. This is why we were able to add the new &ldquo;route&rdquo; method right in our generator; when Ruby found the &ldquo;route&rdquo; method missing in the Create command, it delegated the call to our generator object.</p>
-
-
 <p>Obviously we have a problem here: our new &ldquo;route&rdquo; method needs to be able to remove a route from routes.rb if the Destroy command is called, as well as create a new one for the Create command. One way to implement our new &ldquo;route&rdquo; method would be check the &ldquo;options[:command]&rdquo; value that we saw above on <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/scripts.rb#L31">line 31 of scripts.rb</a>, like this:</p>
-
-
 <pre>def route(route_options)
   if options[:command] == :create
     puts &quot;This will add a new route to routes.rb.&quot;
@@ -157,30 +63,16 @@ class Base &lt; DelegateClass(Rails::Generator::Base)</pre>
     puts &quot;This will remove the new route from routes.rb.&quot;
   end
 end</pre>
-
-
 <p>Now if we run script/generate again, our new method will create a route:</p>
-
-
 <pre>$ ./script/generate version ../build-info/version.txt
       create  app/controllers/version_controller.rb
 This will add a new route to routes.rb.</pre>
-
-
 <p>And if we run the destroy command, we&rsquo;ll remove the route:</p>
-
-
 <pre>$ ./script/destroy version ../build-info/version.txt 
 This will remove the new route from routes.rb.
           rm  app/controllers/version_controller.rb</pre>
-
-
 <p>It turns out a cleaner way to implement the &ldquo;route&rdquo; method is to directly add the method to both the Create and Destroy command classes. This allows me to call a utility method called &ldquo;gsub_file&rdquo; in the Rails::Generator::Commands::Base class which I wouldn&rsquo;t have direct access to from my generator class. It also avoids the somewhat ugly if statement on the options[:command] value, and finally it might make it easier for me someday to refactor the new route methods into a separate module that I could use with various different generators that might need to add and remove routes.</p>
-
-
 <p>Anyway, here&rsquo;s the finished code for the entire generator:</p>
-
-
 <pre>class VersionGenerator &lt; Rails::Generator::NamedBase
   attr_reader :version_path
   def initialize(runtime_args, runtime_options = {})
@@ -196,162 +88,60 @@ This will remove the new route from routes.rb.
     end
   end
 end
-
-module Rails
-  module Generator
-    module Commands
-
-      class Base
-        def route_code(route_options)
-          &quot;map.#{route_options[:name]} &#x27;#{route_options[:name]}&#x27;, :controller =&gt; &#x27;#{route_options[:controller]}&#x27;, :action =&gt; &#x27;#{route_options[:action]}&#x27;&quot;
-        end
-      end
-
-# Here's a readable version of the long string used above in route_code;
-# but it should be kept on one line to avoid inserting extra whitespace
-# into routes.rb when the generator is run:
-# &quot;map.#{route_options[:name]} &#x27;#{route_options[:name]}&#x27;,
-#     :controller =&gt; &#x27;#{route_options[:controller]}&#x27;,
-#     :action =&gt; &#x27;#{route_options[:action]}&#x27;&quot;
-
-      class Create
-        def route(route_options)
-          sentinel = &#x27;ActionController::Routing::Routes.draw do |map|&#x27;
-          logger.route route_code(route_options)
-          gsub_file &#x27;config/routes.rb&#x27;, /(#{Regexp.escape(sentinel)})/mi do |m|
-              &quot;#{m}\n  #{route_code(route_options)}\n&quot;
-          end
-        end
-      end
-
-      class Destroy
-        def route(route_options)
-          logger.remove_route route_code(route_options)
-          to_remove = &quot;\n  #{route_code(route_options)}&quot;
-          gsub_file &#x27;config/routes.rb&#x27;, /(#{to_remove})/mi, &#x27;&#x27;
-        end
-      end
-
+<p>module Rails
+module Generator
+module Commands</p>
+<pre><code>  class Base
+    def route_code(route_options)
+      &amp;quot;map.#{route_options[:name]} &amp;#x27;#{route_options[:name]}&amp;#x27;, :controller =&amp;gt; &amp;#x27;#{route_options[:controller]}&amp;#x27;, :action =&amp;gt; &amp;#x27;#{route_options[:action]}&amp;#x27;&amp;quot;
     end
   end
-end</pre>
+</code></pre>
+<h1>Here's a readable version of the long string used above in route_code;</h1>
+<h1>but it should be kept on one line to avoid inserting extra whitespace</h1>
+<h1>into routes.rb when the generator is run:</h1>
+<h1>&quot;map.#{route_options[:name]} '#{route_options[:name]}',</h1>
+<h1>:controller =&gt; '#{route_options[:controller]}',</h1>
+<h1>:action =&gt; '#{route_options[:action]}'&quot;</h1>
+<pre><code>  class Create
+    def route(route_options)
+      sentinel = &amp;#x27;ActionController::Routing::Routes.draw do |map|&amp;#x27;
+      logger.route route_code(route_options)
+      gsub_file &amp;#x27;config/routes.rb&amp;#x27;, /(#{Regexp.escape(sentinel)})/mi do |m|
+          &amp;quot;#{m}\n  #{route_code(route_options)}\n&amp;quot;
+      end
+    end
+  end
 
+  class Destroy
+    def route(route_options)
+      logger.remove_route route_code(route_options)
+      to_remove = &amp;quot;\n  #{route_code(route_options)}&amp;quot;
+      gsub_file &amp;#x27;config/routes.rb&amp;#x27;, /(#{to_remove})/mi, &amp;#x27;&amp;#x27;
+    end
+  end
 
+end
+</code></pre>
+<p>end
+end</pre></p>
 <p>More or less copied from the existing route_resources action found in <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/commands.rb">commands.rb</a>, this works as follows: If we call script/generate then the route action method in the Create command class is called. This uses gsub_file to look for the &ldquo;sentinel&rdquo; or target area of the file and replaces it with the sentinel + the new route code. I also use the &ldquo;logger&rdquo; method to display log messages using the Rails::Generator::SimpleLogger class. Here&rsquo;s what it looks like on the command line:</p>
-
-
 <pre>$ ./script/generate version ../build-info/version.txt
       create  app/controllers/version_controller.rb
        route  map.version &#x27;version&#x27;,
                  :controller =&gt; &#x27;version&#x27;,
                  :action =&gt; &#x27;display_version&#x27;</pre>
-
-
 <p>If script/destroy is called, then the second route implementation in the Destroy class is called. This uses gsub_file to remove the route code. Finally, the &ldquo;route_code&rdquo; method returns the route code that we want to generate or remove from routes.rb. This time on the command line we get:</p>
-
-
 <pre>$ ./script/destroy version ../build-info/version.txt 
 remove_route  map.version 'version',
                  :controller => 'version',
                  :action => 'display_version'
           rm  app/controllers/version_controller.rb</pre>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2009/9/2/rails-generator-tutorial-part-2-writing-a-custom-manifest-action';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Rails generator tutorial part 2: writing a custom manifest action';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2009/9/2/rails-generator-tutorial-part-2-writing-a-custom-manifest-action';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Rails generator tutorial part 2: writing a custom manifest action';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2009/9/2/rails-generator-tutorial-part-2-writing-a-custom-manifest-action'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Rails generator tutorial part 2: writing a custom manifest action';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

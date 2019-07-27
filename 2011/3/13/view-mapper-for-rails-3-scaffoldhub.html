@@ -1,125 +1,51 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="View Mapper for Rails 3: ScaffoldHub - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>View Mapper for Rails 3: ScaffoldHub - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>View Mapper for Rails 3: ScaffoldHub</h1>
-  
-    <div class="metadata">
-    <span class="date">March 13th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="View Mapper for Rails 3: ScaffoldHub">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>Back in 2009 I wrote a gem called <a href="http://patshaughnessy.net/2009/10/1/view-mapper-generate-complex-view-code-for-your-models">View Mapper</a> which created different variations on the standard Rails scaffolding user interface. This was cool because it could show you how to use a certain plugin or gem, and it even worked with existing models and their associations.</p>
-
-<p>This year I’ve been thinking about how to upgrade View Mapper to work with Rails 3 properly&hellip; and in the end I decided not to upgrade View Mapper at all but instead to create something entirely new: <a href="http://scaffoldhub.org">ScaffoldHub</a>.</p>
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>View Mapper for Rails 3: ScaffoldHub - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>View Mapper for Rails 3: ScaffoldHub</h1><div class="metadata"><span class="date">March 13th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="View Mapper for Rails 3: ScaffoldHub">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>Back in 2009 I wrote a gem called <a href="http://patshaughnessy.net/2009/10/1/view-mapper-generate-complex-view-code-for-your-models">View Mapper</a> which created different variations on the standard Rails scaffolding user interface. This was cool because it could show you how to use a certain plugin or gem, and it even worked with existing models and their associations.</p>
+<p>This year I’ve been thinking about how to upgrade View Mapper to work with Rails 3 properly... and in the end I decided not to upgrade View Mapper at all but instead to create something entirely new: <a href="http://scaffoldhub.org">ScaffoldHub</a>.</p>
 <p><img src="http://patshaughnessy.net/assets/2011/3/13/scaffoldhub.png" alt="ScaffoldHub" /></p>
-
-<p>This is both a web site and a gem&hellip; the <a href="http://scaffoldhub.org">http://scaffoldhub.org</a> site displays a gallery of variations on the Rails scaffolding generator, while a single scaffoldhub gem allows you to run any of these “scaffolds” inside your own app!</p>
-
+<p>This is both a web site and a gem... the <a href="http://scaffoldhub.org">http://scaffoldhub.org</a> site displays a gallery of variations on the Rails scaffolding generator, while a single scaffoldhub gem allows you to run any of these “scaffolds” inside your own app!</p>
 <h2>Scaffolding: learn by example</h2>
-
 <p>Each scaffolding variation might use a certain JQuery plugin (e.g. autocomplete or date picker) or Rails gem (e.g. Paperclip or Will Paginate). This is a great way to get a jump start on learning how to use that particular plugin or gem with Rails. In seconds you something working in your app, and then you can take a look at the generated scaffolding code in detail to see how it works and adapt it to your needs.</p>
-
 <p>As as example, here’s the screen shot shown on scaffoldhub.org for the “autocomplete scaffold:”
 ￼
 <img src="http://patshaughnessy.net/assets/2011/3/13/autocomplete.png" alt="ScaffoldHub" /></p>
-
 <p>Once you have the ScaffoldHub gem installed, all you need to do is type in the command line shown on the web site to create that version of the scaffolding right inside your Rails 3 app. See my example below for more details.</p>
-
 <h2>Community Driven</h2>
-
 <p>I intend ScaffoldHub.org to be community driven: instead writing all the scaffolds myself, anyone will be able to post their own version of Rails scaffolding and end users will see it on the site along with the author’s gravitar, immediately available for use.</p>
-
 <p>The variety and usefulness of the scaffolds won’t be limited by my time or imagination (both in very short supply!) but instead anyone with a good idea and a few hours will be able to post a new scaffold. There won’t be any hidden agenda or preference for coding style or tools; if you disagree or just don’t like the way a certain version of the scaffolding user interface works, just post a newer, better version!</p>
-
 <h2>Easy to use a scaffold; easy to write a scaffold</h2>
-
 <p>The key design goals I have in mind for ScaffoldHub are:</p>
-
 <ul>
-<li><p>To make using different scaffolds tremendously easy for end users. The web site will show you a screen shot of exactly what you’ll get after running each scaffold. Then you will run the scaffoldhub generator the same way you use the standard Rails scaffold generator: a single “rails generate” command.</p></li>
-<li><p>To also make it easy for anyone to write a new scaffold: no Rails generator code to write; no need to create and publish a new gem. You will just post a single code file called the “scaffold spec” along with your ERB templates and you’re done. All end users will be able to immediately start using it without the need to install a new version of the scaffoldhub gem, or any other gem.</p></li>
+<li>
+<p>To make using different scaffolds tremendously easy for end users. The web site will show you a screen shot of exactly what you’ll get after running each scaffold. Then you will run the scaffoldhub generator the same way you use the standard Rails scaffold generator: a single “rails generate” command.</p>
+</li>
+<li>
+<p>To also make it easy for anyone to write a new scaffold: no Rails generator code to write; no need to create and publish a new gem. You will just post a single code file called the “scaffold spec” along with your ERB templates and you’re done. All end users will be able to immediately start using it without the need to install a new version of the scaffoldhub gem, or any other gem.</p>
+</li>
 </ul>
-
-
 <h2>Detailed example</h2>
-
 <p>To get things started, I just posted a single new scaffold on ScaffoldHub.org: the <a href="http://scaffoldhub.org/scaffolds/autocomplete">AutoComplete scaffold</a>. This scaffold looks the same as the standard Rails scaffolding code, except you can use type ahead/autocomplete on one of the text fields. I implemented it using the <a href="http://docs.jquery.com/Plugins/autocomplete">JQuery autocomplete plugin</a>.</p>
-
 <p>To run it, first just install the ScaffoldHub gem in your Rails 3 app by editing your Gemfile and adding this line:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>gem <span class="s"><span class="dl">'</span><span class="k">scaffoldhub</span><span class="dl">'</span></span></pre></div>
 </div>
-
-
 <p>And of course then install it with bundler:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>$ bundle install
 Fetching source index for http://rubygems.org/
 Using rake (0.8.7) 
 Using abstract (1.0.0) 
-
-... etc...
-
-Using railties (3.0.5) 
-Using rails (3.0.5) 
+<p>... etc...</p>
+<p>Using railties (3.0.5)
+Using rails (3.0.5)</p>
 <div class='container'>Using scaffoldhub (0.0.3)<div class='overlay'></div></div>Using sqlite3 (1.3.3) 
 <span class="s">Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.</span>
 </pre></div>
 </div>
-
-
 <p>Now with the gem installed you will have a new generator called “scaffoldhub” available that uses the same syntax as the standard Rails scaffold generator, except for one additional option which specifies which scaffold to use. For example, to create a person model with a name field, you would use:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>rails generate scaffoldhub person name:string --scaffold autocomplete:name</pre></div>
 </div>
-
-
-<p>Here the new &mdash;scaffold option indicates we want to use the autocomplete scaffold from scaffoldhub.org, and that we want the autocomplete behavior on the name field.</p>
-
+<p>Here the new --scaffold option indicates we want to use the autocomplete scaffold from scaffoldhub.org, and that we want the autocomplete behavior on the name field.</p>
 <p>When you run the scaffoldhub command above, you’ll see this output:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>$ rails generate scaffoldhub person name:string --scaffold autocomplete:name
       invoke  active_record
@@ -142,121 +68,25 @@ Using rails (3.0.5)
       <span class="s">create</span>      app/views/people/edit.html.erb
     <span class="s">download</span>      https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/index.html.erb
       <span class="s">create</span>      app/views/people/index.html.erb
-
-...etc...</pre></div>
+<p>...etc...</pre></div></p>
 </div>
-
-
 <p>This looks similar to what the Rails scaffold generator displays, except you’ll notice a number of “download” lines. These indicate that the scaffoldhub gem is downloading the code needed to generate the autocomplete scaffolding. The first download line:</p>
-
 <div class="CodeRay">
   <div class="code"><pre><span class="s">download</span>    http://scaffoldhub.org/scaffolds/autocomplete/spec</pre></div>
 </div>
-
-
-<p>&hellip;actually gets the list of generator template files for autocomplete from scaffoldhub.org, while the remaining download lines:</p>
-
+<p>...actually gets the list of generator template files for autocomplete from scaffoldhub.org, while the remaining download lines:</p>
 <div class="CodeRay">
   <div class="code"><pre><span class="s">download</span>    https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/model.rb
 <span class="s">create</span>      app/models/person.rb</pre></div>
 </div>
-
-
-<p>&hellip;get the actual generator template files.</p>
-
-<h2>More to come&hellip;</h2>
-
+<p>...get the actual generator template files.</p>
+<h2>More to come...</h2>
 <p>The next thing on my list to do is implement the login and contribute user interface for scaffoldhub.org. This should be straightforward, because all it will do is save the URL of the “scaffold spec” file I mentioned above, along with a screen shot and account information about who is posting the scaffold. Stay tuned here for more information and get ready to write your own scaffold!</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'View Mapper for Rails 3: ScaffoldHub';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'View Mapper for Rails 3: ScaffoldHub';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'View Mapper for Rails 3: ScaffoldHub';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on ScaffoldHub</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2011/4/30/contributing-a-new-scaffold-to-scaffoldhub">Contributing a new scaffold to ScaffoldHub</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on ScaffoldHub</div><div class="links"><ul><li><a href="2011/4/30/contributing-a-new-scaffold-to-scaffoldhub">Contributing a new scaffold to ScaffoldHub</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

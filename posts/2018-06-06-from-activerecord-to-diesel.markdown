@@ -385,8 +385,8 @@ Found 20 users with more than one last name.
 Found 80 users with one last name.
 </pre>
 
-As a test, I tried adding a user with no last name and got the expected results
-- the user with no last name was counted as if they had one:
+As a test, I tried adding a user with no last name and got the expected results - the
+user with no last name was counted as if they had one:
 
 <pre>
 $ psql names

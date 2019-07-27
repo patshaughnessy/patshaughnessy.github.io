@@ -1,204 +1,43 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Mephisto Setup on HostingRails.com - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Mephisto Setup on HostingRails.com - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Mephisto Setup on HostingRails.com</h1>
-  
-    <div class="metadata">
-    <span class="date">September 9th 2008</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2008/9/9/mephisto-on-hostingrails-com" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <p>In the past I’ve setup blog sites using <a href="http://b2evolution.net/">B2Evolution</a>, <a href="http://wordpress.org/">WordPress</a> and other PHP frameworks and had no trouble at all. Last week I setup this web site using <a href="http://mephistoblog.com/">Mephisto</a> on a Rails hosting service (<a href="http://www.hostingrails.com/">hostingrails.com</a>), and expected to get it up and running in just a few minutes; after all, if installing and configuring a PHP blog site in 2005 was easy, certainly doing the same in 2008 with better technology (Rails) should be even easier.</p>
-
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Mephisto Setup on HostingRails.com - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Mephisto Setup on HostingRails.com</h1><div class="metadata"><span class="date">September 9th 2008</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2008/9/9/mephisto-on-hostingrails-com" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Mephisto Setup on HostingRails.com">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p>In the past I’ve setup blog sites using <a href="http://b2evolution.net/">B2Evolution</a>, <a href="http://wordpress.org/">WordPress</a> and other PHP frameworks and had no trouble at all. Last week I setup this web site using <a href="http://mephistoblog.com/">Mephisto</a> on a Rails hosting service (<a href="http://www.hostingrails.com/">hostingrails.com</a>), and expected to get it up and running in just a few minutes; after all, if installing and configuring a PHP blog site in 2005 was easy, certainly doing the same in 2008 with better technology (Rails) should be even easier.</p>
 <p>Wrong!</p>
-
 <p>First I created a MySQL database on my production server and called it “mephisto”. Then I set the char set and collation settings using the command line:<pre># mysql -u myusername -p
-mysql> ALTER DATABASE mydatabasename DEFAULT CHARACTER SET utf8
-  COLLATE utf8_unicode_ci</pre></p>
-
+mysql&gt; ALTER DATABASE mydatabasename DEFAULT CHARACTER SET utf8
+COLLATE utf8_unicode_ci</pre></p>
 <p>Since I’m not ready to write my own Rails blog site, I decided to download and setup the latest version of <a href="http://mephistoblog.com/download">Mephisto (0.8 “Drax”)</a>. When I tried to download the TAR file from the 0.8 Drax link using curl I got HTML that redirected me to a different location:</p>
-
 <pre># cat master.tar.gz
 &lt;html>&lt;body>You are being &lt;a href="http://github.com/tarballs/technoweenie-
 mephisto-90e2cc253d94e2e544bc8b21f361c7360c1e9baa.tar.gz">redirected&lt;/a>.&lt;/body>&lt;/html></pre>
-
-
 <p>Probably this is standard behavior by github and I should have used that directly. I need to stop thinking like a PHP developer! Regardless, it wasn’t much trouble to download the actual Mephisto TAR file:</p>
-
 <pre># curl -O http://github.com/tarballs/
   technoweenie-mephisto-90e2cc253d94e2e544bc8b21f361c7360c1e9baa.tar.gz
 # tar xvf technoweenie-mephisto-90e2cc253d94e2e544bc8b21f361c7360c1e9baa.tar.gz
 # mv technoweenie-mephisto-90e2cc253d94e2e544bc8b21f361c7360c1e9baa mephisto</pre>
-
-
 <p>No big deal; so far this was a very similar experience to setting up a PHP web site: create the database, download the code and you’re almost done. Next, I entered the proper values in database.yml and tried to initialize the database:</p>
-
 <pre># rake db:bootstrap RAILS_ENV=production
 (in /home/myusername/mephisto)
 Your config/boot.rb is outdated: Run "rake rails:update".</pre>
-
-
 <p>It was at this point that my problems started. First I wasn’t sure why I received this error message at all. Next I tried to use rails:update to fix it as instructed and ran into further trouble. A couple of hours and 5 or 10 blog posts later I discovered the solution <a href="http://groups.google.com/group/MephistoBlog/browse_thread/thread/a03e8ac350382e0e">here in this great write up</a>. It turns out that Mephisto 0.8 does not work with Rails 2.1 and I needed to downgrade to Rails 2.0.2. Since I’m using a shared server on hostingrails.com I used rails:freeze:edge to get the proper version of Rails installed in my app’s folder:</p>
-
 <pre># rake rails:freeze:edge RELEASE=2.0.2
 Downloading Rails from http://dev.rubyonrails.org/archives/rails_2.0.2.zip
 Unpacking Rails
 Updating current scripts, javascripts, and configuration settings</pre>
-
-
 <p>At this point I tried to initialize the database again but this time got a different error:</p>
-
 <pre># rake db:bootstrap RAILS_ENV=production
 (in /home/myusername/mephisto)
 rake aborted!
 undefined method 'install_gem_spec_stubs' for #&lt;Rails::Initializer:0xb7c652e8></pre>
-
-
-<p>As <a href="http://groups.google.com/group/MephistoBlog/browse_thread/thread/a03e8ac350382e0e">explained here</a>, I still had to manually copy one file from Rails to my application which rails:freeze:edge didn’t handle properly, using this command from my app&rsquo;s folder:</p>
-
+<p>As <a href="http://groups.google.com/group/MephistoBlog/browse_thread/thread/a03e8ac350382e0e">explained here</a>, I still had to manually copy one file from Rails to my application which rails:freeze:edge didn’t handle properly, using this command from my app's folder:</p>
 <pre># cp vendor/rails/railties/environments/boot.rb config/boot.rb</pre>
-
-
 <p>Finally I was able to run rake db:bootstrap successfully! The last bit of configuration I had to do was to add this line to config/environment.rb in order to insure hostingrails.com used the production configuration:</p>
-
 <pre># Uncomment below to force Rails into production mode when
 # you don't control web/app server and can't set it the proper way
 ENV['RAILS_ENV'] ||= 'production'</pre>
-
-
 <p>After creating a symlink and doing some other <a href="http://www.hostingrails.com/forums/wiki_thread/1">standard configuration for hostingrails.com</a>, I was finally able to get my site up and running. It was a lot harder than configuring a PHP site and ruined a whole evening, but in the end wasn’t all that bad.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2008/9/9/mephisto-on-hostingrails-com';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Mephisto Setup on HostingRails.com';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2008/9/9/mephisto-on-hostingrails-com';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Mephisto Setup on HostingRails.com';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2008/9/9/mephisto-on-hostingrails-com'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Mephisto Setup on HostingRails.com';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

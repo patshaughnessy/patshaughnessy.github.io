@@ -1,107 +1,46 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Discovering the Computer Science Behind Postgres Indexes - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Discovering the Computer Science Behind Postgres Indexes - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Discovering the Computer Science Behind Postgres Indexes</h1>
-  
-    <div class="metadata">
-    <span class="date">November 11th 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Discovering the Computer Science Behind Postgres Indexes">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 20px 0px; text-align: center;">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Discovering the Computer Science Behind Postgres Indexes - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Discovering the Computer Science Behind Postgres Indexes</h1><div class="metadata"><span class="date">November 11th 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Discovering the Computer Science Behind Postgres Indexes">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 20px 0px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/11/11/engineering-plans.png"><br/>
   <i> Captain Nemo and Professor Aronnax discussing the<br/>engineering and science behind
   the Nautilus.</i> </div>
-
-
 <p><b> This is the last post in a series based on a
-  presentation I did at the <a href="http://www.baruco.org">Barcelona Ruby Conference</a>
-  called “20,000 Leagues Under ActiveRecord.” (other posts:
-  <a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">one</a>
-  <a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements">two</a>
-  <a href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals">three</a>
-  and <a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4">video</a>).  </b></p>
-
+presentation I did at the <a href="http://www.baruco.org">Barcelona Ruby Conference</a>
+called “20,000 Leagues Under ActiveRecord.” (other posts:
+<a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">one</a>
+<a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements">two</a>
+<a href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals">three</a>
+and <a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4">video</a>).  </b></p>
 <p>We all know indexes are one of the most powerful and important features of
 relational database servers. How do you search for a value quickly? Create an
 index. What do you have to remember to do when joining two tables together?
 Create an index. How do you speed up a SQL statement that’s beginning to run
 slowly? Create an index.</p>
-
 <p>But what are indexes, exactly? And <em>how</em> do they speed up our database searches?
 To find out, I decided to read the C source code inside the PostgreSQL database
 server, to follow along as it searched an index for a simple string value. I
 expected to find sophisticated algorithms and efficient data structures. And I
 did. Today I’ll show you what indexes look like inside Postgres and explain how
 they work.</p>
-
-<p>What I didn’t expect to find &ndash; what I discovered for the first time reading the
-Postgres C source code &ndash; was the Computer Science theory behind what it was
+<p>What I didn’t expect to find - what I discovered for the first time reading the
+Postgres C source code - was the Computer Science theory behind what it was
 doing. Reading the Postgres source was like going back to school and taking
 that class I never had time for when I was younger. The C comments inside
 Postgres not only explain what Postgres does, but <em>why</em>.</p>
-
 <h2>Sequence Scans: A Mindless Search</h2>
-
 <p>When we left the crew of the Nautilus, they were exhausted and beginning to
 faint: the Postgres sequence scan algorithm was mindlessly looping over all of
 the records in the users table! Recall in <a href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals">my last
 post</a>
 we had executed this simple SQL statement to find Captain Nemo:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/select-users.png"/></p>
-
 <p>Postgres first parsed, analyzed and planned the query. Then
 <a href="http://doxygen.postgresql.org/nodeSeqscan_8c.html#af80d84501ff7621d2ef6249b148e7f44">ExecSeqScan</a>,
 the C function inside of Postgres that implements the sequence scan (SEQSCAN)
 plan node, quickly found Captain Nemo:</p>
-
 <p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/></p>
-
 <p>But then inexplicably Postgres continued to loop through the entire user table,
 comparing each name to “Captain Nemo,” even though we had already found what we
 were looking for!</p>
-
 <p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/></p>
-
 <p>Imagine if our users table had millions of records; this could take a very long
 time. Of course, we could have avoided this by removing the sort and rewriting
 our query to accept the first name, but the deeper problem here is the
@@ -109,77 +48,53 @@ inefficient way Postgres searches for our target string. Using a sequence scan
 to compare every single value in the users table with “Captain Nemo” is slow,
 inefficient and depends on the random order the names appear in the table. What
 are we doing wrong? There must be a better way!</p>
-
 <p>The answer is simple: We forgot to create an Index. Let’s do that now.</p>
-
 <h2>Creating an Index</h2>
-
-<p>Creating an index is straightforward &ndash; we just need to run this command:</p>
-
+<p>Creating an index is straightforward - we just need to run this command:</p>
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/create-index.png"/></p>
-
 <p>As Ruby developers, of course, we would use the <span class="code">add_index</span> ActiveRecord
 migration instead; this would run the same <span class="code">CREATE INDEX</span> command behind the
-scenes. When we rerun our select statement, Postgres will create a plan tree as usual &ndash;
+scenes. When we rerun our select statement, Postgres will create a plan tree as usual -
 but this time the plan tree will be slightly different:</p>
-
 <p><img class="centered" src="http://patshaughnessy.net/assets/2014/11/11/indexscan-plan.png"/></p>
-
 <p>Notice at the bottom Postgres now uses INDEXSCAN instead of SEQSCAN. Unlike
 SEQSCAN, INDEXSCAN won’t iterate over the entire users table. Instead, it will
 use the index we just created to find and return the Captain Nemo records
 quickly and efficiently.</p>
-
 <p>Creating an index has solved our performance problem, but it’s also left us with many interesting, unanswered questions:</p>
-
 <ul>
 <li><em>What</em> is a Postgres index, exactly?</li>
 <li>If I could go inside of a Postgres database and take a close look at an index, <em>what would it look like</em>?</li>
 <li>And <em>how</em> does an index speed up searches?</li>
 </ul>
-
-
 <p>Let’s try to answer these questions by reading the Postgres C source code.</p>
-
 <h2>What Is a Postgres Index, Exactly?</h2>
-
 <p>We can get started with a look at the
 <a href="http://www.postgresql.org/docs/9.3/static/sql-createindex.html">documentation</a>
 for the CREATE INDEX command.</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/documentation.png"/></p>
-
 <p>Here you can see all of the options we can use to create an index, such as
 <span class="code">UNIQUE</span> and <span class="code">CONCURRENTLY</span>. Notice there’s an option called <span class="code">USING method</span>. This
 tells Postgres what kind of index we want. Farther down the same page is some
 information about <span class="code">method</span>, the argument to the <span class="code">USING</span> keyword:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/method.png"/></p>
-
 <p>It turns out Postgres implements four different types of indexes. You can use
 them for different types of data and in different situations. Because we didn’t
 specify <span class="code">USING</span> at all, our <span
 class="code">index_users_on_name</span> index is a “btree” (or B-Tree) index,
 the default type.</p>
-
 <p>This is our first clue: a Postgres index is a B-Tree. But what is a B-Tree?
 Where can we find one? Inside of Postgres, of course! Let’s search the Postgres
 C source code for files containing “btree:”</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/find.png"/></p>
-
 <p>The key result is in bold: “./backend/access/nbtree.” Inside this directory is
 a README file; let’s read it:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/readme.png"/></p>
-
 <div style="float: right; padding: 7px 0px 70px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/11/11/atlantis.png"><br/>
   <i>Nemo found the lost continent of Atlantis<br/>next to an underwater
   volcano.</i>
 </div>
-
-
 <p>Amazingly, this README file turns out to be an extensive 12 page document! The
 Postgres source code not only contains helpful and interesting C comments, it
 also contains documentation about the theory and implementation of the database
@@ -187,60 +102,41 @@ server. Reading and understanding the code in open source projects can often be
 intimidating and difficult, but not for Postgres. The developers behind
 Postgres have gone to great lengths to help the rest of us understand their
 work.</p>
-
 <p>The title of the README document, “Btree Indexing,” confirms this directory
 contains the C code that implements Postgres B-Tree indexes. But the first
 sentence is even more interesting: it’s a reference to an academic paper that
-explains what a B-Tree is, and how Postgres indexes work: <a href="http://www.csd.uoc.gr/~hy460/pdf/p650-lehman.pdf">Efficient Locking for
+explains what a B-Tree is, and how Postgres indexes work: <a href="http://www.csd.uoc.gr/%7Ehy460/pdf/p650-lehman.pdf">Efficient Locking for
 Concurrent Operations on B-Trees</a>, by Lehman and Yao.</p>
-
 <p>We’ll find our first look at a B-Tree inside this academic paper.</p>
-
 <h2>What Does a B-Tree Index Look Like?</h2>
-
 <p>Lehman and Yao’s paper explains an innovation they made to the B-Tree algorithm
 in 1981. I’ll discuss this a bit later. But they start with a simple
 introduction to the B-Tree data structure, which was actually invented 9 years
 earlier in 1972. One of their diagrams shows an example of a simple B-Tree:</p>
-
 <p><img class="centered" src="http://patshaughnessy.net/assets/2014/11/11/figure2.png"/></p>
-
 <p>The term B-Tree actually stands for “balanced tree.” B-Trees make searching
 easy and fast. For example, if we wanted to search for the value 53 in this
 example, we first start at the root node which contains the value 40:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/node1.png"/></p>
-
 <p>We compare our target value of 53 with the value we find in the tree node. Is
 53 greater than or less than 40? Because 53 is greater than 40 we follow the
 pointer down to the right. If we were searching for 29, we would go down to the
 left. Pointers on the right lead to larger values; pointers on the left to
 smaller ones.</p>
-
 <p>Following the pointer down the tree to the next child tree node, we encounter a
 node that contains 2 values:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/node2.png"/></p>
-
 <p>This time we compare 53 with both 47 and 62, and find that 47 &lt; 53 &lt; 62. Note
 the values in the tree node are sorted, so this will be easy to do. This time
 we follow the center pointer down.</p>
-
 <p>Now we get to another tree node, this one with 3 values in it:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/node3.png"/></p>
-
 <p>Looking through the sorted list of numbers, we find 51 &lt; 53 &lt; 56, and follow
 the second of four pointers down.</p>
-
 <p>Finally, we come to a leaf node in the tree:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/node4.png"/></p>
-
 <p>And we’ve found the value 53!</p>
-
 <p>B-Trees speed up searches because:</p>
-
 <ul>
 <li>They sort the values (known as <em>keys</em>) inside of each node.</li>
 <li>They are <em>balanced</em>: B-Trees evenly distribute the keys among the nodes,
@@ -248,50 +144,36 @@ minimizing the number of times we have to follow a pointer from one node to
 another. Each pointer leads to a child node that contains more or less the
 same number of keys each other child node does.</li>
 </ul>
-
-
 <h2>What Does a Postgres Index Look Like?</h2>
-
-<p>Lehman and Yao drew this diagram over 30 years ago &ndash; what does it have to do
+<p>Lehman and Yao drew this diagram over 30 years ago - what does it have to do
 with how Postgres works today? Astonishingly, the <span
 class="code">index_users_on_name</span> index we created earlier looks very
 similar to Figure 2: We created an index in 2014 that looks just like a diagram
 from 1981!</p>
-
 <p>When we executed the <span class="code">CREATE INDEX</span> command, Postgres
 saved all of the names from our users table into a B-Tree. These became the
 keys of the tree. Here’s what a node inside a Postgres B-Tree index looks like:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data1.svg"/></p>
-
 <p>Each entry in the index consists of a C structure called <span class="code">IndexTupleData</span>, and is
 followed by a bitmap and a value. Postgres uses the bitmap to record whether
 any of the index attributes in a key are NULL, to save space. The actual values
 in the index appear after the bitmap.</p>
-
 <p>Let’s take a closer look at the <span class="code">IndexTupleData</span>
 structures:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data2.svg"/></p>
-
 <p>Above you can see each IndexTupleData structure contains:</p>
-
 <ul>
 <li><span class="code">t_tid</span>: This is a pointer to either another index
-tuple, or to a database record. Note this isn&rsquo;t a C pointer to physical
+tuple, or to a database record. Note this isn't a C pointer to physical
 memory; instead, it contains numbers Postgres can use to find the referenced
 value among its memory pages.</li>
 <li><span class="code">t_info</span>: This contains information about the index
 tuple, such as how many values it contains, and whether or not there are null
 values.</li>
 </ul>
-
-
 <p>To understand this better, let’s show a few entries from our <span
 class="code">index_users_on_name</span> index:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data3.svg"/></p>
-
 <p>Now I’ve replaced “value” with some names from my users table. The upper tree
 node includes the keys “Dr. Edna Kunde” and “Julius Powlowski,” while the lower
 tree node contains “Julius Powlowski” and “Juston Quitzon.” Notice that, unlike
@@ -299,10 +181,8 @@ Lehman and Yao’s diagram, Postgres repeats the parent keys in each child node.
 Here “Julius Powlowski” is a key in the upper node and in the child node. The
 <span class="code">t_tid</span> pointer from Julius in the upper node
 references the same Julius name in the lower node.</p>
-
 <p>To learn more about exactly how Postgres stores key values into a B-Tree node,
 refer to the itup.h C header file:</p>
-
 <p>
 <div class="sign">
   <div class="sign-icon"></div>
@@ -315,54 +195,39 @@ refer to the itup.h C header file:</p>
   </div>
 </div>
 </p>
-
-
 <h2>Finding the B-Tree Node Containing Captain Nemo</h2>
-
 <p>Now let’s return to our original SELECT statement again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/select-users.png"/></p>
-
 <p>How exactly does Postgres search our <span
 class="code">index_users_on_name</span> index for “Captain Nemo?” Why is
 using the index faster than the sequence scan we saw in my last post? To find
 out, let’s zoom out a bit and take a look at some of the user names in our
 index:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/root-names1.svg"/></p>
-
 <p>This is the root node of the <span class="code">index_users_on_name</span>
 B-Tree. I’ve turned the tree on its side so the names would fit. You can see 4
 names and a NULL value. Postgres created this root node when I created
 <span class="code">index_users_on_name</span>. Note that, aside from the
 first NULL value which represents the beginning of the index, the other 4 names
 are more or less evenly distributed in alphabetical order.</p>
-
 <p>Remember that a B-Tree is a balanced tree. In this example, the B-Tree has 5 child nodes:</p>
-
 <ul>
 <li>the names that appear before Dr. Edna Kunde alphabetically</li>
 <li>names that appear between Dr. Edna Kunde and Julius Powlowski</li>
 <li>names that appear between Julius Powlowski and Monte Nicolas</li>
 <li>etc…</li>
 </ul>
-
-
 <p>Because we’re searching for Captain Nemo, Postgres follows the first, top arrow
 to the right. This is because Captain Nemo comes before Dr. Edna Kunde
 alphabetically:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/root-names2.svg"/></p>
-
 <p>You can see on the right that Postgres has found the B-Tree node that contains
 Captain Nemo. For my test I added 1000 names to the users table; this child
 node in the B-Tree contained about 200 names (240 actually). The B-Tree has
 narrowed down Postgres’s search considerably.</p>
-
 <p>To learn more about the precise algorithm Postgres uses to search for the
 target B-Tree node among all of the nodes in the tree, read the <span
 class="code">_bt_search</span> function.</p>
-
 <p>
 <div class="sign">
   <div class="sign-icon"></div>
@@ -375,36 +240,24 @@ class="code">_bt_search</span> function.</p>
   </div>
 </div>
 </p>
-
-
 <h2>Finding Captain Nemo Inside a Single B-Tree Node</h2>
-
 <p>Now that Postgres has narrowed down the search to a B-Tree node containing
 about 200 names, it still has to find Captain Nemo… how does it do this? Does
 it perform a sequence scan on this shorter list?</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/binary-search1.svg"/></p>
-
 <p>No. To search for a key value inside of a tree node, Postgres switches to use a
 binary search algorithm. It starts by comparing the key that appears at the 50%
 position in the tree node with “Captain Nemo:”</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/binary-search2.svg"/></p>
-
 <p>Because Captain Nemo comes after Breana Witting alphabetically, Postgres
 jumps down to the 75% position and performs another comparison:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/binary-search3.svg"/></p>
-
 <p>This time Captain Nemo comes before Curtis Wolf, so Postgres jumps back a bit.
 Skipping a few more steps (it actually took Postgres 8 comparisons to find
 Captain Nemo in my example), Postgres eventually finds what we are looking for:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/binary-search4.svg"/></p>
-
 <p>To learn more about exactly how Postgres searches for a value in a single
 B-Tree node, read the <span class="code">_bt_binsrch</span> function:</p>
-
 <p>
 <div class="sign">
   <div class="sign-icon"></div>
@@ -417,162 +270,68 @@ B-Tree node, read the <span class="code">_bt_binsrch</span> function:</p>
   </div>
 </div>
 </p>
-
-
 <h2>So Much More to Learn</h2>
-
 <p>I don’t have space in this blog post to cover many other fascinating details
 about B-Trees, database indexes or Postgres internals… maybe I should write
 <em>Postgres Under a Microscope</em> :) But for now, here are just a few interesting
-bits of theory you can read about in <a href="http://www.csd.uoc.gr/~hy460/pdf/p650-lehman.pdf">Efficient Locking for Concurrent
+bits of theory you can read about in <a href="http://www.csd.uoc.gr/%7Ehy460/pdf/p650-lehman.pdf">Efficient Locking for Concurrent
 Operations on B-Trees</a> or in
 the other academic papers it references.</p>
-
 <ul>
-<li><p>Inserting into B-Trees: The most beautiful part of the B-Tree algorithm has
+<li>
+<p>Inserting into B-Trees: The most beautiful part of the B-Tree algorithm has
 to do with inserting new keys into a tree. Key are inserted in sorted order
-into the proper tree node &ndash; but what happens when there’s no more room for a
+into the proper tree node - but what happens when there’s no more room for a
 new key? In this situation, Postgres splits the node into two, inserts the
 new key into one of them, and also adds the key from the split point into the
 parent node, along with a pointer to the new child node. Of course, the
 parent node might also have to be split to fit its new key, resulting in a
-complex, recursive operation.</p></li>
-<li><p>Deleting from B-Trees: The converse operation is also interesting. When
+complex, recursive operation.</p>
+</li>
+<li>
+<p>Deleting from B-Trees: The converse operation is also interesting. When
 deleting a key from a node, Postgres will combine sibling nodes together when
 possible, removing a key from their parent. This can also be a recursive
-operation.</p></li>
-<li><p>B-Link-Trees: Lehman and Yao’s paper actually discusses an innovation they
+operation.</p>
+</li>
+<li>
+<p>B-Link-Trees: Lehman and Yao’s paper actually discusses an innovation they
 researched related to concurrency and locking when multiple threads are using
 the same B-Tree. Remember, Postgres’s code and algorithms need to be
 multithreaded because many clients could be searching or modifying the same
 index at the same time. By adding another pointer from each B-Tree node to
-the next sibling node &ndash; the so-called “right arrow” &ndash; one thread can search a
+the next sibling node - the so-called “right arrow” - one thread can search a
 tree even while a second thread is splitting a node without locking the
-entire index:</p></li>
+entire index:</p>
+</li>
 </ul>
-
-
 <p><img src="http://patshaughnessy.net/assets/2014/11/11/right-arrow.png"/></p>
-
 <h2>Don’t Be Afraid To Explore Beneath The Surface</h2>
-
 <div style="float: right; padding: 22px 0px 70px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/11/11/at-the-helm.png"><br/>
   <i>Captain Nemo at the helm</i>
 </div>
-
-
 <p>Professor Aronnax risked his life and career to find the elusive Nautilus and
 to join Captain Nemo on a long series of amazing underwater adventures. We
-should do the same: Don’t be afraid to dive underwater &ndash; inside and underneath
+should do the same: Don’t be afraid to dive underwater - inside and underneath
 the tools, languages and technologies that you use every day. You may know all
 about how to use Postgres, but do you really know how Postgres itself works
 internally? Take a look inside; before you know it, you’ll be on an underwater
 adventure of your own.</p>
-
 <p>Studying the Computer Science at work behind the scenes of our applications
 isn’t just a matter of having fun, it’s part of being a good developer. As
 software development tools improve year after year, and as building web sites
 and mobile apps becomes easier and easier, we shouldn’t loose sight of the
-Computer Science we depend on. We’re all standing on the shoulders of giants &ndash;
+Computer Science we depend on. We’re all standing on the shoulders of giants -
 people like Lehman and Yao, and the open source developers who used their
-theories to build Postgres. Don’t take the tools you use everyday for granted &ndash;
+theories to build Postgres. Don’t take the tools you use everyday for granted -
 take a look inside them! You’ll become a wiser developer and you’ll find
 insights and knowledge you could never have imagined before.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Discovering the Computer Science Behind Postgres Indexes';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Discovering the Computer Science Behind Postgres Indexes';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Discovering the Computer Science Behind Postgres Indexes';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Postgres</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/1/22/is-your-postgres-query-starved-for-memory">Is Your Postgres Query Starved for Memory?</a></li>
-                  
-                    <li><a href="/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join">A Look at How Postgres Executes a Tiny Join</a></li>
-                  
-                    <li><a href="/2014/10/13/following-a-select-statement-through-postgres-internals">Following a Select Statement Through Postgres Internals</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Postgres</div><div class="links"><ul><li><a href="2016/1/22/is-your-postgres-query-starved-for-memory">Is Your Postgres Query Starved for Memory?</a></li><li><a href="2015/11/24/a-look-at-how-postgres-executes-a-tiny-join">A Look at How Postgres Executes a Tiny Join</a></li><li><a href="2014/10/13/following-a-select-statement-through-postgres-internals">Following a Select Statement Through Postgres Internals</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

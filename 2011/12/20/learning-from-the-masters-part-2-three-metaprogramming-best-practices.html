@@ -1,388 +1,171 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Learning from the masters part 2: three metaprogramming best practices - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Learning from the masters part 2: three metaprogramming best practices - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Learning from the masters part 2: three metaprogramming best practices</h1>
-  
-    <div class="metadata">
-    <span class="date">December 20th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/12/20/learning-from-the-masters-part-2-three-metaprogramming-best-practices" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning from the masters part 2: three metaprogramming best practices">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 10px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning from the masters part 2: three metaprogramming best practices - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning from the masters part 2: three metaprogramming best practices</h1><div class="metadata"><span class="date">December 20th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2011/12/20/learning-from-the-masters-part-2-three-metaprogramming-best-practices" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning from the masters part 2: three metaprogramming best practices">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/mozart.jpg"></td></tr>
   <tr><td align="center"><small><i>Mozart’s Requiem Mass in D minor would be<br/>hard to understand without a translation from Latin</i></small></td></tr>
 </table>
 </div>
-
-
-<p>Metaprogramming has always been one of the most intimidating features of the Ruby language &ndash; it’s considered very “advanced” and can often be very difficult to read and understand. However, I agree completely with what <a href="http://jroller.com/rolsen/">Russ Olsen</a> said about metaprogramming on <a href="http://rubyrogues.com/033-rr-book-club-eloquent-ruby/">this Thursday&rsquo;s Ruby Rogues podcast</a>: that Ruby metaprogramming really isn’t all that hard to understand, that it is just another moderately difficult programming concept any Ruby developer can learn and use.</p>
-
-<p><a href="http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits">Like I did two weeks ago</a> I decided to take a look at the Rails source code, this time to see whether there were any good examples of metaprogramming that I could learn from. What techniques did the Rails core team use with metaprogramming that I could use in my own work? I found that I was impressed by how the Rails team <i>thought</i> about metaprogramming &ndash; the philosophy and coding practices they used &ndash; rather than by the actual metaprogramming techniques themselves.</p>
-
-<p>Today I’m going to discuss three of the metaprogramming practices I found in the Rails source code &ndash; read on to learn more about these best practices and how to use them in your code.</p>
-
+<p>Metaprogramming has always been one of the most intimidating features of the Ruby language - it’s considered very “advanced” and can often be very difficult to read and understand. However, I agree completely with what <a href="http://jroller.com/rolsen/">Russ Olsen</a> said about metaprogramming on <a href="http://rubyrogues.com/033-rr-book-club-eloquent-ruby/">this Thursday's Ruby Rogues podcast</a>: that Ruby metaprogramming really isn’t all that hard to understand, that it is just another moderately difficult programming concept any Ruby developer can learn and use.</p>
+<p><a href="http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits">Like I did two weeks ago</a> I decided to take a look at the Rails source code, this time to see whether there were any good examples of metaprogramming that I could learn from. What techniques did the Rails core team use with metaprogramming that I could use in my own work? I found that I was impressed by how the Rails team <i>thought</i> about metaprogramming - the philosophy and coding practices they used - rather than by the actual metaprogramming techniques themselves.</p>
+<p>Today I’m going to discuss three of the metaprogramming practices I found in the Rails source code - read on to learn more about these best practices and how to use them in your code.</p>
 <p><strong>TL;DR:</strong> Be sure to provide a translated, annotated version of your metaprogramming in comments and to raise exceptions with accurate method name, file and line number information. Also when using <span class="code">method_missing</span> be sure to call <span class="code">super</span> and to implement <span class="code">respond_to?</span>.</p>
-
 <h2>Provide a translation</h2>
-
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/translate.jpg"></td></tr>
 </table>
 </div>
+<p>One of the most commonly used and well known examples of metaprogramming in Rails is the way ActiveRecord implements dynamic finder and scope methods. For example, suppose I have an ActiveRecord model called “Shirt” with a color field. I can get all the red shirt records just by calling <span class="code">Shirt.find_all_by_color('red')</span>. ActiveRecord also supports dynamic scope methods that return a scope object; for example calling <span class="code">Shirt.scoped_by_color('red')</span> will return a scope that you can then chain with other methods.</p>
+<p>Rails implements dynamic finder and scope methods using <span class="code">method_missing</span>. Since I didn’t actually write a method called “scoped_by_color” in my Shirt class, the Ruby interpreter calls <span class="code">method_missing</span> and gives ActiveRecord a chance to handle the missing method call. Here’s a small part of ActiveRecord’s <span class="code">method_missing</span> implementation for these dynamic finder and scope methods - in edge Rails you can find the complete method_missing implementation in ActiveRecord::DynamicMatchers (see <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/dynamic_matchers.rb#L24">dynamic_matchers.rb</a>) or in Rails 3.1 and earlier you’ll find this in ActiveRecord::Base (see <a href="https://github.com/rails/rails/blob/3-1-stable/activerecord/lib/active_record/base.rb#L1051">base.rb</a>):</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">
+</span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">... 
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  self.class_eval </span><span style="color:#4f5b66;">&lt;&lt;-METHOD</span><span style="color:#000000;">, __FILE__, __LINE__ </span><span style="color:#4f5b66;">+ </span><span style="color:#d08770;">1
+</span><span style="color:#008080;">    def self.</span><span style="color:#000000;">#{method_id}</span><span style="color:#008080;">(*args)
+</span><span style="color:#008080;">      attributes = Hash[[:</span><span style="color:#000000;">#{attribute_names.join(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">,:</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)}</span><span style="color:#008080;">].zip(args)]
+</span><span style="color:#008080;">      scoped(:conditions =&gt; attributes)
+</span><span style="color:#008080;">    end
+</span><span style="color:#4f5b66;">  METHOD
+</span><span style="color:#000000;">  send(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments)
+</span><span style="color:#000000;">
+</span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
+</span></pre>
 
-
-<p>One of the most commonly used and well known examples of metaprogramming in Rails is the way ActiveRecord implements dynamic finder and scope methods. For example, suppose I have an ActiveRecord model called “Shirt” with a color field. I can get all the red shirt records just by calling <span class="code">Shirt.find_all_by_color(&lsquo;red&rsquo;)</span>. ActiveRecord also supports dynamic scope methods that return a scope object; for example calling <span class="code">Shirt.scoped_by_color(&lsquo;red&rsquo;)</span> will return a scope that you can then chain with other methods.</p>
-
-<p>Rails implements dynamic finder and scope methods using <span class="code">method_missing</span>. Since I didn’t actually write a method called “scoped_by_color” in my Shirt class, the Ruby interpreter calls <span class="code">method_missing</span> and gives ActiveRecord a chance to handle the missing method call. Here’s a small part of ActiveRecord’s <span class="code">method_missing</span> implementation for these dynamic finder and scope methods &ndash; in edge Rails you can find the complete method_missing implementation in ActiveRecord::DynamicMatchers (see <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/dynamic_matchers.rb#L24">dynamic_matchers.rb</a>) or in Rails 3.1 and earlier you’ll find this in ActiveRecord::Base (see <a href="https://github.com/rails/rails/blob/3-1-stable/activerecord/lib/active_record/base.rb#L1051">base.rb</a>):</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">method_missing</span>(method_id, *arguments, &amp;block)
-
-...etc... 
-
-  <span class="predefined-constant">self</span>.class_eval <span class="string"><span class="delimiter">&lt;&lt;-METHOD</span></span>, <span class="predefined-constant">__FILE__</span>, <span class="predefined-constant">__LINE__</span> + <span class="integer">1</span><span class="string"><span class="content">
-    def self.</span><span class="inline"><span class="inline-delimiter">#{</span>method_id<span class="inline-delimiter">}</span></span><span class="content">(*args)
-      attributes = Hash[[:</span><span class="inline"><span class="inline-delimiter">#{</span>attribute_names.join(<span class="string"><span class="delimiter">'</span><span class="content">,:</span><span class="delimiter">'</span></span>)<span class="inline-delimiter">}</span></span><span class="content">].zip(args)]
-      scoped(:conditions =&gt; attributes)
-    end</span><span class="delimiter">
-  METHOD</span></span>
-  send(method_id, *arguments)
-
-...etc...
-</pre></div>
-</div>
-
-
-
-<p>Hmm &ndash; what the heck does this mean? I’ve removed a lot of the surrounding code from method_missing, but this snippet is still very confusing. When I first saw this code, I was definitely intimidated! What in the world is going on here? Maybe metaprogramming is not for me after all!</p>
-
-<p>Then I noticed a very helpful comment right next to the actual production code &ndash; just to the right, actually:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="comment"># def self.scoped_by_user_name_and_password(*args)</span>
-<span class="comment">#   attributes = Hash[[:user_name, :password].zip(args)]</span>
-<span class="comment">#</span>
-<span class="comment">#   scoped(:conditions =&gt; attributes)</span>
-<span class="comment"># end</span>
-</pre></div>
-</div>
-
-
+<p>Hmm - what the heck does this mean? I’ve removed a lot of the surrounding code from method_missing, but this snippet is still very confusing. When I first saw this code, I was definitely intimidated! What in the world is going on here? Maybe metaprogramming is not for me after all!</p>
+<p>Then I noticed a very helpful comment right next to the actual production code - just to the right, actually:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a7adba;"># def self.scoped_by_user_name_and_password(*args)
+</span><span style="color:#a7adba;">#   attributes = Hash[[:user_name, :password].zip(args)]
+</span><span style="color:#a7adba;">#
+</span><span style="color:#a7adba;">#   scoped(:conditions =&gt; attributes)
+</span><span style="color:#a7adba;"># end
+</span></pre>
 
 <p>I view this comment as a translation, sort of a “clear text” version of the actual metaprogramming code above, that uses two example attributes “user_name” and “password.” Immediately I can make the mental leap that for my case, the Shirt model with a single “color” attribute, the generated code would be:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="comment"># def self.scoped_by_color(*args)</span>
-<span class="comment">#   attributes = Hash[[:color].zip(args)]</span>
-<span class="comment">#</span>
-<span class="comment">#   scoped(:conditions =&gt; attributes)</span>
-<span class="comment"># end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a7adba;"># def self.scoped_by_color(*args)
+</span><span style="color:#a7adba;">#   attributes = Hash[[:color].zip(args)]
+</span><span style="color:#a7adba;">#
+</span><span style="color:#a7adba;">#   scoped(:conditions =&gt; attributes)
+</span><span style="color:#a7adba;"># end
+</span></pre>
 
 <p>This is still far from obvious, but after looking up the meaning of the <a href="http://www.ruby-doc.org/core-1.9.3/Array.html#method-i-zip">Array.zip method</a> and experimenting with the Hash[] syntax in the console:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-&gt; args = [&quot;red&quot;]
- =&gt; [&quot;red&quot;] 
-&gt; [:color].zip(args)
- =&gt; [[:color, &quot;red&quot;]] 
-&gt; Hash[ [[:color, &quot;red&quot;]] ]
- =&gt; {:color=&gt;&quot;red&quot;} 
-</pre></div>
-</div>
-
-
-
-<p>&hellip;I can finally get to a good understanding of what the original metaprogramming was doing. It was defining a new class method called <span class="code">scoped_by_color</span> that simply calls <span class="code">scoped(:conditions => {:color=>&ldquo;red&rdquo;})</span> &ndash; giving me the same behavior I would have gotten by using an anonymous scope directly:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-&gt; Shirt.scoped(:conditions =&gt; {:color =&gt; 'red'})
-  Shirt Load (0.2ms)  SELECT &quot;shirts&quot;.* FROM &quot;shirts&quot; WHERE &quot;shirts&quot;.&quot;color&quot; = 'red'
- =&gt; [#&lt;Shirt id: 1, color: &quot;red&quot;, created_at... &gt;] 
-</pre></div>
-</div>
-
-
-
+<pre>
+> args = ["red"]
+ => ["red"] 
+> [:color].zip(args)
+ => [[:color, "red"]] 
+> Hash[ [[:color, "red"]] ]
+ => {:color=>"red"} 
+</pre>
+<p>...I can finally get to a good understanding of what the original metaprogramming was doing. It was defining a new class method called <span class="code">scoped_by_color</span> that simply calls <span class="code">scoped(:conditions =&gt; {:color=&gt;&quot;red&quot;})</span> - giving me the same behavior I would have gotten by using an anonymous scope directly:</p>
+<pre>
+> Shirt.scoped(:conditions => {:color => 'red'})
+  Shirt Load (0.2ms)  SELECT "shirts".* FROM "shirts" WHERE "shirts"."color" = 'red'
+ => [#<Shirt id: 1, color: "red", created_at... >] 
+</pre>
 <p>I found this translated code comment to be so helpful that I believe it’s a metaprogramming best practice that we should all learn from! The idea isn’t new, actually. In fact <a href="http://yehudakatz.com/">Yehuda Katz</a>, by all accounts a master of Ruby programming, <a href="http://yehudakatz.com/2008/12/29/another-rails-2x3-update">originally mentioned the idea</a> of “annotating metaprogramming” while he was working on Rails 3 back in 2008, saying he was inspired by Michael Klishin (antares), and the next day <a href="http://hashref.com/">Xavier Noria</a> went ahead and added the annotations to the Rails source code in this <a href="https://github.com/rails/rails/commit/a2270ef2594b97891994848138614657363f2806">one large commit</a>.</p>
-
-<p>But wait a minute&hellip; aren’t code comments frowned upon and largely unnecessary, especially in a language as expressive as Ruby is? Also comments instantly become a maintenance problem &ndash; as soon as you change your code the comments are now out of date. However, in the case of metaprogramming, I think this is a small price to pay. I’m impressed that the Rails team took some time to make their code more readable and understandable for other developers, and not just for the Rails interpreter. We should all do the same whenever we use metaprogramming.</p>
-
+<p>But wait a minute... aren’t code comments frowned upon and largely unnecessary, especially in a language as expressive as Ruby is? Also comments instantly become a maintenance problem - as soon as you change your code the comments are now out of date. However, in the case of metaprogramming, I think this is a small price to pay. I’m impressed that the Rails team took some time to make their code more readable and understandable for other developers, and not just for the Rails interpreter. We should all do the same whenever we use metaprogramming.</p>
 <h2>Plan ahead for accidents</h2>
-
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/accident.jpg"></td></tr>
 </table>
 </div>
-
-
 <p>Using the same <span class="code">Shirt.scoped_by_color</span> example, let’s suppose I forget to pass in the color parameter (note: if you try this yourself you won’t get this error unless you’re using edge Rails. In Rails 3.1 and earlier a warning is put into the log file instead.):</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-&gt; Shirt.scoped_by_color
+<pre>
+> Shirt.scoped_by_color
 ArgumentError: wrong number of arguments (0 for 1)
  from .../dynamic_matchers.rb:29:in `scoped_by_color'
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>You can see I now get a fairly obvious exception message: I passed in zero arguments when the <span class="code">scoped_by_color</span> method expects 1. But wait a minute: there actually is no “scoped_by_color” method in my Shirt class! This error message is actually generated dynamically by the following code, also in the same <span class="code">method_missing</span> implementation in <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/dynamic_matchers.rb#L24">dynamic_matchers.rb</a>:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">method_missing</span>(method_id, *arguments, &amp;block)
-
-...etc...
-
-  <span class="keyword">if</span> arguments.size &lt; attribute_names.size
-    method_trace = <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span><span class="predefined-constant">__FILE__</span><span class="inline-delimiter">}</span></span><span class="content">:</span><span class="inline"><span class="inline-delimiter">#{</span><span class="predefined-constant">__LINE__</span><span class="inline-delimiter">}</span></span><span class="content">:in `</span><span class="inline"><span class="inline-delimiter">#{</span>method_id<span class="inline-delimiter">}</span></span><span class="content">'</span><span class="delimiter">&quot;</span></span>
-    backtrace = [method_trace] + caller
-    raise <span class="constant">ArgumentError</span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">wrong number of arguments (</span><span class="inline"><span class="inline-delimiter">#{</span>arguments.size<span class="inline-delimiter">}</span></span><span class="content"> for </span><span class="inline"><span class="inline-delimiter">#{</span>attribute_names.size<span class="inline-delimiter">}</span></span><span class="content">)</span><span class="delimiter">&quot;</span></span>, backtrace
-  <span class="keyword">end</span>
-
-...etc...
-
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">
+</span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> arguments.size </span><span style="color:#4f5b66;">&lt;</span><span style="color:#000000;"> attribute_names.size
+</span><span style="color:#000000;">    method_trace </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#000000;">#{__FILE__}</span><span style="color:#008080;">:</span><span style="color:#000000;">#{__LINE__}</span><span style="color:#008080;">:in `</span><span style="color:#000000;">#{method_id}</span><span style="color:#008080;">&#39;</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">    backtrace </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[method_trace] </span><span style="color:#4f5b66;">+ </span><span style="color:#000000;">caller
+</span><span style="color:#000000;">    </span><span style="color:#795da3;">raise </span><span style="color:#000000;">ArgumentError, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">wrong number of arguments (</span><span style="color:#000000;">#{arguments.size}</span><span style="color:#008080;"> for </span><span style="color:#000000;">#{attribute_names.size}</span><span style="color:#008080;">)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, backtrace
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>This isn’t very glamourous code; all it’s doing is generating a string containing the dynamic method name, <span class="code">scoped_by_color</span> in this example, along with file name and line number information and manually adding it to a backtrace array. Then it raises an exception using the manually generated backtrace.</p>
-
 <p>What I like about this, however, is that the Rails team spent some time thinking about what might go wrong with <span class="code">scoped_by_color</span>. They realized that not passing in enough parameters might be a very common mistake, especially with a dynamically generated method, and wrote some code to anticipate that situation and display a more helpful error message. Because of this, my Rails log file will display dynamic method names such as <span class="code">scoped_by_color</span> in exception backtraces just the same as it does any other method.</p>
-
 <p>I call this practice “planning ahead for accidents.” You should probably do this for any code, but for metaprogramming it’s especially important since it’s often not at all obvious how many or which parameters to pass in to generated code. If you’re using metaprogramming, anything at all you can do to make life easier for developers, including yourself, who will later use your code is worthwhile. When you can’t simply look at a method definition it can be very hard to understand how to call that method.</p>
-
 <p>There’s another simple example of planning ahead for accidents you may not have noticed in the code I showed above:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">self.class_eval </span><span style="color:#4f5b66;">&lt;&lt;-METHOD</span><span style="color:#000000;">, __FILE__, __LINE__ </span><span style="color:#4f5b66;">+ </span><span style="color:#d08770;">1
+</span><span style="color:#008080;">  def self.</span><span style="color:#000000;">#{method_id}</span><span style="color:#008080;">(*args)
+</span><span style="color:#008080;">etc...
+</span><span style="color:#4f5b66;">METHOD
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="predefined-constant">self</span>.class_eval <span class="string"><span class="delimiter">&lt;&lt;-METHOD</span></span>, <span class="predefined-constant">__FILE__</span>, <span class="predefined-constant">__LINE__</span> + <span class="integer">1</span><span class="string"><span class="content">
-  def self.</span><span class="inline"><span class="inline-delimiter">#{</span>method_id<span class="inline-delimiter">}</span></span><span class="content">(*args)
-etc...</span><span class="delimiter">
-METHOD</span></span>
-</pre></div>
-</div>
-
-
-
-<p>Here by passing <span class="code">__FILE__</span> and <span class="code">__LINE__+1</span> into the call to <span class="code">class_eval</span>, the Rails team has insured that any errors or exceptions that occur inside this new, generated method will contain the proper file and line number information.</p>
-
+<p>Here by passing <span class="code">__FILE__</span> and <span class="code">_<em>LINE</em>_+1</span> into the call to <span class="code">class_eval</span>, the Rails team has insured that any errors or exceptions that occur inside this new, generated method will contain the proper file and line number information.</p>
 <h2>Be a good neighbor</h2>
-
 <p>Here’s some more code from the same file, <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/dynamic_matchers.rb#L24">dynamic_matchers.rb</a> in edge Rails, containing the <span class="code">method_missing</span> implementation of dynamic finder and scope methods:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">respond_to?</span>(method_id, include_private = <span class="predefined-constant">false</span>)
-  <span class="keyword">if</span> match = <span class="constant">DynamicFinderMatch</span>.match(method_id)
-    <span class="keyword">return</span> <span class="predefined-constant">true</span> <span class="keyword">if</span> all_attributes_exists?(match.attribute_names)
-  <span class="keyword">elsif</span> match = <span class="constant">DynamicScopeMatch</span>.match(method_id)
-    <span class="keyword">return</span> <span class="predefined-constant">true</span> <span class="keyword">if</span> all_attributes_exists?(match.attribute_names)
-  <span class="keyword">end</span>
-
-  <span class="keyword">super</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">respond_to?</span><span style="color:#000000;">(method_id, include_private </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">false</span><span style="color:#000000;">)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if </span><span style="color:#000000;">match </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">DynamicFinderMatch</span><span style="color:#000000;">.match(method_id)
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">return </span><span style="color:#d08770;">true </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> all_attributes_exists?(match.attribute_names)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">elsif </span><span style="color:#000000;">match </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">DynamicScopeMatch</span><span style="color:#000000;">.match(method_id)
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">return </span><span style="color:#d08770;">true </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> all_attributes_exists?(match.attribute_names)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">super
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Here we can see that ActiveRecord implements <span class="code">respond_to?</span> to indicate which dynamic finder and scope methods <span class="code">method_missing</span> will handle. It returns true if the method_id matches one or more of the model’s attributes, and false if not. This is important since other code in your application that uses the Shirt model, for example, might call <span class="code">respond_to?</span> to determine whether or not Shirt has a color attribute.</p>
-
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/neighborhood.jpg"></td></tr>
 </table>
 </div>
-
-
-<p>It might seem that there’s not a tremendous amount of value here &ndash; after all, I know that my Shirt model handles find_by_color and find_all_by_color, etc., and I’ll probably never call <span class="code">Shirt.respond_to?</span> myself directly. However, keep in mind that other developers might work with the same application in the future, and also there may be gems or other 3rd party code that use my Shirt model from a more generalized perspective and that might call <span class="code">respond_to?</span> on it.</p>
-
+<p>It might seem that there’s not a tremendous amount of value here - after all, I know that my Shirt model handles find_by_color and find_all_by_color, etc., and I’ll probably never call <span class="code">Shirt.respond_to?</span> myself directly. However, keep in mind that other developers might work with the same application in the future, and also there may be gems or other 3rd party code that use my Shirt model from a more generalized perspective and that might call <span class="code">respond_to?</span> on it.</p>
 <p>I consider this to be one example of another metaprogramming best practice: “Being a good neighbor.” Here the Rails team has taken some extra time to be sure that the Shirt model will work well and cooperate with other nearby code in the same application.</p>
-
 <p>Another example of “being a good neighbor” is the way the Rails team calls <span class="code">super</span> in the case where a missing method actually does not match one of the Shirt model’s attributes:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if </span><span style="color:#000000;">match </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">(</span><span style="color:#008080;">DynamicFinderMatch</span><span style="color:#000000;">.match(method_id) </span><span style="color:#4f5b66;">|| </span><span style="color:#008080;">DynamicScopeMatch</span><span style="color:#000000;">.match(method_id))
+</span><span style="color:#000000;">
+</span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">else
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">super
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">def</span> <span class="function">method_missing</span>(method_id, *arguments, &amp;block)
-  <span class="keyword">if</span> match = (<span class="constant">DynamicFinderMatch</span>.match(method_id) || <span class="constant">DynamicScopeMatch</span>.match(method_id))
-
-...etc...
-
-  <span class="keyword">else</span>
-    <span class="keyword">super</span>
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
-
-<p>Just as <span class="code">respond_to?</span> returns false if the method_id doesn’t match one or more of the attributes, <span class="code">method_missing</span> will call <span class="code">super</span> so Ruby will call any other <span class="code">method_missing</span> functions that might be defined elsewhere. If ActiveRecord didn’t call <span class="code">super</span> when it’s <span class="code">method_missing</span> didn’t handle the method call, then no other modules included into the Shirt class or it&rsquo;s superclasses would receive a <span class="code">method_missing</span> call. This is really less of a best practice and more of an absolute requirement when using <span class="code">method_missing</span>: you always, always need to call <span class="code">super</span> when you don’t handle the call.</p>
-
-<p>Although implementing <span class="code">respond_to?</span> and calling <span class="code">super</span> are specific to <span class="code">method_missing</span>, for me being a good neighbor more generally means you need to think about the larger system around you &ndash; your neighborhood. This is especially true of metaprogramming, since something as simple as forgetting to call <span class="code">super</span> can have a profound effect on other parts of your application.</p>
-
+<p>Just as <span class="code">respond_to?</span> returns false if the method_id doesn’t match one or more of the attributes, <span class="code">method_missing</span> will call <span class="code">super</span> so Ruby will call any other <span class="code">method_missing</span> functions that might be defined elsewhere. If ActiveRecord didn’t call <span class="code">super</span> when it’s <span class="code">method_missing</span> didn’t handle the method call, then no other modules included into the Shirt class or it's superclasses would receive a <span class="code">method_missing</span> call. This is really less of a best practice and more of an absolute requirement when using <span class="code">method_missing</span>: you always, always need to call <span class="code">super</span> when you don’t handle the call.</p>
+<p>Although implementing <span class="code">respond_to?</span> and calling <span class="code">super</span> are specific to <span class="code">method_missing</span>, for me being a good neighbor more generally means you need to think about the larger system around you - your neighborhood. This is especially true of metaprogramming, since something as simple as forgetting to call <span class="code">super</span> can have a profound effect on other parts of your application.</p>
 <h2>Conclusion</h2>
-
 <p>Metaprogramming is a very powerful tool and can be a great way to solve complex problems with elegant, concise code. Don’t be afraid of using it! But when you do use metaprogramming be sure to:</p>
-
 <ul>
   <li>Take the extra time to provide a translated version of your generated code - this will make it much, much easier for future developers to read and understand your code.</li>
   <li>Be sure that any error exceptions or errors you generate use the proper method name, file name and line number information so other developers don’t have to go on a wild goose chase to understand where a problem lies.</li>
   <li>When using <span class="code">method_missing</span> always be sure to implement <span class="code">respond_to?</span> and to call <span class="code">super</span> when you don’t handle the method call, otherwise you might break code that surrounds and uses your class.</li>
 </ul>
-
-
-<p>I’m sure there are other good examples of metaprogramming best practices elsewhere in Rails and in many other projects &ndash; what do you think? What else should Ruby developers keep in mind while using metaprogramming?</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2011/12/20/learning-from-the-masters-part-2-three-metaprogramming-best-practices';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Learning from the masters part 2: three metaprogramming best practices';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2011/12/20/learning-from-the-masters-part-2-three-metaprogramming-best-practices';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Learning from the masters part 2: three metaprogramming best practices';
-    (function () {
+<p>I’m sure there are other good examples of metaprogramming best practices elsewhere in Rails and in many other projects - what do you think? What else should Ruby developers keep in mind while using metaprogramming?</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2011/12/20/learning-from-the-masters-part-2-three-metaprogramming-best-practices'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Learning from the masters part 2: three metaprogramming best practices';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

@@ -1,60 +1,10 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Ruby, Smalltalk and Class Variables - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Ruby, Smalltalk and Class Variables - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Ruby, Smalltalk and Class Variables</h1>
-  
-    <div class="metadata">
-    <span class="date">December 17th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/12/17/ruby-smalltalk-and-class-variables" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Ruby, Smalltalk and Class Variables">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 17px 30px 10px 0px;
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Ruby, Smalltalk and Class Variables - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Ruby, Smalltalk and Class Variables</h1><div class="metadata"><span class="date">December 17th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/12/17/ruby-smalltalk-and-class-variables" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Ruby, Smalltalk and Class Variables">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 17px 30px 10px 0px;
 line-height:16px">
   <table cellpadding="0" cellspacing="0" border="0">
     <tr><td align="center"><img src="http://patshaughnessy.net/assets/2012/12/17/bluebook-and-ruby.png"></td></tr>
     <tr><td align="center"><i>Many of the ideas behind Ruby’s object model<br/>were developed for Smalltalk in the 1970s.</i></td></tr>
   </table>
 </div>
-
-
 <p>A couple weeks ago <a href="http://erniemiller.org/2012/11/29/ruby-tidbit-include-vs-extend-with-module-class-variables/">an article by Ernie
 Miller</a>
 got me interested in how class variables work in Ruby. After doing a bit of
@@ -64,9 +14,8 @@ Variables
 In Ruby</a>
 way back in 2006 that still applies today. The fundamental problem with class
 variables in Ruby is that they are shared among a class and all of its
-subclasses &ndash; as John explained six years ago, this can lead to confusion and
+subclasses - as John explained six years ago, this can lead to confusion and
 unexpected behavior.</p>
-
 <p>But for me the interesting question here is: “Why?” Why does Ruby share a single
 value across all of the subclasses? Why have a distinction between “class
 variables” and “class instance variables?” Where do these ideas come from? It
@@ -80,80 +29,64 @@ Smalltalk, Alan Kay didn’t just invent a programming language; he also
 conceived of the entire concept of object oriented programming (OOP) and
 implemented it for the first time.  While not in very widespread use now,
 Smalltalk has influenced many other object oriented programming languages that
-are used widely today &ndash; most importantly Objective C and Ruby.</p>
-
+are used widely today - most importantly Objective C and Ruby.</p>
 <p>Today I’m going to look at how class variables work in Smalltalk, and compare and
 contrast that against how they work in Ruby. As you’ll see, I found that class
 variables aren’t the only idea Ruby took from Smalltalk. Much of Ruby’s object
 model design was taken from Smalltalk as well.</p>
-
 <h2>Class variables in Ruby</h2>
-
 <p>First, let’s quickly review what a class variable is, and how they work in Ruby. Using
 <a href="http://railstips.org/blog/archives/2006/11/18/class-and-instance-variables-in-ruby/">John Nunemaker’s example from
 2006</a>,
 here’s a simple Ruby class, <span class="code">Polygon</span>, that contains a single class variable,
 <span class="code">@@sides</span>:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Polygon</span>
-  <span class="class-variable">@@sides</span> = <span class="integer">10</span>
-  <span class="keyword">def</span> <span class="predefined-constant">self</span>.<span class="function">sides</span>
-    <span class="class-variable">@@sides</span>
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-puts <span class="constant">Polygon</span>.sides
-=&gt; <span class="integer">10</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Polygon
+</span><span style="color:#343d46;">  </span><span style="color:#4f5b66;">@@</span><span style="color:#000000;">sides </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">10
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#000000;">self.</span><span style="color:#795da3;">sides
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@@</span><span style="color:#000000;">sides
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">puts </span><span style="color:#008080;">Polygon</span><span style="color:#000000;">.sides
+</span><span style="color:#000000;">=&gt; </span><span style="color:#d08770;">10
+</span></pre>
 
 <p>This is simple enough: <span class="code">@@sides</span> is a variable that any class or instance
 method of <span class="code">Polygon</span> can access. Here the <span class="code">sides</span> class method returns it. At a
 conceptual level, internally Ruby associates the <span class="code">@@sides</span> variable with the
 same memory structure used to represent the <span class="code">Polygon</span> class:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/12/17/polygon.png"/></p>
-
 <p>The confusion comes in when you define a subclass; again here is another one of
 John Nunemaker’s examples:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Triangle </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">Polygon
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@@</span><span style="color:#000000;">sides </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">3
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">puts </span><span style="color:#008080;">Triangle</span><span style="color:#000000;">.sides
+</span><span style="color:#a7adba;">#=&gt; 3
+</span><span style="color:#000000;">puts </span><span style="color:#008080;">Polygon</span><span style="color:#000000;">.sides
+</span><span style="color:#a7adba;">#=&gt; 3
+</span></pre>
 
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Triangle</span> &lt; <span class="constant">Polygon</span>
-  <span class="class-variable">@@sides</span> = <span class="integer">3</span>
-<span class="keyword">end</span>
-
-puts <span class="constant">Triangle</span>.sides
-<span class="comment">#=&gt; 3</span>
-puts <span class="constant">Polygon</span>.sides
-<span class="comment">#=&gt; 3</span>
-</pre></div>
-</div>
-
-
-
-<p>Notice both class variables, <span class="code">Triangle.sides</span> and <span class="code">Polygon.sides</span>, were changed to
-3. In fact, internally Ruby creates a single variable that both classes share:</p>
-
+<p>Notice both class variables, <span class="code">Triangle.sides</span> and <span class="code">Polygon.sides</span>, were changed to</p>
+<ol start="3">
+<li>In fact, internally Ruby creates a single variable that both classes share:</li>
+</ol>
 <p><img src="http://patshaughnessy.net/assets/2012/12/17/polygon-and-triangle.png"/></p>
-
 <p>I may write in more detail about the details of Ruby’s internal implementation
 of class variables in an upcoming blog post, but for today I’ll just use these
 very simple diagrams. Instead, now let’s switch gears and learn more about
 Smalltalk….</p>
-
 <h2>What is Smalltalk?</h2>
-
 <p>As I said above, Alan Kay invented Smalltalk along with object oriented
 programming while working at Xerox PARC in the early 1970s. This is the same
 laboratory that also invented the personal computer, the graphical user
 interface, and the Ethernet among many other things. Object oriented
 programming actually seems to be one of their less important inventions!</p>
-
 <p>In Smalltalk, Kay introduced terminology and ideas that we all take for granted
 today. Every value in Smalltalk, including language constructs such as code
 blocks, is an object. A Smalltalk program consists of these objects and the
@@ -161,32 +94,27 @@ way they interact; to call a particular Smalltalk function, you “send a
 message” to the object that implements that function. In Smalltalk, functions
 are known as “methods.” An object implements a series of methods. All of this
 should sound very familiar, of course.</p>
-
 <div style="float: left; padding: 17px 30px 10px 0px;
 line-height:16px">
   <table cellpadding="0" cellspacing="0" border="0">
     <tr><td align="center"><img src="http://patshaughnessy.net/assets/2012/12/17/children.png"></td></tr>
     <tr><td align="center"><i>
-
-In the 1970s, Alan Kay envisioned a laptop/tablet he called
+<p>In the 1970s, Alan Kay envisioned a laptop/tablet he called
 the<br/>
 “Dynabook” would run Smalltalk. He and his team actually built
 a<br/>
 computer called the “Interim Dynabook” and used it to teach<br/>
-programming to middle school children.
-
-    </i></td></tr>
+programming to middle school children.</p>
+<pre><code>&lt;/i&gt;&lt;/td&gt;&lt;/tr&gt;
+</code></pre>
   </table>
 </div>
-
-
 <p>From the very beginning, Kay’s conception of OOP included the idea of an
 object’s “class.” An object’s class described a series of behaviors (methods)
 each instance of that class exhibited.  Smalltalk also implemented the concept
 of polymorphism, which allows the developer to define “subclasses” that share
 the behaviors of their “superclass.” All of these terms we use often today were
 coined by Kay and his colleagues 40 years ago.</p>
-
 <p>Smalltalk, however, is more than just a programming language; it’s an entire
 graphical development environment. I think of Smalltalk as a precursor to
 Visual Studio or XCode, invented before Microsoft or Apple even existed, in a
@@ -194,7 +122,6 @@ world where computers were found only in academic or government settings! One
 other impressive goal Alan Kay and the Smalltalk team had from the beginning
 was to use their visual environment as a teaching tool for school children.
 It’s a truly amazing story.</p>
-
 <p>To learn more about the history and origin of Smalltalk, I would highly
 recommend reading <i>The Early History Of Smalltalk</i>
 (<a href="http://www.smalltalk.org/smalltalk/TheEarlyHistoryOfSmalltalk_Abstract.html">html</a>
@@ -207,10 +134,8 @@ narrative of how Kay and his colleagues borrowed ideas from even earlier, but
 with the combination of hard work, creativity and pure talent managed to take a
 large step forward and revolutionize the computer science world of their day,
 and ours.</p>
-
-<p>Alan Kay created the first working version of Smalltalk in 1972 &ndash; in his own
+<p>Alan Kay created the first working version of Smalltalk in 1972 - in his own
 words, here is how it happened:</p>
-
 <blockquote style="line-height:16px">
 I had expected that the new Smalltalk would be an iconic language and would
 take at least two years to invent, but fate intervened. One day, in a typical
@@ -228,24 +153,17 @@ itself. It was about "a page", and as far as power goes, LISP was the whole
 nine-yards for functional languages. I was quite sure I could do the same for
 object-oriented languages….
 </blockquote>
-
-
 <p>Here Kay referred to <a href="http://en.wikipedia.org/wiki/John_McCarthy_(computer_scientist)">John
 McCarthy</a>, who
 invented LISP about 10 years earlier.  It took Kay only eight early mornings of
 work to finish the first version of Smalltalk:</p>
-
 <blockquote style="line-height:16px">
 The first few versions had flaws that were soundly criticized by the group. But
 by morning 8 or so, a version appeared that seemed to work….
 </blockquote>
-
-
 <p>I wish I could be as creative, dedicated and productive as Alan Kay and his
 Xerox PARC colleagues were 40 years ago!</p>
-
 <h2>Class variables in Smalltalk</h2>
-
 <p>To find out how class variables actually work in Smalltalk, I
 installed <a href="http://smalltalk.gnu.org">GNU
 Smalltalk</a>, a command line based
@@ -258,12 +176,9 @@ specify a list of arguments… without a method name! I suppose the
 first argument is the method name or vice-versa. But after a
 couple of days I became accustomed to the idiosyncratic syntax,
 and the language began to make more sense to me.</p>
-
-<p>Here is the same <span class="code">Polygon</span> class again &ndash; now I have Smalltalk on the left, and
+<p>Here is the same <span class="code">Polygon</span> class again - now I have Smalltalk on the left, and
 Ruby on the right:</p>
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
+<pre>
 Object subclass: Polygon [
   Sides := 10.
 ]
@@ -273,220 +188,166 @@ Polygon class extend [
 ]
 
 Polygon sides printNl.
-=&gt; 10
-</pre></div>
-</div>
-
-
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Polygon</span>
-  <span class="class-variable">@@sides</span> = <span class="integer">10</span>
-  <span class="keyword">def</span> <span class="predefined-constant">self</span>.<span class="function">sides</span>
-    <span class="class-variable">@@sides</span>
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-
-puts <span class="constant">Polygon</span>.sides
-<span class="comment">#=&gt; 10</span>
-</pre></div>
-</div>
-
-
+=> 10
+</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Polygon
+</span><span style="color:#343d46;">  </span><span style="color:#4f5b66;">@@</span><span style="color:#000000;">sides </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">10
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#000000;">self.</span><span style="color:#795da3;">sides
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@@</span><span style="color:#000000;">sides
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#4f5b66;">&lt;</span><span style="color:#000000;">p</span><span style="color:#4f5b66;">&gt;</span><span style="color:#000000;">puts </span><span style="color:#008080;">Polygon</span><span style="color:#000000;">.sides
+</span><span style="color:#a7adba;">#=&amp;gt; 10&lt;/p&gt;
+</span></pre>
 
 <p>Here’s a quick explanation of what the Smalltalk code does:</p>
-
 <ul>
-<li><p><span class="code">Object subclass: Polygon</span> &ndash; this means send the <span class="code">subclass</span>
+<li>
+<p><span class="code">Object subclass: Polygon</span> - this means send the <span class="code">subclass</span>
 message to the <span class="code">Object</span> class and pass in the name <span class="code">Polygon</span>. It
 creates a new class, which is a subclass of the <span class="code">Object</span> class.
 This is analogous to <span class="code">class Polygon &lt; Object</span> in Ruby. Of
 course, in Ruby specifying <span class="code">Object</span> as the superclass is
-unnecessary.</p></li>
-<li><p><span class="code">Sides := 10.</span> &ndash; this declares a class variable <span class="code">Sides</span>, and
-assigns it a value. Ruby instead uses the <span class="code">@@sides</span> syntax.</p></li>
-<li><p><span class="code">Polygon class extend</span> &ndash; this “extends” the <span class="code">Polygon</span> class;
+unnecessary.</p>
+</li>
+<li>
+<p><span class="code">Sides := 10.</span> - this declares a class variable <span class="code">Sides</span>, and
+assigns it a value. Ruby instead uses the <span class="code">@@sides</span> syntax.</p>
+</li>
+<li>
+<p><span class="code">Polygon class extend</span> - this “extends” the <span class="code">Polygon</span> class;
 i.e., it opens up the <span class="code">Polygon</span> class and allows me to add a class
-method.  In Ruby I use <span class="code">class Polygon; def self.sides</span>.</p></li>
-<li><p>The <span class="code">printNl</span> method prints a value to the console; it works
+method.  In Ruby I use <span class="code">class Polygon; def self.sides</span>.</p>
+</li>
+<li>
+<p>The <span class="code">printNl</span> method prints a value to the console; it works
 the same way as <span class="code">puts</span> in Ruby, except <span class="code">printNl</span> is a method of
-the <span class="code">Sides</span> object. Imagine calling <span class="code">@@sides.puts</span> in Ruby!</p></li>
+the <span class="code">Sides</span> object. Imagine calling <span class="code">@@sides.puts</span> in Ruby!</p>
+</li>
 </ul>
-
-
 <p>Aside from the superficial syntax differences, if you take a step back and
 think about this, it’s striking how similar Smalltalk and Ruby really are! Not
 only do both languages share the same class variable concept, but I wrote the
 <span class="code">Polygon</span> class, declared a class variable and printed it out exactly the same
 way in both languages. In fact, you can think of Ruby as a newer version of
 Smalltalk with a simpler, easier to use syntax!</p>
-
 <p>As I said at the top, Smalltalk shares class variables among subclasses the
 same way Ruby does. Here’s how I would declare the Triangle subclass in
 Smalltalk and Ruby:</p>
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
+<pre>
 Polygon subclass: Triangle [
 ]
 Triangle class extend [
   set_sides: num [ Sides := num ]
 ]
 Polygon sides printNl.
-=&gt; 10 
+=> 10 
 
-</pre></div>
-</div>
-
-
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Triangle</span> &lt; <span class="constant">Polygon</span>
-  <span class="keyword">def</span> <span class="predefined-constant">self</span>.<span class="function">sides=</span>(num)
-    <span class="class-variable">@@sides</span> = num
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-puts <span class="constant">Triangle</span>.sides
-<span class="comment">#=&gt; 10</span>
-</pre></div>
-</div>
-
-
+</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Triangle </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">Polygon
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#000000;">self.</span><span style="color:#795da3;">sides=</span><span style="color:#000000;">(num)
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@@</span><span style="color:#000000;">sides </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> num
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#4f5b66;">&lt;</span><span style="color:#000000;">p</span><span style="color:#4f5b66;">&gt;</span><span style="color:#000000;">puts </span><span style="color:#008080;">Triangle</span><span style="color:#000000;">.sides
+</span><span style="color:#a7adba;">#=&amp;gt; 10&lt;/p&gt;
+</span></pre>
 
 <p>Here I declare the <span class="code">Triangle</span> subclass and a method to set the class variable’s
 value. Now let’s try changing the value of the class variable from the
 subclass:</p>
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
+<pre>
 Triangle set_sides: 3.
 Triangle sides printNl.
-=&gt; 3</pre></div>
-</div>
-
-
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
-<span class="constant">Triangle</span>.sides = <span class="integer">3</span>
-puts <span class="constant">Triangle</span>.sides
-=&gt; <span class="integer">3</span></pre></div>
-</div>
-
-
+=> 3</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#008080;">Triangle</span><span style="color:#000000;">.sides </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">3
+</span><span style="color:#000000;">puts </span><span style="color:#008080;">Triangle</span><span style="color:#000000;">.sides
+</span><span style="color:#000000;">=&gt; </span><span style="color:#d08770;">3</span></pre>
 
 <p>No surprise; by calling the <span class="code">set_slides</span> class method (<span class="code">sides=</span> in Ruby) I can
 update the value. But notice since both <span class="code">Polygon</span> and <span class="code">Triangle</span> share the same
 class variable, it’s changed for <span class="code">Polygon</span> also:</p>
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
+<pre>
 Polygon sides printNl.
-=&gt; 3
-</pre></div>
-</div>
-
-
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
-puts <span class="constant">Polygon</span>.sides
-=&gt; <span class="integer">3</span>
-</pre></div>
-</div>
-
-
+=> 3
+</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">puts </span><span style="color:#008080;">Polygon</span><span style="color:#000000;">.sides
+</span><span style="color:#000000;">=&gt; </span><span style="color:#d08770;">3
+</span></pre>
 
 <p>Again, we’ve seen Ruby and Smalltalk behave in exactly the same way.</p>
-
 <p>One way the two languages differ is that Smalltalk does allow you to create a
 separate class variable for each subclass, if you want. By repeating the class
 variable definition and the accessor class method in both classes they become
 separate variables, at least in GNU Smalltalk which I was using:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>Object <span class="r">subclass:</span> Polygon [
   Sides := <span class="cl">10</span>.
 ]
-
-Polygon <span class="r">class</span> extend [
-  sides [ ^Sides ]
-]
-
-Polygon <span class="r">subclass:</span> Triangle [
-  Sides := <span class="cl">3</span>.
-]
-
-Triangle <span class="r">class</span> extend [
-  sides [ ^Sides ]
-]
-
-Polygon sides printNl.
->= 10
-
-Triangle sides printNl.
->= 3
+<p>Polygon <span class="r">class</span> extend [
+sides [ ^Sides ]
+]</p>
+<p>Polygon <span class="r">subclass:</span> Triangle [
+Sides := <span class="cl">3</span>.
+]</p>
+<p>Triangle <span class="r">class</span> extend [
+sides [ ^Sides ]
+]</p>
+<p>Polygon sides printNl.</p>
+<blockquote>
+<p>= 10</p>
+</blockquote>
+<p>Triangle sides printNl.</p>
+<blockquote>
+<p>= 3</p>
+</blockquote>
 </pre></div>
 </div>
-
-
 <p>This isn’t true in Ruby; as we saw above <span class="code">@@sides</span> will always refer to the
 same value.</p>
-
 <h2>Class instance variables</h2>
-
 <p>In Ruby if you want to keep a separate value for each class, then you need to
 use a class instance variable instead of a class variable. What does this mean?
 Let’s take a look at another one of John Nunemaker’s examples:</p>
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Polygon</span>
-  <span class="keyword">def</span> <span class="predefined-constant">self</span>.<span class="function">sides</span>
-    <span class="instance-variable">@sides</span>
-  <span class="keyword">end</span>
-  <span class="instance-variable">@sides</span> = <span class="integer">8</span>
-<span class="keyword">end</span>
-
-puts <span class="constant">Polygon</span>.sides
-<span class="comment">#=&gt; 8</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Polygon
+</span><span style="color:#343d46;">  </span><span style="color:#a71d5d;">def </span><span style="color:#000000;">self.</span><span style="color:#795da3;">sides
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">sides
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">sides </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">8
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">puts </span><span style="color:#008080;">Polygon</span><span style="color:#000000;">.sides
+</span><span style="color:#a7adba;">#=&gt; 8
+</span></pre>
 
 <p>Now since I used the <span class="code">@sides</span> notation instead of <span class="code">@@sides</span>, Ruby created an
 instance variable instead of a class variable:</p>
-
 <p><img
 src="http://patshaughnessy.net/assets/2012/12/17/polygon-instance.png"/></p>
-
 <p>Conceptually there’s no difference, until I create the <span class="code">Triangle</span> subclass again:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Triangle</span> &lt; <span class="constant">Polygon</span>
-  <span class="instance-variable">@sides</span> = <span class="integer">3</span>
-<span class="keyword">end</span>
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Triangle </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">Polygon
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">sides </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">3
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Now each class has its own copy of the value <span class="code">@sides</span>:</p>
-
 <p><img
 src="http://patshaughnessy.net/assets/2012/12/17/polygon-and-triangle-instance.png"/></p>
-
 <p>Now let’s try the same thing in Smalltalk. In Smalltalk to declare an instance
 variable you call the <span class="code">instanceVariableNames</span> method on a class:</p>
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
+<pre>
 Object subclass: Polygon [
 ]
 
@@ -495,39 +356,26 @@ Polygon instanceVariableNames: 'Sides '!
 Polygon extend [
   sides [ ^Sides ]
 ]
-</pre></div>
-</div>
-
-
-
-<div class="CodeRay" style="display: inline-block; width: 40%;">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Polygon</span>
-  <span class="keyword">def</span> <span class="function">sides</span>
-    <span class="instance-variable">@sides</span>
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-
-
-</pre></div>
-</div>
-
-
+</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Polygon
+</span><span style="color:#343d46;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">sides
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">sides
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Here I’ve created a new class <span class="code">Polygon</span>, a subclass of <span class="code">Object</span>. Then I send
 the <span class="code">instanceVariableNames</span> message to this new class, telling Smalltalk to
 create a new instance variable called <span class="code">Sides</span>. Finally, I reopen the <span class="code">Polygon</span>
 class and add the <span class="code">sides</span> method to it. Again I show the corresponding Ruby
 code on the right.</p>
-
 <p>However, here <span class="code">Sides</span> and <span class="code">@sides</span> are instance variables of <span class="code">Polygon</span> objects,
 and not of the <span class="code">Polygon</span> class. To create a class instance variable in Smalltalk,
 you instead have to send the <span class="code">class</span> message to <span class="code">Polygon</span> first before calling
 <span class="code">instanceVariableNames</span> or <span class="code">extend</span>, like this:</p>
-
-<div class="CodeRay" style="display: inline-block; width: 50%;">
-  <div class="code"><pre>
+<pre>
 Object subclass: Polygon [
 ]
 
@@ -536,33 +384,21 @@ Polygon class instanceVariableNames: 'Sides '!
 Polygon class extend [
   sides [ ^Sides ]
 ]
-</pre></div>
-</div>
-
-
-
-<div class="CodeRay" style="display: inline-block; width: 30%;">
-  <div class="code"><pre>
-<span class="keyword">class</span> <span class="class">Polygon</span>
-  <span class="keyword">def</span> <span class="predefined-constant">self</span>.<span class="function">sides</span>
-    <span class="instance-variable">@sides</span>
-  <span class="keyword">end</span>
-<span class="keyword">end</span>
-
-
-
-</pre></div>
-</div>
-
-
+</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Polygon
+</span><span style="color:#343d46;">  </span><span style="color:#a71d5d;">def </span><span style="color:#000000;">self.</span><span style="color:#795da3;">sides
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">sides
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
 <p>Again, notice that the Smalltalk and Ruby code snippets are really just two
 different ways of expressing the same commands. In Smalltalk you say <span class="code">Polygon
-class extend [ sides&hellip;</span> while in Ruby you say <span class="code">class Polygon; def self.sides</span>.
+class extend [ sides...</span> while in Ruby you say <span class="code">class Polygon; def self.sides</span>.
 To me Ruby seems to be a more succinct version of Smalltalk.</p>
-
 <h2>Metaclasses in Smalltalk and Ruby</h2>
-
 <div style="float: right; padding: 17px 0px 10px 30px;
 line-height:16px">
   <table cellpadding="0" cellspacing="0" border="0">
@@ -578,239 +414,111 @@ use 20 years later!
     </i></td></tr>
   </table>
 </div>
-
-
 <p>Let’s take another look at the line of code I used above to create an instance
 variable in Smalltalk:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>Polygon <span class="r">instanceVariableNames:</span> <span class="pc">'Sides '</span>!
 </pre></div>
 </div>
-
-
 <p>Translating from Smalltalk into English, this means:</p>
-
 <ul>
-<li><p>Take the <span class="code">Polygon</span> class,</p></li>
-<li><p>send it a message called <span class="code">instanceVariableNames</span>,</p></li>
-<li><p>and pass the string <span class="code">Sides</span> as a parameter.</p></li>
+<li>
+<p>Take the <span class="code">Polygon</span> class,</p>
+</li>
+<li>
+<p>send it a message called <span class="code">instanceVariableNames</span>,</p>
+</li>
+<li>
+<p>and pass the string <span class="code">Sides</span> as a parameter.</p>
+</li>
 </ul>
-
-
 <p>Again, this is how you define instance variables in Smalltalk. That is, now
 when I create instances of the <span class="code">Polygon</span> class, they will each have a <span class="code">Sides</span>
 instance variable. Saying the same thing in a different way, to give all
 polygon instances an instance variable, I call a method on the <span class="code">Polygon</span> class.</p>
-
 <p>As I explained above, to create a class instance variable in Smalltalk you have
 to use the <span class="code">class</span> keyword, like this:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>Polygon class <span class="r">instanceVariableNames:</span> <span class="pc">'Sides '</span>!
 </pre></div>
 </div>
-
-
 <p>This code literally means: call the <span class="code">instanceVariableNames</span> method on the
 <span class="code">Polygon</span> class’s class. Following the same pattern, now all instances of the
 <span class="code">Polygon</span> class will contain a class instance variable. But what is the “class of
 the <span class="code">Polygon</span> class” in Smalltalk? What does this mean? Spending just a moment at
 the GNU Smalltalk REPL we can find out:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>$ gst
 GNU Smalltalk ready
-
-st> Polygon printNl.
-=> Polygon
-
-st> Polygon class printNl.
-=> Polygon class
+<p>st&gt; Polygon printNl.
+=&gt; Polygon</p>
+<p>st&gt; Polygon class printNl.
+=&gt; Polygon class</p>
 </pre></div>
 </div>
-
-
 <p>I first display the <span class="code">Polygon</span> class object, and I get “Polygon”. Displaying the
 class of the <span class="code">Polygon</span> class, I get “Polygon class.” But what type of object is
 this? Let’s call <span class="code">class</span> on it:</p>
-
 <div class="CodeRay">
   <div class="code"><pre>st> Polygon class class printNl.
 => Metaclass
 </pre></div>
 </div>
-
-
 <p>Ah… so the class of a class is a <span class="code">Metaclass</span>. Above, when I called
 <span class="code">instanceVariableNames</span> to create a class instance variable, I was actually
 using the <span class="code">Polygon</span> metaclass, an instance of the <span class="code">Metaclass</span> class.</p>
-
 <p>Here’s a diagram showing how these classes are all related in Smalltalk:</p>
-
 <p><img
 src="http://patshaughnessy.net/assets/2012/12/17/metaclasses-smalltalk.png"/></p>
-
 <p>By now, it should be no surprise if I tell you internally Ruby uses the same
 model. Here’s how classes work inside of Ruby:</p>
-
 <p><img
 src="http://patshaughnessy.net/assets/2012/12/17/metaclasses-ruby.png"/></p>
-
 <p>In Ruby whenever you create a class, Ruby internally creates a corresponding
 new class called the “metaclass.” Unlike Smalltalk, Ruby doesn’t use this for
 class instance variables, but only to keep track of class methods. Also, Ruby
 doesn’t have a <span class="code">Metaclass</span> class, but instead all metaclasses are simply
 instances of the <span class="code">Class</span> class.</p>
-
 <p>In Ruby the metaclass is a hidden, mysterious concept. Ruby silently creates it
 without telling you and doesn’t expose the metaclass in the language directly.
 In Smalltalk, however, the metaclasses are not hidden at all and instead play a
 large role in the language. Creating a class instance variable, as I did above,
 is just one example of using a metaclass in Smalltalk. Another good example is
 the way you add class methods by calling <span class="code">extend</span>.</p>
-
 <p>When you ask for a class’s class in Ruby, you simply get <span class="code">Class</span>. Ruby doesn’t
 tell you about the metaclass:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ irb
-&gt; class Polygon; end
-&gt; Polygon.class
+> class Polygon; end
+> Polygon.class
 Class
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>To see a Ruby metaclass, you have to use a trick instead:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ irb
-&gt; class Polygon
-&gt;   def self.metaclass
-&gt;     class &lt;&lt; self
-&gt;       self
-&gt;     end
-&gt;   end
-&gt; end
-=&gt; nil
-&gt; Polygon.metaclass
-=&gt; #&lt;Class:Polygon&gt;
-</pre></div>
-</div>
-
-
-
-<p>“#&lt;Class:Polygon>” is the metaclass of <span class="code">Polygon</span>. This syntax means
+> class Polygon
+>   def self.metaclass
+>     class << self
+>       self
+>     end
+>   end
+> end
+=> nil
+> Polygon.metaclass
+=> #<Class:Polygon>
+</pre>
+<p>“#&lt;Class:Polygon&gt;” is the metaclass of <span class="code">Polygon</span>. This syntax means
 the metaclass is “an instance of <span class="code">Class</span> for the <span class="code">Polygon</span> class,” or
 the metaclass for <span class="code">Polygon</span>.</p>
-
 <p></p>
-
-
 <blockquote>
 * Quoted text and images from: The Early History Of Smalltalk, by Alan Kay, © 1993 Association for Computing Machinery
 </blockquote>
-
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2012/12/17/ruby-smalltalk-and-class-variables';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Ruby, Smalltalk and Class Variables';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2012/12/17/ruby-smalltalk-and-class-variables';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Ruby, Smalltalk and Class Variables';
-    (function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2012/12/17/ruby-smalltalk-and-class-variables'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Ruby, Smalltalk and Class Variables';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

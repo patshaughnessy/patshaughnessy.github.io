@@ -1,111 +1,37 @@
-
-<!doctype html>
-<html>
-  <head>
-    <!-- 1140px Grid styles for IE -->
-    <!--[if lte IE 9]><link rel="stylesheet" href="/assets/css/ie.css" type="text/css" media="screen" /><![endif]-->
-    <link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen" />
-    <link rel="stylesheet" href="/assets/css/main.css"href="/assets/css/main.css" type="text/css" media="screen" >
-    <link rel="alternate" type="application/atom+xml" title="Exploring Ruby’s Regular Expression Algorithm - feed" href="http://feeds2.feedburner.com/patshaughnessy" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> 
-    <title>Exploring Ruby’s Regular Expression Algorithm - Pat Shaughnessy</title>
-  </head>
-<body>
-  <div id="banner">
-    <div class="row">
-      <div class="onecol"></div>
-      <div class="elevencol last">
-        <a href="/">
-          <span id="title">
-            Pat Shaughnessy
-          </span>
-          <span id="tagline">
-            blogger, rubyist, aspiring author
-          </span>
-        </a>
-      </div>
-    </div>
-  </div>
-  <div id="container">
-    <div class="row">
-      <div class="onecol"></div>
-      
-        <div class="ninecol white">
-      
-        <article class="post">
-  <header>
-  <h1>Exploring Ruby’s Regular Expression Algorithm</h1>
-  
-    <div class="metadata">
-    <span class="date">April 3rd 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/4/3/exploring-rubys-regular-expression-algorithm" class="date">&nbsp; Comments and &nbsp; Reactions</a><br/>
-    
-      <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Exploring Ruby’s Regular Expression Algorithm">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
-    
-    </div>
-  
-  </header>
-
-  <section class="content">
-    <div style="float: left; padding: 7px 30px 20px 0px">
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Exploring Ruby’s Regular Expression Algorithm - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Exploring Ruby’s Regular Expression Algorithm</h1><div class="metadata"><span class="date">April 3rd 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/4/3/exploring-rubys-regular-expression-algorithm" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Exploring Ruby’s Regular Expression Algorithm">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 20px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
   <tr><td><img src="http://patshaughnessy.net/assets/2012/4/3/oniguruma.png"></td></tr>
   <tr><td align="center"><small><i>According to <a href="http://en.wikipedia.org/wiki/Oniguruma">Wikipedia</a>, Oniguruma means<br/>“Devil’s Chariot” in Japanese</i></small></td></tr>
 </table>
 </div>
-
-
-<p>We’re all familiar with regular expressions; they are “the developer’s swiss army knife.” Whatever sort of information you need to find, whatever sort of text you need to parse, there’s always a way to do it using a regular expression search. In fact, you’ve probably been using regular expressions for much longer than you have been using Ruby &ndash; regular expressions have been included in almost every major programming language for many years: Perl, Javascript, PHP, Java, etc. Ruby was invented in mid-1990’s, while regular expressions were invented in the 1960s, thirty years earlier!</p>
-
-<br/>
-
-
-<br/>
-
-
-<p>But how do regular expressions actually work? If you’re interested in learning more about the computer science theory behind regular expression engines, you should read a fantastic series of three articles written by <a href="http://swtch.com/~rsc/">Russ Cox</a>:</p>
-
+<p>We’re all familiar with regular expressions; they are “the developer’s swiss army knife.” Whatever sort of information you need to find, whatever sort of text you need to parse, there’s always a way to do it using a regular expression search. In fact, you’ve probably been using regular expressions for much longer than you have been using Ruby - regular expressions have been included in almost every major programming language for many years: Perl, Javascript, PHP, Java, etc. Ruby was invented in mid-1990’s, while regular expressions were invented in the 1960s, thirty years earlier!</p>
+<p><br/>
+<br/></p>
+<p>But how do regular expressions actually work? If you’re interested in learning more about the computer science theory behind regular expression engines, you should read a fantastic series of three articles written by <a href="http://swtch.com/%7Ersc/">Russ Cox</a>:</p>
 <ul>
-<li><a href="http://swtch.com/~rsc/regexp/regexp1.html">Regular Expression Matching Can Be Simple And Fast</a> (2007)</li>
-<li><a href="http://swtch.com/~rsc/regexp/regexp2.html">Regular Expression Matching: the Virtual Machine Approach</a> (2009), and:</li>
-<li><a href="http://swtch.com/~rsc/regexp/regexp3.html">Regular Expression Matching in the Wild</a> (2010).</li>
+<li><a href="http://swtch.com/%7Ersc/regexp/regexp1.html">Regular Expression Matching Can Be Simple And Fast</a> (2007)</li>
+<li><a href="http://swtch.com/%7Ersc/regexp/regexp2.html">Regular Expression Matching: the Virtual Machine Approach</a> (2009), and:</li>
+<li><a href="http://swtch.com/%7Ersc/regexp/regexp3.html">Regular Expression Matching in the Wild</a> (2010).</li>
 </ul>
-
-
 <p>I won’t repeat everything that Russ wrote again here today. But I will quickly note that Ruby uses the “Non-recursive Backtracking Implementation” discussed in the second article, which means that it does exhibit the same exponentially slow performance as Perl does for pathological regex expressions. In other words, this means that Ruby is NOT using the most optimal regex algorithm available, Thompson NFA, that Russ described in the first article.</p>
-
-<p>Today I’m going to take a close look at <a href="http://www.geocities.jp/kosako3/oniguruma/">Oniguruma</a>, the regular expression engine used by Ruby. Using some simple diagrams I’ll illustrate how it works in detail for a few simple regex pattern examples. Read on to get a sense of what happens inside of Ruby every time you use a regular expression &ndash; there’s more to it than you might think!</p>
-
+<p>Today I’m going to take a close look at <a href="http://www.geocities.jp/kosako3/oniguruma/">Oniguruma</a>, the regular expression engine used by Ruby. Using some simple diagrams I’ll illustrate how it works in detail for a few simple regex pattern examples. Read on to get a sense of what happens inside of Ruby every time you use a regular expression - there’s more to it than you might think!</p>
 <h2>Oniguruma</h2>
-
 <p>Since version 1.9 MRI Ruby has implemented regular expressions using a slightly modified version of an open source C library called “Oniguruma,” also used by PHP. Along with providing all of the standard regex features, Oniguruma is nice since it handles multibyte characters very well, such as Japanese text.</p>
-
 <p>At a very high level, here’s what happens when you first pass a regex pattern to Oniguruma:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex-high-level.png" alt="Oniguruma parses and compiles a regex" /></p>
-
-<p>In the first step, Oniguruma reads the regex search pattern, tokenizes it and parses it into a tree structure containing a series of syntax nodes &ndash; an Abstract Syntax Tree (AST). This is very similar to how Ruby itself parses your Ruby program. In fact, you can think of Oniguruma’s regex engine as a second programming language that is embedded right inside of Ruby. Whenever you use a regex pattern in your Ruby code, you’re really writing a second program in an entirely different language. After parsing your search pattern, Oniguruma compiles it into a series of instructions that will later be executed by a virtual machine. These instructions implement a state machine, as Russ Cox described in his articles.</p>
-
+<p>In the first step, Oniguruma reads the regex search pattern, tokenizes it and parses it into a tree structure containing a series of syntax nodes - an Abstract Syntax Tree (AST). This is very similar to how Ruby itself parses your Ruby program. In fact, you can think of Oniguruma’s regex engine as a second programming language that is embedded right inside of Ruby. Whenever you use a regex pattern in your Ruby code, you’re really writing a second program in an entirely different language. After parsing your search pattern, Oniguruma compiles it into a series of instructions that will later be executed by a virtual machine. These instructions implement a state machine, as Russ Cox described in his articles.</p>
 <p>Later when you actually execute a search using a regex pattern, Oniguruma’s virtual machine will execute the search, simply following the instructions that were previously compiled, running them against a given target string.</p>
-
-<p>This week in order to understand how Oniguruma works internally and to see how its algorithm compared to what Russ Cox described, I recompiled Ruby 2.0 (ruby-head) from source after setting a couple of special compiler flags: ONIG_DEBUG_COMPILE and ONIG_DEBUG_MATCH. Setting these flags enabled me to see a lot of debug output from Oniguruma as I ran some regex searches, showing me which Oniguruma VM instructions the regex pattern was compiled to and what happened when Oniguruma’s VM ran the instructions. Here’s what I found&hellip;.</p>
-
+<p>This week in order to understand how Oniguruma works internally and to see how its algorithm compared to what Russ Cox described, I recompiled Ruby 2.0 (ruby-head) from source after setting a couple of special compiler flags: ONIG_DEBUG_COMPILE and ONIG_DEBUG_MATCH. Setting these flags enabled me to see a lot of debug output from Oniguruma as I ran some regex searches, showing me which Oniguruma VM instructions the regex pattern was compiled to and what happened when Oniguruma’s VM ran the instructions. Here’s what I found....</p>
 <h2>Example 1: Matching a simple substring</h2>
-
 <p>Here’s a very simple Ruby script that searches for the word “brown” in a target string:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">The quick brown fox jumps over the lazy dog.</span><span class="delimiter">&quot;</span></span>
-p str.match(<span class="regexp"><span class="delimiter">/</span><span class="content">brown</span><span class="delimiter">/</span></span>)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">brown</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
+</span></pre>
 
 <p>If I run this using my modified version of Ruby, I see lots of additional debug output (much more than I display here):</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ ruby regex.rb
 PATTERN: /brown/ (US-ASCII)
 optimize: EXACT_BM
@@ -116,56 +42,34 @@ code length: 7
 
 match_at: str: 140261368903056 (0x7f912511b590) etc ...
 size: 44, start offset: 10
-  10&gt; &quot;brown f...&quot;         [exact5:brown]
-  15&gt; &quot; fox ju...&quot;         [end]
+  10> "brown f..."         [exact5:brown]
+  15> " fox ju..."         [end]
 
-#&lt;MatchData &quot;brown&quot;&gt;
-</pre></div>
-</div>
-
-
-
-<p>The key here is the text “0:[exact5:brown] 6:[end]” &ndash; this line describes the two VM instructions that Oniguruma has compiled the <span class="code">/brown/</span> pattern into. Here’s what this regex program looks like:</p>
-
+#<MatchData "brown">
+</pre>
+<p>The key here is the text “0:[exact5:brown] 6:[end]” - this line describes the two VM instructions that Oniguruma has compiled the <span class="code">/brown/</span> pattern into. Here’s what this regex program looks like:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex1.png" alt="/brown/" /></p>
-
 <p>You can think of this diagram as the state machine for the <span class="code">/brown/</span> search:</p>
-
 <ul>
 <li><span class="code">exact5:brown</span> checks the target string at the current position to see whether the 5 letters “brown” appear there, and</li>
 <li><span class="code">end</span> means the search is over; it returns the characters matched so far and stops.</li>
 </ul>
-
-
 <p>When running a regex search Oniguruma steps through the VM instructions and the target string at the same time. Let’s walk through how this works for my example; first, the <span class="code">exact5:brown</span> instruction is executed on the target string at the location where the word “brown” appears:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex2.png" alt="exact5:brown VM instruction" /></p>
-
-<p>How did Oniguruma know where to start? Well, it turns out that it contains an optimizer that decides where to start the regex search based on the target string and the first VM instruction. You can see evidence of that above: “optimize: EXACT_BM&hellip; exact: [brown]: length: 5&hellip; start offset: 10”. In this case, since Oniguruma knew it was going to look for the word “brown” it jumped ahead to the first appearance of “brown.” Yes, I know this sounds like cheating, but actually this is just a simple optimization to speed up searches for common regex patterns.</p>
-
+<p>How did Oniguruma know where to start? Well, it turns out that it contains an optimizer that decides where to start the regex search based on the target string and the first VM instruction. You can see evidence of that above: “optimize: EXACT_BM... exact: [brown]: length: 5... start offset: 10”. In this case, since Oniguruma knew it was going to look for the word “brown” it jumped ahead to the first appearance of “brown.” Yes, I know this sounds like cheating, but actually this is just a simple optimization to speed up searches for common regex patterns.</p>
 <p>Next, Oniguruma executes the <span class="code">exact5:brown</span> instruction by checking whether the next 5 characters match or not. Since they match, Oniguruma steps past the 5 characters in the target string, and also moves to the next VM instruction:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex3.png" alt="end VM instruction" /></p>
-
-<p>Now, Oniguruma executes the <span class="code">end</span> instruction &ndash; which simply means that it is done. Whenever the VM reaches the <span class="code">end</span> instruction it stops, declares success and returns the matching string.</p>
-
+<p>Now, Oniguruma executes the <span class="code">end</span> instruction - which simply means that it is done. Whenever the VM reaches the <span class="code">end</span> instruction it stops, declares success and returns the matching string.</p>
 <h2>Example 2: matching one string or another</h2>
-
-<p>Now let’s take a more complex example and see what happens &ndash; in this pattern I want to match either “black” or “brown”:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">The quick brown fox jumps over the lazy dog.</span><span class="delimiter">&quot;</span></span>
-p str.match(<span class="regexp"><span class="delimiter">/</span><span class="content">black|brown</span><span class="delimiter">/</span></span>)
-</pre></div>
-</div>
-
-
+<p>Now let’s take a more complex example and see what happens - in this pattern I want to match either “black” or “brown”:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">black|brown</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
+</span></pre>
 
 <p>Running again:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ ruby regex.rb
 PATTERN: /black|brown/ (US-ASCII)
 optimize: EXACT
@@ -176,60 +80,36 @@ code length: 23
 
 match_at: str: 140614855412048 (0x7fe37281c950), ...
 size: 44, start offset: 10
-  10&gt; &quot;brown f...&quot;         [push:(11)]
-  10&gt; &quot;brown f...&quot;         [exact5:black]
-  10&gt; &quot;brown f...&quot;         [exact5:brown]
-  15&gt; &quot; fox ju...&quot;         [end]
+  10> "brown f..."         [push:(11)]
+  10> "brown f..."         [exact5:black]
+  10> "brown f..."         [exact5:brown]
+  15> " fox ju..."         [end]
 
-#&lt;MatchData &quot;brown&quot;&gt;
-</pre></div>
-</div>
-
-
-
+#<MatchData "brown">
+</pre>
 <p>Again, the key line is: “0:[push:(11)] 5:[exact5:black] 11:[jump:(6)] 16:[exact5:brown] 22:[end]”. This is the VM program that will execute our <span class="code">/black|brown/</span> regex search:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex4.png" alt="/black/brown/" /></p>
-
 <p>This is a lot more complicated! First of all, above you can see the optimizer is now only looking for the letter “b”: “optimize: EXACT exact: [b]: length: 1”. This is because the words “black” and “brown” both begin with the same letter “b”.</p>
-
 <p>Now let’s step through this more complex regex program, slowly:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex5.png" alt="push VM instruction" /></p>
-
 <p>The <span class="code">push</span> command executes first, at the first occurrence of “b.” <span class="code">Push</span> pushes the location of another VM instruction and corresponding target string location onto something called the “Backtrack Stack:”</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex6.png" alt="exact5:black VM instruction" /></p>
-
 <p>The Backtrack Stack is central to the way Oniguruma works, as we’ll see in a moment. Oniguruma uses it to keep track of alternative match paths through the target string if one path doesn’t lead to a match. Let’s continue this example and you’ll see what I mean.</p>
-
-<p>Above we are now going to execute the <span class="code">exact5:black</span> command on the target string, but where the word “brown” appears. This means that the command will not match, and so the regex search will fail. However, before returning a failure to Ruby, Oniguruma will check the Backtrack Stack to see if some alternative path was saved there. In this case there is one: the <span class="code">exact5.brown</span> command &ndash; the second half of my OR condition in <span class="code">/black|brown/</span>. Now Oniguruma pops the <span class="code">exact5:brown</span> command and corresponding target string location off the stack and continues from there:</p>
-
+<p>Above we are now going to execute the <span class="code">exact5:black</span> command on the target string, but where the word “brown” appears. This means that the command will not match, and so the regex search will fail. However, before returning a failure to Ruby, Oniguruma will check the Backtrack Stack to see if some alternative path was saved there. In this case there is one: the <span class="code">exact5.brown</span> command - the second half of my OR condition in <span class="code">/black|brown/</span>. Now Oniguruma pops the <span class="code">exact5:brown</span> command and corresponding target string location off the stack and continues from there:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex7.png" alt="exact5:brown VM instruction" /></p>
-
 <p>Now there is a match, so Oniguruma steps past the 5 characters and moves to the next instruction:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex8.png" alt="end VM instruction" /></p>
-
 <p>Now Oniguruma has reached the <span class="code">end</span> instruction again, and so returns the matched characters back to Ruby.</p>
-
 <h2>Example 3: the anychar* instruction</h2>
-
 <p>Now for my last example today, let’s see what happens when I run this command regex pattern instead:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">The quick brown fox jumps over the lazy dog.</span><span class="delimiter">&quot;</span></span>
-p str.match(<span class="regexp"><span class="delimiter">/</span><span class="content">brown.*</span><span class="delimiter">/</span></span>)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">brown.*</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
+</span></pre>
 
 <p>Now, of course, we want to match “brown” followed by any series of characters until the end of the line. Here’s the debug output:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ ruby regex.rb
 PATTERN: /brown.*/ (US-ASCII)
 optimize: EXACT_BM
@@ -240,220 +120,76 @@ code length: 8
 
 match_at: str: 140284579067040 (0x7f968c80b4a0), ...
 size: 44, start offset: 10
-  10&gt; &quot;brown f...&quot;         [exact5:brown]
-  15&gt; &quot; fox ju...&quot;         [anychar*]
-  44&gt; &quot;&quot;                   [end]
+  10> "brown f..."         [exact5:brown]
+  15> " fox ju..."         [anychar*]
+  44> ""                   [end]
 
-#&lt;MatchData &quot;brown fox jumps over the lazy dog.&quot;&gt;
-</pre></div>
-</div>
-
-
-
+#<MatchData "brown fox jumps over the lazy dog.">
+</pre>
 <p>And here’s the new state machine:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex9.png" alt="/brown.*/" /></p>
-
 <p>This time you can see a new Oniguruma VM instruction: <span class="code">anychar*</span>. As you can guess, this represents the <span class="code">.*</span> syntax in the regex pattern. Let’s step through the process again and see what happens:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex10.png" alt="exact5:brown VM instruction" /></p>
-
 <p>Again, we’ve started at position 10, where “brown” appears. And again it will match, causing Oniguruma to step past “brown” and move to the next instruction:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex11.png" alt="anychar* VM instruction" /></p>
-
 <p>The <span class="code">anychar*</span> instruction is next. Here’s how <span class="code">anychar*</span> works:</p>
-
 <ul>
 <li>First, it matches any character, so it always steps forward by one.</li>
 <li>But instead of stepping to the next instruction, Oniguruma loops back and runs <span class="code">anychar*</span> again on the next character.</li>
 <li>It also pushes an entry onto the Backtrack Stack for the current character and the next instruction, <span class="code">end</span> in this program:</li>
 </ul>
-
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex12.png" alt="anychar* VM instruction 2" /></p>
-
 <p>Now from here Oniguruma simply iterates through the rest of the string, repeating the steps above for each character: “brown fox jumps over the lazy dog.” As it iterates through the rest of the target string, it repeatedly saves the <span class="code">end</span> command over and over again onto the backtrack stack:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex13.png" alt="anychar* VM instruction 3" /></p>
-
 <p>And again:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex14.png" alt="anychar* VM instruction 4" /></p>
-
 <p>Finally, after a number of iterations Oniguruma reaches the end of the string:</p>
-
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex15.png" alt="anychar* VM instruction 5" /></p>
-
 <p>Here <span class="code">anychar*</span> will fail, since there are no more characters left in the string. What happens when there’s a failure and some VM command doesn’t match? Well, like in the previous example Oniguruma will pop the last command off the stack, and continue the search from that point. So in this case it will pop off the <span class="code">end</span> command and the last target string location, pointing at the trailing period. This means Oniguruma will return all of the text up to the end of the string back to Ruby: “brown fox jumps over the lazy dog.”</p>
-
 <p>But why does <span class="code">anychar*</span> need to push every single string location onto the stack as it iterates? The reason is that if there were more commands in the regex pattern after the <span class="code">.*</span>, or if the <span class="code">.*</span> were embedded inside a more complex pattern, then it’s not obvious which string location would eventually lead to a complete match. Oniguruma might need to try them all. In this simple example the pattern matches to the end of the string, so there’s no need to pop off more than one command from the stack.</p>
-
-<p>One interesting detail here is that if you do include other commands after the <span class="code">.*</span> &ndash; for example if you search for <span class="code">/.*brown/</span>, then Oniguruma will not use actually use <span class="code">anychar*</span>. Instead it will use another related command called <span class="code">anychar*-peek-next:b</span> for example. This works just like <span class="code">anychar*</span> but instead of pushing every string location onto the Backtrack Stack, it only pushes locations that match the given character, “b” in this case. This optimization works because Oniguruma knows the next character must be a “b.”</p>
-
+<p>One interesting detail here is that if you do include other commands after the <span class="code">.*</span> - for example if you search for <span class="code">/.*brown/</span>, then Oniguruma will not use actually use <span class="code">anychar*</span>. Instead it will use another related command called <span class="code">anychar*-peek-next:b</span> for example. This works just like <span class="code">anychar*</span> but instead of pushing every string location onto the Backtrack Stack, it only pushes locations that match the given character, “b” in this case. This optimization works because Oniguruma knows the next character must be a “b.”</p>
 <h2>A pathological regex pattern</h2>
-
 <p>I mentioned at the top that Ruby displays the same poor performance that Perl does when given a pathological, or very complex regex pattern. It’s actually very easy to see this happen using Ruby on your own computer. Try running this very simple regex search on your computer:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">aaa</span><span class="delimiter">&quot;</span></span>
-p str.match(<span class="regexp"><span class="delimiter">/</span><span class="content">a?a?a?aaa</span><span class="delimiter">/</span></span>)
-</pre></div>
-</div>
-
-
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">aaa</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">a?a?a?aaa</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
+</span></pre>
 
 <p>This should run very quickly:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ time ruby regex.rb
-#&lt;MatchData &quot;aaa&quot;&gt;
+#<MatchData "aaa">
 ruby regex.rb  0.02s user 0.01s system 30% cpu 0.080 total
-</pre></div>
-</div>
-
-
-
-<p>However, if you repeat this pattern using 29 repetitions instead of 3 the time required to find the match begins to explode, just as Russ shows in the <a href="http://swtch.com/~rsc/regexp/regexp1.html">graph on the left in his first article</a>:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
-str = <span class="string"><span class="delimiter">&quot;</span><span class="content">aaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span><span class="delimiter">&quot;</span></span>  <span class="comment"># 29 repetitions</span>
-p str.match(<span class="regexp"><span class="delimiter">/</span><span class="content">a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span><span class="delimiter">/</span></span>)
-</pre></div>
-</div>
-
-
+</pre>
+<p>However, if you repeat this pattern using 29 repetitions instead of 3 the time required to find the match begins to explode, just as Russ shows in the <a href="http://swtch.com/%7Ersc/regexp/regexp1.html">graph on the left in his first article</a>:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">aaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span><span style="color:#4f5b66;">&quot;  </span><span style="color:#a7adba;"># 29 repetitions
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
+</span></pre>
 
 <p>Running with 29 repetitions:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ time ruby regex.rb
-#&lt;MatchData &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;&gt;
+#<MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
 ruby regex.rb  17.09s user 0.01s system 99% cpu 17.098 total
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>Or with 30 repetitions:</p>
-
-<div class="CodeRay">
-  <div class="code"><pre>
+<pre>
 $ time ruby regex.rb
-#&lt;MatchData &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;&gt;
+#<MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
 ruby regex.rb  34.00s user 0.01s system 99% cpu 34.025 total
-</pre></div>
-</div>
-
-
-
+</pre>
 <p>For 31 repetitions the time is 67 seconds and it increases exponentially from there. The reason this happens is that the Backtracking algorithm Oniguruma uses has to iterate through a list of combinations that increases exponentially with the length of the regex pattern. If Oniguruma and Ruby had used the Thompson NFA algorthim that Russ explained this wouldn’t happen!</p>
-
 <h2>Scratching the surface</h2>
-
-<p>As I said at the beginning, here I’m just scratching the surface of what Oniguruma and Ruby can do. As you probably know, there are many, many more regex operators and options available for you to use, each of which have corresponding Oniguruma VM instructions. In addition, my examples today were extremely simple and straightforward &ndash; in a typical Ruby application you might have very complex regex patterns that compile to a program containing hundreds of different Oniguruma VM instructions and many different match paths to follow through the target string.</p>
-
-<p>However, the basic idea will always be the same. Every Oniguruma regex pattern is compiled into a series of VM instructions representing a state machine. When Oniguruma reaches a non-matching state &ndash; i.e. a dead end &ndash; it will pop off another alternative path through the target string from the Backtrack Stack that might have been left by a <span class="code">push</span>, <span class="code">anychar*</span> or other similar command.</p>
-
-  </section>
-
-  
-    <section class="comments">
-      <div id="disqus_thread"><script type='text/javascript'> 
-          var disqus_identifier = 'http://patshaughnessy.net/2012/4/3/exploring-rubys-regular-expression-algorithm';
-          var disqus_shortname = 'patshaughnessy';
-          var disqus_title = 'Exploring Ruby’s Regular Expression Algorithm';
-        </script></div>
-      <script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"> </script>
-      <noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript>
-    </section>
-  
-</article>
-
-  <script type="text/javascript">
-    var disqus_identifier = 'http://patshaughnessy.net/2012/4/3/exploring-rubys-regular-expression-algorithm';
-    var disqus_shortname = 'patshaughnessy';
-    var disqus_title = 'Exploring Ruby’s Regular Expression Algorithm';
-    (function () {
+<p>As I said at the beginning, here I’m just scratching the surface of what Oniguruma and Ruby can do. As you probably know, there are many, many more regex operators and options available for you to use, each of which have corresponding Oniguruma VM instructions. In addition, my examples today were extremely simple and straightforward - in a typical Ruby application you might have very complex regex patterns that compile to a program containing hundreds of different Oniguruma VM instructions and many different match paths to follow through the target string.</p>
+<p>However, the basic idea will always be the same. Every Oniguruma regex pattern is compiled into a series of VM instructions representing a state machine. When Oniguruma reaches a non-matching state - i.e. a dead end - it will pop off another alternative path through the target string from the Backtrack Stack that might have been left by a <span class="code">push</span>, <span class="code">anychar*</span> or other similar command.</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2012/4/3/exploring-rubys-regular-expression-algorithm'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Exploring Ruby’s Regular Expression Algorithm';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-  </script>
-
-
-      </div>
-      
-        <div class="twocol last" id="right">
-          <div id="sidebar">
-            <img src="/assets/images/pat.jpg"/>
-            <div class="header">Subscribe</a></div>
-            <div class="links">
-              <ul>
-                <li>
-                  <a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a>
-                  <a href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"/>
-                  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-                  <a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a>
-                </li>
-              </ul>
-            </div>
-            <div class="header">Buy my book</div>
-            <div class="links">
-              <ul>
-                <li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></a></li>
-                <li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li>
-              </ul>
-            </div>
-            
-              <div class="header">More on Ruby</div>
-              <div class="links">
-                <ul>
-                  
-                    <li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li>
-                  
-                    <li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li>
-                  
-                    <li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li>
-                  
-                    <li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li>
-                  
-                </ul>
-              </div>
-            
-            <div class="header">Popular</div>
-            <div class="links">
-              <ul>
-                <li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li>
-                <li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li>
-                <li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li>
-                <li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li>
-              </ul>
-            </div>
-            <div class="header"><a href="/">More...</a></div>
-          </div>
-        </div>
-      
-    <div class="row" id="copyright">
-      <p>Content and UI design &copy; 2018 Pat Shaughnessy</a>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-  var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-  document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-  </script>
-  <script type="text/javascript">
-  try {
-  var pageTracker = _gat._getTracker("UA-5273122-4");
-  pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-</body>
-</html>
-
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>
