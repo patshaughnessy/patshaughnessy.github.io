@@ -1,13 +1,23 @@
 extern crate maud;
+extern crate ordinal;
 
 use self::maud::html;
 use self::maud::PreEscaped;
+use chrono::Datelike;
+use self::ordinal::Ordinal;
 
 use post::Post;
 
 pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
-    let formatted_date_string = post.date.format("%B %e, %Y").to_string();
-    let recent_posts = all_posts.iter().filter(|p| p.tag == post.tag || post.tag.is_none()).take(4);
+    let month_string = post.date.format("%B").to_string();
+    let day_string = Ordinal(post.date.day());
+    let year_string = post.date.format("%Y").to_string();
+    let date_string = format!("{} {} {}", month_string, day_string, year_string);
+    let recent_posts = all_posts.iter()
+        .filter(|p|
+                (p.tag == post.tag || post.tag.is_none())
+                && *p != post
+        ).take(4);
     let recent_links = recent_posts.map(|p|
         (
             &p.url,
@@ -22,7 +32,7 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
             header {
               h1 { (post.title) }
               div class="metadata" {
-                span class="date" { (formatted_date_string) }
+                span class="date" { (date_string) }
                 (PreEscaped("&nbsp;&mdash;&nbsp;"))
                 @if !draft {
                     a href="#disqus_thread" data-disqus-identifier={ "http://patshaughnessy.net/" (post.url) } class="date" {
