@@ -29,7 +29,7 @@ pub fn highlighted_html_for_language(snippet: &String, attributes: String) -> St
     } else if attributes.contains("type=\"c\"") {
         highlighted_html_for_string(&snippet, &SYNTAX_SET, &C_SYNTAX, &THEME)
     } else {
-        format!("<pre>{}</pre>", snippet.to_string())
+        format!("<pre{}>{}</pre>", attributes, snippet.to_string())
     }
 }
 

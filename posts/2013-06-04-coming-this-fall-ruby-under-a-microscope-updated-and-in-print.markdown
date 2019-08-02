@@ -30,6 +30,7 @@ If you give me your email address Iâ€™ll send you a single, quick note when itâ€
 </div>
 
 <div style="clear: left"> </div>
+
 ## More content, and updated for Ruby 2.0
 
 <div style="float: right; padding: 8px 0px 10px 30px;
@@ -45,6 +46,7 @@ arguments</span>, <span class="code">Module#prepend</span> and more. Finally, Iâ
 diagrams and the text to account for important changes to YARV internals.
 
 <div style="clear: left"> </div>
+
 ## Reviewed by Aaron Patterson
 
 No longer will you have to trust me that I have everything correct. Aaron

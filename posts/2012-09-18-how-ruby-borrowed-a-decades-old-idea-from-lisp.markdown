@@ -13,7 +13,7 @@ tag: Ruby
 
 Blocks are one of the most commonly used and powerful features of Ruby. As you probably know, they allow you to pass a code snippet to iterators such as <span class="code">each</span>, <span class="code">detect</span> or <span class="code">inject</span>. You can also write your own functions that call blocks for other reasons using the <span class="code">yield</span> keyword. Ruby code containing blocks is often more succinct, elegant and expressive than the equivalent code would appear in older languages such as C.
 
-However, don’t jump to the conclusion that blocks are a new idea! In fact, blocks are not new to Ruby at all; the computer science concept behind blocks, called “closures,” [was first invented by Peter J. Landin](http://en.wikipedia.org/wiki/Closure_(computer_science\)#History_and_etymology) in 1964, a few years after the original version of [Lisp](http://en.wikipedia.org/wiki/Lisp_(programming_language\)) was created by [John McCarthy](http://en.wikipedia.org/wiki/John_McCarthy_(computer_scientist\)) in 1958. Closures were later adopted by Lisp - or more precisely a dialect of Lisp called [Scheme](http://en.wikipedia.org/wiki/Scheme_(programming_language\)), invented by [Gerald Sussman](http://en.wikipedia.org/wiki/Gerald_Jay_Sussman) and [Guy Steele](http://en.wikipedia.org/wiki/Guy_L._Steele,_Jr.) in 1975. Sussman and Steele’s use of closures in Scheme brought the idea to many programmers for the first time starting in the 1970s.
+However, don’t jump to the conclusion that blocks are a new idea! In fact, blocks are not new to Ruby at all; the computer science concept behind blocks, called “closures,” <a href="http://en.wikipedia.org/wiki/Closure_(computer_science)#History_and_etymology">was first invented by Peter J. Landin</a>) in 1964, a few years after the original version of <a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a> was created by <a href="http://en.wikipedia.org/wiki/John_McCarthy_(computer_scientist)">John McCarthy</a> in 1958. Closures were later adopted by Lisp - or more precisely a dialect of Lisp called <a href="http://en.wikipedia.org/wiki/Scheme_(programming_language)">Scheme</a>, invented by <a href="http://en.wikipedia.org/wiki/Gerald_Jay_Sussman">Gerald Sussman</a> and <a href="http://en.wikipedia.org/wiki/Guy_L._Steele,_Jr.">Guy Steele</a> in 1975. Sussman and Steele’s use of closures in Scheme brought the idea to many programmers for the first time starting in the 1970s.
 
 But what does “closure” actually mean? In other words, exactly what are Ruby blocks? Are they as simple as they appear? Are they just the snippet of Ruby code that appears between the <span class="code">do</span> and <span class="code">end</span> keywords? Or is there more to Ruby blocks than meets the eye? In this chapter I’ll review how Ruby implements blocks internally, and show how they meet the definition of “closure” used by Sussman and Steele back in 1975. I’ll also show how blocks, lambdas, procs and bindings are all different ways of looking at closures, and how these objects are related to Ruby’s metaprogramming API.
 
@@ -128,16 +128,12 @@ Following this train of thought, we can see that blocks are Ruby’s implementat
 
 <div class="yellow">
 
-<p><b>
+<b>
 [ Note: In Ruby Under a Microscope I won't show or discuss any C code directly, except for optional sections that are called out with a different background color like this. ]
-</b></p>
-
-<br/>
+</b>
 
 In Ruby 1.9 and later you can find the actual definition of the <span class="code">rb_block_t</span> structure in the vm_core.h file. Here it is:
 
-<br/>
-<br/>
 <pre type="c">
 typedef struct rb_block_struct {
     VALUE self;			/* share with method frame if it's only block */
@@ -148,7 +144,6 @@ typedef struct rb_block_struct {
 } rb_block_t;
 </pre>
 
-<br/>
 You can see the <span class="code">iseq</span> and <span class="code">DFP</span> values I described above, along with a few other values:
 <ul>
 <li><span class="code">self</span>: As we’ll see in the next sections when I cover lambdas, procs and bindings, the value the <span class="code">self</span> pointer had when the block was first referred to is also an important part of the closure’s environment. Ruby executes block code inside the same object context the code outside the block had.</li>
@@ -158,8 +153,6 @@ You can see the <span class="code">iseq</span> and <span class="code">DFP</span>
 
 Right above the definition of <span class="code">rb_block_t</span> in vm_core.h you’ll see the <span class="code">rb_control_frame_t</span> structure defined:
 
-<br/>
-<br/>
 <pre type="c">
 typedef struct {
     VALUE *pc;			/* cfp[0] */
@@ -175,7 +168,6 @@ typedef struct {
     const rb_method_entry_t *me;/* cfp[10] */
 } rb_control_frame_t;
 </pre>
-<br/>
 
 Notice that this C structure also contains all of the same values the <span class="code">rb_block_t</span> structure did: everything from <span class="code">self</span> down to <span class="code">proc</span>. The fact these two structures share the same values is actually one of the interesting, but confusing, optimizations Ruby uses internally to speed things up a bit. Whenever you refer to a block for the first time by passing it into a method call, as I explained above Ruby creates a new <span class="code">rb_block_t</span> structure and copies values such as the LFP from the current <span class="code">rb_control_frame_t</span> structure into it. However, by making the members of these two structures similar &ndash; <span class="code">rb_block_t</span> is a subset of <span class="code">rb_control_frame_t</span> &ndash; Ruby is able to avoid creating a new <span class="code">rb_block_t</span> structure and instead sets the pointer to the new block to refer to the common portion of the <span class="code">rb_control_frame_t</span> structure. In other words, instead of allocating new memory to hold a new <span class="code">rb_block_t</span> structure, Ruby simple passes around a pointer to the middle of the <span class="code">rb_control_frame_t</span> structure. This is very confusing, but does avoid unnecessary calls to malloc, and speeds up the process of creating blocks.
 </div>

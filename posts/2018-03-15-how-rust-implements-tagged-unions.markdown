@@ -9,8 +9,6 @@ tag: Rust
 
 Rust [describes itself](https://www.rust-lang.org/en-US/) as:
 
-<br/>
-
 <blockquote>
 …a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety.
 </blockquote>

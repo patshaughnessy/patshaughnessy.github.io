@@ -49,32 +49,38 @@ let(:paintings) { [one, two, three] }
 Suppose my first requirement is to return the first painting from the list.
 Simple enough:
 
-<pre type="ruby" style="display: inline-block; width: 200px;">
+<div style="display: inline-block; width: 200px;">
+<pre type="ruby">
 def first(list)
   list.first
 end
 </pre>
-<pre type="ruby" style="display: inline-block;">
+</div>
+<div style="display: inline-block;">
+<pre type="ruby">
 it "should return the first element" do
   first(paintings).must_equal one
 end
 </pre>
+</div>
 
 I just call <span class="code">Array#first</span> and I’m done. Returning the
 rest of the list is slightly more interesting:
 
-<pre type="ruby" style="display: inline-block; width: 200px;">
+<div style="display: inline-block; width: 200px;">
+<pre type="ruby">
 def rest(list)
   _, *rest = list
   rest
 end
 </pre>
-<pre type="ruby" style="display: inline-block">
-it "returns the rest of the elements" do
+</div><div style="display: inline-block;">
+<pre type="ruby">it "returns the rest of the elements" do
   rest(paintings).must_equal [two, three]
 end
 
 </pre>
+</div>
 
 Using [a trick I learned from
 Avdi](http://devblog.avdi.org/2010/01/31/first-and-rest-in-ruby/), <span
@@ -90,24 +96,29 @@ Now suppose my business requirement changes slightly and I instead need to
 return the first painting sorted alphabetically by name. Once again, it’s not
 hard to do.
 
-<pre type="ruby" style="display: inline-block; width: 300px;">
+<div style="display: inline-block; width: 300px;">
+<pre type="ruby">
 def first(list)
   list.sort do |p1, p2|
     p1.name <=> p2.name
   end.first
 end
 </pre>
-<pre type="ruby" style="display: inline-block">
+</div>
+<div style="display: inline-block;">
+<pre type="ruby">
 it "should return the first element" do
   first(paintings).name.must_equal "Guernica"
 end
 
 
 </pre>
+</div>
 
 And I need <span class="code">rest</span> to use the same sort order, so I repeat the call to <span class="code">sort</span>:
 
-<pre type="ruby" style="display: inline-block; width: 300px;">
+<div style="display: inline-block; width: 300px;">
+<pre type="ruby">
 def rest(list)
   _, *rest = list.sort do |p1, p2|
     p1.name <=> p2.name
@@ -115,7 +126,9 @@ def rest(list)
   rest
 end
 </pre>
-<pre type="ruby" style="display: inline-block">
+</div>
+<div style="display: inline-block;">
+<pre type="ruby">
 it "returns the rest of the elements" do
   rest(paintings).map(&:name).must_equal [
     "Petite Fleurs",
@@ -123,6 +136,7 @@ it "returns the rest of the elements" do
   ]
 end
 </pre>
+</div>
 
 I’ve implemented new behavior, but still have two methods and two tests:
 
@@ -133,7 +147,8 @@ I’ve implemented new behavior, but still have two methods and two tests:
 Because both of my methods are covered by tests, I’m free to refactor them. I
 decide to extract a new method, <span class="code">sorted_by_name</span>:
 
-<pre type="ruby" style="display: inline-block; width: 300px;">
+<div style="display: inline-block; width: 300px;">
+<pre type="ruby">
 def first(list)
   sorted_by_name(list).first
 end
@@ -152,8 +167,10 @@ def sorted_by_name(list)
   end
 end
 </pre>
+</div>
 
-<pre type="ruby" style="display: inline-block; width: 400px;">
+<div style="display: inline-block; width: 400px;">
+<pre type="ruby">
 it "returns the element with the first name" do
   first(paintings).name.must_equal "Guernica"
 end
@@ -172,6 +189,7 @@ end
 
 
 </pre>
+</div>
 
 Here I’ve simply moved the call to sort into a utility method called
 <span class="code">sorted_by_name</span>. Now <span class="code">first</span>
@@ -191,7 +209,8 @@ refactored my code without adding any new behavior, no new test were required.
 
 In this scenario, take the time to mark the new, untested method as private:
 
-<pre type="ruby" style="display: inline-block; width: 300px;">
+<div style="display: inline-block; width: 300px;">
+<pre type="ruby">
 def first(list)
   sorted_by_name(list).first
 end
@@ -211,8 +230,10 @@ def sorted_by_name(list)
   end
 end
 </pre>
+</div>
 
-<pre type="ruby" style="display: inline-block; width: 400px;">
+<div style="display: inline-block; width: 400px;">
+<pre type="ruby">
 it "returns the element with the first name" do
   first(paintings).name.must_equal "Guernica"
 end
@@ -232,6 +253,7 @@ end
 
 
 </pre>
+</div>
 
 The <span class="code">private</span> keyword here reminds me I’ve already tested <span
 class="code">sorted_by_name</span>, that I don’t need to write new tests for

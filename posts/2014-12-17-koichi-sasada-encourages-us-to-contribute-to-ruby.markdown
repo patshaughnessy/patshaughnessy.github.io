@@ -28,8 +28,8 @@ Ruby programs to run faster today.
 
 He concludes with a message for all of us: We should follow in his footsteps
 and not be afraid to contribute to Ruby, to create “yet another Ruby
-implementation.” Thinking about his story, to do this maybe we need to seek out
-- or to create - the right learning environment, like the one Koichi found in
+implementation.” Thinking about his story, to do this maybe we need to seek out -
+or to create - the right learning environment, like the one Koichi found in
 Japan 10 years ago. Thanks for writing this, Koichi! I’m happy and proud that
 RUM now concludes with this message.
 

@@ -92,5 +92,5 @@ In Matsue, October 2014<br/>
 Yukihiro Matsumoto
 <br/>
 <hr align="left"/>
-<small>\*1 Twain, Mark, A Connecticut Yankee in King Arthur’s Court. (Kameyama Nagarjuna translation, Iwasaki Bookstore, 1971)<br/>
-\*2 Aoki Minero al., Ruby Hacking Guide. (Impress, 2002)</small>
+<small>*1 Twain, Mark, A Connecticut Yankee in King Arthur’s Court. (Kameyama Nagarjuna translation, Iwasaki Bookstore, 1971)<br/>
+*2 Aoki Minero al., Ruby Hacking Guide. (Impress, 2002)</small>

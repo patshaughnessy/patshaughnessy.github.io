@@ -137,8 +137,8 @@ the new <span class='code'>ActiveRecord::Relation</span>:
 ## The Internal Implementation of ActiveRecord::FinderMethods#first
 
 Now you can see ActiveRecord creates a third instance of <span
-class='code'>ActiveRecord::Relation</span>
-- this time with even more information about the query we’d like to execute.
+class='code'>ActiveRecord::Relation</span> - this time with even more information
+about the query we’d like to execute.
   But what are all those other values: <span class='code'>order</span>, <span
   class='code'>limit</span> and <span class='code'>offset</span>? Where do they
   come from? We can find out by taking a look at the implementation of <span

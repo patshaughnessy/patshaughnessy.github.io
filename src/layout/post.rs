@@ -34,7 +34,6 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
               div class="metadata" {
                 span class="date" { (date_string) }
                 (PreEscaped("&nbsp;&mdash;&nbsp;"))
-                @if !draft {
                     a href="#disqus_thread" data-disqus-identifier={ "http://patshaughnessy.net/" (post.url) } class="date" {
                         (PreEscaped("&nbsp; Comments and &nbsp; Reactions"))
                     }
@@ -43,7 +42,6 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
                         "Tweet"
                     }
                     script type="text/javascript" src="//platform.twitter.com/widgets.js" { }
-                }
               }
             }
             section class="content" { (PreEscaped(&post.content)) }
@@ -126,13 +124,13 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
               div class="header" {
                 "More on " (t)
               }
-            }
-            div class="links" {
-              ul {
-                @for (link_url, link_title) in recent_links {
-                  li {
-                    a href=(link_url) {
-                      (link_title)
+              div class="links" {
+                ul {
+                  @for (link_url, link_title) in recent_links {
+                    li {
+                      a href=(link_url) {
+                        (link_title)
+                      }
                     }
                   }
                 }

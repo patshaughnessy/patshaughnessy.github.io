@@ -83,8 +83,9 @@ puts Polygon.sides
 #=> 3
 </pre>
 
-Notice both class variables, <span class="code">Triangle.sides</span> and <span class="code">Polygon.sides</span>, were changed to
-3. In fact, internally Ruby creates a single variable that both classes share:
+Notice both class variables, <span class="code">Triangle.sides</span> and <span
+class="code">Polygon.sides</span>, were changed to 3. In fact, internally Ruby
+creates a single variable that both classes share:
 
 <img src="http://patshaughnessy.net/assets/2012/12/17/polygon-and-triangle.png"/>
 
@@ -120,9 +121,7 @@ the<br/>
 “Dynabook” would run Smalltalk. He and his team actually built
 a<br/>
 computer called the “Interim Dynabook” and used it to teach<br/>
-programming to middle school children.
-
-    </i></td></tr>
+programming to middle school children.</i></td></tr>
   </table>
 </div>
 
