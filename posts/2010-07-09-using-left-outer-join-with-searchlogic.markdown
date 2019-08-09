@@ -249,46 +249,48 @@ associated_key = matching_association(<span class="gv">$1</span>).primary_key_na
 <span class="r">end</span></pre></div>
 </div><br>
 <p>Finally, we can put it all together like this:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
-  has_one <span class="sy">:author</span>
 
-  <span class="r">class</span> &lt;&lt; <span class="cl">self</span>
-    <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+<pre type="ruby">
+class Book < ActiveRecord::Base
+  has_one :author
+
+  class << self
+    def method_missing(name, *args, &block)
       association_names =
         reflect_on_all_associations.collect { |assoc| assoc.name }
-      <span class="r">if</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^without_(</span></span><span class="il"><span class="idl">#{</span>association_names.join(<span class="s"><span class="dl">&quot;</span><span class="k">|</span><span class="dl">&quot;</span></span>)<span class="idl">}</span></span><span class="rx"><span class="k">)$</span><span class="dl">/</span></span>
-        associated_table = matching_association(<span class="gv">$1</span>).table_name
-        associated_key = matching_association(<span class="gv">$1</span>).primary_key_name
+      if name.to_s =~ /^without_(#{association_names.join("|")})$/
+        associated_table = matching_association($1).table_name
+        associated_key = matching_association($1).primary_key_name
         named_scope name,
           {
-            <span class="sy">:joins</span> =&gt; join_clause(associated_table, associated_key),
-            <span class="sy">:conditions</span> =&gt; where_clause(associated_table, associated_key)
+            :joins => join_clause(associated_table, associated_key),
+            :conditions => where_clause(associated_table, associated_key)
           }
         send(name)
-      <span class="r">else</span>
-        <span class="r">super</span>
-      <span class="r">end</span>
-    <span class="r">end</span>
+      else
+        super
+      end
+    end
 
-    <span class="r">def</span> <span class="fu">matching_association</span>(match)
-      <span class="iv">@matching_association</span> ||= reflect_on_all_associations.detect <span class="r">do</span> |assoc|
+    def matching_association(match)
+      @matching_association ||= reflect_on_all_associations.detect do |assoc|
         assoc.name.to_s == match
-      <span class="r">end</span>
-    <span class="r">end</span>
+      end
+    end
 
-    <span class="r">def</span> <span class="fu">join_clause</span>(associated_table, associated_key)
-      outer_join = <span class="s"><span class="dl">&quot;</span><span class="k">LEFT OUTER JOIN </span></span><span class="il"><span class="idl">#{</span>associated_table<span class="idl">}</span></span><span class="s"><span class="dl">&quot;</span></span>
-      outer_join += <span class="s"><span class="dl">&quot;</span><span class="k"> ON </span></span><span class="il"><span class="idl">#{</span>associated_table<span class="idl">}</span></span><span class="s"><span class="k">.</span></span><span class="il"><span class="idl">#{</span>associated_key<span class="idl">}</span></span><span class="s"><span class="dl">&quot;</span></span>
-      outer_join += <span class="s"><span class="dl">&quot;</span><span class="k"> = </span></span><span class="il"><span class="idl">#{</span>quoted_table_name<span class="idl">}</span></span><span class="s"><span class="k">.</span></span><span class="il"><span class="idl">#{</span>primary_key<span class="idl">}</span></span><span class="s"><span class="dl">&quot;</span></span>
-    <span class="r">end</span>
+    def join_clause(associated_table, associated_key)
+      outer_join = "LEFT OUTER JOIN #{associated_table}"
+      outer_join += " ON #{associated_table}.#{associated_key}"
+      outer_join += " = #{quoted_table_name}.#{primary_key}"
+    end
 
-    <span class="r">def</span> <span class="fu">where_clause</span>(associated_table, associated_key)
-      <span class="s"><span class="dl">&quot;</span></span><span class="il"><span class="idl">#{</span>associated_table<span class="idl">}</span></span><span class="s"><span class="k">.</span></span><span class="il"><span class="idl">#{</span>associated_key<span class="idl">}</span></span><span class="s"><span class="k"> IS NULL</span><span class="dl">&quot;</span></span>
-    <span class="r">end</span>
-  <span class="r">end</span>
-<span class="r">end</span></pre></div>
-</div><br>
+    def where_clause(associated_table, associated_key)
+      "#{associated_table}.#{associated_key} IS NULL"
+    end
+  end
+end
+</pre>
+
 <p>Note that I used &ldquo;send(name)&rdquo; to call the named scope we just created with named_scope. Let&rsquo;s make sure it still all works properly in the console:</p>
 <div class="CodeRay">
   <div class="code"><pre>&gt;&gt; Book.without_author.collect { |book| book.title }
@@ -299,41 +301,42 @@ associated_key = matching_association(<span class="gv">$1</span>).primary_key_na
 </div><br>
 <p>Phew &ndash; it does! Ideally I would have some RSpec examples setup to test this, instead of using the console.</p>
 <p>Just like in <a href="http://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic">my last article</a>, the last thing I&rsquo;ll do today is move these class methods out of the Book model and into a new module called SearchLogicExtensions, which in my application I saved into a file called config/initializers/search_logic_extensions.rb. This causes the method missing code to be loaded when my app starts up. At the bottom I extend ActiveRecord::Base with the new module, so the named scope can be used by every model in my application:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">module</span> <span class="cl">SearchLogicExtensions</span>
-  <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
+
+<pre type="ruby">
+module SearchLogicExtensions
+  def method_missing(name, *args, &block)
     association_names =
       reflect_on_all_associations.collect { |assoc| assoc.name }
-    <span class="r">if</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^without_(</span></span><span class="il"><span class="idl">#{</span>association_names.join(<span class="s"><span class="dl">&quot;</span><span class="k">|</span><span class="dl">&quot;</span></span>)<span class="idl">}</span></span><span class="rx"><span class="k">)$</span><span class="dl">/</span></span>
-      associated_table = matching_association(<span class="gv">$1</span>).table_name
-      associated_key = matching_association(<span class="gv">$1</span>).primary_key_name
+    if name.to_s =~ /^without_(#{association_names.join("|")})$/
+      associated_table = matching_association($1).table_name
+      associated_key = matching_association($1).primary_key_name
       named_scope name,
         {
-          <span class="sy">:joins</span> =&gt; join_clause(associated_table, associated_key),
-          <span class="sy">:conditions</span> =&gt; where_clause(associated_table, associated_key)
+          :joins => join_clause(associated_table, associated_key),
+          :conditions => where_clause(associated_table, associated_key)
         }
       send(name)
-    <span class="r">else</span>
-      <span class="r">super</span>
-    <span class="r">end</span>
-  <span class="r">end</span>
+    else
+      super
+    end
+  end
 
-  <span class="r">def</span> <span class="fu">matching_association</span>(match)
-    <span class="iv">@matching_association</span> ||= reflect_on_all_associations.detect <span class="r">do</span> |assoc|
+  def matching_association(match)
+    @matching_association ||= reflect_on_all_associations.detect do |assoc|
         assoc.name.to_s == match
-    <span class="r">end</span>
-  <span class="r">end</span>
+    end
+  end
 
-  <span class="r">def</span> <span class="fu">join_clause</span>(associated_table, associated_key)
-    outer_join = <span class="s"><span class="dl">&quot;</span><span class="k">LEFT OUTER JOIN </span></span><span class="il"><span class="idl">#{</span>associated_table<span class="idl">}</span></span><span class="s"><span class="dl">&quot;</span></span>
-    outer_join += <span class="s"><span class="dl">&quot;</span><span class="k"> ON </span></span><span class="il"><span class="idl">#{</span>associated_table<span class="idl">}</span></span><span class="s"><span class="k">.</span></span><span class="il"><span class="idl">#{</span>associated_key<span class="idl">}</span></span><span class="s"><span class="dl">&quot;</span></span>
-    outer_join += <span class="s"><span class="dl">&quot;</span><span class="k"> = </span></span><span class="il"><span class="idl">#{</span>quoted_table_name<span class="idl">}</span></span><span class="s"><span class="k">.</span></span><span class="il"><span class="idl">#{</span>primary_key<span class="idl">}</span></span><span class="s"><span class="dl">&quot;</span></span>
-  <span class="r">end</span>
+  def join_clause(associated_table, associated_key)
+    outer_join = "LEFT OUTER JOIN #{associated_table}"
+    outer_join += " ON #{associated_table}.#{associated_key}"
+    outer_join += " = #{quoted_table_name}.#{primary_key}"
+  end
 
-  <span class="r">def</span> <span class="fu">where_clause</span>(associated_table, associated_key)
-    <span class="s"><span class="dl">&quot;</span></span><span class="il"><span class="idl">#{</span>associated_table<span class="idl">}</span></span><span class="s"><span class="k">.</span></span><span class="il"><span class="idl">#{</span>associated_key<span class="idl">}</span></span><span class="s"><span class="k"> IS NULL</span><span class="dl">&quot;</span></span>
-  <span class="r">end</span>
-<span class="r">end</span>
+  def where_clause(associated_table, associated_key)
+    "#{associated_table}.#{associated_key} IS NULL"
+  end
+end
 
-<span class="co">ActiveRecord</span>::<span class="co">Base</span>.extend(<span class="co">SearchLogicExtensions</span>)</pre></div>
-</div>
+ActiveRecord::Base.extend(SearchLogicExtensions)
+</pre>

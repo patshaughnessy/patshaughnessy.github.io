@@ -26,69 +26,70 @@ Later you provide your credentials on the command line when you push your new sc
 
 To write a new scaffold for ScaffoldHub, you first need to write a Ruby code file called a “scaffold spec.” Here’s an example:
 
-<div class="CodeRay">
-  <div class="code"><pre><span class="co">Scaffoldhub</span>::<span class="co">Specification</span>.new <span class="r">do</span> 
- 
-  <span class="c"># Github URL where you will post your scaffold - the specified folder must contain this file</span> 
-  base_url  <span class="s"><span class="dl">'</span><span class="k">https://github.com/your_name/your_repo</span><span class="dl">'</span></span> 
- 
-  <span class="c"># The name of your new scaffold: should be a single word</span> 
-  name <span class="s"><span class="dl">'</span><span class="k">example</span><span class="dl">'</span></span> 
- 
-  <span class="c"># Metadata about this scaffold - these values are only used for display on scaffoldhub.org:</span> 
-  metadata <span class="r">do</span> 
- 
-    <span class="c"># A short paragraph describing what this scaffold does</span> 
-    description <span class="s"><span class="dl">'</span><span class="k">The example scaffold.</span><span class="dl">'</span></span> 
- 
-    <span class="c"># 4x3 aspect ratio screen shot</span> 
-    screenshot <span class="s"><span class="dl">'</span><span class="k">example_screenshot.png</span><span class="dl">'</span></span> 
- 
-    <span class="c"># Tag(s) to help scaffoldhub.org users find your scaffold</span> 
-    tag <span class="s"><span class="dl">'</span><span class="k">jquery</span><span class="dl">'</span></span> 
-    tag <span class="s"><span class="dl">'</span><span class="k">autocomplete</span><span class="dl">'</span></span> 
- 
-    <span class="c"># Optionally specify an example of a scaffold parameter</span> 
-    parameter_example <span class="s"><span class="dl">'</span><span class="k">FIELD_NAME</span><span class="dl">'</span></span> 
- 
-    <span class="c"># Optionally post a link to an article you write explaining how the scaffold works.</span> 
-    blog_post <span class="s"><span class="dl">'</span><span class="k">http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub</span><span class="dl">'</span></span> 
-  <span class="r">end</span> 
- 
-  <span class="c"># Define a model template - this ERB file will be used to generate a new</span> 
-  <span class="c"># model class with this path &amp; filename: app/models/NAME.rb</span> 
-  model <span class="s"><span class="dl">'</span><span class="k">templates/model.rb</span><span class="dl">'</span></span> 
- 
-  <span class="c"># Define an ActiveRecord migration template - this ERB file will be used to generate a new</span> 
-  <span class="c"># migration class with this path &amp; filename: db/migrate/TIMESTAMP_create_PLURAL_NAME.rb</span> 
-  migration <span class="s"><span class="dl">'</span><span class="k">templates/migration.rb</span><span class="dl">'</span></span> 
- 
-  <span class="c"># Define a controller template - this ERB file will be used to generate a new</span> 
-  <span class="c"># controller class with this path &amp; filename: app/controllers/PLURAL_NAME.rb</span> 
-  controller <span class="s"><span class="dl">'</span><span class="k">templates/controller.rb</span><span class="dl">'</span></span> 
- 
-  <span class="c"># You can use &quot;with_options&quot; to specify the same source folder for a series of templates.</span> 
-  <span class="c"># You can also specify the same destination folder using the :dest option,</span> 
-  <span class="c"># or just use the :src and :dest options separately on each keyword.</span> 
-  with_options <span class="sy">:src</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">templates</span><span class="dl">'</span></span> <span class="r">do</span> 
-    view <span class="s"><span class="dl">'</span><span class="k">_form.html.erb</span><span class="dl">'</span></span> 
-    view <span class="s"><span class="dl">'</span><span class="k">new.html.erb</span><span class="dl">'</span></span> 
-    view <span class="s"><span class="dl">'</span><span class="k">edit.html.erb</span><span class="dl">'</span></span> 
-    view <span class="s"><span class="dl">'</span><span class="k">index.html.erb</span><span class="dl">'</span></span> 
-    view <span class="s"><span class="dl">'</span><span class="k">show.html.erb</span><span class="dl">'</span></span> 
-  <span class="r">end</span> 
- 
-  <span class="c"># Other keywords available are:</span> 
- 
-  <span class="c"># Define any other generic template - this ERB file will be used to generate</span> 
-  <span class="c"># a new file - the dest option is required to indicate where to put the new file</span> 
-  <span class="c"># template 'xyz.html.erb', :dest =&gt; 'path/to/xyz.html'</span> 
- 
-  <span class="c"># Copy any file without running an ERB transformation</span> 
-  <span class="c"># file 'xyz.html', :dest =&gt; 'path/to/xyz.html'</span> 
- 
-<span class="r">end</span></pre></div>
-</div>
+<pre type="ruby">
+Scaffoldhub::Specification.new do
+
+  # Github URL where you will post your scaffold - the specified folder must contain this file
+  base_url  'https://github.com/your_name/your_repo'
+
+  # The name of your new scaffold: should be a single word
+  name 'example'
+
+  # Metadata about this scaffold - these values are only used for display on scaffoldhub.org:
+  metadata do
+
+    # A short paragraph describing what this scaffold does
+    description 'The example scaffold.'
+
+    # 4x3 aspect ratio screen shot
+    screenshot 'example_screenshot.png'
+
+    # Tag(s) to help scaffoldhub.org users find your scaffold
+    tag 'jquery'
+    tag 'autocomplete'
+
+    # Optionally specify an example of a scaffold parameter
+    parameter_example 'FIELD_NAME'
+
+    # Optionally post a link to an article you write explaining how the scaffold works.
+    blog_post 'http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub'
+  end
+
+  # Define a model template - this ERB file will be used to generate a new
+  # model class with this path & filename: app/models/NAME.rb
+  model 'templates/model.rb'
+
+  # Define an ActiveRecord migration template - this ERB file will be used to generate a new
+  # migration class with this path & filename: db/migrate/TIMESTAMP_create_PLURAL_NAME.rb
+  migration 'templates/migration.rb'
+
+  # Define a controller template - this ERB file will be used to generate a new
+  # controller class with this path & filename: app/controllers/PLURAL_NAME.rb
+  controller 'templates/controller.rb'
+
+  # You can use "with_options" to specify the same source folder for a series of templates.
+  # You can also specify the same destination folder using the :dest option,
+  # or just use the :src and :dest options separately on each keyword.
+  with_options :src => 'templates' do
+    view '_form.html.erb'
+    view 'new.html.erb'
+    view 'edit.html.erb'
+    view 'index.html.erb'
+    view 'show.html.erb'
+  end
+
+  # Other keywords available are:
+
+  # Define any other generic template - this ERB file will be used to generate
+  # a new file - the dest option is required to indicate where to put the new file
+  # template 'xyz.html.erb', :dest => 'path/to/xyz.html'
+
+  # Copy any file without running an ERB transformation
+  # file 'xyz.html', :dest => 'path/to/xyz.html'
+
+end
+</pre>
+
 As you can see, this file describes in a simple way what files your scaffold will generate on the end user's machine. It refers to a series of ERB templates that you would write also. In the “metadata” section, the scaffold spec provides some additional info that is only used for display purposes on scaffoldhub.org.
 
 The scaffoldhub gem provides a generator called “new_scaffold” to help save you some typing; run it inside of any Rails 3 app to generate the scaffold spec above along with a copy of the standard Rails scaffold generator ERB templates that are mentioned in the example spec:

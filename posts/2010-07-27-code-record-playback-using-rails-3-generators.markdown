@@ -83,8 +83,8 @@ Installing ri documentation for generate_from_diff-0.0.1...
 Installing RDoc documentation for generate_from_diff-0.0.1...</pre></div>
 </div><br>
 <p>Next, let&rsquo;s commit my new controller and routes.rb code changes:</p>
-<div class="CodeRay">
-  <div class="code"><pre>$ git add .
+
+<pre>$ git add .
 
 $ git status
 # On branch master
@@ -104,8 +104,7 @@ Created commit 037ca3b: Build info
  create mode 100644 app/controllers/build_info_controller.rb
  create mode 100644 app/helpers/build_info_helper.rb
  create mode 100644 test/functional/build_info_controller_test.rb
- create mode 100644 test/unit/helpers/build_info_helper_test.rb</pre></div>
-</div><br>
+ create mode 100644 test/unit/helpers/build_info_helper_test.rb</pre>
 <p>One last detail: we need to edit the Gemfile to load generate_from_diff into this application:</p>
 <div class="CodeRay">
   <div class="code"><pre>source <span class="s"><span class="dl">'</span><span class="k">http://rubygems.org</span><span class="dl">'</span></span>

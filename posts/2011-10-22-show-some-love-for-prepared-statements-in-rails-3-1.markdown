@@ -34,7 +34,7 @@ Loading development environment (Rails 3.0.10)
 ruby-1.8.7-p352 :001 > ActiveRecord::Base.logger = Logger.new(STDOUT)
 ruby-1.8.7-p352 :002 > Person.find 1
   Person Load (0.1ms)  SELECT "people".* FROM "people" WHERE "people"."id" = 1 LIMIT 1
- => #<Person id: 1, name: "one", age: 23, created_at...
+ => #&lt;Person id: 1, name: "one", age: 23, created_at...
 </pre>
 
 No surprise here: ActiveRecord has constructed a simple SELECT statement that finds a record in the “people” table with the primary key “id” set to 1.
@@ -46,7 +46,7 @@ $ rails c
 Loading development environment (Rails 3.1.1)
 ruby-1.8.7-p352 :001 > Person.find 1
   Person Load (5.6ms)  SELECT "people".* FROM "people" WHERE "people"."id" = ? LIMIT 1  [["id", 1]]
- => #<Person id: 1, name: "one", age: 23, created_at...
+ => #&lt;Person id: 1, name: "one", age: 23, created_at...
 </pre>
 
 Do you see the subtle difference? ActiveRecord 3.0 generated a select statement that contained a where clause: <span class="code">WHERE people.id = 1</span>, but ActiveRecord 3.1 generated a slightly different where clause: <span class="code">WHERE people.id = ?</span> followed by: <span class="code">[["id", 1]]</span>. Why is there a difference? What does the <span class="code">[["id", 1]]</span> notation mean? Why does any of this matter at all?
@@ -113,7 +113,7 @@ $ rails c
 Loading development environment (Rails 3.1.1)
 ruby-1.8.7-p352 :001 > Person.find 3
   Person Load (3.4ms)  SELECT "people".* FROM "people" WHERE "people"."id" = ? LIMIT 1  [["id", 3]]
- => #<Person id: 3, name: "three", age: 43, created_at...
+ => #&lt;Person id: 3, name: "three", age: 43, created_at...
 </pre>
 
 The first time we execute a query for a person, the StatementPool class will have an empty cache, and the SQLiteAdapter class will have to send the SQL statement to the database to be compiled and processed - to be “prepared.” But during this call SQLiteAdapter saves the new prepared statement into the StatementPool cache.
@@ -125,7 +125,7 @@ ruby-1.8.7-p352 :002 > Person.find 1
 SEND SOME LOVE TO THE RAILS CORE TEAM FOR SPEEDING UP YOUR APP!
 Using cached prepared statement for SELECT  "people".* FROM "people"  WHERE "people"."id" = ? LIMIT 1
   Person Load (0.4ms)  SELECT "people".* FROM "people" WHERE "people"."id" = ? LIMIT 1  [["id", 1]]
- => #<Person id: 1, name: "one", age: 23, created_at...
+ => #&lt;Person id: 1, name: "one", age: 23, created_at...
 </pre>
 
 ... you can see that we now reuse the cached prepared statement from StatementPool and save some database execution time. Notice this was true even though I was loading a different person record, not id=3, but id=1. If you add this code to one of your Rails 3.1 apps and take a look at the log file, you’ll find out how much love you need to send to the Rails core team!

@@ -263,13 +263,13 @@ And finally my view will consist of a single text field; editing app/views/peopl
 Please enter the name of a person:
 <%= text_field_tag 'person_name' %>
 
-<script>
+&lt;script>
 $(function() {
   $("#person_name" ).autocomplete({
-    source: "<%= people_autocomplete_person_name_path %>"
+    source: "&lt;%= people_autocomplete_person_name_path %>"
   });
 })
-</script>
+&lt;/script>
 </pre>
 
 Here I call the jQuery UI autocomplete widget on page load, and set it up against my single text field. I’ve set the source attribute to be the path of the “autocomplete_person_name” action, which I included in the people controller generate command above. Using unobtrusive Javascript would be much better, but for today this keeps things simple. If I have time, I’ll try to add Soulmate support to an existing Rails autocomplete gem, such as rails3-jquery-autocomplete.

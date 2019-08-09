@@ -122,6 +122,7 @@ Error: uninitialized constant Rails::Generator.
    </div><br>
 <p>Things are looking worse and worse! It turns out that the generators architecture for Rails 3 has been completely rewritten, and that generators written for Rails 2.x will simply not work at all in Rails 3. What to do now? Of course, I could simply hand code the migration for adding the avatar columns to the users table, and continue to work on my sample application. Instead, I decided to give up on the plugin entirely and to try using Paperclip as a gem.</p>
 <p><a name="fact4"></a><b>Fact 4: You use Bundler and a &ldquo;Gemfile&rdquo; to declare gems</b></p>
+
 Let&rsquo;s take a look at how gems are installed for a Rails 3 app. Rails 3 uses a new file called the &ldquo;Gemfile,&rdquo; which specifies which gems should be included in your application. This file is read and used by Bundler, which manages gems and their dependencies. We can specify that our application uses the Paperclip gem by adding a single line to the Gemfile like this:</p>
 <p/>
 <div class="CodeRay">
@@ -221,28 +222,29 @@ Using paperclip (2.3.2.beta1)
 <p><img src="http://patshaughnessy.net/assets/2010/5/22/paperclip_error.png"></p>
 <p>&hellip; more trouble! I&rsquo;m definitely having a bad day&hellip; what now? Well it seems that Paperclip is just not being loaded at all, or is being initialized improperly for some reason. At this point I started to poke around the Paperclip source code a bit, and found that the code that includes the Paperclip module into ActiveRecord::Base was moved and is no longer being called. Since Paperclip is not included in my User/ActiveRecord class I get the error has_attached_file not defined, since that&rsquo;s defined by Paperclip.</p>
 <p>I found the include code in a file called &ldquo;lib/paperclip/railtie.rb:&rdquo;</p>
-<div class="CodeRay">
-  <div class="code"><pre>require <span class="s"><span class="dl">'</span><span class="k">paperclip</span><span class="dl">'</span></span>
 
-<span class="r">module</span> <span class="cl">Paperclip</span>
-  <span class="r">if</span> <span class="r">defined?</span> <span class="co">Rails</span>::<span class="co">Railtie</span>
-    require <span class="s"><span class="dl">'</span><span class="k">rails</span><span class="dl">'</span></span>
-    <span class="r">class</span> <span class="cl">Railtie</span> &lt; <span class="co">Rails</span>::<span class="co">Railtie</span>
-      config.after_initialize <span class="r">do</span>
-        <span class="co">Paperclip</span>::<span class="co">Railtie</span>.insert
-      <span class="r">end</span>
-    <span class="r">end</span>
-  <span class="r">end</span>
+<pre type="ruby">
+require 'paperclip'
 
-  <span class="r">class</span> <span class="cl">Railtie</span>
-    <span class="r">def</span> <span class="pc">self</span>.insert
-<span class='container'>      <span class="co">ActiveRecord</span>::<span class="co">Base</span>.send(<span class="sy">:include</span>, <span class="co">Paperclip</span>)<span class='overlay'></span></span>
-<span class='container'>      <span class="co">File</span>.send(<span class="sy">:include</span>, <span class="co">Paperclip</span>::<span class="co">Upfile</span>)<span class='overlay'></span></span>
-    <span class="r">end</span>
-  <span class="r">end</span>
-<span class="r">end</span>
-</pre></div>
-</div><br>
+module Paperclip
+  if defined? Rails::Railtie
+    require 'rails'
+    class Railtie < Rails::Railtie
+      config.after_initialize do
+        Paperclip::Railtie.insert
+      end
+    end
+  end
+
+  class Railtie
+    def self.insert
+      ActiveRecord::Base.send(:include, Paperclip)
+      File.send(:include, Paperclip::Upfile)
+    end
+  end
+end
+</pre>
+
 <p>I&rsquo;m not quite sure what Thoughtbot&rsquo;s plans are for Paperclip, but if you take some time to read through Yehuda Katz&rsquo;s write up <a href="http://www.engineyard.com/blog/2010/rails-and-merb-merge-rails-core-part-4-of-6/">Rails and Merb Merge: Rails Core (Part 4 of 6)</a>, you&rsquo;ll learn about how Rails frameworks like ActiveRecord and ActiveController have been recast as instances of this &ldquo;Rails::Railtie&rdquo; class. Possibly Paperclip will become one of these. Rails 3 has a new API for declaring how Railties are loaded and initialized, but it looks like this version of Paperclip and this version of Rails aren&rsquo;t quite working correctly now.</p>
 <p><a name="fact7"></a><b>Fact 7: Bundler does not call rails/init.rb in each gem</b></p>
 <p>For now, the problem I&rsquo;m having in my sample application is that the Paperclip::Railtie.insert method is not being called &ndash; the two lines I highlighted above need to be executed in order to enable &ldquo;has_attached_file&rdquo; to be present as a class method for ActiveRecord models. To make things more interesting, Thoughtbot did include a call to insert inside rails/init.rb, like this:</p>
@@ -252,17 +254,19 @@ Using paperclip (2.3.2.beta1)
 </div><br>
 <p>&hellip; but for Rails 3, it turns out that <a href="https://rails.lighthouseapp.com/projects/8994/tickets/3745-railsinitrb-is-not-being-called-anymore">Bundler no longer calls rails/init.rb</a>.</p>
 <p>Moving this line instead to config/application.rb will solve the problem:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">module</span> <span class="cl">PaperclipSampleApp</span>
-  <span class="r">class</span> <span class="cl">Application</span> &lt; <span class="co">Rails</span>::<span class="co">Application</span>
 
-<span class='container'>    <span class="co">Paperclip</span>::<span class="co">Railtie</span>.insert<span class='overlay'></span></span>
+<pre type="ruby">
+module PaperclipSampleApp
+  class Application < Rails::Application
+
+    Paperclip::Railtie.insert
 
     etc…
-    
-  <span class="r">end</span>
-<span class="r">end</span></pre></div>
-</div><br>
+
+  end
+end
+</pre>
+
 <p>Alternatively, you could just create a file called &ldquo;config/initializers/paperclip.rb&rdquo; and put the call to insert there.</p>
 <p>Now reloading the users index page we finally get Paperclip to work:</p>
 <p><img src="http://patshaughnessy.net/assets/2010/5/22/index_view.png"></p>

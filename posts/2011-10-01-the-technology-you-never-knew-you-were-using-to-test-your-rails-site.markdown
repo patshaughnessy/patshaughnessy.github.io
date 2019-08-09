@@ -156,15 +156,15 @@ Feature: View the home page
   Scenario: Viewing the home page                  # features/view_web_page.feature:6
     {^s:Given I am on the home page^}                    # features/step_definitions/web_steps.rb:44
 DEBUG: the HTML passed from Capybara and Nokogiri to Libxml2 is:
-<!DOCTYPE html>
-<html>
-<head>
-  <title>SimpleWebApp</title>
-  <link href="/assets/application.css" media="screen" rel="stylesheet" type="text/css" />
-  <script src="/assets/application.js" type="text/javascript"></script>
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;head>
+  &lt;title>SimpleWebApp&lt;/title>
+  &lt;link href="/assets/application.css" media="screen" rel="stylesheet" type="text/css" />
+  &lt;script src="/assets/application.js" type="text/javascript">&lt;/script>
   
-</head>
-<body>
+&lt;/head>
+&lt;body>
 
 This is a simple web page.
 

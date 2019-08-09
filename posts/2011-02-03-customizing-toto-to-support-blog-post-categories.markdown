@@ -19,15 +19,15 @@ Toto comes with a fast, effective test suite written using [Riot](https://github
 
 I’ll start today by writing a few new Riot tests specifying exactly what behavior I mean by “blog post categories.”  I added this code to test/toto_test.rb in my local Toto gem folder:
 
-<div class="CodeRay"> 
-  <div class="code"><pre>context <span class="s"><span class="dl">&quot;</span><span class="k">GET a tag page</span><span class="dl">&quot;</span></span> <span class="r">do</span> 
-  setup { <span class="iv">@toto</span>.get(<span class="s"><span class="dl">'</span><span class="k">/tags/the-wizard-of-oz</span><span class="dl">'</span></span>) }
-  asserts(<span class="s"><span class="dl">&quot;</span><span class="k">returns a 200</span><span class="dl">&quot;</span></span>)                         { topic.status }.equals <span class="i">200</span> 
-  asserts(<span class="s"><span class="dl">&quot;</span><span class="k">body is not empty</span><span class="dl">&quot;</span></span>)                     { <span class="r">not</span> topic.body.empty? }
-  should(<span class="s"><span class="dl">&quot;</span><span class="k">includes only the entries for that tag</span><span class="dl">&quot;</span></span>) { topic.body }.includes_elements(<span class="s"><span class="dl">&quot;</span><span class="k">li.entry</span><span class="dl">&quot;</span></span>, <span class="i">2</span>)
-  should(<span class="s"><span class="dl">&quot;</span><span class="k">has access to @tag</span><span class="dl">&quot;</span></span>)                     { topic.body }.includes_html(<span class="s"><span class="dl">&quot;</span><span class="k">#tag</span><span class="dl">&quot;</span></span> =&gt; <span class="rx"><span class="dl">/</span><span class="k">The Wizard of Oz</span><span class="dl">/</span></span>)
-<span class="r">end</span></pre></div> 
-</div> 
+<pre type="ruby">
+context "GET a tag page" do
+  setup { @toto.get('/tags/the-wizard-of-oz') }
+  asserts("returns a 200")                         { topic.status }.equals 200
+  asserts("body is not empty")                     { not topic.body.empty? }
+  should("includes only the entries for that tag") { topic.body }.includes_elements("li.entry", 2)
+  should("has access to @tag")                     { topic.body }.includes_html("#tag" => /The Wizard of Oz/)
+end
+</pre>
 
 The syntax might be a bit unfamiliar if you’re used to RSpec, but you can probably figure out that the behavior I’m looking for is:
 
@@ -37,19 +37,16 @@ The syntax might be a bit unfamiliar if you’re used to RSpec, but you can prob
 
 I’d like to be able to categorize my posts by adding a new “tag” attribute to the YAML header of each article. So I’ll also have to update a couple of the test articles inside the Toto test suite to make these tests work properly... First I’ll edit test/articles/1990-05-17-the-wonderful-wizard-of-oz.txt and add a tag value like this:
 
-<div class="CodeRay"> 
-  <div class="code"><pre>title: The Wonderful Wizard of Oz
+<pre>title: The Wonderful Wizard of Oz
 date: 17/05/1990
-<div class='container'>tag: The Wizard of Oz<div class='overlay'></div></div>
-_Once upon a time_...</pre></div> 
-</div> 
+tag: The Wizard of Oz
+_Once upon a time_...</pre>
 
 Next, I’ll add the same “tag: The Wizard of Oz” to some other test article, for example test/articles/2001-01-01-two-thousand-and-one.txt.
 
 Now running the tests of course I get failures:
 
-<div class="CodeRay"> 
-  <div class="code"><pre>$ rake
+<pre>$ rake
 (in /Users/pat/rails-apps/toto)
 
 ...etc... 
@@ -62,8 +59,7 @@ Toto GET a tag page
 
 ...etc...
 
-62 passes, 3 failures, 0 errors in 0.148593 seconds</pre></div> 
-</div> 
+62 passes, 3 failures, 0 errors in 0.148593 seconds</pre>
 
 Here Toto is returning a 404 page not found error since I haven’t implemented anything related to the new category page yet.
 
@@ -71,12 +67,10 @@ Here Toto is returning a 404 page not found error since I haven’t implemented 
 
 Another nice thing about Toto is that the article page template and other templates are implemented with ERB by default, which is very familiar and easy to use. I’ll continue now by writing a new ERB file called “tag.rhtml” in tests/templates to render my new category page:
 
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="ta">&lt;h1</span> <span class="an">id</span>=<span class="s"><span class="dl">&quot;</span><span class="k">tag</span><span class="dl">&quot;</span></span><span class="ta">&gt;</span>Articles about <span class="il"><span class="idl">&lt;%=</span> tag <span class="idl">%&gt;</span></span><span class="ta">&lt;/h1&gt;</span> 
+<pre><span class="ta">&lt;h1</span> <span class="an">id</span>=<span class="s"><span class="dl">&quot;</span><span class="k">tag</span><span class="dl">&quot;</span></span><span class="ta">&gt;</span>Articles about <span class="il"><span class="idl">&lt;%=</span> tag <span class="idl">%&gt;</span></span><span class="ta">&lt;/h1&gt;</span> 
 <span class="il"><span class="idl">&lt;%</span> <span class="r">for</span> entry <span class="r">in</span> archives <span class="idl">%&gt;</span></span> 
   <span class="ta">&lt;li</span> <span class="an">class</span>=<span class="s"><span class="dl">&quot;</span><span class="k">entry</span><span class="dl">&quot;</span></span><span class="ta">&gt;</span><span class="il"><span class="idl">&lt;%=</span> entry.title <span class="idl">%&gt;</span></span><span class="ta">&lt;/li&gt;</span> 
-<span class="il"><span class="idl">&lt;%</span> <span class="r">end</span> <span class="idl">%&gt;</span></span></pre></div> 
-</div> 
+<span class="il"><span class="idl">&lt;%</span> <span class="r">end</span> <span class="idl">%&gt;</span></span></pre>
 
 Note I’ve used two HTML details here that correspond to the way I wrote the Riot tests above:
 
@@ -85,37 +79,34 @@ Note I’ve used two HTML details here that correspond to the way I wrote the Ri
 
 Of course, the tag.rhtml code I use on my actual blog site which you’re reading now is a bit more verbose:
 
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="ta">&lt;h1&gt;</span>Articles on <span class="il"><span class="idl">&lt;%=</span> tag <span class="idl">%&gt;</span></span><span class="ta">&lt;/h1&gt;</span> 
- 
-<span class="ta">&lt;table</span> <span class="an">id</span>=<span class="s"><span class="dl">&quot;</span><span class="k">archive-table</span><span class="dl">&quot;</span></span><span class="ta">&gt;</span> 
-  <span class="il"><span class="idl">&lt;%</span> <span class="r">if</span> archives.length &gt; <span class="i">0</span> <span class="idl">%&gt;</span></span> 
-    <span class="il"><span class="idl">&lt;%</span> last_month = <span class="pc">nil</span> <span class="idl">%&gt;</span></span> 
-    <span class="il"><span class="idl">&lt;%</span> <span class="r">for</span> entry <span class="r">in</span> archives <span class="idl">%&gt;</span></span> 
-      <span class="ta">&lt;tr&gt;</span> 
-        <span class="ta">&lt;td</span> <span class="an">align</span>=<span class="s"><span class="dl">&quot;</span><span class="k">right</span><span class="dl">&quot;</span></span><span class="ta">&gt;</span> 
-          <span class="il"><span class="idl">&lt;%</span> month = entry.date.split.first <span class="idl">%&gt;</span></span> 
-          <span class="il"><span class="idl">&lt;%</span> <span class="r">if</span> last_month.nil? || month != last_month <span class="idl">%&gt;</span></span> 
-            <span class="il"><span class="idl">&lt;%=</span> month <span class="idl">%&gt;</span></span> 
-            <span class="il"><span class="idl">&lt;%=</span> entry.date.split.last <span class="idl">%&gt;</span></span> 
-          <span class="il"><span class="idl">&lt;%</span> <span class="r">end</span> <span class="idl">%&gt;</span></span> 
-          <span class="il"><span class="idl">&lt;%</span> last_month = month <span class="idl">%&gt;</span></span> 
-        <span class="ta">&lt;/td&gt;</span> 
-        <span class="ta">&lt;td&gt;</span> 
-          <span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">&quot;</span><span class="il"><span class="idl">&lt;%=</span> entry.path <span class="idl">%&gt;</span></span><span class="dl">&quot;</span></span><span class="ta">&gt;</span><span class="il"><span class="idl">&lt;%=</span> entry.title <span class="idl">%&gt;</span></span><span class="ta">&lt;/a&gt;</span> 
-        <span class="ta">&lt;/td&gt;</span> 
-      <span class="ta">&lt;/tr&gt;</span> 
-    <span class="il"><span class="idl">&lt;%</span> <span class="r">end</span> <span class="idl">%&gt;</span></span> 
-  <span class="il"><span class="idl">&lt;%</span> <span class="r">end</span> <span class="idl">%&gt;</span></span> 
-<span class="ta">&lt;/table&gt;</span></pre></div> 
-</div> 
+<pre>
+&lt;table id="archive-table"> 
+  &lt;% if archives.length > 0 %> 
+    &lt;% last_month = nil %> 
+    &lt;% for entry in archives %> 
+      &lt;tr> 
+        &lt;td align="right"> 
+          &lt;% month = entry.date.split.first %> 
+          &lt;% if last_month.nil? || month != last_month %> 
+            &lt;%= month %> 
+            &lt;%= entry.date.split.last %> 
+          &lt;% end %> 
+          &lt;% last_month = month %> 
+        &lt;/td> 
+        &lt;td> 
+          &lt;a href="&lt;%= entry.path %>">&lt;%= entry.title %>&lt;/a> 
+        &lt;/td> 
+      &lt;/tr> 
+    &lt;% end %> 
+  &lt;% end %> 
+&lt;/table> 
+</pre> 
 
 There’s just a bit of logic around displaying the month and year text, and also a couple of CSS cues for my blog’s stylesheet. But to get the tests to pass you just need the barebones tag.rhtml file I showed above.
 
 Let’s try the tests again:
 
-<div class="CodeRay"> 
-  <div class="code"><pre>$ rake
+<pre>$ rake
 (in /Users/pat/rails-apps/toto)
 
 ...etc... 
@@ -128,8 +119,7 @@ Toto GET a tag page
 
 ...etc...
 
-62 passes, 3 failures, 0 errors in 0.148593 seconds</pre></div> 
-</div> 
+62 passes, 3 failures, 0 errors in 0.148593 seconds</pre>
 
 It’s still failing because I haven’t changed Toto’s routing method to find the new ERB file yet... let’s do that next.
 
@@ -137,41 +127,41 @@ It’s still failing because I haven’t changed Toto’s routing method to find
 
 Toto implements routing using the Toto::Site.go method. Here’s what that looks like:
 
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="r">def</span> <span class="fu">go</span> route, env = {}, type = <span class="sy">:html</span> 
-  route &lt;&lt; <span class="pc">self</span>./ <span class="r">if</span> route.empty?
-  type, path = type =~ <span class="rx"><span class="dl">/</span><span class="k">html|xml|json</span><span class="dl">/</span></span> ? type.to_sym : <span class="sy">:html</span>, route.join(<span class="s"><span class="dl">'</span><span class="k">/</span><span class="dl">'</span></span>)
-  context = lambda <span class="r">do</span> |data, page|
-    <span class="co">Context</span>.new(data, <span class="iv">@config</span>, path, env).render(page, type)
-  <span class="r">end</span> 
- 
-  body, status = <span class="r">if</span> <span class="co">Context</span>.new.respond_to?(<span class="sy"><span class="sy">:</span><span class="dl">&quot;</span><span class="k">to_</span><span class="il"><span class="idl">#{</span>type<span class="idl">}</span></span><span class="dl">&quot;</span></span>)
-    <span class="r">if</span> route.first =~ <span class="rx"><span class="dl">/</span><span class="ch">\d</span><span class="k">{4}</span><span class="dl">/</span></span> 
-      <span class="r">case</span> route.size
-        <span class="r">when</span> <span class="i">1</span>..<span class="i">3</span> 
-          context[archives(route * <span class="s"><span class="dl">'</span><span class="k">-</span><span class="dl">'</span></span>), <span class="sy">:archives</span>]
-        <span class="r">when</span> <span class="i">4</span> 
-          context[article(route), <span class="sy">:article</span>]
-        <span class="r">else</span> http <span class="i">400</span> 
-      <span class="r">end</span> 
-    <span class="r">elsif</span> respond_to?(path)
+<pre type="ruby">
+def go route, env = {}, type = :html
+  route << self./ if route.empty?
+  type, path = type =~ /html|xml|json/ ? type.to_sym : :html, route.join('/')
+  context = lambda do |data, page|
+    Context.new(data, @config, path, env).render(page, type)
+  end
+
+  body, status = if Context.new.respond_to?(:"to_#{type}")
+    if route.first =~ /\d{4}/
+      case route.size
+        when 1..3
+          context[archives(route * '-'), :archives]
+        when 4
+          context[article(route), :article]
+        else http 400
+      end
+    elsif respond_to?(path)
       context[send(path, type), path.to_sym]
-    <span class="r">elsif</span> (repo = <span class="iv">@config</span>[<span class="sy">:github</span>][<span class="sy">:repos</span>].grep(<span class="rx"><span class="dl">/</span><span class="il"><span class="idl">#{</span>path<span class="idl">}</span></span><span class="dl">/</span></span>).first) &amp;&amp;
-          !<span class="iv">@config</span>[<span class="sy">:github</span>][<span class="sy">:user</span>].empty?
-      context[<span class="co">Repo</span>.new(repo, <span class="iv">@config</span>), <span class="sy">:repo</span>]
-    <span class="r">else</span> 
+    elsif (repo = @config[:github][:repos].grep(/#{path}/).first) &&
+          !@config[:github][:user].empty?
+      context[Repo.new(repo, @config), :repo]
+    else
       context[{}, path.to_sym]
-    <span class="r">end</span> 
-  <span class="r">else</span> 
-    http <span class="i">400</span> 
-  <span class="r">end</span> 
- 
-<span class="r">rescue</span> <span class="co">Errno</span>::<span class="co">ENOENT</span> =&gt; e
-  <span class="r">return</span> <span class="sy">:body</span> =&gt; http(<span class="i">404</span>).first, <span class="sy">:type</span> =&gt; <span class="sy">:html</span>, <span class="sy">:status</span> =&gt; <span class="i">404</span> 
-<span class="r">else</span> 
-  <span class="r">return</span> <span class="sy">:body</span> =&gt; body || <span class="s"><span class="dl">&quot;</span><span class="dl">&quot;</span></span>, <span class="sy">:type</span> =&gt; type, <span class="sy">:status</span> =&gt; status || <span class="i">200</span> 
-<span class="r">end</span></pre></div> 
-</div> 
+    end
+  else
+    http 400
+  end
+
+rescue Errno::ENOENT => e
+  return :body => http(404).first, :type => :html, :status => 404
+else
+  return :body => body || "", :type => type, :status => status || 200
+end
+</pre>
 
 Let’s take a few minutes to understand this method... this bit of code is really interesting. It plays the same role that routes.rb does in a Rails application. When Toto gets an HTTP request, it converts the path string into an array of strings and passes that into the “go” method as the first parameter: “route.” For example, if a user requests http://patshaughnessy.net/2011/1/23/4-tips-for-how-to-customize-a-toto-blog-site, then route will be set to:
 
@@ -222,50 +212,51 @@ So to get Toto to use my new tag.rhtml template, I need to return this from the 
   <div class="code"><pre>context[{ <span class="sy">:tag</span> =&gt; <span class="s">'The Wizard of Oz'</span>, <span class="sy">:archives</span> =&gt; [ ...array of tagged articles... ] }, <span class="sy">:tag</span>]</pre></div> 
 </div> 
 
-Here’s how to do it - I’ll repeat the entire “go” method again with my changes highlighted:
+Here’s how to do it - I’ll repeat the entire “go” method again:
 
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="r">def</span> <span class="fu">go</span> route, env = {}, type = <span class="sy">:html</span> 
-  route &lt;&lt; <span class="pc">self</span>./ <span class="r">if</span> route.empty?
-  type, path = type =~ <span class="rx"><span class="dl">/</span><span class="k">html|xml|json</span><span class="dl">/</span></span> ? type.to_sym : <span class="sy">:html</span>, route.join(<span class="s"><span class="dl">'</span><span class="k">/</span><span class="dl">'</span></span>)
-  context = lambda <span class="r">do</span> |data, page|
-    <span class="co">Context</span>.new(data, <span class="iv">@config</span>, path, env).render(page, type)
-  <span class="r">end</span> 
- 
-  body, status = <span class="r">if</span> <span class="co">Context</span>.new.respond_to?(<span class="sy"><span class="sy">:</span><span class="dl">&quot;</span><span class="k">to_</span><span class="il"><span class="idl">#{</span>type<span class="idl">}</span></span><span class="dl">&quot;</span></span>)
-    <span class="r">if</span> route.first =~ <span class="rx"><span class="dl">/</span><span class="ch">\d</span><span class="k">{4}</span><span class="dl">/</span></span> 
-      <span class="r">case</span> route.size
-        <span class="r">when</span> <span class="i">1</span>..<span class="i">3</span> 
-          context[archives(route * <span class="s"><span class="dl">'</span><span class="k">-</span><span class="dl">'</span></span>), <span class="sy">:archives</span>]
-        <span class="r">when</span> <span class="i">4</span> 
-          context[article(route), <span class="sy">:article</span>]
-        <span class="r">else</span> http <span class="i">400</span> 
-      <span class="r">end</span> 
+<pre type="ruby">
+def go route, env = {}, type = :html
+  route << self./ if route.empty?
+  type, path = type =~ /html|xml|json/ ? type.to_sym : :html, route.join('/')
+  context = lambda do |data, page|
+    Context.new(data, @config, path, env).render(page, type)
+  end
 
-<div class='container'>    <span class="r">elsif</span> route.first == <span class="s"><span class="dl">'</span><span class="k">tags</span><span class="dl">'</span></span> &amp;&amp; route.size == <span class="i">2</span> 
-      <span class="r">if</span> (data = archives(<span class="s"><span class="dl">'</span><span class="dl">'</span></span>, route[<span class="i">1</span>])).nil?
-        http <span class="i">404</span> 
-      <span class="r">else</span> 
-        context[data, <span class="sy">:tag</span>]
-      <span class="r">end</span><span class='overlay'></span></div> 
-    <span class="r">elsif</span> respond_to?(path)
+  body, status = if Context.new.respond_to?(:"to_#{type}")
+    if route.first =~ /\d{4}/
+      case route.size
+        when 1..3
+          context[archives(route * '-'), :archives]
+        when 4
+          context[article(route), :article]
+        else http 400
+      end
+
+    elsif route.first == 'tags' && route.size == 2
+      if (data = archives('', route[1])).nil?
+        http 404
+      else
+        context[data, :tag]
+      end
+
+    elsif respond_to?(path)
       context[send(path, type), path.to_sym]
-    <span class="r">elsif</span> (repo = <span class="iv">@config</span>[<span class="sy">:github</span>][<span class="sy">:repos</span>].grep(<span class="rx"><span class="dl">/</span><span class="il"><span class="idl">#{</span>path<span class="idl">}</span></span><span class="dl">/</span></span>).first) &amp;&amp;
-          !<span class="iv">@config</span>[<span class="sy">:github</span>][<span class="sy">:user</span>].empty?
-      context[<span class="co">Repo</span>.new(repo, <span class="iv">@config</span>), <span class="sy">:repo</span>]
-    <span class="r">else</span> 
+    elsif (repo = @config[:github][:repos].grep(/#{path}/).first) &&
+          !@config[:github][:user].empty?
+      context[Repo.new(repo, @config), :repo]
+    else
       context[{}, path.to_sym]
-    <span class="r">end</span> 
-  <span class="r">else</span> 
-    http <span class="i">400</span> 
-  <span class="r">end</span> 
- 
-<span class="r">rescue</span> <span class="co">Errno</span>::<span class="co">ENOENT</span> =&gt; e
-  <span class="r">return</span> <span class="sy">:body</span> =&gt; http(<span class="i">404</span>).first, <span class="sy">:type</span> =&gt; <span class="sy">:html</span>, <span class="sy">:status</span> =&gt; <span class="i">404</span> 
-<span class="r">else</span> 
-  <span class="r">return</span> <span class="sy">:body</span> =&gt; body || <span class="s"><span class="dl">&quot;</span><span class="dl">&quot;</span></span>, <span class="sy">:type</span> =&gt; type, <span class="sy">:status</span> =&gt; status || <span class="i">200</span> 
-<span class="r">end</span></pre></div> 
-</div>
+    end
+  else
+    http 400
+  end
+
+rescue Errno::ENOENT => e
+  return :body => http(404).first, :type => :html, :status => 404
+else
+  return :body => body || "", :type => type, :status => status || 200
+end
+</pre>
 
 You can see I match on routes.first == ‘tags’ and that there’s exactly one more level to the path; for example /tags/the-wizard-of-oz. Then I call the existing archives method, and pass in the tag from the URL as a parameter:
 
@@ -281,8 +272,7 @@ Finally if this is not nil, I return the desired context value:
 
 I’ll get to the archives method next, but in the meantime let’s run the tests again:
 
-<div class="CodeRay"> 
-  <div class="code"><pre>$ rake
+<pre>$ rake
 (in /Users/pat/rails-apps/toto)
 
 ...etc... 
@@ -295,8 +285,7 @@ Toto GET a tag page
 
 ...etc...
 
-62 passes, 3 failures, 0 errors in 0.148593 seconds</pre></div> 
-</div> 
+62 passes, 3 failures, 0 errors in 0.148593 seconds</pre>
 
 Still failing - but at least I know I haven’t broken any of the other existing routes since all of the other 62 tests still pass!
 
@@ -346,8 +335,7 @@ My changes are highlighted; I started by adding a new parameter called “tag,�
 
 Re-running the tests again:
 
-<div class="CodeRay"> 
-  <div class="code"><pre>$ rake
+<pre>$ rake
 (in /Users/pat/rails-apps/toto)
 
 ...etc... 
@@ -360,8 +348,7 @@ Toto GET a tag page
  
 ...etc... 
 
-65 passes, 0 failures, 0 errors in 0.158935 seconds</pre></div> 
-</div>
+65 passes, 0 failures, 0 errors in 0.158935 seconds</pre>
 
 ... they pass! Now I’m ready to edit my real blog application, add the new tag.rhtml template to it, and try out my category page.
 

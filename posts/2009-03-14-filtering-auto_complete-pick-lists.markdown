@@ -78,7 +78,10 @@ end</pre>
 end</pre>
 <p>Filtered_auto_complete_for takes a block and evaluates it when the actual HTTP Ajax request is received from the auto complete Javascript. The block is provided with the find options hash and also the request parameters. This enables the controller&rsquo;s block to modify the find options in any way it would like, possibly using the HTTP request parameters provided. I&rsquo;ve also removed the options parameter since that&rsquo;s not necessary any more.</p>
 <p>As an example, here&rsquo;s my sample app&rsquo;s controller code:</p>
-<pre>class ProjectsController &lt; ApplicationController
+
+<pre type="ruby">
+
+class ProjectsController < ApplicationController
 
   # Handle auto complete for project names as usual:
   auto_complete_for :project, :name
@@ -88,10 +91,10 @@ end</pre>
   filtered_auto_complete_for :task, :name do | find_options, params|
     find_options.merge!(
       {
-        :include =&gt; :project,
-        :conditions =&gt; [ &quot;LOWER(tasks.name) LIKE ? AND projects.name = ?&quot;,
-                         &#x27;%&#x27; + params[&#x27;task&#x27;][&#x27;name&#x27;].downcase + &#x27;%&#x27;,
-                         params[&#x27;project&#x27;] ],
+        :include => :project,
+        :conditions => [ "LOWER(tasks.name) LIKE ? AND projects.name = ?",
+                         '%' + params['task']['name'].downcase + '%',
+                         params['project'] ],
         :order => "tasks.name ASC"
       }
     )

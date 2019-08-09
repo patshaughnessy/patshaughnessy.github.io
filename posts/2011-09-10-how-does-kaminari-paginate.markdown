@@ -75,32 +75,33 @@ Here ActiveRecord has just combined the options from the two scopes together and
 
 Finally, let’s take a quick look at how Akira Matsuda actually implemented this inside of Kaminari. You can find the code that implements the <span class="code">page</span> method for ActiveRecord models in the [active_record_model_extension.rb](https://github.com/amatsuda/kaminari/blob/master/lib/kaminari/models/active_record_model_extension.rb) file inside of the Kaminari gem:
 
-<div class="CodeRay"> 
-  <div class="code"><pre>require <span class="co">File</span>.join(<span class="co">File</span>.dirname(<span class="pc">__FILE__</span>), <span class="s"><span class="dl">'</span><span class="k">active_record_relation_methods</span><span class="dl">'</span></span>)
+<pre type="ruby">
+require File.join(File.dirname(__FILE__), 'active_record_relation_methods')
  
-<span class="r">module</span> <span class="cl">Kaminari</span> 
-  <span class="r">module</span> <span class="cl">ActiveRecordExtension</span> 
-    extend <span class="co">ActiveSupport</span>::<span class="co">Concern</span> 
-    included <span class="r">do</span> 
-      <span class="r">def</span> <span class="pc">self</span>.inherited(kls) <span class="c">#:nodoc:</span> 
-        <span class="r">super</span> 
+module Kaminari 
+  module ActiveRecordExtension 
+    extend ActiveSupport::Concern 
+    included do 
+      def self.inherited(kls) #:nodoc: 
+        super 
  
-        kls.class_eval <span class="r">do</span> 
-          include <span class="co">Kaminari</span>::<span class="co">ConfigurationMethods</span> 
+        kls.class_eval do 
+          include Kaminari::ConfigurationMethods 
  
-          <span class="c"># Fetch the values at the specified page number</span> 
-          <span class="c">#   Model.page(5)</span> 
-<div class='container'>          scope <span class="sy">:page</span>, <span class="co">Proc</span>.new {|num|
-            limit(default_per_page).offset(default_per_page * ([num.to_i, <span class="i">1</span>].max - <span class="i">1</span>))
-          } <span class="r">do</span> <span class='overlay'></span></div>            include <span class="co">Kaminari</span>::<span class="co">ActiveRecordRelationMethods</span> 
-            include <span class="co">Kaminari</span>::<span class="co">PageScopeMethods</span> 
-          <span class="r">end</span>
-        <span class="r">end</span> 
-      <span class="r">end</span> 
-    <span class="r">end</span> 
-  <span class="r">end</span> 
-<span class="r">end</span></pre></div> 
-</div> 
+          # Fetch the values at the specified page number 
+          #   Model.page(5) 
+          scope :page, Proc.new {|num|
+            limit(default_per_page).offset(default_per_page * ([num.to_i, 1].max - 1))
+          } do 
+            include Kaminari::ActiveRecordRelationMethods 
+            include Kaminari::PageScopeMethods 
+          end
+        end 
+      end 
+    end 
+  end 
+end
+</pre>
 
 There’s a lot of metaprogramming going on here, so let’s take it one step at a time. The first thing to learn is that the Kaminari::ActiveRecordExtension module uses ActiveRecord::Concern, which provides a standard way to add behavior to some target Ruby class. [This well written article](http://www.fakingfantastic.com/2010/09/20/concerning-yourself-with-active-support-concern) does a nice job of explaining how ActiveSupport::Concern works in Rails 3. Elsewhere in the gem source code Kaminari::ActiveRecordExtension is included in ActiveRecord::Base, which becomes the target class in this case. The rest of the code reads something like this:
 <ul>

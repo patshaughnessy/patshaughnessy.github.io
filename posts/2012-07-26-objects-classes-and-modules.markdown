@@ -6,7 +6,7 @@ tag: Ruby
 
 If you’re interested in Ruby internals you can [sign up here](http://patshaughnessy.net/ruby-under-a-microscope) and I’ll send you an email when the eBook is finished.  I also posted [one entire chapter](http://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope) in May, and two other excerpts from [Chapter One](http://patshaughnessy.net/2012/6/18/the-start-of-a-long-journey-how-ruby-parses-and-compiles-your-code) and [Chapter Two](http://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code) last month.</b>
 
-<br/>
+<p></p>
 
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
@@ -54,7 +54,7 @@ Ruby needs to save the class pointer in <span class="code">RObject</span> becaus
 
 <pre type="console">
 > euler = Mathematician.new
- => #<Mathematician:0x007fbd738608c0>
+ => #&lt;Mathematician:0x007fbd738608c0>
 </pre>
 
 Here by displaying the class name, “#&lt;Mathematician…,” Ruby is displaying the value of the class pointer for the <span class="code">euler</span> object when I inspect it. The hex string that follows is actually the <span class="code">VALUE</span> pointer for the object. This will be different for every instance of <span class="code">Mathematician</span> .
@@ -67,7 +67,7 @@ Ruby also has to keep track of any values you save in it - Ruby uses the instanc
 > euler.last_name  = 'Euler'
  => "Euler" 
 > euler
- => #<Mathematician:0x007fbd738608c0 @first_name="Leonhard", @last_name="Euler"> 
+ => #&lt;Mathematician:0x007fbd738608c0 @first_name="Leonhard", @last_name="Euler"> 
 </pre>
 
 Here you can see Ruby now also displays the instance variable array for <span class="code">euler</span> when I inspect it again. Ruby needs to save this array of values in each object since every object instance can have different values for the same instance variables - for example:
@@ -76,7 +76,7 @@ Here you can see Ruby now also displays the instance variable array for <span cl
 > euclid = Mathematician.new
 > euclid.first_name = 'Euclid'
 > euclid
- => #<Mathematician:0x007fabdb850690 @first_name="Euclid">
+ => #&lt;Mathematician:0x007fabdb850690 @first_name="Euclid">
 </pre>
 
 Now let’s take a look at Ruby’s C memory structures in a bit more detail - when you run this simple script, Ruby will create one <span class="code">RClass</span> structure and two <span class="code">RObject</span> structures:

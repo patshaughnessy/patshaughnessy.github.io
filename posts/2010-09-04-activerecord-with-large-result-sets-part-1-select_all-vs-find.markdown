@@ -91,23 +91,25 @@ $ rake db:migrate
 $ rm test/performance/browsing_test.rb</pre></div>
 </div><br>
 <p>Editing the load_users_test.rb file, I&rsquo;ll add a couple simple tests that load all of the user records:</p>
-<div class="CodeRay">
-  <div class="code"><pre>require <span class="s"><span class="dl">'</span><span class="k">test_helper</span><span class="dl">'</span></span>
-require <span class="s"><span class="dl">'</span><span class="k">rails/performance_test_help</span><span class="dl">'</span></span>
 
-<span class="r">class</span> <span class="cl">LoadUsersTest</span> &lt; <span class="co">ActionDispatch</span>::<span class="co">PerformanceTest</span>
-  <span class="r">def</span> <span class="fu">test_find</span>
-    user_models = <span class="co">User</span>.find <span class="sy">:all</span>
-    puts <span class="s"><span class="dl">&quot;</span><span class="k">Loaded </span><span class="il"><span class="idl">#{</span><span class="co">user_models.size</span><span class="idl">}</span></span><span class="k"> users</span><span class="dl">&quot;</span></span>
-  <span class="r">end</span>
+<pre type="ruby">
+require 'test_helper'
+require 'rails/performance_test_help'
 
-  <span class="r">def</span> <span class="fu">test_select_all</span>
+class LoadUsersTest < ActionDispatch::PerformanceTest
+  def test_find
+    user_models = User.find :all
+    puts "Loaded #{user_models.size} users"
+  end
+
+  def test_select_all
     user_hashes =
-      <span class="co">ActiveRecord</span>::<span class="co">Base</span>.connection.select_all(<span class="s"><span class="dl">'</span><span class="k">SELECT users.* FROM users</span><span class="dl">'</span></span>)
-    puts <span class="s"><span class="dl">&quot;</span><span class="k">Loaded </span><span class="il"><span class="idl">#{</span><span class="co">user_hashes.size</span><span class="idl">}</span></span><span class="k"> users</span><span class="dl">&quot;</span></span>
-  <span class="r">end</span>
-<span class="r">end</span></pre></div>
-</div><br>
+      ActiveRecord::Base.connection.select_all('SELECT users.* FROM users')
+    puts "Loaded #{user_hashes.size} users"
+  end
+end
+</pre>
+
 <p>Finally, I&rsquo;ll install &ldquo;ruby-prof,&rdquo; a helpful profiling tool that will allow us to use the rake test:profile command:</p>
 <div class="CodeRay">
   <div class="code"><pre>$ gem install ruby-prof

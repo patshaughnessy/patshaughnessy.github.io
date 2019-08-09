@@ -84,7 +84,7 @@ This is still far from obvious, but after looking up the meaning of the [Array.z
 <pre type="console">
 > Shirt.scoped(:conditions => {:color => 'red'})
   Shirt Load (0.2ms)  SELECT "shirts".* FROM "shirts" WHERE "shirts"."color" = 'red'
- => [#<Shirt id: 1, color: "red", created_at... >] 
+ => [#&lt;Shirt id: 1, color: "red", created_at... >] 
 </pre>
 
 I found this translated code comment to be so helpful that I believe it’s a metaprogramming best practice that we should all learn from! The idea isn’t new, actually. In fact [Yehuda Katz](http://yehudakatz.com/), by all accounts a master of Ruby programming, [originally mentioned the idea](http://yehudakatz.com/2008/12/29/another-rails-2x3-update) of “annotating metaprogramming” while he was working on Rails 3 back in 2008, saying he was inspired by Michael Klishin (antares), and the next day [Xavier Noria](http://hashref.com/) went ahead and added the annotations to the Rails source code in this [one large commit](https://github.com/rails/rails/commit/a2270ef2594b97891994848138614657363f2806).

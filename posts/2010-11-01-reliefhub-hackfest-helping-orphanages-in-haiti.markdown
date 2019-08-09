@@ -25,18 +25,20 @@ date: 2010/11/1
 <p><img src="http://patshaughnessy.net/assets/2010/10/31/reliefhub3.png"></p>
 <p><a href="http://dancroak.com">Dan Croak</a> jumpstarted the project on Rails 3 using <a href="http://github.com/thoughtbot/suspenders">ThoughtBot&rsquo;s suspenders</a> and also setup a continuous integration server for us in a matter of just minutes using <a href="http://github.com/defunkt/cijoe">CI Joe</a> on an Ubuntu server graciously donated to us for the week by <a href="http://railsmachine.com/">Rails Machine</a>.</p>
 <p>Dan also helped the team get up to speed on the latest testing tools and ideas from ThoughtBot, like <a href="http://github.com/thoughtbot/bourne">Bourne</a>, <a href="http://robots.thoughtbot.com/post/159805987/speculating-with-shoulda">Shoulda RSpec matchers:</a></p>
-<div class="CodeRay">
-  <div class="code"><pre>describe <span class="co">Project</span> <span class="r">do</span>
-  let(<span class="sy">:project</span>) { Factory(<span class="sy">:project</span>) }
 
-  it { should belong_to(<span class="sy">:organization</span>) }
-  it { should have_many(<span class="sy">:donations</span>) }
-<span class="r">end</span>
-</pre></div>
-</div><br/>
+
+<pre type="ruby">
+describe Project do
+  let(:project) { Factory(:project) }
+
+  it { should belong_to(:organization) }
+  it { should have_many(:donations) }
+end
+</pre>
+
 <p>... and <a href="http://robots.thoughtbot.com/post/284805810/gimme-three-steps">Factory Girl cucumber steps</a>:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">Scenario:</span> Visitor reviews project
+
+<pre><span class="r">Scenario:</span> Visitor reviews project
   <span class="r">Given</span> the following organization exists:
     | name                          |
     | Mission des Eglises Baptistes |
@@ -44,8 +46,8 @@ date: 2010/11/1
     | name                | funds purpose           | organization              
     | Christmas Toy Drive | New or gently used toys | name: Mission des Eglis...
 etc...
-</pre></div>
-</div><br/>
+</pre>
+
 <p>Dan taught us a lot more than this, and also singlehandedly implemented a number of the user stories.</p>
 <p><a href="http://theagiledeveloper.com/">Matt Deiters</a> implemented some other key user stories, did a lot of user interface implementation work and also wrote a rake task to seed our database with development data.</p>
 <p><a href="http://github.com/klobuczek">Heinrich Klobuczek</a> used the <a href="http://github.com/iain/http_accept_language">http_accept_language gem</a> to provide internationalization support, and then proceeded to translate the site into French himself... despite being Polish! We&rsquo;ll have to have Rousseau check his French soon... lol.</p>

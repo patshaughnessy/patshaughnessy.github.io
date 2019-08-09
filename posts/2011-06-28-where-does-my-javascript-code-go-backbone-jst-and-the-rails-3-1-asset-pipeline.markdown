@@ -56,32 +56,32 @@ This is what I like the most about Backbone: it organizes my code! No longer do 
 
 JST stands for “Javascript Templates” and is an [open source project](http://code.google.com/p/trimpath/wiki/JavaScriptTemplates) that’s been around for a number of years now. Backbone makes it easy to use JST to construct the HTML generated for each Javascript view object. Note how James created 3 views in his application, called show.js, index.js, and notice.js, all stored in the app/javascripts/views folder. These contain the Backbone code required to display a single document, or a collection of documents. For example, here’s the views/index.js file:
 
-<div class="CodeRay"> 
-  <div class="code"><pre>App.Views.Index = Backbone.View.extend({
-    <span class="ke">initialize</span>: <span class="kw">function</span>() {
-        <span class="lv">this</span>.render();
+<pre>
+App.Views.Index = Backbone.View.extend({
+    initialize: function() {
+        this.render();
     },
-    
-    <span class="ke">render</span>: <span class="kw">function</span>() {
-        <span class="pd">$</span>(<span class="lv">this</span>.el).html(JST.documents_collection({ <span class="ke">collection</span>: <span class="lv">this</span>.collection }));
-        <span class="pd">$</span>(<span class="s"><span class="dl">'</span><span class="k">#app</span><span class="dl">'</span></span>).html(<span class="lv">this</span>.el);
+
+    render: function() {
+        $(this.el).html(JST.documents_collection({ collection: this.collection }));
+        $('#app').html(this.el);
     }
-});</pre></div> 
-</div> 
+});
+</pre>
 
 This code is called when CloudEdit needs to display a list of documents. You can see that it calls the “JST.documents_collection” function and passes in the collection of documents. This actually refers to the “documents_collect.jst” file, which in CloudEdit is saved in the app/views/documents folder, where you would normally find the server-side view code. And here’s what the documents-collection.jst file looks like:
 
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="il"><span class="idl">&lt;%</span> <span class="r">if</span>(collection.models.length &gt; <span class="i">0</span>) { <span class="idl">%&gt;</span></span> 
-    <span class="ta">&lt;h3&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">'</span><span class="k">#new</span><span class="dl">'</span></span><span class="ta">&gt;</span>Create New<span class="ta">&lt;/a&gt;</span><span class="ta">&lt;/h3&gt;</span><span class="ta">&lt;ul&gt;</span> 
-    <span class="il"><span class="idl">&lt;%</span> collection.each(function(item) { <span class="idl">%&gt;</span></span> 
-        <span class="ta">&lt;li&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">'</span><span class="k">#documents/</span><span class="il"><span class="idl">&lt;%=</span> item.id <span class="idl">%&gt;</span></span><span class="dl">'</span></span><span class="ta">&gt;</span><span class="il"><span class="idl">&lt;%=</span> item.escape(<span class="s"><span class="dl">'</span><span class="k">title</span><span class="dl">'</span></span>) <span class="idl">%&gt;</span></span><span class="ta">&lt;/a&gt;</span><span class="ta">&lt;/li&gt;</span> 
-    <span class="il"><span class="idl">&lt;%</span> }); <span class="idl">%&gt;</span></span> 
-    <span class="ta">&lt;/ul&gt;</span> 
-<span class="il"><span class="idl">&lt;%</span> } <span class="r">else</span> { <span class="idl">%&gt;</span></span> 
-    <span class="ta">&lt;h3&gt;</span>No documents! <span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">'</span><span class="k">#new</span><span class="dl">'</span></span><span class="ta">&gt;</span>Create one<span class="ta">&lt;/a&gt;</span><span class="ta">&lt;/h3&gt;</span> 
-<span class="il"><span class="idl">&lt;%</span> } <span class="idl">%&gt;</span></span></pre></div> 
-</div> 
+<pre>
+&lt;% if(collection.models.length > 0) { %>
+    &lt;h3>&lt;a href='#new'>Create New&lt;/a>&lt;/h3>&lt;ul>
+    <% collection.each(function(item) { &lt;%
+        &lt;li>&lt;a href='#documents/&lt;%= item.id %>'>&lt;%= item.escape('title') %>&lt;/a>&lt;/li>
+    <% }); %>
+    &lt;/ul>
+<% } else { %>
+    &lt;h3>No documents! &lt;a href='#new'>Create one&lt;/a>&lt;/h3>
+<% } %>
+</pre>
 
 As James explains in part 2 of his tutorial, this resembles ERB code but is actually evaluated on the client side to display the list of documents. The variables “collection” and “item” refer to the Backbone collection and model objects used by CloudEdit.
 
@@ -109,40 +109,38 @@ Here we can see they’ve created the usual “model,” “controllers” and �
 
 Here’s what the index_view.coffee file in the app/assets/javascripts/backbone/views/posts folder looks like:
 
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="co">Backbone_scaffold_test</span>.<span class="co">Views</span>.<span class="co">Posts</span> ||= {}
- 
-<span class="r">class</span> <span class="cl">Backbone_scaffold_test</span>.<span class="co">Views</span>.<span class="co">Posts</span>.<span class="co">PostView</span> extends <span class="co">Backbone</span>.<span class="co">View</span> 
-  template: <span class="co">JST</span>[<span class="s"><span class="dl">&quot;</span><span class="k">backbone/templates/posts/post</span><span class="dl">&quot;</span></span>]
-  
-  events:
-    <span class="s"><span class="dl">&quot;</span><span class="k">click .destroy</span><span class="dl">&quot;</span></span> : <span class="s"><span class="dl">&quot;</span><span class="k">destroy</span><span class="dl">&quot;</span></span> 
-      
-  tagName: <span class="s"><span class="dl">&quot;</span><span class="k">tr</span><span class="dl">&quot;</span></span> 
-  
-  destroy: () -&gt;
-    <span class="iv">@options</span>.model.destroy()
-    this.remove()
-    
-    <span class="r">return</span> <span class="pc">false</span> 
-    
-  render: -&gt;
-    <span class="er">$</span>(this.el).html(this.template(this.options.model.toJSON() ))    
-    <span class="r">return</span> <span class="pc">this</span></pre></div> 
-</div> 
+<pre>
+Backbone_scaffold_test.Views.Posts ||= {}
 
+class Backbone_scaffold_test.Views.Posts.PostView extends Backbone.View
+  template: JST["backbone/templates/posts/post"]
+
+  events:
+    "click .destroy" : "destroy"
+
+  tagName: "tr"
+
+  destroy: () ->
+    @options.model.destroy()
+    this.remove()
+
+    return false
+
+  render: ->
+    $(this.el).html(this.template(this.options.model.toJSON() ))
+    return this
+</pre>
 
 This is CoffeeScript, which you can guess from the file extension, one of the other exciting innovations in Rails 3.1. I don’t have time to explain everything here today, but one important detail to notice here is that the view code calls JST["backbone/templates/posts/post"]. This refers to the post.jst.ejs JST template file, located in the app/assets/javascripts/backbone/templates/posts folder:
 
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="ta">&lt;td&gt;</span><span class="il"><span class="idl">&lt;%=</span> title <span class="idl">%&gt;</span></span><span class="ta">&lt;/td&gt;</span> 
-<span class="ta">&lt;td&gt;</span><span class="il"><span class="idl">&lt;%=</span> content <span class="idl">%&gt;</span></span><span class="ta">&lt;/td&gt;</span> 
- 
-<span class="ta">&lt;td&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">&quot;</span><span class="k">#/</span><span class="il"><span class="idl">&lt;%=</span> id <span class="idl">%&gt;</span></span><span class="dl">&quot;</span></span><span class="ta">&gt;</span>Show<span class="ta">&lt;/td&gt;</span> 
-<span class="ta">&lt;td&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">&quot;</span><span class="k">#/</span><span class="il"><span class="idl">&lt;%=</span> id <span class="idl">%&gt;</span></span><span class="k">/edit</span><span class="dl">&quot;</span></span><span class="ta">&gt;</span>Edit<span class="ta">&lt;/td&gt;</span> 
-<span class="ta">&lt;td&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">&quot;</span><span class="k">#/</span><span class="il"><span class="idl">&lt;%=</span> id <span class="idl">%&gt;</span></span><span class="k">/destroy</span><span class="dl">&quot;</span></span> <span class="an">class</span>=<span class="s"><span class="dl">&quot;</span><span class="k">destroy</span><span class="dl">&quot;</span></span><span class="ta">&gt;</span>Destroy<span class="ta">&lt;/a&gt;</span><span class="ta">&lt;/td&gt;</span></pre></div> 
-</div> 
+<pre>
+&lt;td>&lt;%= title %>&lt;/td>
+&lt;td>&lt;%= content %>&lt;/td>
 
+&lt;td>&lt;a href="#/&lt;%= id %>">Show&lt;/td>
+&lt;td>&lt;a href="#/&lt;%= id %>/edit">Edit&lt;/td>
+&lt;td>&lt;a href="#/&lt;%= id %>/destroy" class="destroy">Destroy&lt;/a>&lt;/td>
+</pre>
 
 Again, think of JST like a client side ERB transformation.
 

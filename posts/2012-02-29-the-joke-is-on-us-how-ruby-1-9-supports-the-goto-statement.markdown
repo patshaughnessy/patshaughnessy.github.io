@@ -46,7 +46,7 @@ First, let’s try running the code above directly using a normal Ruby 1.9.3 MRI
 <pre type="console">
 $ rvm 1.9.3
 $ ruby joke.rb 
-joke.rb:1:in `<main>': undefined method `__label__' for main:Object (NoMethodError)
+joke.rb:1:in `&lt;main>': undefined method `__label__' for main:Object (NoMethodError)
 </pre>
 
 No surprise: since I haven’t yet enabled <span class="code">goto</span> statement support, I get an error from Ruby stating that the <span class="code">\_\_label\_\_</span> method is not defined on line 1. Until you enable the <span class="code">SUPPORT_JOKE</span> setting, the <span class="code">\_\_goto\_\_</span> and <span class="code">\_\_label\_\_</span> methods aren’t defined.

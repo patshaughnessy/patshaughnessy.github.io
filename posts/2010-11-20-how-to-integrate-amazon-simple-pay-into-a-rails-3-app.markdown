@@ -166,47 +166,50 @@ etc...
 etc...</pre></div>
   </div><br>
 <p>And now let&rsquo;s write a new action in the payments controller for this; edit app/controllers/payments_controller.rb:</p>
-  <div class="CodeRay">
-    <div class="code"><pre><span class="r">class</span> <span class="cl">PaymentsController</span> &lt; <span class="co">ApplicationController</span>
 
-  <span class="r">def</span> <span class="fu">confirm</span>
-    <span class="iv">@payment</span> = <span class="co">Payment</span>.new(
-      <span class="sy">:transaction_amount</span> =&gt; params[<span class="sy">:transactionAmount</span>],
-      <span class="sy">:transaction_id</span>     =&gt; params[<span class="sy">:transactionId</span>]
-    )
-    <span class="r">if</span> <span class="iv">@payment</span>.save
-      redirect_to(<span class="iv">@payment</span>, <span class="sy">:notice</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">Payment was successfully created.</span><span class="dl">'</span></span>)
-    <span class="r">else</span>
-      redirect_to <span class="sy">:action</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">index</span><span class="dl">&quot;</span></span>
-    <span class="r">end</span>
-  <span class="r">end</span>
-  
-etc...</pre></div>
-  </div><br/>
+<pre type="ruby">
+class PaymentsController < ApplicationController
+
+def confirm
+  @payment = Payment.new(
+    :transaction_amount => params[:transactionAmount],
+    :transaction_id     => params[:transactionId]
+  )
+  if @payment.save
+    redirect_to(@payment, :notice => 'Payment was successfully created.')
+  else
+    redirect_to :action => "index"
+  end
+end
+
+etc...
+</pre>
+
 <p>This looks similar to the create action we got from the scaffolding generator. This action will be called when users return from the Amazon Payments site, and will record the transaction in our application&rsquo;s payments table. More on this in a moment.</p>
 <p>Finally in the payment model we need a bit of code to parse the transaction amount string passed back from Amazon:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">class</span> <span class="cl">Payment</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
 
-  validates_presence_of <span class="sy">:amount</span>
-  validates_presence_of <span class="sy">:transaction_id</span>
+<pre type="ruby">
+class Payment < ActiveRecord::Base
 
-  <span class="r">def</span> <span class="fu">transaction_amount=</span>(currency_and_amount)
+  validates_presence_of :amount
+  validates_presence_of :transaction_id
+
+  def transaction_amount=(currency_and_amount)
     currency = parse(currency_and_amount).first
-    <span class="r">if</span> currency == <span class="s"><span class="dl">'</span><span class="k">USD</span><span class="dl">'</span></span>
+    if currency == 'USD'
       amount = parse(currency_and_amount).last.to_f
-    <span class="r">else</span>
+    else
       amount = currency.to_f
-    <span class="r">end</span>
-    <span class="pc">self</span>.amount = amount <span class="r">unless</span> amount == <span class="fl">0.0</span>
-  <span class="r">end</span>
+    end
+    self.amount = amount unless amount == 0.0
+  end
 
-  <span class="r">def</span> <span class="fu">parse</span>(currency_and_amount)
-    <span class="iv">@parsed</span> ||= currency_and_amount.split
-  <span class="r">end</span>
-<span class="r">end</span>
-</pre></div>
-</div><br/>
+  def parse(currency_and_amount)
+    @parsed ||= currency_and_amount.split
+  end
+end
+</pre>
+
 <p>The &ldquo;transaction amount&rdquo; parameter from Amazon may contain a prefix &ldquo;USD&rdquo; specifying the currency. However, sometimes this is not present. The code above parses the string as necessary in a virtual attribute &ldquo;transaction_amount&rdquo; and then saves the corresponding amount as the &ldquo;amount&rdquo; float value in the database. The Payment model also validates that both amount and transaction id are specified by Amazon in order to consider the payment valid.</p>
 <p>Now let&rsquo;s fire up the app and try it out!</p>
 <p><img src="http://patshaughnessy.net/assets/2010/11/20/listing_payments_empty.png"></p>
@@ -225,32 +228,34 @@ etc...</pre></div>
 </ul></p>
 <h2>Step 7: Using a helper to generate the payment form easily</h2>
 <p>Of course our view code is very ugly - all of that complex HTML is hard to read and confusing, and also if we want more than one button in our app we will have to repeat all of the HTML. The best thing to do render the payment form using a helper. This code will do the trick - save this code in app/helpers/amazon_simple_pay_helper.rb:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">module</span> <span class="cl">AmazonSimplePayHelper</span>
 
-  <span class="co">AMAZON_ACCESS_KEY</span> = <span class="s"><span class="dl">'</span><span class="k">11SEM03K88SD016FS1G2</span><span class="dl">'</span></span>
+<pre type="ruby">
+module AmazonSimplePayHelper
 
-  <span class="co">AMAZON_PAYMENTS_ACCOUNT_ID</span> = <span class="s"><span class="dl">'</span><span class="k">KWKCCYNIVXJL42AE3FVCZCA65I3522JBV4EJVX</span><span class="dl">'</span></span>
+  AMAZON_ACCESS_KEY = '11SEM03K88SD016FS1G2'
 
-  <span class="r">def</span> <span class="fu">amazon_simple_pay_form_tag</span>(options = {}, &amp;block)
-    sandbox = <span class="s"><span class="dl">'</span><span class="k">-sandbox</span><span class="dl">'</span></span> <span class="r">unless</span> <span class="co">Rails</span>.env == <span class="s"><span class="dl">'</span><span class="k">production</span><span class="dl">'</span></span>
-    pipeline_url = <span class="s"><span class="dl">&quot;</span><span class="k">https://authorize.payments</span></span><span class="il"><span class="idl">#{</span>sandbox<span class="idl">}</span></span><span class="s">.amazon.com/pba/paypipeline</span><span class="dl">&quot;</span></span> 
-    html_options = { <span class="sy">:action</span> =&gt; pipeline_url, <span class="sy">:method</span> =&gt; <span class="sy">:post</span> }.merge(options)
-    content = capture(&amp;block)
-    output = <span class="co">ActiveSupport</span>::<span class="co">SafeBuffer</span>.new
-    output.safe_concat(tag(<span class="sy">:form</span>, html_options, <span class="pc">true</span>))
-    output &lt;&lt; content
-    output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">accessKey</span><span class="dl">'</span></span>, <span class="co">AMAZON_ACCESS_KEY</span>))
-    output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">amazonPaymentsAccountId</span><span class="dl">'</span></span>, <span class="co">AMAZON_PAYMENTS_ACCOUNT_ID</span>))
-    output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">immediateReturn</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">1</span><span class="dl">'</span></span>))
-    output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">processImmediate</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">1</span><span class="dl">'</span></span>))
-    output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">cobrandingStyle</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">logo</span><span class="dl">'</span></span>))
-    output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">returnUrl</span><span class="dl">'</span></span>, confirm_payment_url))
-    output.safe_concat(<span class="s"><span class="dl">&quot;</span><span class="k">&lt;/form&gt;</span><span class="dl">&quot;</span></span>)
-  <span class="r">end</span>
+  AMAZON_PAYMENTS_ACCOUNT_ID = 'KWKCCYNIVXJL42AE3FVCZCA65I3522JBV4EJVX'
 
-<span class="r">end</span></pre></div>
-</div><br/>
+  def amazon_simple_pay_form_tag(options = {}, &block)
+    sandbox = '-sandbox' unless Rails.env == 'production'
+    pipeline_url = "https://authorize.payments#{sandbox}.amazon.com/pba/paypipeline"
+    html_options = { :action => pipeline_url, :method => :post }.merge(options)
+    content = capture(&block)
+    output = ActiveSupport::SafeBuffer.new
+    output.safe_concat(tag(:form, html_options, true))
+    output << content
+    output.safe_concat(hidden_field_tag('accessKey', AMAZON_ACCESS_KEY))
+    output.safe_concat(hidden_field_tag('amazonPaymentsAccountId', AMAZON_PAYMENTS_ACCOUNT_ID))
+    output.safe_concat(hidden_field_tag('immediateReturn', '1'))
+    output.safe_concat(hidden_field_tag('processImmediate', '1'))
+    output.safe_concat(hidden_field_tag('cobrandingStyle', 'logo'))
+    output.safe_concat(hidden_field_tag('returnUrl', confirm_payment_url))
+    output.safe_concat("</form>")
+  end
+
+end
+</pre>
+
 <p>This helper uses the same code the standard &ldquo;form_tag&rdquo; Rails view helper does, except that it provides the additional fields and attributes required by Amazon. Here&rsquo;s how it works:</p>
 <ul>
   <li>First it calculates the form action URL - the amazon payments sandbox URL from the HTML above. &ldquo;Sandbox&rdquo; is included in the URL unless your are running on your production server.</li>

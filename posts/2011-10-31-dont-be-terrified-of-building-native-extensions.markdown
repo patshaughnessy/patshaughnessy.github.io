@@ -14,6 +14,7 @@ One of the scariest moments in the life of a Ruby developer is seeing that dread
 For years I’ve been nervous installing gems that contained native extensions because I wasn’t familiar with the gem extension build process, and had no idea where to begin when something went wrong. Today I’m going to confront my own worst fears – and yours – by taking a closer look at what “Building native extensions” actually means.DELIM After reviewing how the build process works, I'll give you some advice that will hopefully point you in the right direction the next time you run into a problem.
 
 <div style="clear: left"></div>
+
 ## What are native extensions anyway?
 
 Before we get to what might go wrong building native extensions, let’s take a look at what native extensions are and why Ruby developers need them. “Native extensions” are the glue that connects a Ruby gem with some other non-Ruby software component or library present on your machine. Here’s a simple diagram that shows the relationship between a Ruby gem and some software it uses:

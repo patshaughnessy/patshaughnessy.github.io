@@ -77,7 +77,9 @@ This will remove the new route from routes.rb.
           rm  app/controllers/version_controller.rb</pre>
 <p>It turns out a cleaner way to implement the &ldquo;route&rdquo; method is to directly add the method to both the Create and Destroy command classes. This allows me to call a utility method called &ldquo;gsub_file&rdquo; in the Rails::Generator::Commands::Base class which I wouldn&rsquo;t have direct access to from my generator class. It also avoids the somewhat ugly if statement on the options[:command] value, and finally it might make it easier for me someday to refactor the new route methods into a separate module that I could use with various different generators that might need to add and remove routes.</p>
 <p>Anyway, here&rsquo;s the finished code for the entire generator:</p>
-<pre>class VersionGenerator &lt; Rails::Generator::NamedBase
+
+<pre type="ruby">
+class VersionGenerator < Rails::Generator::NamedBase
   attr_reader :version_path
   def initialize(runtime_args, runtime_options = {})
     super
@@ -85,10 +87,10 @@ This will remove the new route from routes.rb.
   end
   def manifest
     record do |m|
-      m.template(&#x27;controller.rb&#x27;, &#x27;app/controllers/version_controller.rb&#x27;)
-      m.route :name =&gt; &#x27;version&#x27;,
-              :controller =&gt; &#x27;version&#x27;,
-              :action =&gt; &#x27;display_version&#x27;
+      m.template('controller.rb', 'app/controllers/version_controller.rb')
+      m.route :name => 'version',
+              :controller => 'version',
+              :action => 'display_version'
     end
   end
 end
@@ -99,23 +101,23 @@ module Rails
 
       class Base
         def route_code(route_options)
-          &quot;map.#{route_options[:name]} &#x27;#{route_options[:name]}&#x27;, :controller =&gt; &#x27;#{route_options[:controller]}&#x27;, :action =&gt; &#x27;#{route_options[:action]}&#x27;&quot;
+          "map.#{route_options[:name]} '#{route_options[:name]}', :controller => '#{route_options[:controller]}', :action => '#{route_options[:action]}'"
         end
       end
 
 # Here's a readable version of the long string used above in route_code;
 # but it should be kept on one line to avoid inserting extra whitespace
 # into routes.rb when the generator is run:
-# &quot;map.#{route_options[:name]} &#x27;#{route_options[:name]}&#x27;,
-#     :controller =&gt; &#x27;#{route_options[:controller]}&#x27;,
-#     :action =&gt; &#x27;#{route_options[:action]}&#x27;&quot;
+# "map.#{route_options[:name]} '#{route_options[:name]}',
+#     :controller => '#{route_options[:controller]}',
+#     :action => '#{route_options[:action]}'"
 
       class Create
         def route(route_options)
-          sentinel = &#x27;ActionController::Routing::Routes.draw do |map|&#x27;
+          sentinel = 'ActionController::Routing::Routes.draw do |map|'
           logger.route route_code(route_options)
-          gsub_file &#x27;config/routes.rb&#x27;, /(#{Regexp.escape(sentinel)})/mi do |m|
-              &quot;#{m}\n  #{route_code(route_options)}\n&quot;
+          gsub_file 'config/routes.rb', /(#{Regexp.escape(sentinel)})/mi do |m|
+              "#{m}\n  #{route_code(route_options)}\n"
           end
         end
       end
@@ -123,14 +125,16 @@ module Rails
       class Destroy
         def route(route_options)
           logger.remove_route route_code(route_options)
-          to_remove = &quot;\n  #{route_code(route_options)}&quot;
-          gsub_file &#x27;config/routes.rb&#x27;, /(#{to_remove})/mi, &#x27;&#x27;
+          to_remove = "\n  #{route_code(route_options)}"
+          gsub_file 'config/routes.rb', /(#{to_remove})/mi, ''
         end
       end
 
     end
   end
-end</pre>
+end
+</pre>
+
 <p>More or less copied from the existing route_resources action found in <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/commands.rb">commands.rb</a>, this works as follows: If we call script/generate then the route action method in the Create command class is called. This uses gsub_file to look for the &ldquo;sentinel&rdquo; or target area of the file and replaces it with the sentinel + the new route code. I also use the &ldquo;logger&rdquo; method to display log messages using the Rails::Generator::SimpleLogger class. Here&rsquo;s what it looks like on the command line:</p>
 <pre>$ ./script/generate version ../build-info/version.txt
       create  app/controllers/version_controller.rb

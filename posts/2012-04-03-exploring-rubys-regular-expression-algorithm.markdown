@@ -63,7 +63,7 @@ size: 44, start offset: 10
   10> "brown f..."         [exact5:brown]
   15> " fox ju..."         [end]
 
-#<MatchData "brown">
+#&lt;MatchData "brown">
 </pre>
 
 The key here is the text “0:[exact5:brown] 6:[end]” - this line describes the two VM instructions that Oniguruma has compiled the <span class="code">/brown/</span> pattern into. Here’s what this regex program looks like:
@@ -114,7 +114,7 @@ size: 44, start offset: 10
   10> "brown f..."         [exact5:brown]
   15> " fox ju..."         [end]
 
-#<MatchData "brown">
+#&lt;MatchData "brown">
 </pre>
 
 Again, the key line is: “0:[push:(11)] 5:[exact5:black] 11:[jump:(6)] 16:[exact5:brown] 22:[end]”. This is the VM program that will execute our <span class="code">/black|brown/</span> regex search:
@@ -169,7 +169,7 @@ size: 44, start offset: 10
   15> " fox ju..."         [anychar*]
   44> ""                   [end]
 
-#<MatchData "brown fox jumps over the lazy dog.">
+#&lt;MatchData "brown fox jumps over the lazy dog.">
 </pre>
 
 And here’s the new state machine:
@@ -223,7 +223,7 @@ This should run very quickly:
 
 <pre type="console">
 $ time ruby regex.rb
-#<MatchData "aaa">
+#&lt;MatchData "aaa">
 ruby regex.rb  0.02s user 0.01s system 30% cpu 0.080 total
 </pre>
 
@@ -238,7 +238,7 @@ Running with 29 repetitions:
 
 <pre type="console">
 $ time ruby regex.rb
-#<MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+#&lt;MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
 ruby regex.rb  17.09s user 0.01s system 99% cpu 17.098 total
 </pre>
 
@@ -246,7 +246,7 @@ Or with 30 repetitions:
 
 <pre type="console">
 $ time ruby regex.rb
-#<MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+#&lt;MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
 ruby regex.rb  34.00s user 0.01s system 99% cpu 34.025 total
 </pre>
 
