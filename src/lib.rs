@@ -41,9 +41,9 @@ pub fn run(input_path: PathBuf, output_path: PathBuf, draft: bool) -> Result<usi
     all_posts.sort_by_key(|p| Reverse(p.date));
     let params = CompileParams {all_posts: all_posts, output_path: output_path, draft: draft};
     Ok(params).and_then(compile_posts)
-             .and_then(compile_home_page)
-             .and_then(compile_rss_feed)
-             .map(|_output| count)
+              .and_then(compile_home_page)
+              .and_then(compile_rss_feed)
+              .map(|_output| count)
 }
 
 fn compile_posts(params: CompileParams) -> Result<CompileParams, InvalidPostError> {

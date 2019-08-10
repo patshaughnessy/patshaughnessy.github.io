@@ -14,6 +14,8 @@ use regex::Regex;
 use regex::RegexBuilder;
 use regex::Captures;
 
+use std::fs;
+
 use invalid_post_error::InvalidPostError;
 use highlight::highlighted_html_for;
 
@@ -36,6 +38,7 @@ impl Post {
         let title = header_map.get("title").ok_or_else(|| InvalidPostError::new_for_path(input_path, "Missing title"))?;
         let date = date_from_headers(&header_map, input_path)?;
         let url = url_from_headers(&header_map, title, &date);
+        let content = html(&lines, &header_map, input_path)?;
         Ok(
             Post {
                 path: path_from_url(&url),
@@ -44,7 +47,7 @@ impl Post {
                 date: date,
                 tag: header_map.get("tag").map(|str| str.clone()),
                 headers: header_map.clone(),
-                content: html(&lines)
+                content: content
             }
         )
     }
@@ -146,7 +149,22 @@ fn header_map(header_lines: &Vec<String>) -> HashMap<String, String> {
     headers
 }
 
-pub fn html(lines: &Vec<String>) -> String {
+pub fn html(lines: &Vec<String>, header_map: &HashMap<String, String>, input_path: &PathBuf) -> Result<String, InvalidPostError> {
+    let html_path = header_map.get("html");
+    match html_path {
+        Some(html_path) => html_from_file(html_path, input_path),
+        None            => html_from_markdown(lines)
+    }
+}
+
+fn html_from_file(html_path: &String, input_path: &PathBuf) -> Result<String, InvalidPostError> {
+    let parent_path = input_path.parent().ok_or_else(|| InvalidPostError::new_for_path(input_path, "Invalid input path"))?;
+    let path = parent_path.join(html_path);
+    fs::read_to_string(&path).map_err(|_| InvalidPostError::new_for_path(&path, "Unable to read html source file"))
+}
+
+
+fn html_from_markdown(lines: &Vec<String>) -> Result<String, InvalidPostError> {
     let mut markdown = String::new();
     for line in other_lines(lines) {
         markdown.push_str(&line);
@@ -155,9 +173,7 @@ pub fn html(lines: &Vec<String>) -> String {
     let parser = Parser::new(&markdown);
     let mut html = String::new();
     html::push_html(&mut html, parser);
-    with_delim_removed(
-        with_highlighted_code_snippets(&html)
-    )
+    Ok(with_delim_removed(with_highlighted_code_snippets(&html)))
 }
 
 fn with_highlighted_code_snippets(html: &String) -> String {
@@ -249,6 +265,13 @@ mod tests {
         assert_eq!(post.content, html);
     }
 
+    #[test]
+    fn it_renders_hard_coded_legacy_html_from_a_file() {
+        let post = Post::from(&hard_coded_legacy_input_path()).unwrap();
+        let html = fs::read_to_string(hard_coded_legacy_html_path()).unwrap();
+        assert_eq!(post.content, html);
+    }
+
     fn input_path() -> PathBuf {
         tests_path().join("2018-01-18-learning-rust-if-let-vs-match.markdown")
     }
@@ -263,6 +286,14 @@ mod tests {
 
     fn rendered_html_path() -> PathBuf {
         tests_path().join("learning-rust-if-let-vs--match.html")
+    }
+
+    fn hard_coded_legacy_input_path() -> PathBuf {
+        tests_path().join("2010-02-20-getting-started-with-ruby-metaprogramming.markdown")
+    }
+
+    fn hard_coded_legacy_html_path() -> PathBuf {
+        tests_path().join("getting-started-with-ruby-metaprogramming.html")
     }
 
     fn tests_path() -> PathBuf {
