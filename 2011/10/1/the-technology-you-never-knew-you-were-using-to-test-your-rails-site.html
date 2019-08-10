@@ -11,7 +11,7 @@ that use the default Capybara driver</i></small></td></tr>
 <p>But what you probably didn’t know is that indirectly Capybara uses a large, complex open source C library called <a href="http://xmlsoft.org">Libxml2</a> to parse the HTML returned by your site, and to run assertions against it. It’s interesting to me that each time I run a Cucumber BDD test on a Ruby on Rails web site, the HTML I’m trying to inspect and test is passed into a C library... in other words, that my Cucumber tests are actually implemented by C code I never even knew I had on my machine.</p>
 <h2>An example Rails BDD/integration test</h2>
 <p>Let’s start by taking a look at a typical Cucumber feature:</p>
-<pre>
+<pre type="console">
 {^rx:Scenario:^} Viewing the home page
     {^kw:Given^} I am on the home page
      {^cl:Then^} I should see "This is a simple web page."
@@ -41,7 +41,7 @@ that use the default Capybara driver</i></small></td></tr>
 <h2>Proving that Cucumber BDD tests use the Libxml2 C library</h2>
 <p>Next, let’s take a look at exactly how Nokogiri is calling Libxml2, and prove that this C library is being used in my example Cucumber test. Here’s the documentation for C Libxml2 API call used by Nokogiri to parse HTML (from: <a href="http://xmlsoft.org/html/libxml-HTMLparser.html#htmlReadMemory">http://xmlsoft.org/html/libxml-HTMLparser.html#htmlReadMemory</a>):</p>
 <p><b>Function: htmlReadMemory</b></p>
-<pre>
+<pre type="console">
 htmlDocPtr	htmlReadMemory (const char * buffer, 
       int size, 
       const char * URL, 
@@ -112,7 +112,7 @@ parse an XML in-memory document and build a tree.<br/>
 </span></pre>
 
 <p>I added the three fprintf lines at the top of the C function which will print out the HTML that is passed in from Capybara to Nokogiri on its way to Libxml2. Now if we manually recompile the C extension code in Nokogiri:</p>
-<pre>
+<pre type="console">
 $ cd ~/.rvm/gems/ruby-1.8.7-p352/gems/nokogiri-1.5.0/ext/nokogiri
 $ make
 $ make install
@@ -120,7 +120,7 @@ $ make install
 /Users/pat/.rvm/gems/ruby-1.8.7-p352/gems/nokogiri-1.5.0/lib/nokogiri
 </pre>
 <p>...and run the Cucumber test back in my Ruby app, we’ll see the HTML on it’s way to the Libxml2 library!</p>
-<pre>
+<pre type="console">
 $ bundle exec cucumber features/view_web_page.feature
 Using the default profile...
 Feature: View the home page
@@ -131,15 +131,15 @@ Feature: View the home page
   Scenario: Viewing the home page                  # features/view_web_page.feature:6
     {^s:Given I am on the home page^}                    # features/step_definitions/web_steps.rb:44
 DEBUG: the HTML passed from Capybara and Nokogiri to Libxml2 is:
-<!DOCTYPE html>
-<html>
-<head>
-  <title>SimpleWebApp</title>
-  <link href="/assets/application.css" media="screen" rel="stylesheet" type="text/css" />
-  <script src="/assets/application.js" type="text/javascript"></script>
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;head>
+  &lt;title>SimpleWebApp&lt;/title>
+  &lt;link href="/assets/application.css" media="screen" rel="stylesheet" type="text/css" />
+  &lt;script src="/assets/application.js" type="text/javascript">&lt;/script>
   
-</head>
-<body>
+&lt;/head>
+&lt;body>
 
 This is a simple web page.
 

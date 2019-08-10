@@ -22,17 +22,18 @@
 <p><img src="http://patshaughnessy.net/assets/2010/10/31/reliefhub3.png"></p>
 <p><a href="http://dancroak.com">Dan Croak</a> jumpstarted the project on Rails 3 using <a href="http://github.com/thoughtbot/suspenders">ThoughtBot&rsquo;s suspenders</a> and also setup a continuous integration server for us in a matter of just minutes using <a href="http://github.com/defunkt/cijoe">CI Joe</a> on an Ubuntu server graciously donated to us for the week by <a href="http://railsmachine.com/">Rails Machine</a>.</p>
 <p>Dan also helped the team get up to speed on the latest testing tools and ideas from ThoughtBot, like <a href="http://github.com/thoughtbot/bourne">Bourne</a>, <a href="http://robots.thoughtbot.com/post/159805987/speculating-with-shoulda">Shoulda RSpec matchers:</a></p>
-<div class="CodeRay">
-  <div class="code"><pre>describe <span class="co">Project</span> <span class="r">do</span>
-  let(<span class="sy">:project</span>) { Factory(<span class="sy">:project</span>) }
-<p>it { should belong_to(<span class="sy">:organization</span>) }
-it { should have_many(<span class="sy">:donations</span>) }
-<span class="r">end</span></p>
-</pre></div>
-</div><br/>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">describe Project </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">  let(</span><span style="color:#008080;">:project</span><span style="color:#000000;">) { Factory(</span><span style="color:#008080;">:project</span><span style="color:#000000;">) }
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  it { should belong_to(</span><span style="color:#008080;">:organization</span><span style="color:#000000;">) }
+</span><span style="color:#000000;">  it { should have_many(</span><span style="color:#008080;">:donations</span><span style="color:#000000;">) }
+</span><span style="color:#a71d5d;">end
+</span></pre>
+
 <p>... and <a href="http://robots.thoughtbot.com/post/284805810/gimme-three-steps">Factory Girl cucumber steps</a>:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">Scenario:</span> Visitor reviews project
+<pre><span class="r">Scenario:</span> Visitor reviews project
   <span class="r">Given</span> the following organization exists:
     | name                          |
     | Mission des Eglises Baptistes |
@@ -40,8 +41,7 @@ it { should have_many(<span class="sy">:donations</span>) }
     | name                | funds purpose           | organization              
     | Christmas Toy Drive | New or gently used toys | name: Mission des Eglis...
 etc...
-</pre></div>
-</div><br/>
+</pre>
 <p>Dan taught us a lot more than this, and also singlehandedly implemented a number of the user stories.</p>
 <p><a href="http://theagiledeveloper.com/">Matt Deiters</a> implemented some other key user stories, did a lot of user interface implementation work and also wrote a rake task to seed our database with development data.</p>
 <p><a href="http://github.com/klobuczek">Heinrich Klobuczek</a> used the <a href="http://github.com/iain/http_accept_language">http_accept_language gem</a> to provide internationalization support, and then proceeded to translate the site into French himself... despite being Polish! We&rsquo;ll have to have Rousseau check his French soon... lol.</p>
@@ -56,4 +56,4 @@ etc...
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
     }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
                       !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="links"><ul><li><a href="2018/10/24/summer-school-with-the-rust-compiler">Summer School With The Rust Compiler</a></li><li><a href="2018/6/9/from-activerecord-to-diesel">From ActiveRecord to Diesel</a></li><li><a href="2018/3/15/how-rust-implements-tagged-unions">How Rust Implements Tagged Unions</a></li><li><a href="2018/1/18/learning-rust-if-let-vs--match">Learning Rust: If Let vs. Match</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

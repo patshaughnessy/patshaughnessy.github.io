@@ -154,12 +154,12 @@
 
 <p>Note that right now the code inside the <span class="code">add_selector</span> definitions must be expressed as XPath expressions, and not as CSS. But using the <span class="code">XPath.css</span> function like I did above we can easily convert my CSS to XPath, and then pass it along to Capybara.</p>
 <p>A nice side benefit here is that I get a more readable error message if there’s a Cucumber failure:</p>
-<pre>
+<pre type="console">
 {^error:And I should see "Things.txt" in the second file section
   Unable to find file 3 (Capybara::ElementNotFound)^}
 </pre>
 <p>Instead of:</p>
-<pre>
+<pre type="console">
 {^error:And I should see "Things.txt" in the second file section
   expected css ".per_file_container:nth-child(3):contains('Things.txt')" to return something
 (RSpec::Expectations::ExpectationNotMetError)^}

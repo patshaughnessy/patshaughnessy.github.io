@@ -46,31 +46,35 @@ ruby-1.8.7-p302 :001 &gt; Person.page(3).per(5).to_sql
 <p>Here ActiveRecord has just combined the options from the two scopes together and produced a single SQL statement.</p>
 <h2>How does Kaminari create the page scope?</h2>
 <p>Finally, let’s take a quick look at how Akira Matsuda actually implemented this inside of Kaminari. You can find the code that implements the <span class="code">page</span> method for ActiveRecord models in the <a href="https://github.com/amatsuda/kaminari/blob/master/lib/kaminari/models/active_record_model_extension.rb">active_record_model_extension.rb</a> file inside of the Kaminari gem:</p>
-<div class="CodeRay"> 
-  <div class="code"><pre>require <span class="co">File</span>.join(<span class="co">File</span>.dirname(<span class="pc">__FILE__</span>), <span class="s"><span class="dl">'</span><span class="k">active_record_relation_methods</span><span class="dl">'</span></span>)
-<p><span class="r">module</span> <span class="cl">Kaminari</span>
-<span class="r">module</span> <span class="cl">ActiveRecordExtension</span>
-extend <span class="co">ActiveSupport</span>::<span class="co">Concern</span>
-included <span class="r">do</span>
-<span class="r">def</span> <span class="pc">self</span>.inherited(kls) <span class="c">#:nodoc:</span>
-<span class="r">super</span></p>
-<pre><code>    kls.class_eval &lt;span class=&quot;r&quot;&gt;do&lt;/span&gt; 
-      include &lt;span class=&quot;co&quot;&gt;Kaminari&lt;/span&gt;::&lt;span class=&quot;co&quot;&gt;ConfigurationMethods&lt;/span&gt; 
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#795da3;">require </span><span style="color:#008080;">File</span><span style="color:#795da3;">.join(</span><span style="color:#008080;">File</span><span style="color:#795da3;">.dirname(</span><span style="color:#000000;">__FILE__</span><span style="color:#795da3;">), </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">active_record_relation_methods</span><span style="color:#4f5b66;">&#39;</span><span style="color:#795da3;">)
+</span><span style="color:#000000;"> 
+</span><span style="color:#a71d5d;">module </span><span style="color:#000000;">Kaminari 
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">module </span><span style="color:#000000;">ActiveRecordExtension 
+</span><span style="color:#000000;">    </span><span style="color:#795da3;">extend </span><span style="color:#008080;">ActiveSupport</span><span style="color:#000000;">::Concern 
+</span><span style="color:#000000;">    included </span><span style="color:#a71d5d;">do 
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">def </span><span style="color:#000000;">self.</span><span style="color:#795da3;">inherited</span><span style="color:#000000;">(kls) </span><span style="color:#a7adba;">#:nodoc: 
+</span><span style="color:#000000;">        </span><span style="color:#a71d5d;">super 
+</span><span style="color:#000000;"> 
+</span><span style="color:#000000;">        kls.class_eval </span><span style="color:#a71d5d;">do 
+</span><span style="color:#000000;">          </span><span style="color:#795da3;">include </span><span style="color:#008080;">Kaminari</span><span style="color:#000000;">::ConfigurationMethods 
+</span><span style="color:#000000;"> 
+</span><span style="color:#000000;">          </span><span style="color:#a7adba;"># Fetch the values at the specified page number 
+</span><span style="color:#000000;">          </span><span style="color:#a7adba;">#   Model.page(5) 
+</span><span style="color:#000000;">          scope </span><span style="color:#008080;">:page</span><span style="color:#000000;">, </span><span style="color:#008080;">Proc</span><span style="color:#000000;">.</span><span style="color:#795da3;">new </span><span style="color:#000000;">{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">num</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">            limit(default_per_page).offset(default_per_page </span><span style="color:#4f5b66;">* </span><span style="color:#000000;">([num.to_i, </span><span style="color:#d08770;">1</span><span style="color:#000000;">].max </span><span style="color:#4f5b66;">- </span><span style="color:#d08770;">1</span><span style="color:#000000;">))
+</span><span style="color:#000000;">          } </span><span style="color:#a71d5d;">do 
+</span><span style="color:#000000;">            </span><span style="color:#795da3;">include </span><span style="color:#008080;">Kaminari</span><span style="color:#000000;">::ActiveRecordRelationMethods 
+</span><span style="color:#000000;">            </span><span style="color:#795da3;">include </span><span style="color:#008080;">Kaminari</span><span style="color:#000000;">::PageScopeMethods 
+</span><span style="color:#000000;">          </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">        </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end 
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-      &lt;span class=&quot;c&quot;&gt;# Fetch the values at the specified page number&lt;/span&gt; 
-      &lt;span class=&quot;c&quot;&gt;#   Model.page(5)&lt;/span&gt; 
-</code></pre>
-<div class='container'>          scope <span class="sy">:page</span>, <span class="co">Proc</span>.new {|num|
-            limit(default_per_page).offset(default_per_page * ([num.to_i, <span class="i">1</span>].max - <span class="i">1</span>))
-          } <span class="r">do</span> <span class='overlay'></span></div>            include <span class="co">Kaminari</span>::<span class="co">ActiveRecordRelationMethods</span> 
-            include <span class="co">Kaminari</span>::<span class="co">PageScopeMethods</span> 
-          <span class="r">end</span>
-        <span class="r">end</span> 
-      <span class="r">end</span> 
-    <span class="r">end</span> 
-  <span class="r">end</span> 
-<span class="r">end</span></pre></div> 
-</div> 
 <p>There’s a lot of metaprogramming going on here, so let’s take it one step at a time. The first thing to learn is that the Kaminari::ActiveRecordExtension module uses ActiveRecord::Concern, which provides a standard way to add behavior to some target Ruby class. <a href="http://www.fakingfantastic.com/2010/09/20/concerning-yourself-with-active-support-concern">This well written article</a> does a nice job of explaining how ActiveSupport::Concern works in Rails 3. Elsewhere in the gem source code Kaminari::ActiveRecordExtension is included in ActiveRecord::Base, which becomes the target class in this case. The rest of the code reads something like this:</p>
 <ul>
   <li>When Kaminari:: ActiveRecordExtension is included in ActiveRecord::Base...</li>

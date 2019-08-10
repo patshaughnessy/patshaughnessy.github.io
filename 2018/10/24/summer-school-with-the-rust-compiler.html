@@ -27,7 +27,7 @@ it in just a few seconds:</p>
 </span></pre>
 
 <p>When I ran it, the output was:</p>
-<pre>
+<pre class="console">
 $ ruby int-loop.rb
 1
 2
@@ -54,7 +54,7 @@ one line of code to my example, <span class="code">i = i+1</span>:</p>
 </span></pre>
 
 <p>As I expected, Ruby printed out 2 through 4:</p>
-<pre>
+<pre class="console">
 $ ruby int-loop.rb
 2
 3
@@ -83,7 +83,7 @@ to rewrite it in only a few minutes:</p>
 <p>I had to type semicolons after each line and use a <span
 class="code">main</span> function. A bit more typing, but really this is
 exactly the same program. Running this, of course, produced the same result:</p>
-<pre>
+<pre class="console">
 $ rustc int-loop.rs && ./int-loop
 1
 2
@@ -101,7 +101,7 @@ $ rustc int-loop.rs && ./int-loop
 </pre>
 <h2>Lesson One: Passing By Reference vs. Passing By Value</h2>
 <p>Compiling this, the Rust compiler hit me over the head with Computer Science!</p>
-<pre>
+<pre class="console">
 $ rustc int-loop.rs && ./int-loop
 error[E0271]: type mismatch resolving `<&i32 as std::ops::Add<i32>>::Output == &i32`
   --> int-loop.rs:4:14
@@ -121,7 +121,7 @@ message straight out of type theory! The error <span class="code">type mismatch
 resolving `&lt;&amp;i32 as std::ops::Add&gt;::Output == &amp;i32`</span> makes no sense to me at
 all.</p>
 <p>I decided to take the compiler’s suggestion and run the explain command:</p>
-<pre>
+<pre class="console">
 $ rustc --explain E0271
 This is because of a type mismatch between the associated type of some
 trait (e.g. `T::Bar`, where `T` implements `trait Quux { type Bar; }`)
@@ -133,7 +133,7 @@ didn’t resemble my code at all. What is a trait? What is an associated type? I
 didn’t use any of these more advanced Rust concepts in my simple script. Maybe
 I needed a PhD. in Computer Science even to try to use Rust?</p>
 <p>Eventually, I figured it out. The key lines from the error message were:</p>
-<pre>
+<pre class="console">
  4 |         i = i+1;
    |              ^ expected i32, found &i32
 </pre>
@@ -162,7 +162,7 @@ the reference before using it. I changed <span class="code">i = i+1</span> to
 <span style="color:#000000;">}</span>
 </pre>
 <p>Then Rust slapped me in the face again with more Computer Science:</p>
-<pre>
+<pre class="console">
 $ rustc int-loop.rs && ./int-loop
 error[E0594]: cannot assign to immutable borrowed content `*i`
   --> int-loop.rs:26:9
@@ -226,7 +226,7 @@ immutable by default. Because it was immutable, my code can’t change it.</p>
 </pre>
 <h2>Lesson Four: Declaring Side Effects</h2>
 <p>Running the Rust compiler again, I got the same error along with a new warning:</p>
-<pre>
+<pre class="console">
 $ rustc int-loop.rs && ./int-loop
 error[E0594]: cannot assign to immutable borrowed content `*i`
   --> int-loop.rs:14:9
@@ -268,7 +268,7 @@ forced me to declare that my code might change the array.</p>
 <span style="color:#000000;">    }</span>
 <span style="color:#000000;">}</span>
 </pre>
-<pre>
+<pre class="console">
 $ rustc int-loop.rs && ./int-loop
 2
 3
@@ -332,7 +332,7 @@ end
 puts "----"
 p array
 </pre>
-<pre>
+<pre class="console">
 $ ruby int-loop.rb
 2
 3
@@ -358,7 +358,7 @@ end
 puts "----"
 p array
 </pre>
-<pre>
+<pre class="console">
 $ ruby string-loop.rb
 one-mutated
 two-mutated

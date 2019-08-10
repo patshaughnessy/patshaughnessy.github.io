@@ -55,7 +55,7 @@
 </span></pre>
 
 <p>This is still far from obvious, but after looking up the meaning of the <a href="http://www.ruby-doc.org/core-1.9.3/Array.html#method-i-zip">Array.zip method</a> and experimenting with the Hash[] syntax in the console:</p>
-<pre>
+<pre type="console">
 > args = ["red"]
  => ["red"] 
 > [:color].zip(args)
@@ -64,10 +64,10 @@
  => {:color=>"red"} 
 </pre>
 <p>...I can finally get to a good understanding of what the original metaprogramming was doing. It was defining a new class method called <span class="code">scoped_by_color</span> that simply calls <span class="code">scoped(:conditions =&gt; {:color=&gt;&quot;red&quot;})</span> - giving me the same behavior I would have gotten by using an anonymous scope directly:</p>
-<pre>
+<pre type="console">
 > Shirt.scoped(:conditions => {:color => 'red'})
   Shirt Load (0.2ms)  SELECT "shirts".* FROM "shirts" WHERE "shirts"."color" = 'red'
- => [#<Shirt id: 1, color: "red", created_at... >] 
+ => [#&lt;Shirt id: 1, color: "red", created_at... >] 
 </pre>
 <p>I found this translated code comment to be so helpful that I believe it’s a metaprogramming best practice that we should all learn from! The idea isn’t new, actually. In fact <a href="http://yehudakatz.com/">Yehuda Katz</a>, by all accounts a master of Ruby programming, <a href="http://yehudakatz.com/2008/12/29/another-rails-2x3-update">originally mentioned the idea</a> of “annotating metaprogramming” while he was working on Rails 3 back in 2008, saying he was inspired by Michael Klishin (antares), and the next day <a href="http://hashref.com/">Xavier Noria</a> went ahead and added the annotations to the Rails source code in this <a href="https://github.com/rails/rails/commit/a2270ef2594b97891994848138614657363f2806">one large commit</a>.</p>
 <p>But wait a minute... aren’t code comments frowned upon and largely unnecessary, especially in a language as expressive as Ruby is? Also comments instantly become a maintenance problem - as soon as you change your code the comments are now out of date. However, in the case of metaprogramming, I think this is a small price to pay. I’m impressed that the Rails team took some time to make their code more readable and understandable for other developers, and not just for the Rails interpreter. We should all do the same whenever we use metaprogramming.</p>
@@ -78,7 +78,7 @@
 </table>
 </div>
 <p>Using the same <span class="code">Shirt.scoped_by_color</span> example, let’s suppose I forget to pass in the color parameter (note: if you try this yourself you won’t get this error unless you’re using edge Rails. In Rails 3.1 and earlier a warning is put into the log file instead.):</p>
-<pre>
+<pre type="console">
 > Shirt.scoped_by_color
 ArgumentError: wrong number of arguments (0 for 1)
  from .../dynamic_matchers.rb:29:in `scoped_by_color'

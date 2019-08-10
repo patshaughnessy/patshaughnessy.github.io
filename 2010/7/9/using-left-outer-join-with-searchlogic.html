@@ -244,45 +244,48 @@ associated_key = matching_association(<span class="gv">$1</span>).primary_key_na
 <span class="r">end</span></pre></div></p>
 </div><br>
 <p>Finally, we can put it all together like this:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">class</span> <span class="cl">Book</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
-  has_one <span class="sy">:author</span>
-<p><span class="r">class</span> &lt;&lt; <span class="cl">self</span>
-<span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
-association_names =
-reflect_on_all_associations.collect { |assoc| assoc.name }
-<span class="r">if</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^without_(</span></span><span class="il"><span class="idl">#{</span>association_names.join(<span class="s"><span class="dl">&quot;</span><span class="k">|</span><span class="dl">&quot;</span></span>)<span class="idl">}</span></span><span class="rx"><span class="k">)$</span><span class="dl">/</span></span>
-associated_table = matching_association(<span class="gv">$1</span>).table_name
-associated_key = matching_association(<span class="gv">$1</span>).primary_key_name
-named_scope name,
-{
-<span class="sy">:joins</span> =&gt; join_clause(associated_table, associated_key),
-<span class="sy">:conditions</span> =&gt; where_clause(associated_table, associated_key)
-}
-send(name)
-<span class="r">else</span>
-<span class="r">super</span>
-<span class="r">end</span>
-<span class="r">end</span></p>
-<pre><code>&lt;span class=&quot;r&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;fu&quot;&gt;matching_association&lt;/span&gt;(match)
-  &lt;span class=&quot;iv&quot;&gt;@matching_association&lt;/span&gt; ||= reflect_on_all_associations.detect &lt;span class=&quot;r&quot;&gt;do&lt;/span&gt; |assoc|
-    assoc.name.to_s == match
-  &lt;span class=&quot;r&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;r&quot;&gt;end&lt;/span&gt;
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Book </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
+</span><span style="color:#000000;">  has_one </span><span style="color:#008080;">:author
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">class </span><span style="color:#4f5b66;">&lt;&lt; </span><span style="color:#000000;">self
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(name, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">args, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">      association_names </span><span style="color:#4f5b66;">=
+</span><span style="color:#000000;">        reflect_on_all_associations.collect { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">assoc</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> assoc.name }
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">if </span><span style="color:#000000;">name.to_s </span><span style="color:#4f5b66;">=~ /</span><span style="color:#96b5b4;">^without_(#{association_names.join(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">|</span><span style="color:#4f5b66;">&quot;</span><span style="color:#96b5b4;">)})$</span><span style="color:#4f5b66;">/
+</span><span style="color:#000000;">        associated_table </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> matching_association(</span><span style="color:#4f5b66;">$</span><span style="color:#000000;">1).table_name
+</span><span style="color:#000000;">        associated_key </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> matching_association(</span><span style="color:#4f5b66;">$</span><span style="color:#000000;">1).primary_key_name
+</span><span style="color:#000000;">        named_scope name,
+</span><span style="color:#000000;">          {
+</span><span style="color:#000000;">            </span><span style="color:#008080;">:joins </span><span style="color:#000000;">=&gt; join_clause(associated_table, associated_key),
+</span><span style="color:#000000;">            </span><span style="color:#008080;">:conditions </span><span style="color:#000000;">=&gt; where_clause(associated_table, associated_key)
+</span><span style="color:#000000;">          }
+</span><span style="color:#000000;">        send(name)
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">else
+</span><span style="color:#000000;">        </span><span style="color:#a71d5d;">super
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">matching_association</span><span style="color:#000000;">(match)
+</span><span style="color:#000000;">      </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">matching_association </span><span style="color:#4f5b66;">||=</span><span style="color:#000000;"> reflect_on_all_associations.detect </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">assoc</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">        assoc.name.to_s </span><span style="color:#4f5b66;">== </span><span style="color:#000000;">match
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">join_clause</span><span style="color:#000000;">(associated_table, associated_key)
+</span><span style="color:#000000;">      outer_join </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">LEFT OUTER JOIN </span><span style="color:#000000;">#{associated_table}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">      outer_join </span><span style="color:#4f5b66;">+= &quot;</span><span style="color:#008080;"> ON </span><span style="color:#000000;">#{associated_table}</span><span style="color:#008080;">.</span><span style="color:#000000;">#{associated_key}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">      outer_join </span><span style="color:#4f5b66;">+= &quot;</span><span style="color:#008080;"> = </span><span style="color:#000000;">#{quoted_table_name}</span><span style="color:#008080;">.</span><span style="color:#000000;">#{primary_key}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">where_clause</span><span style="color:#000000;">(associated_table, associated_key)
+</span><span style="color:#000000;">      </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{associated_table}</span><span style="color:#008080;">.</span><span style="color:#000000;">#{associated_key}</span><span style="color:#008080;"> IS NULL</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-&lt;span class=&quot;r&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;fu&quot;&gt;join_clause&lt;/span&gt;(associated_table, associated_key)
-  outer_join = &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;LEFT OUTER JOIN &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;il&quot;&gt;&lt;span class=&quot;idl&quot;&gt;#{&lt;/span&gt;associated_table&lt;span class=&quot;idl&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-  outer_join += &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt; ON &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;il&quot;&gt;&lt;span class=&quot;idl&quot;&gt;#{&lt;/span&gt;associated_table&lt;span class=&quot;idl&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;k&quot;&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;il&quot;&gt;&lt;span class=&quot;idl&quot;&gt;#{&lt;/span&gt;associated_key&lt;span class=&quot;idl&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-  outer_join += &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt; = &lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;il&quot;&gt;&lt;span class=&quot;idl&quot;&gt;#{&lt;/span&gt;quoted_table_name&lt;span class=&quot;idl&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;k&quot;&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;il&quot;&gt;&lt;span class=&quot;idl&quot;&gt;#{&lt;/span&gt;primary_key&lt;span class=&quot;idl&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-&lt;span class=&quot;r&quot;&gt;end&lt;/span&gt;
-
-&lt;span class=&quot;r&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;fu&quot;&gt;where_clause&lt;/span&gt;(associated_table, associated_key)
-  &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;il&quot;&gt;&lt;span class=&quot;idl&quot;&gt;#{&lt;/span&gt;associated_table&lt;span class=&quot;idl&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;k&quot;&gt;.&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;il&quot;&gt;&lt;span class=&quot;idl&quot;&gt;#{&lt;/span&gt;associated_key&lt;span class=&quot;idl&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;k&quot;&gt; IS NULL&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/span&gt;
-&lt;span class=&quot;r&quot;&gt;end&lt;/span&gt;
-</code></pre>
-<p><span class="r">end</span>
-<span class="r">end</span></pre></div></p>
-</div><br>
 <p>Note that I used &ldquo;send(name)&rdquo; to call the named scope we just created with named_scope. Let&rsquo;s make sure it still all works properly in the console:</p>
 <div class="CodeRay">
   <div class="code"><pre>&gt;&gt; Book.without_author.collect { |book| book.title }
@@ -293,40 +296,46 @@ send(name)
 </div><br>
 <p>Phew &ndash; it does! Ideally I would have some RSpec examples setup to test this, instead of using the console.</p>
 <p>Just like in <a href="http://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic">my last article</a>, the last thing I&rsquo;ll do today is move these class methods out of the Book model and into a new module called SearchLogicExtensions, which in my application I saved into a file called config/initializers/search_logic_extensions.rb. This causes the method missing code to be loaded when my app starts up. At the bottom I extend ActiveRecord::Base with the new module, so the named scope can be used by every model in my application:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">module</span> <span class="cl">SearchLogicExtensions</span>
-  <span class="r">def</span> <span class="fu">method_missing</span>(name, *args, &amp;block)
-    association_names =
-      reflect_on_all_associations.collect { |assoc| assoc.name }
-    <span class="r">if</span> name.to_s =~ <span class="rx"><span class="dl">/</span><span class="k">^without_(</span></span><span class="il"><span class="idl">#{</span>association_names.join(<span class="s"><span class="dl">&quot;</span><span class="k">|</span><span class="dl">&quot;</span></span>)<span class="idl">}</span></span><span class="rx"><span class="k">)$</span><span class="dl">/</span></span>
-      associated_table = matching_association(<span class="gv">$1</span>).table_name
-      associated_key = matching_association(<span class="gv">$1</span>).primary_key_name
-      named_scope name,
-        {
-          <span class="sy">:joins</span> =&gt; join_clause(associated_table, associated_key),
-          <span class="sy">:conditions</span> =&gt; where_clause(associated_table, associated_key)
-        }
-      send(name)
-    <span class="r">else</span>
-      <span class="r">super</span>
-    <span class="r">end</span>
-  <span class="r">end</span>
-<p><span class="r">def</span> <span class="fu">matching_association</span>(match)
-<span class="iv">@matching_association</span> ||= reflect_on_all_associations.detect <span class="r">do</span> |assoc|
-assoc.name.to_s == match
-<span class="r">end</span>
-<span class="r">end</span></p>
-<p><span class="r">def</span> <span class="fu">join_clause</span>(associated_table, associated_key)
-outer_join = <span class="s"><span class="dl">&quot;</span><span class="k">LEFT OUTER JOIN </span></span><span class="il"><span class="idl">#{</span>associated_table<span class="idl">}</span></span><span class="s"><span class="dl">&quot;</span></span>
-outer_join += <span class="s"><span class="dl">&quot;</span><span class="k"> ON </span></span><span class="il"><span class="idl">#{</span>associated_table<span class="idl">}</span></span><span class="s"><span class="k">.</span></span><span class="il"><span class="idl">#{</span>associated_key<span class="idl">}</span></span><span class="s"><span class="dl">&quot;</span></span>
-outer_join += <span class="s"><span class="dl">&quot;</span><span class="k"> = </span></span><span class="il"><span class="idl">#{</span>quoted_table_name<span class="idl">}</span></span><span class="s"><span class="k">.</span></span><span class="il"><span class="idl">#{</span>primary_key<span class="idl">}</span></span><span class="s"><span class="dl">&quot;</span></span>
-<span class="r">end</span></p>
-<p><span class="r">def</span> <span class="fu">where_clause</span>(associated_table, associated_key)
-<span class="s"><span class="dl">&quot;</span></span><span class="il"><span class="idl">#{</span>associated_table<span class="idl">}</span></span><span class="s"><span class="k">.</span></span><span class="il"><span class="idl">#{</span>associated_key<span class="idl">}</span></span><span class="s"><span class="k"> IS NULL</span><span class="dl">&quot;</span></span>
-<span class="r">end</span>
-<span class="r">end</span></p>
-<p><span class="co">ActiveRecord</span>::<span class="co">Base</span>.extend(<span class="co">SearchLogicExtensions</span>)</pre></div></p>
-</div>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">module </span><span style="color:#000000;">SearchLogicExtensions
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(name, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">args, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">    association_names </span><span style="color:#4f5b66;">=
+</span><span style="color:#000000;">      reflect_on_all_associations.collect { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">assoc</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> assoc.name }
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">if </span><span style="color:#000000;">name.to_s </span><span style="color:#4f5b66;">=~ /</span><span style="color:#96b5b4;">^without_(#{association_names.join(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">|</span><span style="color:#4f5b66;">&quot;</span><span style="color:#96b5b4;">)})$</span><span style="color:#4f5b66;">/
+</span><span style="color:#000000;">      associated_table </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> matching_association(</span><span style="color:#4f5b66;">$</span><span style="color:#000000;">1).table_name
+</span><span style="color:#000000;">      associated_key </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> matching_association(</span><span style="color:#4f5b66;">$</span><span style="color:#000000;">1).primary_key_name
+</span><span style="color:#000000;">      named_scope name,
+</span><span style="color:#000000;">        {
+</span><span style="color:#000000;">          </span><span style="color:#008080;">:joins </span><span style="color:#000000;">=&gt; join_clause(associated_table, associated_key),
+</span><span style="color:#000000;">          </span><span style="color:#008080;">:conditions </span><span style="color:#000000;">=&gt; where_clause(associated_table, associated_key)
+</span><span style="color:#000000;">        }
+</span><span style="color:#000000;">      send(name)
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">else
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">super
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">matching_association</span><span style="color:#000000;">(match)
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">matching_association </span><span style="color:#4f5b66;">||=</span><span style="color:#000000;"> reflect_on_all_associations.detect </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">assoc</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">        assoc.name.to_s </span><span style="color:#4f5b66;">== </span><span style="color:#000000;">match
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">join_clause</span><span style="color:#000000;">(associated_table, associated_key)
+</span><span style="color:#000000;">    outer_join </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">LEFT OUTER JOIN </span><span style="color:#000000;">#{associated_table}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">    outer_join </span><span style="color:#4f5b66;">+= &quot;</span><span style="color:#008080;"> ON </span><span style="color:#000000;">#{associated_table}</span><span style="color:#008080;">.</span><span style="color:#000000;">#{associated_key}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">    outer_join </span><span style="color:#4f5b66;">+= &quot;</span><span style="color:#008080;"> = </span><span style="color:#000000;">#{quoted_table_name}</span><span style="color:#008080;">.</span><span style="color:#000000;">#{primary_key}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">where_clause</span><span style="color:#000000;">(associated_table, associated_key)
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{associated_table}</span><span style="color:#008080;">.</span><span style="color:#000000;">#{associated_key}</span><span style="color:#008080;"> IS NULL</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#008080;">ActiveRecord</span><span style="color:#000000;">::</span><span style="color:#008080;">Base</span><span style="color:#000000;">.</span><span style="color:#795da3;">extend</span><span style="color:#000000;">(SearchLogicExtensions)
+</span></pre>
+
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2010/7/9/using-left-outer-join-with-searchlogic'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Using LEFT OUTER JOIN with SearchLogic';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';

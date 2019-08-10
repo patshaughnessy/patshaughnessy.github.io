@@ -25,30 +25,30 @@
 <p>This is what I like the most about Backbone: it organizes my code! No longer do I have everything combined together in one large application.js file... it’s all split up into different classes that play the same MVC roles that I use in my Rails app. And James has organized the code for these classes in separate folders that are easy to find and remember.</p>
 <h2>JST: Javascript views evaluated on the client side</h2>
 <p>JST stands for “Javascript Templates” and is an <a href="http://code.google.com/p/trimpath/wiki/JavaScriptTemplates">open source project</a> that’s been around for a number of years now. Backbone makes it easy to use JST to construct the HTML generated for each Javascript view object. Note how James created 3 views in his application, called show.js, index.js, and notice.js, all stored in the app/javascripts/views folder. These contain the Backbone code required to display a single document, or a collection of documents. For example, here’s the views/index.js file:</p>
-<div class="CodeRay"> 
-  <div class="code"><pre>App.Views.Index = Backbone.View.extend({
-    <span class="ke">initialize</span>: <span class="kw">function</span>() {
-        <span class="lv">this</span>.render();
+<pre>
+App.Views.Index = Backbone.View.extend({
+    initialize: function() {
+        this.render();
     },
-<pre><code>&lt;span class=&quot;ke&quot;&gt;render&lt;/span&gt;: &lt;span class=&quot;kw&quot;&gt;function&lt;/span&gt;() {
-    &lt;span class=&quot;pd&quot;&gt;$&lt;/span&gt;(&lt;span class=&quot;lv&quot;&gt;this&lt;/span&gt;.el).html(JST.documents_collection({ &lt;span class=&quot;ke&quot;&gt;collection&lt;/span&gt;: &lt;span class=&quot;lv&quot;&gt;this&lt;/span&gt;.collection }));
-    &lt;span class=&quot;pd&quot;&gt;$&lt;/span&gt;(&lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;#app&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt;).html(&lt;span class=&quot;lv&quot;&gt;this&lt;/span&gt;.el);
-}
-</code></pre>
-<p>});</pre></div></p>
-</div> 
+
+    render: function() {
+        $(this.el).html(JST.documents_collection({ collection: this.collection }));
+        $('#app').html(this.el);
+    }
+});
+</pre>
 <p>This code is called when CloudEdit needs to display a list of documents. You can see that it calls the “JST.documents_collection” function and passes in the collection of documents. This actually refers to the “documents_collect.jst” file, which in CloudEdit is saved in the app/views/documents folder, where you would normally find the server-side view code. And here’s what the documents-collection.jst file looks like:</p>
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="il"><span class="idl">&lt;%</span> <span class="r">if</span>(collection.models.length &gt; <span class="i">0</span>) { <span class="idl">%&gt;</span></span> 
-    <span class="ta">&lt;h3&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">'</span><span class="k">#new</span><span class="dl">'</span></span><span class="ta">&gt;</span>Create New<span class="ta">&lt;/a&gt;</span><span class="ta">&lt;/h3&gt;</span><span class="ta">&lt;ul&gt;</span> 
-    <span class="il"><span class="idl">&lt;%</span> collection.each(function(item) { <span class="idl">%&gt;</span></span> 
-        <span class="ta">&lt;li&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">'</span><span class="k">#documents/</span><span class="il"><span class="idl">&lt;%=</span> item.id <span class="idl">%&gt;</span></span><span class="dl">'</span></span><span class="ta">&gt;</span><span class="il"><span class="idl">&lt;%=</span> item.escape(<span class="s"><span class="dl">'</span><span class="k">title</span><span class="dl">'</span></span>) <span class="idl">%&gt;</span></span><span class="ta">&lt;/a&gt;</span><span class="ta">&lt;/li&gt;</span> 
-    <span class="il"><span class="idl">&lt;%</span> }); <span class="idl">%&gt;</span></span> 
-    <span class="ta">&lt;/ul&gt;</span> 
-<span class="il"><span class="idl">&lt;%</span> } <span class="r">else</span> { <span class="idl">%&gt;</span></span> 
-    <span class="ta">&lt;h3&gt;</span>No documents! <span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">'</span><span class="k">#new</span><span class="dl">'</span></span><span class="ta">&gt;</span>Create one<span class="ta">&lt;/a&gt;</span><span class="ta">&lt;/h3&gt;</span> 
-<span class="il"><span class="idl">&lt;%</span> } <span class="idl">%&gt;</span></span></pre></div> 
-</div> 
+<pre>
+&lt;% if(collection.models.length > 0) { %>
+    &lt;h3>&lt;a href='#new'>Create New&lt;/a>&lt;/h3>&lt;ul>
+    <% collection.each(function(item) { &lt;%
+        &lt;li>&lt;a href='#documents/&lt;%= item.id %>'>&lt;%= item.escape('title') %>&lt;/a>&lt;/li>
+    <% }); %>
+    &lt;/ul>
+<% } else { %>
+    &lt;h3>No documents! &lt;a href='#new'>Create one&lt;/a>&lt;/h3>
+<% } %>
+</pre>
 <p>As James explains in part 2 of his tutorial, this resembles ERB code but is actually evaluated on the client side to display the list of documents. The variables “collection” and “item” refer to the Backbone collection and model objects used by CloudEdit.</p>
 <p>Since CloudEdit is based on Rails 2.3.8, it uses the <a href="http://documentcloud.github.com/jammit/">Jammit gem</a>, also from <a href="http://www.documentcloud.org/home">DocumentCloud</a> to package and download all of the client code, similar to how the Rails 3.1 asset pipeline works. James has configured Jammit to look for all of the Backbone code in the public/javascript folders above, and the JST files in the app/views folder.</p>
 <h2>Rails 3.1 and the asset pipeline</h2>
@@ -62,30 +62,36 @@
 <p><img src="http://patshaughnessy.net/assets/2011/6/27/backbone_rails_scaffold.gif" alt="public folder" /></p>
 <p>Here we can see they’ve created the usual “model,” “controllers” and “views” folders right under app/assets/javascripts. This works well with Rails 3.1 and Sprockets since all of these files will be compiled and combined together. You can also see a folder called “templates/posts”. This folder holds files similar to the JST files we saw above in the CloudEdit example, but instead CodeBrew is using the <a href="https://github.com/sstephenson/ruby-ejs/">EJS gem</a> to preprocess their JST files on the server before later using them on the client side.</p>
 <p>Here’s what the index_view.coffee file in the app/assets/javascripts/backbone/views/posts folder looks like:</p>
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="co">Backbone_scaffold_test</span>.<span class="co">Views</span>.<span class="co">Posts</span> ||= {}
-<p><span class="r">class</span> <span class="cl">Backbone_scaffold_test</span>.<span class="co">Views</span>.<span class="co">Posts</span>.<span class="co">PostView</span> extends <span class="co">Backbone</span>.<span class="co">View</span>
-template: <span class="co">JST</span>[<span class="s"><span class="dl">&quot;</span><span class="k">backbone/templates/posts/post</span><span class="dl">&quot;</span></span>]</p>
-<p>events:
-<span class="s"><span class="dl">&quot;</span><span class="k">click .destroy</span><span class="dl">&quot;</span></span> : <span class="s"><span class="dl">&quot;</span><span class="k">destroy</span><span class="dl">&quot;</span></span></p>
-<p>tagName: <span class="s"><span class="dl">&quot;</span><span class="k">tr</span><span class="dl">&quot;</span></span></p>
-<p>destroy: () -&gt;
-<span class="iv">@options</span>.model.destroy()
-this.remove()</p>
-<pre><code>&lt;span class=&quot;r&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;pc&quot;&gt;false&lt;/span&gt; 
-</code></pre>
-<p>render: -&gt;
-<span class="er">$</span>(this.el).html(this.template(this.options.model.toJSON() ))<br />
-<span class="r">return</span> <span class="pc">this</span></pre></div></p>
-</div> 
+<pre>
+Backbone_scaffold_test.Views.Posts ||= {}
+
+class Backbone_scaffold_test.Views.Posts.PostView extends Backbone.View
+  template: JST["backbone/templates/posts/post"]
+
+  events:
+    "click .destroy" : "destroy"
+
+  tagName: "tr"
+
+  destroy: () ->
+    @options.model.destroy()
+    this.remove()
+
+    return false
+
+  render: ->
+    $(this.el).html(this.template(this.options.model.toJSON() ))
+    return this
+</pre>
 <p>This is CoffeeScript, which you can guess from the file extension, one of the other exciting innovations in Rails 3.1. I don’t have time to explain everything here today, but one important detail to notice here is that the view code calls JST[&quot;backbone/templates/posts/post&quot;]. This refers to the post.jst.ejs JST template file, located in the app/assets/javascripts/backbone/templates/posts folder:</p>
-<div class="CodeRay"> 
-  <div class="code"><pre><span class="ta">&lt;td&gt;</span><span class="il"><span class="idl">&lt;%=</span> title <span class="idl">%&gt;</span></span><span class="ta">&lt;/td&gt;</span> 
-<span class="ta">&lt;td&gt;</span><span class="il"><span class="idl">&lt;%=</span> content <span class="idl">%&gt;</span></span><span class="ta">&lt;/td&gt;</span> 
-<p><span class="ta">&lt;td&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">&quot;</span><span class="k">#/</span><span class="il"><span class="idl">&lt;%=</span> id <span class="idl">%&gt;</span></span><span class="dl">&quot;</span></span><span class="ta">&gt;</span>Show<span class="ta">&lt;/td&gt;</span>
-<span class="ta">&lt;td&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">&quot;</span><span class="k">#/</span><span class="il"><span class="idl">&lt;%=</span> id <span class="idl">%&gt;</span></span><span class="k">/edit</span><span class="dl">&quot;</span></span><span class="ta">&gt;</span>Edit<span class="ta">&lt;/td&gt;</span>
-<span class="ta">&lt;td&gt;</span><span class="ta">&lt;a</span> <span class="an">href</span>=<span class="s"><span class="dl">&quot;</span><span class="k">#/</span><span class="il"><span class="idl">&lt;%=</span> id <span class="idl">%&gt;</span></span><span class="k">/destroy</span><span class="dl">&quot;</span></span> <span class="an">class</span>=<span class="s"><span class="dl">&quot;</span><span class="k">destroy</span><span class="dl">&quot;</span></span><span class="ta">&gt;</span>Destroy<span class="ta">&lt;/a&gt;</span><span class="ta">&lt;/td&gt;</span></pre></div></p>
-</div> 
+<pre>
+&lt;td>&lt;%= title %>&lt;/td>
+&lt;td>&lt;%= content %>&lt;/td>
+
+&lt;td>&lt;a href="#/&lt;%= id %>">Show&lt;/td>
+&lt;td>&lt;a href="#/&lt;%= id %>/edit">Edit&lt;/td>
+&lt;td>&lt;a href="#/&lt;%= id %>/destroy" class="destroy">Destroy&lt;/a>&lt;/td>
+</pre>
 <p>Again, think of JST like a client side ERB transformation.</p>
 <h2>Conclusion</h2>
 <p>While it’s still not obvious how to organize your Javascript code files in a Rails project, I hope looking at these two examples sparked some ideas and will make you think twice about it. Remember, organizing your code files in directories is not simply a matter of housekeeping or typing: having a well organized project directory structure will lead to well organized code, and ultimately to a better application.</p>

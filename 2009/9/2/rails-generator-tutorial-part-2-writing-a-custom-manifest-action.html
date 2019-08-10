@@ -73,58 +73,64 @@ This will remove the new route from routes.rb.
           rm  app/controllers/version_controller.rb</pre>
 <p>It turns out a cleaner way to implement the &ldquo;route&rdquo; method is to directly add the method to both the Create and Destroy command classes. This allows me to call a utility method called &ldquo;gsub_file&rdquo; in the Rails::Generator::Commands::Base class which I wouldn&rsquo;t have direct access to from my generator class. It also avoids the somewhat ugly if statement on the options[:command] value, and finally it might make it easier for me someday to refactor the new route methods into a separate module that I could use with various different generators that might need to add and remove routes.</p>
 <p>Anyway, here&rsquo;s the finished code for the entire generator:</p>
-<pre>class VersionGenerator &lt; Rails::Generator::NamedBase
-  attr_reader :version_path
-  def initialize(runtime_args, runtime_options = {})
-    super
-    @version_path = File.join(RAILS_ROOT, name)
-  end
-  def manifest
-    record do |m|
-      m.template(&#x27;controller.rb&#x27;, &#x27;app/controllers/version_controller.rb&#x27;)
-      m.route :name =&gt; &#x27;version&#x27;,
-              :controller =&gt; &#x27;version&#x27;,
-              :action =&gt; &#x27;display_version&#x27;
-    end
-  end
-end
-<p>module Rails
-module Generator
-module Commands</p>
-<pre><code>  class Base
-    def route_code(route_options)
-      &amp;quot;map.#{route_options[:name]} &amp;#x27;#{route_options[:name]}&amp;#x27;, :controller =&amp;gt; &amp;#x27;#{route_options[:controller]}&amp;#x27;, :action =&amp;gt; &amp;#x27;#{route_options[:action]}&amp;#x27;&amp;quot;
-    end
-  end
-</code></pre>
-<h1>Here's a readable version of the long string used above in route_code;</h1>
-<h1>but it should be kept on one line to avoid inserting extra whitespace</h1>
-<h1>into routes.rb when the generator is run:</h1>
-<h1>&quot;map.#{route_options[:name]} '#{route_options[:name]}',</h1>
-<h1>:controller =&gt; '#{route_options[:controller]}',</h1>
-<h1>:action =&gt; '#{route_options[:action]}'&quot;</h1>
-<pre><code>  class Create
-    def route(route_options)
-      sentinel = &amp;#x27;ActionController::Routing::Routes.draw do |map|&amp;#x27;
-      logger.route route_code(route_options)
-      gsub_file &amp;#x27;config/routes.rb&amp;#x27;, /(#{Regexp.escape(sentinel)})/mi do |m|
-          &amp;quot;#{m}\n  #{route_code(route_options)}\n&amp;quot;
-      end
-    end
-  end
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">VersionGenerator </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">Rails::Generator::NamedBase
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">attr_reader </span><span style="color:#008080;">:version_path
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">initialize</span><span style="color:#000000;">(runtime_args, runtime_options </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">{})
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">super
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">version_path </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">File</span><span style="color:#000000;">.join(RAILS_ROOT, name)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">manifest
+</span><span style="color:#000000;">    record </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">m</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">      m.template(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">controller.rb</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">app/controllers/version_controller.rb</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">      m.route </span><span style="color:#008080;">:name </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">version</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">,
+</span><span style="color:#000000;">              </span><span style="color:#008080;">:controller </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">version</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">,
+</span><span style="color:#000000;">              </span><span style="color:#008080;">:action </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">display_version</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">module </span><span style="color:#000000;">Rails
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">module </span><span style="color:#000000;">Generator
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">module </span><span style="color:#000000;">Commands
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Base
+</span><span style="color:#343d46;">        </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">route_code</span><span style="color:#000000;">(route_options)
+</span><span style="color:#000000;">          </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">map.</span><span style="color:#000000;">#{route_options[</span><span style="color:#008080;">:name</span><span style="color:#000000;">]}</span><span style="color:#008080;"> &#39;</span><span style="color:#000000;">#{route_options[</span><span style="color:#008080;">:name</span><span style="color:#000000;">]}</span><span style="color:#008080;">&#39;, :controller =&gt; &#39;</span><span style="color:#000000;">#{route_options[</span><span style="color:#008080;">:controller</span><span style="color:#000000;">]}</span><span style="color:#008080;">&#39;, :action =&gt; &#39;</span><span style="color:#000000;">#{route_options[</span><span style="color:#008080;">:action</span><span style="color:#000000;">]}</span><span style="color:#008080;">&#39;</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">        </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#a7adba;"># Here&#39;s a readable version of the long string used above in route_code;
+</span><span style="color:#a7adba;"># but it should be kept on one line to avoid inserting extra whitespace
+</span><span style="color:#a7adba;"># into routes.rb when the generator is run:
+</span><span style="color:#a7adba;"># &quot;map.#{route_options[:name]} &#39;#{route_options[:name]}&#39;,
+</span><span style="color:#a7adba;">#     :controller =&gt; &#39;#{route_options[:controller]}&#39;,
+</span><span style="color:#a7adba;">#     :action =&gt; &#39;#{route_options[:action]}&#39;&quot;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Create
+</span><span style="color:#343d46;">        </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">route</span><span style="color:#000000;">(route_options)
+</span><span style="color:#000000;">          sentinel </span><span style="color:#4f5b66;">= &#39;</span><span style="color:#008080;">ActionController::Routing::Routes.draw do |map|</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">          logger.route route_code(route_options)
+</span><span style="color:#000000;">          gsub_file </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">config/routes.rb</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">(#{</span><span style="color:#008080;">Regexp</span><span style="color:#96b5b4;">.escape(sentinel)})</span><span style="color:#4f5b66;">/</span><span style="color:#a71d5d;">mi do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">m</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">              </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{m}</span><span style="color:#96b5b4;">\n  </span><span style="color:#000000;">#{route_code(route_options)}</span><span style="color:#96b5b4;">\n</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">          </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">        </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Destroy
+</span><span style="color:#343d46;">        </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">route</span><span style="color:#000000;">(route_options)
+</span><span style="color:#000000;">          logger.remove_route route_code(route_options)
+</span><span style="color:#000000;">          to_remove </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#96b5b4;">\n  </span><span style="color:#000000;">#{route_code(route_options)}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">          gsub_file </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">config/routes.rb</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">(#{to_remove})</span><span style="color:#4f5b66;">/</span><span style="color:#a71d5d;">mi</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&#39;&#39;
+</span><span style="color:#000000;">        </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-  class Destroy
-    def route(route_options)
-      logger.remove_route route_code(route_options)
-      to_remove = &amp;quot;\n  #{route_code(route_options)}&amp;quot;
-      gsub_file &amp;#x27;config/routes.rb&amp;#x27;, /(#{to_remove})/mi, &amp;#x27;&amp;#x27;
-    end
-  end
-
-end
-</code></pre>
-<p>end
-end</pre></p>
 <p>More or less copied from the existing route_resources action found in <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/commands.rb">commands.rb</a>, this works as follows: If we call script/generate then the route action method in the Create command class is called. This uses gsub_file to look for the &ldquo;sentinel&rdquo; or target area of the file and replaces it with the sentinel + the new route code. I also use the &ldquo;logger&rdquo; method to display log messages using the Rails::Generator::SimpleLogger class. Here&rsquo;s what it looks like on the command line:</p>
 <pre>$ ./script/generate version ../build-info/version.txt
       create  app/controllers/version_controller.rb

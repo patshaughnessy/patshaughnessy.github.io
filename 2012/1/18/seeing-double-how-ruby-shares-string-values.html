@@ -63,7 +63,7 @@
 </span></pre>
 
 <p>Running this code I get the following output:</p>
-<pre>
+<pre type="console">
 $ ruby test.rb
 str:
 DEBUG: RString = 0x7fd64a84f620
@@ -122,7 +122,7 @@ DEBUG: len     = 56
 </span></pre>
 
 <p>Running this:</p>
-<pre>
+<pre type="console">
 $ ruby test.rb
 str:
 DEBUG: RString = 0x7fdd2904f4a8
@@ -186,7 +186,7 @@ DEBUG: len     = 56
 </span></pre>
 
 <p>Running this I get:</p>
-<pre>
+<pre type="console">
 $ ruby test.rb
 str:
 DEBUG: RString = 0x7fa46b04ef90
@@ -243,7 +243,7 @@ DEBUG: len     = 56
 </span></pre>
 
 <p>Now I see that the value of <span class="code">ptr</span> for <span class="code">str2</span> is set to <span class="code">ptr+1</span> from <span class="code">str</span>!</p>
-<pre>
+<pre type="console">
 $ ruby test.rb
 str:
 DEBUG: RString = 0x7fb71b04efa0
@@ -295,11 +295,11 @@ DEBUG: len     = 55
 </span></pre>
 
 <p>Then create a C Makefile using this command:</p>
-<pre>
+<pre type="console">
 $ ruby extconf.rb
 </pre>
 <p>And finally compile the C code like this:</p>
-<pre>
+<pre type="console">
 $ make
 </pre>
 <p>Now you can use the Ruby snippets from above if your Ruby code is located in the same directory.</p>

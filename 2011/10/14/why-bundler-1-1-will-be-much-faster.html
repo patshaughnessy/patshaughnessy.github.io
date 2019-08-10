@@ -11,7 +11,7 @@
 <p>Also since what Bundler does is determine which gems should be included in your application - your “bundle” - based on which gems depend on which other gems, it needs to download all of the gem dependency information as well. Downloading and processing all of this information is what takes 30 seconds or more, depending on your network connection and CPU.</p>
 <h2>Is Bundler 1.1 actually faster?</h2>
 <p>The best way to find out if the new version of Bundler is any faster is just to install it and try it out:</p>
-<pre>
+<pre type="console">
 $ gem install bundler --pre
 Successfully installed bundler-1.1.rc
 1 gem installed
@@ -40,7 +40,7 @@ Your bundle is updated! Use `bundle show [gemname]` to see where a bundled gem i
 <p>But how does this actually work? And what does “Fetching gem metadata...” mean? What's happening as those dots gradually appear? Let’s take a closer look...</p>
 <h2>The RubyGems.org API</h2>
 <p>We can get some idea of what’s going on here by trying the <span class="code">bundle update</span> command again with the <span class="code">--verbose</span> option enabled:</p>
-<pre>
+<pre type="console">
 $ bundle update --verbose
 Fetching gem metadata from http://rubygems.org/
 Query List: ["rails", "sqlite3", "json", "sass-rails", "coffee-rails", "uglifier", "jquery-rails"]
@@ -81,7 +81,7 @@ etc...
 </span></pre>
 
 <p>Running this using my favorite example gem “uglifier:”</p>
-<pre>
+<pre type="console">
 $ ruby parse_rubygems_api.rb uglifier
 uglifier version 1.0.3 dependencies: [["multi_json", ">= 1.0.2"], ["execjs", ">= 0.3.0"]]
 uglifier version 1.0.2 dependencies: [["multi_json", ">= 1.0.2"], ["execjs", ">= 0.3.0"]]
@@ -100,7 +100,7 @@ uglifier version 0.1.0 dependencies: []
 </pre>
 <p>Notice that the response includes the dependencies for each version of the gem, not just the latest version. This is necessary since Bundler’s resolver algorithm might need to use an older version of the gem, depending on what other gems are included in the bundle.</p>
 <p>You can also provide a list of comma separated gem names, such as what we see Bundler doing in the verbose output above:</p>
-<pre>
+<pre type="console">
 $ ruby parse_rubygems_api.rb rails,sqlite3,json,sass-rails,coffee-rails,uglifier,jquery-rails
 </pre>
 <p>This HTTP API call is very fast - less than a second - and provides all the information Bundler needs to have, and nothing more.</p>
@@ -115,12 +115,12 @@ $ ruby parse_rubygems_api.rb rails,sqlite3,json,sass-rails,coffee-rails,uglifier
 <p>And I’ll draw a simple diagram that represents the contents of this Gemfile; in other words just a single gem:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/10/14/one.png" alt="single gem" /></p>
 <p>Next, I’ll run <span class="code">bundle update --verbose</span> in the folder containing this Gemfile and take a look at the output; but this time I’ll intersperse the output text with more diagrams showing what’s actually going on inside Bundler’s dependency-fetch algorithm:</p>
-<pre>
+<pre type="console">
 $ bundle update --verbose
 Fetching gem metadata from http://rubygems.org/
 </pre>
 <p><img src="http://patshaughnessy.net/assets/2011/10/14/two.png" alt="first HTTP request" /></p>
-<pre>
+<pre type="console">
 Query List: ["uglifier"]
 Query Gemcutter Dependency Endpoint API: uglifier
 Fetching from: http://rubygems.org/api/v1/dependencies?gems=uglifier
@@ -131,7 +131,7 @@ HTTP Success
 <p>The latest version of uglifier depends on json, execjs and multi_json, while some older versions of uglifier depend on “therubyracer” gem.</p>
 <p>The next thing Bundler will do is send a second HTTP request to RubyGems.org asking for the dependencies of these four gems:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/10/14/four.png" alt="second HTTP request" /></p>
-<pre>
+<pre type="console">
 Query List: ["multi_json", "execjs", "json", "therubyracer"]
 Query Gemcutter Dependency Endpoint API: multi_json execjs json therubyracer
 Fetching from: http://rubygems.org/api/v1/dependencies?gems=multi_json,execjs,json,therubyracer
@@ -141,7 +141,7 @@ HTTP Success
 <p><img src="http://patshaughnessy.net/assets/2011/10/14/five.png" alt="second HTTP request result" /></p>
 <p>This time we can see that the “execjs” gem has some versions that depend on “multi_json” and that “therubyracer” depends on “libv8.” Finally, Bundler continues by sending a third HTTP request to RubyGems.org to get the dependencies of libv8 - multi_json is not included since we already have its info:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/10/14/six.png" alt="third HTTP request result" /></p>
-<pre>
+<pre type="console">
 Query List: ["libv8"]
 Query Gemcutter Dependency Endpoint API: libv8
 Fetching from: http://rubygems.org/api/v1/dependencies?gems=libv8
@@ -149,12 +149,12 @@ HTTP Success
 </pre>
 <p>This time RubyGems.org returns an empty set, since libv8 has no dependencies at all:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/10/14/seven.png" alt="third HTTP request result" /></p>
-<pre>
+<pre type="console">
 Query List: []
 Unmet Dependencies: 
 </pre>
 <p>Now Bundler has all the dependency information it needs, so it continues by running the resolver algorithm and then outputs the gems that were included in my new bundle:</p>
-<pre>
+<pre type="console">
 Using multi_json (1.0.3) from /Users/pat/.rvm/gems/ruby-1.8.7-p352/specifications/multi_json-1.0.3.gemspec 
 Using execjs (1.2.9) from /Users/pat/.rvm/gems/ruby-1.8.7-p352/specifications/execjs-1.2.9.gemspec 
 Using uglifier (1.0.3) from /Users/pat/.rvm/gems/ruby-1.8.7-p352/specifications/uglifier-1.0.3.gemspec 

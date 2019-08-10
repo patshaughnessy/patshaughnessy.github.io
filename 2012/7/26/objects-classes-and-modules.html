@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Objects, Classes and Modules - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Objects, Classes and Modules</h1><div class="metadata"><span class="date">July 26th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2012/7/26/objects-classes-and-modules" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Objects, Classes and Modules">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p><b>This is an excerpt from the third chapter of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.</p>
 <p>If you’re interested in Ruby internals you can <a href="http://patshaughnessy.net/ruby-under-a-microscope">sign up here</a> and I’ll send you an email when the eBook is finished.  I also posted <a href="http://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope">one entire chapter</a> in May, and two other excerpts from <a href="http://patshaughnessy.net/2012/6/18/the-start-of-a-long-journey-how-ruby-parses-and-compiles-your-code">Chapter One</a> and <a href="http://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code">Chapter Two</a> last month.</b></p>
-<p><br/></p>
+<p></p>
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
     <tr><td><img src="http://patshaughnessy.net/assets/2012/7/26/three_peppers.jpg"></td></tr>
@@ -34,26 +34,26 @@
 </span></pre>
 
 <p>Ruby needs to save the class pointer in <span class="code">RObject</span> because every object has to keep track of the class you used to create it:</p>
-<pre>
+<pre type="console">
 > euler = Mathematician.new
- => #<Mathematician:0x007fbd738608c0>
+ => #&lt;Mathematician:0x007fbd738608c0>
 </pre>
 <p>Here by displaying the class name, “#&lt;Mathematician…,” Ruby is displaying the value of the class pointer for the <span class="code">euler</span> object when I inspect it. The hex string that follows is actually the <span class="code">VALUE</span> pointer for the object. This will be different for every instance of <span class="code">Mathematician</span> .</p>
 <p>Ruby also has to keep track of any values you save in it - Ruby uses the instance variable array to do this:</p>
-<pre>
+<pre type="console">
 > euler.first_name = 'Leonhard'
  => "Leonhard" 
 > euler.last_name  = 'Euler'
  => "Euler" 
 > euler
- => #<Mathematician:0x007fbd738608c0 @first_name="Leonhard", @last_name="Euler"> 
+ => #&lt;Mathematician:0x007fbd738608c0 @first_name="Leonhard", @last_name="Euler"> 
 </pre>
 <p>Here you can see Ruby now also displays the instance variable array for <span class="code">euler</span> when I inspect it again. Ruby needs to save this array of values in each object since every object instance can have different values for the same instance variables - for example:</p>
-<pre>
+<pre type="console">
 > euclid = Mathematician.new
 > euclid.first_name = 'Euclid'
 > euclid
- => #<Mathematician:0x007fabdb850690 @first_name="Euclid">
+ => #&lt;Mathematician:0x007fabdb850690 @first_name="Euclid">
 </pre>
 <p>Now let’s take a look at Ruby’s C memory structures in a bit more detail - when you run this simple script, Ruby will create one <span class="code">RClass</span> structure and two <span class="code">RObject</span> structures:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/7/26/script-and-objects.png"/></p>
@@ -70,7 +70,7 @@
 <p><img src="http://patshaughnessy.net/assets/2012/7/26/value-pointer-with-flag.png"/></p>
 <p>Whenever the <span class="code">FIXNUM_FLAG</span> is set, Ruby knows this <span class="code">VALUE</span> is really a small integer, an instance of the <span class="code">Fixnum</span> class, and not a pointer to a value structure. There is also a similar bit flag to indicate if the <span class="code">VALUE</span> is a symbol, and values such as <span class="code">nil</span>, <span class="code">true</span> and <span class="code">false</span> also have special values.</p>
 <p>It’s easy to see that integers, strings and other generic values are all objects using IRB:</p>
-<pre>
+<pre type="console">
 $ irb
 > "string".class
  => String 
@@ -86,7 +86,7 @@ $ irb
 </blockquote>
 <p>What about instance variables for generic objects? Do integers, strings and other generic data values have instance variables? That would seem a bit odd. But if integers and strings are objects, then this must be true! And if this is true, where does Ruby save these values, if it doesn’t use the <span class="code">RObject</span> structure?</p>
 <p>Using the <span class="code">instance_variables</span> method you can see that each of these basic values can also contain an array of instance variables, as strange as that might seem at first:</p>
-<pre>
+<pre type="console">
 $ irb
 > str = "some string value"
  => "some string value" 

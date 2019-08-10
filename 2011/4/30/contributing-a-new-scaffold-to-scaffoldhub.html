@@ -10,59 +10,72 @@
 <p>Later you provide your credentials on the command line when you push your new scaffold up to ScaffoldHub using the scaffoldhub gem.</p>
 <h2>Step 2: Write your new scaffold</h2>
 <p>To write a new scaffold for ScaffoldHub, you first need to write a Ruby code file called a “scaffold spec.” Here’s an example:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="co">Scaffoldhub</span>::<span class="co">Specification</span>.new <span class="r">do</span> 
-<p><span class="c"># Github URL where you will post your scaffold - the specified folder must contain this file</span>
-base_url  <span class="s"><span class="dl">'</span><span class="k">https://github.com/your_name/your_repo</span><span class="dl">'</span></span></p>
-<p><span class="c"># The name of your new scaffold: should be a single word</span>
-name <span class="s"><span class="dl">'</span><span class="k">example</span><span class="dl">'</span></span></p>
-<p><span class="c"># Metadata about this scaffold - these values are only used for display on scaffoldhub.org:</span>
-metadata <span class="r">do</span></p>
-<pre><code>&lt;span class=&quot;c&quot;&gt;# A short paragraph describing what this scaffold does&lt;/span&gt; 
-description &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;The example scaffold.&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#008080;">Scaffoldhub</span><span style="color:#000000;">::</span><span style="color:#008080;">Specification</span><span style="color:#000000;">.</span><span style="color:#795da3;">new </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Github URL where you will post your scaffold - the specified folder must contain this file
+</span><span style="color:#000000;">  base_url  </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">https://github.com/your_name/your_repo</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># The name of your new scaffold: should be a single word
+</span><span style="color:#000000;">  name </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">example</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Metadata about this scaffold - these values are only used for display on scaffoldhub.org:
+</span><span style="color:#000000;">  metadata </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a7adba;"># A short paragraph describing what this scaffold does
+</span><span style="color:#000000;">    description </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">The example scaffold.</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a7adba;"># 4x3 aspect ratio screen shot
+</span><span style="color:#000000;">    screenshot </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">example_screenshot.png</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a7adba;"># Tag(s) to help scaffoldhub.org users find your scaffold
+</span><span style="color:#000000;">    tag </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">jquery</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    tag </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">autocomplete</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a7adba;"># Optionally specify an example of a scaffold parameter
+</span><span style="color:#000000;">    parameter_example </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">FIELD_NAME</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a7adba;"># Optionally post a link to an article you write explaining how the scaffold works.
+</span><span style="color:#000000;">    blog_post </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Define a model template - this ERB file will be used to generate a new
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># model class with this path &amp; filename: app/models/NAME.rb
+</span><span style="color:#000000;">  model </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">templates/model.rb</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Define an ActiveRecord migration template - this ERB file will be used to generate a new
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># migration class with this path &amp; filename: db/migrate/TIMESTAMP_create_PLURAL_NAME.rb
+</span><span style="color:#000000;">  migration </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">templates/migration.rb</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Define a controller template - this ERB file will be used to generate a new
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># controller class with this path &amp; filename: app/controllers/PLURAL_NAME.rb
+</span><span style="color:#000000;">  controller </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">templates/controller.rb</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># You can use &quot;with_options&quot; to specify the same source folder for a series of templates.
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># You can also specify the same destination folder using the :dest option,
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># or just use the :src and :dest options separately on each keyword.
+</span><span style="color:#000000;">  with_options </span><span style="color:#008080;">:src </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">templates</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">    view </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">_form.html.erb</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    view </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">new.html.erb</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    view </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">edit.html.erb</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    view </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">index.html.erb</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    view </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">show.html.erb</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Other keywords available are:
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Define any other generic template - this ERB file will be used to generate
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># a new file - the dest option is required to indicate where to put the new file
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># template &#39;xyz.html.erb&#39;, :dest =&gt; &#39;path/to/xyz.html&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Copy any file without running an ERB transformation
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># file &#39;xyz.html&#39;, :dest =&gt; &#39;path/to/xyz.html&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">end
+</span></pre>
 
-&lt;span class=&quot;c&quot;&gt;# 4x3 aspect ratio screen shot&lt;/span&gt; 
-screenshot &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;example_screenshot.png&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
-
-&lt;span class=&quot;c&quot;&gt;# Tag(s) to help scaffoldhub.org users find your scaffold&lt;/span&gt; 
-tag &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;jquery&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
-tag &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;autocomplete&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
-
-&lt;span class=&quot;c&quot;&gt;# Optionally specify an example of a scaffold parameter&lt;/span&gt; 
-parameter_example &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;FIELD_NAME&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
-
-&lt;span class=&quot;c&quot;&gt;# Optionally post a link to an article you write explaining how the scaffold works.&lt;/span&gt; 
-blog_post &lt;span class=&quot;s&quot;&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;/span&gt; 
-</code></pre>
-<p><span class="r">end</span></p>
-<p><span class="c"># Define a model template - this ERB file will be used to generate a new</span>
-<span class="c"># model class with this path &amp; filename: app/models/NAME.rb</span>
-model <span class="s"><span class="dl">'</span><span class="k">templates/model.rb</span><span class="dl">'</span></span></p>
-<p><span class="c"># Define an ActiveRecord migration template - this ERB file will be used to generate a new</span>
-<span class="c"># migration class with this path &amp; filename: db/migrate/TIMESTAMP_create_PLURAL_NAME.rb</span>
-migration <span class="s"><span class="dl">'</span><span class="k">templates/migration.rb</span><span class="dl">'</span></span></p>
-<p><span class="c"># Define a controller template - this ERB file will be used to generate a new</span>
-<span class="c"># controller class with this path &amp; filename: app/controllers/PLURAL_NAME.rb</span>
-controller <span class="s"><span class="dl">'</span><span class="k">templates/controller.rb</span><span class="dl">'</span></span></p>
-<p><span class="c"># You can use &quot;with_options&quot; to specify the same source folder for a series of templates.</span>
-<span class="c"># You can also specify the same destination folder using the :dest option,</span>
-<span class="c"># or just use the :src and :dest options separately on each keyword.</span>
-with_options <span class="sy">:src</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">templates</span><span class="dl">'</span></span> <span class="r">do</span>
-view <span class="s"><span class="dl">'</span><span class="k">_form.html.erb</span><span class="dl">'</span></span>
-view <span class="s"><span class="dl">'</span><span class="k">new.html.erb</span><span class="dl">'</span></span>
-view <span class="s"><span class="dl">'</span><span class="k">edit.html.erb</span><span class="dl">'</span></span>
-view <span class="s"><span class="dl">'</span><span class="k">index.html.erb</span><span class="dl">'</span></span>
-view <span class="s"><span class="dl">'</span><span class="k">show.html.erb</span><span class="dl">'</span></span>
-<span class="r">end</span></p>
-<p><span class="c"># Other keywords available are:</span></p>
-<p><span class="c"># Define any other generic template - this ERB file will be used to generate</span>
-<span class="c"># a new file - the dest option is required to indicate where to put the new file</span>
-<span class="c"># template 'xyz.html.erb', :dest =&gt; 'path/to/xyz.html'</span></p>
-<p><span class="c"># Copy any file without running an ERB transformation</span>
-<span class="c"># file 'xyz.html', :dest =&gt; 'path/to/xyz.html'</span></p>
-<p><span class="r">end</span></pre></div></p>
-</div>
-As you can see, this file describes in a simple way what files your scaffold will generate on the end user's machine. It refers to a series of ERB templates that you would write also. In the “metadata” section, the scaffold spec provides some additional info that is only used for display purposes on scaffoldhub.org.
+<p>As you can see, this file describes in a simple way what files your scaffold will generate on the end user's machine. It refers to a series of ERB templates that you would write also. In the “metadata” section, the scaffold spec provides some additional info that is only used for display purposes on scaffoldhub.org.</p>
 <p>The scaffoldhub gem provides a generator called “new_scaffold” to help save you some typing; run it inside of any Rails 3 app to generate the scaffold spec above along with a copy of the standard Rails scaffold generator ERB templates that are mentioned in the example spec:</p>
 <div class="CodeRay">
   <div class="code"><pre>

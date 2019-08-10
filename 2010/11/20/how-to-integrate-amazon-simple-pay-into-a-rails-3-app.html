@@ -152,42 +152,50 @@ etc...
 <p>etc...</pre></div></p>
   </div><br>
 <p>And now let&rsquo;s write a new action in the payments controller for this; edit app/controllers/payments_controller.rb:</p>
-  <div class="CodeRay">
-    <div class="code"><pre><span class="r">class</span> <span class="cl">PaymentsController</span> &lt; <span class="co">ApplicationController</span>
-<p><span class="r">def</span> <span class="fu">confirm</span>
-<span class="iv">@payment</span> = <span class="co">Payment</span>.new(
-<span class="sy">:transaction_amount</span> =&gt; params[<span class="sy">:transactionAmount</span>],
-<span class="sy">:transaction_id</span>     =&gt; params[<span class="sy">:transactionId</span>]
-)
-<span class="r">if</span> <span class="iv">@payment</span>.save
-redirect_to(<span class="iv">@payment</span>, <span class="sy">:notice</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">Payment was successfully created.</span><span class="dl">'</span></span>)
-<span class="r">else</span>
-redirect_to <span class="sy">:action</span> =&gt; <span class="s"><span class="dl">&quot;</span><span class="k">index</span><span class="dl">&quot;</span></span>
-<span class="r">end</span>
-<span class="r">end</span></p>
-<p>etc...</pre></div></p>
-  </div><br/>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">PaymentsController </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ApplicationController
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">confirm
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">payment </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Payment</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(
+</span><span style="color:#000000;">    </span><span style="color:#008080;">:transaction_amount </span><span style="color:#000000;">=&gt; params[</span><span style="color:#008080;">:transactionAmount</span><span style="color:#000000;">],
+</span><span style="color:#000000;">    </span><span style="color:#008080;">:transaction_id     </span><span style="color:#000000;">=&gt; params[</span><span style="color:#008080;">:transactionId</span><span style="color:#000000;">]
+</span><span style="color:#000000;">  )
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">payment.save
+</span><span style="color:#000000;">    redirect_to(</span><span style="color:#4f5b66;">@</span><span style="color:#000000;">payment, </span><span style="color:#008080;">:notice </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Payment was successfully created.</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">else
+</span><span style="color:#000000;">    redirect_to </span><span style="color:#008080;">:action </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">index</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
+</span></pre>
+
 <p>This looks similar to the create action we got from the scaffolding generator. This action will be called when users return from the Amazon Payments site, and will record the transaction in our application&rsquo;s payments table. More on this in a moment.</p>
 <p>Finally in the payment model we need a bit of code to parse the transaction amount string passed back from Amazon:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">class</span> <span class="cl">Payment</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
-<p>validates_presence_of <span class="sy">:amount</span>
-validates_presence_of <span class="sy">:transaction_id</span></p>
-<p><span class="r">def</span> <span class="fu">transaction_amount=</span>(currency_and_amount)
-currency = parse(currency_and_amount).first
-<span class="r">if</span> currency == <span class="s"><span class="dl">'</span><span class="k">USD</span><span class="dl">'</span></span>
-amount = parse(currency_and_amount).last.to_f
-<span class="r">else</span>
-amount = currency.to_f
-<span class="r">end</span>
-<span class="pc">self</span>.amount = amount <span class="r">unless</span> amount == <span class="fl">0.0</span>
-<span class="r">end</span></p>
-<p><span class="r">def</span> <span class="fu">parse</span>(currency_and_amount)
-<span class="iv">@parsed</span> ||= currency_and_amount.split
-<span class="r">end</span>
-<span class="r">end</span></p>
-</pre></div>
-</div><br/>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Payment </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  validates_presence_of </span><span style="color:#008080;">:amount
+</span><span style="color:#000000;">  validates_presence_of </span><span style="color:#008080;">:transaction_id
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">transaction_amount=</span><span style="color:#000000;">(currency_and_amount)
+</span><span style="color:#000000;">    currency </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> parse(currency_and_amount).first
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> currency </span><span style="color:#4f5b66;">== &#39;</span><span style="color:#008080;">USD</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">      amount </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> parse(currency_and_amount).last.to_f
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">else
+</span><span style="color:#000000;">      amount </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> currency.to_f
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">    self.amount </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> amount </span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> amount </span><span style="color:#4f5b66;">== </span><span style="color:#d08770;">0.0
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">parse</span><span style="color:#000000;">(currency_and_amount)
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">parsed </span><span style="color:#4f5b66;">||=</span><span style="color:#000000;"> currency_and_amount.split
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
+
 <p>The &ldquo;transaction amount&rdquo; parameter from Amazon may contain a prefix &ldquo;USD&rdquo; specifying the currency. However, sometimes this is not present. The code above parses the string as necessary in a virtual attribute &ldquo;transaction_amount&rdquo; and then saves the corresponding amount as the &ldquo;amount&rdquo; float value in the database. The Payment model also validates that both amount and transaction id are specified by Amazon in order to consider the payment valid.</p>
 <p>Now let&rsquo;s fire up the app and try it out!</p>
 <p><img src="http://patshaughnessy.net/assets/2010/11/20/listing_payments_empty.png"></p>
@@ -206,28 +214,34 @@ amount = currency.to_f
 </ul></p>
 <h2>Step 7: Using a helper to generate the payment form easily</h2>
 <p>Of course our view code is very ugly - all of that complex HTML is hard to read and confusing, and also if we want more than one button in our app we will have to repeat all of the HTML. The best thing to do render the payment form using a helper. This code will do the trick - save this code in app/helpers/amazon_simple_pay_helper.rb:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="r">module</span> <span class="cl">AmazonSimplePayHelper</span>
-<p><span class="co">AMAZON_ACCESS_KEY</span> = <span class="s"><span class="dl">'</span><span class="k">11SEM03K88SD016FS1G2</span><span class="dl">'</span></span></p>
-<p><span class="co">AMAZON_PAYMENTS_ACCOUNT_ID</span> = <span class="s"><span class="dl">'</span><span class="k">KWKCCYNIVXJL42AE3FVCZCA65I3522JBV4EJVX</span><span class="dl">'</span></span></p>
-<p><span class="r">def</span> <span class="fu">amazon_simple_pay_form_tag</span>(options = {}, &amp;block)
-sandbox = <span class="s"><span class="dl">'</span><span class="k">-sandbox</span><span class="dl">'</span></span> <span class="r">unless</span> <span class="co">Rails</span>.env == <span class="s"><span class="dl">'</span><span class="k">production</span><span class="dl">'</span></span>
-pipeline_url = <span class="s"><span class="dl">&quot;</span><span class="k">https://authorize.payments</span></span><span class="il"><span class="idl">#{</span>sandbox<span class="idl">}</span></span><span class="s">.amazon.com/pba/paypipeline</span><span class="dl">&quot;</span></span>
-html_options = { <span class="sy">:action</span> =&gt; pipeline_url, <span class="sy">:method</span> =&gt; <span class="sy">:post</span> }.merge(options)
-content = capture(&amp;block)
-output = <span class="co">ActiveSupport</span>::<span class="co">SafeBuffer</span>.new
-output.safe_concat(tag(<span class="sy">:form</span>, html_options, <span class="pc">true</span>))
-output &lt;&lt; content
-output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">accessKey</span><span class="dl">'</span></span>, <span class="co">AMAZON_ACCESS_KEY</span>))
-output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">amazonPaymentsAccountId</span><span class="dl">'</span></span>, <span class="co">AMAZON_PAYMENTS_ACCOUNT_ID</span>))
-output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">immediateReturn</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">1</span><span class="dl">'</span></span>))
-output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">processImmediate</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">1</span><span class="dl">'</span></span>))
-output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">cobrandingStyle</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">logo</span><span class="dl">'</span></span>))
-output.safe_concat(hidden_field_tag(<span class="s"><span class="dl">'</span><span class="k">returnUrl</span><span class="dl">'</span></span>, confirm_payment_url))
-output.safe_concat(<span class="s"><span class="dl">&quot;</span><span class="k">&lt;/form&gt;</span><span class="dl">&quot;</span></span>)
-<span class="r">end</span></p>
-<p><span class="r">end</span></pre></div></p>
-</div><br/>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">module </span><span style="color:#000000;">AmazonSimplePayHelper
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  AMAZON_ACCESS_KEY </span><span style="color:#4f5b66;">= &#39;</span><span style="color:#008080;">11SEM03K88SD016FS1G2</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  AMAZON_PAYMENTS_ACCOUNT_ID </span><span style="color:#4f5b66;">= &#39;</span><span style="color:#008080;">KWKCCYNIVXJL42AE3FVCZCA65I3522JBV4EJVX</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">amazon_simple_pay_form_tag</span><span style="color:#000000;">(options </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">{}, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">    sandbox </span><span style="color:#4f5b66;">= &#39;</span><span style="color:#008080;">-sandbox</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">unless </span><span style="color:#008080;">Rails</span><span style="color:#000000;">.env </span><span style="color:#4f5b66;">== &#39;</span><span style="color:#008080;">production</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">    pipeline_url </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">https://authorize.payments</span><span style="color:#000000;">#{sandbox}</span><span style="color:#008080;">.amazon.com/pba/paypipeline</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">    html_options </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">{ </span><span style="color:#008080;">:action </span><span style="color:#000000;">=&gt; pipeline_url, </span><span style="color:#008080;">:method </span><span style="color:#000000;">=&gt; </span><span style="color:#008080;">:post </span><span style="color:#000000;">}.merge(options)
+</span><span style="color:#000000;">    content </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> capture(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+</span><span style="color:#000000;">    output </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">ActiveSupport</span><span style="color:#000000;">::</span><span style="color:#008080;">SafeBuffer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new
+</span><span style="color:#000000;">    output.safe_concat(tag(</span><span style="color:#008080;">:form</span><span style="color:#000000;">, html_options, </span><span style="color:#d08770;">true</span><span style="color:#000000;">))
+</span><span style="color:#000000;">    output </span><span style="color:#4f5b66;">&lt;&lt;</span><span style="color:#000000;"> content
+</span><span style="color:#000000;">    output.safe_concat(hidden_field_tag(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">accessKey</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, AMAZON_ACCESS_KEY))
+</span><span style="color:#000000;">    output.safe_concat(hidden_field_tag(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">amazonPaymentsAccountId</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, AMAZON_PAYMENTS_ACCOUNT_ID))
+</span><span style="color:#000000;">    output.safe_concat(hidden_field_tag(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">immediateReturn</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">1</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">))
+</span><span style="color:#000000;">    output.safe_concat(hidden_field_tag(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">processImmediate</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">1</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">))
+</span><span style="color:#000000;">    output.safe_concat(hidden_field_tag(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">cobrandingStyle</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">logo</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">))
+</span><span style="color:#000000;">    output.safe_concat(hidden_field_tag(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">returnUrl</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, confirm_payment_url))
+</span><span style="color:#000000;">    output.safe_concat(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">&lt;/form&gt;</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">end
+</span></pre>
+
 <p>This helper uses the same code the standard &ldquo;form_tag&rdquo; Rails view helper does, except that it provides the additional fields and attributes required by Amazon. Here&rsquo;s how it works:</p>
 <ul>
   <li>First it calculates the form action URL - the amazon payments sandbox URL from the HTML above. &ldquo;Sandbox&rdquo; is included in the URL unless your are running on your production server.</li>
@@ -255,4 +269,4 @@ output.safe_concat(<span class="s"><span class="dl">&quot;</span><span class="k"
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
     }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
                       !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="links"><ul><li><a href="2018/10/24/summer-school-with-the-rust-compiler">Summer School With The Rust Compiler</a></li><li><a href="2018/6/9/from-activerecord-to-diesel">From ActiveRecord to Diesel</a></li><li><a href="2018/3/15/how-rust-implements-tagged-unions">How Rust Implements Tagged Unions</a></li><li><a href="2018/1/18/learning-rust-if-let-vs--match">Learning Rust: If Let vs. Match</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

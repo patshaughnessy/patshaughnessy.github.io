@@ -7,7 +7,7 @@
 <p>One of the scariest moments in the life of a Ruby developer is seeing that dreaded message appear as you try to install a new gem: <span class="code">Building native extensions.  This could take a while...</span>. As the console output suddenly hangs, you feel a horrible, sinking sensation of fear in your stomach: something truly bad is about to happen! Then your worse nightmare comes true: in the console you get: <span class="code">ERROR: Failed to build gem native extension</span>. Now you’re condemned to spending hours googling for obscure compiler flags, environment settings or Linux package info - and <i>not</i> doing Ruby development.</p>
 <p>For years I’ve been nervous installing gems that contained native extensions because I wasn’t familiar with the gem extension build process, and had no idea where to begin when something went wrong. Today I’m going to confront my own worst fears – and yours – by taking a closer look at what “Building native extensions” actually means. After reviewing how the build process works, I'll give you some advice that will hopefully point you in the right direction the next time you run into a problem.</p>
 <div style="clear: left"></div>
-## What are native extensions anyway?
+<h2>What are native extensions anyway?</h2>
 <p>Before we get to what might go wrong building native extensions, let’s take a look at what native extensions are and why Ruby developers need them. “Native extensions” are the glue that connects a Ruby gem with some other non-Ruby software component or library present on your machine. Here’s a simple diagram that shows the relationship between a Ruby gem and some software it uses:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/10/31/gem%20extension.png" alt="gem native extension" /></p>
 <p>The native extension is some C code that’s included inside the Ruby gem that calls the external component’s API, converting the parameters and return values between the format the external library needs and what the Ruby interpreter expects. Native extensions are one of the reasons for the success of the Ruby platform, since they allow Ruby gem authors to take advantage of non-Ruby libraries when appropriate in an organized, standard way. This means that Ruby gem authors can use Ruby to do what Ruby is best at, but switch to C or some other programming language or library when that makes sense.</p>
@@ -21,7 +21,7 @@
 <p>Once the Makefile is generated, Rubygems runs the <span class="code">make</span> command in the ext/[GEMNAME] folder, causing your C compiler to be executed on each C code file present there, with all of the proper flags and settings. After all of the C code files are compiled, the Makefile also runs the C linker to build the new gem extension executable file.</p>
 <p>Finally, the last step is to install the new native executable file into the proper directory, using the <span class="code">make install</span> command. Now when the Ruby code in the gem calls a function implemented in the C extension code, the Ruby interpreter will be able to find the new native executable file.</p>
 <p>If you’re interested in the details, you can try using the <span class="code">--verbose</span> option the next time you install a gem containing native extensions, for example:</p>
-<pre>
+<pre type="console">
 $ gem install sqlite3 --verbose
 </pre>
 <h2>Conquering your fear: what to do when there’s an error</h2>
@@ -29,7 +29,7 @@ $ gem install sqlite3 --verbose
 <p>But don’t lose hope, there are a few fairly simple things you can do after getting an error compiling native extensions that will often solve or at least avoid the problem you’ve run into. Let’s start with the most obvious, and the most effective way to avoid native extension terror...</p>
 <h2>Always use Homebrew or your Linux platform’s package manager</h2>
 <p>The most common problem you’ll run into while compiling native extension code is that either you’re missing the external library the code depends on entirely, or that it’s installed into the wrong place. For example, here’s what you’ll get if you try to install the “mysql2” gem but forgot that you’ve never installed MySQL itself onto your new Mac laptop:</p>
-<pre>
+<pre type="console">
 $ gem install mysql2
 Building native extensions.  This could take a while...
 ERROR:  Error installing mysql2:
@@ -73,13 +73,13 @@ Results logged to /Users/pat/.rvm/gems/ruby-1.8.7-p352/gems/mysql2-0.3.7/ext/mys
   <li>The smart people who wrote the Homebrew formula you are using had Ruby development in mind and most probably included just the package components you need, for example including mysql-devel in the mysql formula. This means you don’t have to worry about these details yourself. As it does for mysql, the Homebrew formulas can also automatically install important C-language patches that you probably would never be aware of or even know how to install.</li>
 </ul>
 <p>So in this example we can solve the problem with a simple command:</p>
-<pre>
+<pre type="console">
 $ brew install mysql
 ==> Downloading http://downloads.mysql.com/archives/mysql-5.5/mysql-5.5.15.tar.gz
 etc...
 </pre>
 <p>and then repeat:</p>
-<pre>
+<pre type="console">
 $ gem install mysql2
 Building native extensions.  This could take a while...
 Successfully installed mysql2-0.3.7
@@ -88,7 +88,7 @@ Successfully installed mysql2-0.3.7
 <h2>Look for a missing or incorrect configuration flag</h2>
 <p>If you have the package or server your gem depends on but the native extensions still don’t compile properly, then there might be some configuration settings that you need to provide in order for the C compiler to work. Usually these options indicate where some target package is located on your machine; they might also indicate your machine’s architecture (32 vs. 64 bit) or other things.</p>
 <p>For example, if you want to use the “R” statistical programming language in your Ruby app, then you might try to install the rsruby gem like this:</p>
-<pre>
+<pre type="console">
 $ gem install rsruby
 Building native extensions.  This could take a while...
 ERROR:  Error installing rsruby:
@@ -102,7 +102,7 @@ ERROR: Cannot find the R library, aborting.
 ...etc...
 </pre>
 <p>As usual, there was a problem compiling the native extensions. But if you keeping reading the error message you’ll find some helpful information:</p>
-<pre>
+<pre type="console">
 You may need configuration options.
 
 Provided configuration options:
@@ -117,21 +117,21 @@ Provided configuration options:
 ...etc...
 </pre>
 <p>Reading the <a href="https://github.com/alexgutteridge/rsruby">github readme page for rsruby</a>, it turns out the option we need is <span class="code">--with-R-dir</span> to indicate where the R language interpreter is installed. The proper command line is:</p>
-<pre>
+<pre type="console">
 gem install rsruby -- --with-R-dir=/usr/local/Cellar/r/2.13.2/R.framework/Resources
 </pre>
 <p>This is a specific example of this command line pattern:</p>
-<pre>
+<pre type="console">
 gem install xyz_gem -- --with-some=/path/i/need/to/provide
 </pre>
 <p>The first two dashes separate the Rubygems options from the C compiler options passed to the native extensions process.</p>
 <p>If there’s not a lot of documentation for the gem you’re trying to install, then googling for each one of the available options listed in the console output will often take you to a StackOverflow or other discussion containing the magic setting you need to add. As a last resort you can dive in and just read the Ruby code inside extconf.rb to see what it’s looking for. Extconf.rb uses the <a href="http://stdlib.rubyonrails.org/libdoc/mkmf/rdoc/index.html">mkmf Ruby library</a> to generate the C Makefile, but even if you’re not familiar with mkmf most of the code you’ll find in extconf.rb will be fairly easy to understand, listing which directories to search in, which C header or library files to look for, etc. Usually there will be some clue here leading you in the right direction.</p>
 <p>Note: if you’re using Bundler and don’t actually type in the <span class="code">gem install</span> commands manually like this, you can specify these extension code settings using the <span class="code">bundler config</span> command line like this:</p>
-<pre>
+<pre type="console">
 bundle config build.XYZ --with-some-setting-required-to-compile=...
 </pre>
 <p>For the rsruby example above, I could have used bundler config like this:</p>
-<pre>
+<pre type="console">
 bundle config build.rsruby --with-R-dir=/usr/local/Cellar/r/2.13.2/R.framework/Resources
 </pre>
 <p>Now everytime you run bundler on this machine, it will include the proper options for building the native extensions for rsruby, every time rsruby is installed again. This will most likely happen if you run <span class="code">bundle upgrade</span> and get a newer version of rsruby, for example. FYI these config settings are saved in the “~/.bundle/config” file. For more details see the <a href="http://gembundler.com/man/bundle-config.1.html">Bundler documentation</a>.</p>
@@ -139,7 +139,7 @@ bundle config build.rsruby --with-R-dir=/usr/local/Cellar/r/2.13.2/R.framework/R
 <p>Ok - you finally got your native extensions to compile properly, and the gem installed. Now you’re finally out of the woods and ready to get back to the Ruby development you were planning to do two hours ago, right?</p>
 <p>Wait! Before continuing, double check whether the server or package you just installed to work with your new gem also requires some environment variables to be set. Ironically, these are often the same values, such as directory paths, that you needed to set using a <span class="code">gem install</span> or <span class="code">bundle config</span> option.</p>
 <p>For example, the <span class="code">gem install</span> command above will get the rsruby gem built and installed. But the R interpreter won’t actually work until you set the “R_HOME” environment variable properly:</p>
-<pre>
+<pre type="console">
 export R_HOME=/usr/local/Cellar/r/2.13.2/R.framework/Resources
 </pre>
 <p>The same is true for Oracle and the ruby-oci8 gem, and for many other servers and packages.</p>

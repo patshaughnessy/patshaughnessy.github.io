@@ -31,7 +31,7 @@
 </span></pre>
 
 <p>If I run this using my modified version of Ruby, I see lots of additional debug output (much more than I display here):</p>
-<pre>
+<pre type="console">
 $ ruby regex.rb
 PATTERN: /brown/ (US-ASCII)
 optimize: EXACT_BM
@@ -45,7 +45,7 @@ size: 44, start offset: 10
   10> "brown f..."         [exact5:brown]
   15> " fox ju..."         [end]
 
-#<MatchData "brown">
+#&lt;MatchData "brown">
 </pre>
 <p>The key here is the text “0:[exact5:brown] 6:[end]” - this line describes the two VM instructions that Oniguruma has compiled the <span class="code">/brown/</span> pattern into. Here’s what this regex program looks like:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex1.png" alt="/brown/" /></p>
@@ -69,7 +69,7 @@ size: 44, start offset: 10
 </span></pre>
 
 <p>Running again:</p>
-<pre>
+<pre type="console">
 $ ruby regex.rb
 PATTERN: /black|brown/ (US-ASCII)
 optimize: EXACT
@@ -85,7 +85,7 @@ size: 44, start offset: 10
   10> "brown f..."         [exact5:brown]
   15> " fox ju..."         [end]
 
-#<MatchData "brown">
+#&lt;MatchData "brown">
 </pre>
 <p>Again, the key line is: “0:[push:(11)] 5:[exact5:black] 11:[jump:(6)] 16:[exact5:brown] 22:[end]”. This is the VM program that will execute our <span class="code">/black|brown/</span> regex search:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex4.png" alt="/black/brown/" /></p>
@@ -109,7 +109,7 @@ size: 44, start offset: 10
 </span></pre>
 
 <p>Now, of course, we want to match “brown” followed by any series of characters until the end of the line. Here’s the debug output:</p>
-<pre>
+<pre type="console">
 $ ruby regex.rb
 PATTERN: /brown.*/ (US-ASCII)
 optimize: EXACT_BM
@@ -124,7 +124,7 @@ size: 44, start offset: 10
   15> " fox ju..."         [anychar*]
   44> ""                   [end]
 
-#<MatchData "brown fox jumps over the lazy dog.">
+#&lt;MatchData "brown fox jumps over the lazy dog.">
 </pre>
 <p>And here’s the new state machine:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/4/3/regex9.png" alt="/brown.*/" /></p>
@@ -157,9 +157,9 @@ size: 44, start offset: 10
 </span></pre>
 
 <p>This should run very quickly:</p>
-<pre>
+<pre type="console">
 $ time ruby regex.rb
-#<MatchData "aaa">
+#&lt;MatchData "aaa">
 ruby regex.rb  0.02s user 0.01s system 30% cpu 0.080 total
 </pre>
 <p>However, if you repeat this pattern using 29 repetitions instead of 3 the time required to find the match begins to explode, just as Russ shows in the <a href="http://swtch.com/%7Ersc/regexp/regexp1.html">graph on the left in his first article</a>:</p>
@@ -170,15 +170,15 @@ ruby regex.rb  0.02s user 0.01s system 30% cpu 0.080 total
 </span></pre>
 
 <p>Running with 29 repetitions:</p>
-<pre>
+<pre type="console">
 $ time ruby regex.rb
-#<MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+#&lt;MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
 ruby regex.rb  17.09s user 0.01s system 99% cpu 17.098 total
 </pre>
 <p>Or with 30 repetitions:</p>
-<pre>
+<pre type="console">
 $ time ruby regex.rb
-#<MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+#&lt;MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
 ruby regex.rb  34.00s user 0.01s system 99% cpu 34.025 total
 </pre>
 <p>For 31 repetitions the time is 67 seconds and it increases exponentially from there. The reason this happens is that the Backtracking algorithm Oniguruma uses has to iterate through a list of combinations that increases exponentially with the length of the regex pattern. If Oniguruma and Ruby had used the Thompson NFA algorthim that Russ explained this wouldn’t happen!</p>

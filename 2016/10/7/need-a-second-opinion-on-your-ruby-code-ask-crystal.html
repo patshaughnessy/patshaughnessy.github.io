@@ -105,7 +105,7 @@ it is here in this example. What if there was a way to find code issues the
 Ruby interpreter doesn’t report? Imagine if this code review could happen before
 my code is ever deployed or used?</p>
 <p>There is; we just need to run my Ruby code through the Crystal compiler:</p>
-<pre>
+<pre class="console">
 $ cp lead_singers.rb lead_singers.cr
 $ crystal lead_singers.cr
 </pre>
@@ -113,7 +113,7 @@ $ crystal lead_singers.cr
 very different language. How in the world can I use a compiler written for one
 language on code written in another?</p>
 <p>Well, you’re right. I run into a syntax error immediately:</p>
-<pre>
+<pre class="console">
 $ crystal lead_singers.cr 
 Syntax error in ./lead_singers.cr:27: unterminated char literal, use double quotes for strings
 
@@ -132,7 +132,7 @@ problem:</p>
 </span></pre>
 
 <p>Let’s compile again:</p>
-<pre>
+<pre class="console">
 $ crystal lead_singers.cr 
 Error in ./lead_singers.cr:3: undefined method 'attr_reader'
 
@@ -159,7 +159,7 @@ Easy enough to fix:</p>
 
 <p>Now let’s try again. Compiling my Ruby code using Crystal for a third time, I
 get:</p>
-<pre>
+<pre class="console">
 $ crystal lead_singers.cr
 Error in ./lead_singers.cr:22: instantiating 'Singer:Class#new(String, String, String)'
 
@@ -244,7 +244,7 @@ happened here. Take the time to read through the page-long error message; it’s
 quite helpful. It explains all of the patterns the Crystal compiler looked for
 in my code, <code>@band = 1</code>, <code>@band = Type.new</code> etc. But because my assignment <code>@band = band</code> didn’t fall into any of these categories, Crystal couldn’t figure out what
 type of value <code>@band</code> represents:</p>
-<pre>
+<pre class="console">
 in ./lead_singers.cr:6: Can't infer the type of instance variable '@band' of Singer
 </pre>
 <p>To fix this, I’ll just declare the type of my <code>@band</code> variable right where I
@@ -270,7 +270,7 @@ declare it, along with my two other instance variables:</p>
 name and type. My three variables, <code>band</code>, <code>first_name</code> and <code>last_name</code> are all
 strings, so I just need to tell Crystal this using a more verbose declaration.</p>
 <p>Now we should be good to go! Let's try compiling again:</p>
-<pre>
+<pre class="console">
 $ crystal lead_singers.cr         
 Error in ./lead_singers.cr:30: undefined method 'first_name' for Nil (compile-time type
 is (Singer | Nil))
@@ -322,7 +322,7 @@ all about Crystal and go back to writing Ruby.</p>
 <h2>Understanding a Crystal Nil Trace</h2>
 <p>Instead, I decide to take some time to understand what Crystal is telling me. I
 focus at the beginning of the Crystal error message:</p>
-<pre>
+<pre class="console">
 Error in ./lead_singers.cr:30: undefined method 'first_name' for Nil (compile-time type
 is (Singer | Nil))
 
@@ -376,14 +376,14 @@ defined for every class in that union type: <code>Singer</code> and <code>Nil</c
 understand what is wrong, Crystal backtracks through the code starting from
 where the missing method was found to where the offending type was introduced.
 You can read the Nil trace above for yourself. It starts with:</p>
-<pre>
+<pre class="console">
  ./lead_singers.cr:29
 
     singer = lead_singer_for("Doors", lead_singers)
     ^~~~~~
 </pre>
 <p>And reading down you can see where the <code>Nil</code> type was actually introduced:</p>
-<pre>
+<pre class="console">
   /Users/pat/bllvm/crystal/src/enumerable.cr:228
 
       def find(if_none = nil)
@@ -428,7 +428,7 @@ would create them like this:</p>
 </span></pre>
 
 <p>In Ruby, this would have worked just fine. But Crystal objects:</p>
-<pre>
+<pre class="console">
 $ crystal lead_singers.cr      
 Error in ./lead_singers.cr:26: instantiating 'Singer:Class#new(String, String, Nil)'
 
@@ -470,7 +470,7 @@ super-famous singers, I need to use the same union type we saw earlier:</p>
 </span></pre>
 
 <p>Finally, we’re ready to compile my Ruby and move on!</p>
-<pre>
+<pre class="console">
 $ crystal lead_singers.cr
 Error in ./lead_singers.cr:37: instantiating 'longest_last_name(Array(Singer))'
 

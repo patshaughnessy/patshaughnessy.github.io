@@ -85,21 +85,25 @@ $ rails generate model user name:string email:string
 $ rm test/performance/browsing_test.rb</pre></div>
 </div><br>
 <p>Editing the load_users_test.rb file, I&rsquo;ll add a couple simple tests that load all of the user records:</p>
-<div class="CodeRay">
-  <div class="code"><pre>require <span class="s"><span class="dl">'</span><span class="k">test_helper</span><span class="dl">'</span></span>
-require <span class="s"><span class="dl">'</span><span class="k">rails/performance_test_help</span><span class="dl">'</span></span>
-<p><span class="r">class</span> <span class="cl">LoadUsersTest</span> &lt; <span class="co">ActionDispatch</span>::<span class="co">PerformanceTest</span>
-<span class="r">def</span> <span class="fu">test_find</span>
-user_models = <span class="co">User</span>.find <span class="sy">:all</span>
-puts <span class="s"><span class="dl">&quot;</span><span class="k">Loaded </span><span class="il"><span class="idl">#{</span><span class="co">user_models.size</span><span class="idl">}</span></span><span class="k"> users</span><span class="dl">&quot;</span></span>
-<span class="r">end</span></p>
-<p><span class="r">def</span> <span class="fu">test_select_all</span>
-user_hashes =
-<span class="co">ActiveRecord</span>::<span class="co">Base</span>.connection.select_all(<span class="s"><span class="dl">'</span><span class="k">SELECT users.* FROM users</span><span class="dl">'</span></span>)
-puts <span class="s"><span class="dl">&quot;</span><span class="k">Loaded </span><span class="il"><span class="idl">#{</span><span class="co">user_hashes.size</span><span class="idl">}</span></span><span class="k"> users</span><span class="dl">&quot;</span></span>
-<span class="r">end</span>
-<span class="r">end</span></pre></div></p>
-</div><br>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">test_helper</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">rails/performance_test_help</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">LoadUsersTest </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActionDispatch::PerformanceTest
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">test_find
+</span><span style="color:#000000;">    user_models </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">User</span><span style="color:#000000;">.find </span><span style="color:#008080;">:all
+</span><span style="color:#000000;">    puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Loaded </span><span style="color:#000000;">#{user_models.size}</span><span style="color:#008080;"> users</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">test_select_all
+</span><span style="color:#000000;">    user_hashes </span><span style="color:#4f5b66;">=
+</span><span style="color:#000000;">      </span><span style="color:#008080;">ActiveRecord</span><span style="color:#000000;">::</span><span style="color:#008080;">Base</span><span style="color:#000000;">.connection.select_all(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">SELECT users.* FROM users</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
+</span><span style="color:#000000;">    puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Loaded </span><span style="color:#000000;">#{user_hashes.size}</span><span style="color:#008080;"> users</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end
+</span></pre>
+
 <p>Finally, I&rsquo;ll install &ldquo;ruby-prof,&rdquo; a helpful profiling tool that will allow us to use the rake test:profile command:</p>
 <div class="CodeRay">
   <div class="code"><pre>$ gem install ruby-prof

@@ -46,9 +46,11 @@ post in a very natural, human way:</p>
 connection to the tables in my database. It has to speak to the database server
 like everyone else, using the server’s language: SQL. Reading my log file, I
 can see how ActiveRecord translates <span class="code">post.comments</span> into SQL:</p>
-<pre>
-select comments.* from comments where comments.post_id = 1
-</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">select</span><span style="color:#000000;"> comments.</span><span style="color:#4f5b66;">* </span><span style="color:#a71d5d;">from</span><span style="color:#000000;"> comments </span><span style="color:#a71d5d;">where </span><span style="color:#d08770;">comments</span><span style="color:#000000;">.</span><span style="color:#d08770;">post_id </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">1
+</span></pre>
+
 <p>After executing this SQL statement, ActiveRecord converts the result set into
 an array of Ruby objects which I can then use in my code. For example, if I
 want the latest comment for a post I can write:</p>
@@ -113,11 +115,13 @@ trick:</p>
 </span></pre>
 
 <p>ActiveRecord translates this into SQL code as follows:</p>
-<pre>
-select comments.* from comments
-where comments.post_id = 1
-order by comments.updated_at desc limit 1
-</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">select</span><span style="color:#000000;"> comments.</span><span style="color:#4f5b66;">* </span><span style="color:#a71d5d;">from</span><span style="color:#000000;"> comments
+</span><span style="color:#a71d5d;">where </span><span style="color:#d08770;">comments</span><span style="color:#000000;">.</span><span style="color:#d08770;">post_id </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">1
+</span><span style="color:#a71d5d;">order by </span><span style="color:#d08770;">comments</span><span style="color:#000000;">.</span><span style="color:#d08770;">updated_at </span><span style="color:#a71d5d;">desc limit </span><span style="color:#d08770;">1
+</span></pre>
+
 <p>This will run much faster than my previous solution, because my database only
 transmits one comment record over the network to my Ruby server: the latest
 one. And Ruby only creates one Ruby object, for the latest comment:</p>
@@ -222,14 +226,16 @@ speak the database’s language: SQL. By writing SQL directly, I can be sure the
 database is doing exactly what I want, that it’s using the most efficient
 algorithm possible. I can be sure my database and I understand each other.</p>
 <p>Here’s one way to update all the posts using SQL:</p>
-<pre>
-update posts set latest_comment_author = (
-  select author from comments
-  where comments.post_id = posts.id
-  order by comments.updated_at desc
-  limit 1
-)
-</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">update</span><span style="color:#000000;"> posts </span><span style="color:#a71d5d;">set</span><span style="color:#000000;"> latest_comment_author </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> (
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">select</span><span style="color:#000000;"> author </span><span style="color:#a71d5d;">from</span><span style="color:#000000;"> comments
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">where </span><span style="color:#d08770;">comments</span><span style="color:#000000;">.</span><span style="color:#d08770;">post_id </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">posts</span><span style="color:#000000;">.</span><span style="color:#d08770;">id
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">order by </span><span style="color:#d08770;">comments</span><span style="color:#000000;">.</span><span style="color:#d08770;">updated_at </span><span style="color:#a71d5d;">desc
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">limit </span><span style="color:#d08770;">1
+</span><span style="color:#000000;">)
+</span></pre>
+
 <p>This tiny SQL program actually uses SQL commands similar to the what I found
 repeated in my log file. But there’s an important difference: This SQL code
 doesn’t refer to hard coded post id values, such as 1 or 2. Here I’ve updated

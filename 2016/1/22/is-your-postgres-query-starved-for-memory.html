@@ -115,7 +115,7 @@ so the primary hash table actually has a bit less than 4MB available to it.
 <h2>Measuring Your SQL Statement’s Blood Pressure</h2>
 <p>If one of the SQL queries in your application is running slowly, use the
 <span class="code">EXPLAIN ANALYZE</span> to find out what’s going on:</p>
-<pre>
+<pre style="font-size: 10px">
 > explain analyze select title, company from publications, authors where author = name;
 
                                                           QUERY PLAN                                                           
@@ -162,7 +162,7 @@ $ vim /usr/local/var/postgres/postgresql.conf
 <pre>
 $ launchctl load homebrew.mxcl.postgresql.plist
 </pre>
-<pre>
+<pre style="font-size: 10px">
 > explain analyze select title, company from publications, authors where author = name;
                                                           QUERY PLAN                                                           
 -------------------------------------------------------------------------------------------------------------------------------

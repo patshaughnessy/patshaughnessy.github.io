@@ -74,7 +74,7 @@
 <p><img src="http://patshaughnessy.net/assets/2012/1/4/shared-string.png" alt="shared strings" /></p>
 <p>Aside from saving memory, this also speeds up execution of your Ruby programs dramatically by avoiding the need to allocate more memory from the heap using another call to <span class="code">malloc</span>. <span class="code">Malloc</span> is actually a fairly expensive operation: it takes time to track down available memory of the proper size in the heap, and also to keep track of it for freeing later.</p>
 <p>Here’s a somewhat more accurate version of the C RString structure, including the <span class="code">shared</span> value:</p>
-<pre>
+<pre type="console">
 struct RString {
     long len;
     char *ptr;
@@ -194,7 +194,7 @@ struct RString {
 </span></pre>
 
 <p>We get an interesting result:</p>
-<pre>
+<pre type="console">
        user     system      total        real
 21 chars  0.250000   0.000000   0.250000 (  0.247459)
 22 chars  0.250000   0.000000   0.250000 (  0.246954)

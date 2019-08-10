@@ -29,14 +29,14 @@
 <p>In case you get bored by all of the technical details, be sure to skip down to the bottom of the article, where I reveal a couple of other jokes included in Ruby 1.9 by the Ruby core team!</p>
 <h2>Enabling goto support in your Ruby 1.9 installation</h2>
 <p>First, let’s try running the code above directly using a normal Ruby 1.9.3 MRI interpreter. I’ll paste the code above into a file called “joke.rb” and then run it like this:</p>
-<pre>
+<pre type="console">
 $ rvm 1.9.3
 $ ruby joke.rb 
-joke.rb:1:in `<main>': undefined method `__label__' for main:Object (NoMethodError)
+joke.rb:1:in `&lt;main>': undefined method `__label__' for main:Object (NoMethodError)
 </pre>
 <p>No surprise: since I haven’t yet enabled <span class="code">goto</span> statement support, I get an error from Ruby stating that the <span class="code">__label__</span> method is not defined on line 1. Until you enable the <span class="code">SUPPORT_JOKE</span> setting, the <span class="code">__goto__</span> and <span class="code">__label__</span> methods aren’t defined.</p>
 <p>Here’s how to enable the <span class="code">goto</span> statement support. First, find the source code for your Ruby 1.9 installation, and open the “vm_opts.h” header file in an editor. Here’s how I would do that on my Mac laptop using RVM:</p>
-<pre>
+<pre type="console">
 $ cd ~/.rvm/src/ruby-1.9.3-preview1
 $ mvim vm_opts.h
 </pre>
@@ -99,7 +99,7 @@ $ mvim vm_opts.h
 </span></pre>
 
 <p>... and save the modified vm_opts.h file. Now I need to recompile Ruby, using the “make” command like this:</p>
-<pre>
+<pre type="console">
 $ make
 	CC = /usr/bin/gcc-4.2
 	LD = ld
@@ -119,7 +119,7 @@ installing default zlib libraries
 linking ruby
 </pre>
 <p>You can see most of the C source code files depend on vm_opts.h and will be recompiled with the new setting. Now I just need to install the new Ruby executable file like this:</p>
-<pre>
+<pre type="console">
 $ make install
 ./miniruby -I./lib -I. -I.ext/common  ./tool/rbinstall.rb --make="make" ...
 installing binary commands:   /Users/pat/.rvm/rubies/ruby-1.9.3-preview1/bin
@@ -128,7 +128,7 @@ installing base libraries:    /Users/pat/.rvm/rubies
 ... etc ...
 </pre>
 <p>And I’m done - my special, customized Ruby 1.9 executable is now ready. Let’s give it a try and see what happens:</p>
-<pre>
+<pre type="console">
 $ ruby joke.rb
 The Ruby core team is playing a joke on us!
 The Ruby core team is playing a joke on us!
@@ -167,7 +167,7 @@ The Ruby core team is playing a joke on us!
 </span></pre>
 
 <p>I first learned about Ripper watching Peter Cooper’s excellent <a href="http://rubyreloaded.com/trickshots/">RubyTrickShots</a> screen cast. Also, I've skipped over the tokenize/lex step here today, but adding a call to <span class="code">Ripper.lex</span> would display the output of the Ruby tokenizer. Running this, <span class="code">Ripper.sexp</span> will display the AST produced by the Bison parser inside of Ruby:</p>
-<pre>
+<pre type="console">
 [:program,
  [[:method_add_arg,
    [:fcall, [:@ident, "__label__", [1, 0]]],
@@ -205,7 +205,7 @@ The Ruby core team is playing a joke on us!
 </span></pre>
 
 <p>Running this, I get:</p>
-<pre>
+<pre type="console">
 $ ruby byte_code.rb 
 == disasm: <RubyVM::InstructionSequence:<compiled>@<compiled>>==========
 0000 trace            1                                               (   1)
@@ -291,7 +291,7 @@ $ ruby byte_code.rb
 </span></pre>
 
 <p>Once you’ve enabled <span class="code">SUPPORT_JOKE</span> and recompiled, you’ll be able to run these two other special, hard coded methods:</p>
-<pre>
+<pre type="console">
 $ irb
 ruby-1.9.3-preview1 :001 > bitblt
  => "a bit of bacon, lettuce and tomato" 

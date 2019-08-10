@@ -70,26 +70,34 @@ end</pre>
 end</pre>
 <p>Filtered_auto_complete_for takes a block and evaluates it when the actual HTTP Ajax request is received from the auto complete Javascript. The block is provided with the find options hash and also the request parameters. This enables the controller&rsquo;s block to modify the find options in any way it would like, possibly using the HTTP request parameters provided. I&rsquo;ve also removed the options parameter since that&rsquo;s not necessary any more.</p>
 <p>As an example, here&rsquo;s my sample app&rsquo;s controller code:</p>
-<pre>class ProjectsController &lt; ApplicationController
-<h1>Handle auto complete for project names as usual:</h1>
-<p>auto_complete_for :project, :name</p>
-<h1>For task name auto complete, only display tasks</h1>
-<h1>that belong to the given project:</h1>
-<p>filtered_auto_complete_for :task, :name do | find_options, params|
-find_options.merge!(
-{
-:include =&gt; :project,
-:conditions =&gt; [ &quot;LOWER(tasks.name) LIKE ? AND projects.name = ?&quot;,
-'%' + params['task']['name'].downcase + '%',
-params['project'] ],
-:order =&gt; &quot;tasks.name ASC&quot;
-}
-)
-end</p>
-<p>def index
-@projects = Project.find(:all)
-end</p>
-<p>etc...</pre></p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">ProjectsController </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ApplicationController
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Handle auto complete for project names as usual:
+</span><span style="color:#000000;">  auto_complete_for </span><span style="color:#008080;">:project</span><span style="color:#000000;">, </span><span style="color:#008080;">:name
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># For task name auto complete, only display tasks
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># that belong to the given project: 
+</span><span style="color:#000000;">  filtered_auto_complete_for </span><span style="color:#008080;">:task</span><span style="color:#000000;">, </span><span style="color:#008080;">:name </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">| </span><span style="color:#000000;">find_options, params</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">    find_options.merge!(
+</span><span style="color:#000000;">      {
+</span><span style="color:#000000;">        </span><span style="color:#008080;">:include </span><span style="color:#000000;">=&gt; </span><span style="color:#008080;">:project</span><span style="color:#000000;">,
+</span><span style="color:#000000;">        </span><span style="color:#008080;">:conditions </span><span style="color:#000000;">=&gt; [ </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">LOWER(tasks.name) LIKE ? AND projects.name = ?</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">,
+</span><span style="color:#000000;">                         </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">%</span><span style="color:#4f5b66;">&#39; +</span><span style="color:#000000;"> params[</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">task</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">][</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">name</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">].downcase </span><span style="color:#4f5b66;">+ &#39;</span><span style="color:#008080;">%</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">,
+</span><span style="color:#000000;">                         params[</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">project</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">] ],
+</span><span style="color:#000000;">        </span><span style="color:#008080;">:order </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">tasks.name ASC</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">      }
+</span><span style="color:#000000;">    )
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">index
+</span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">projects </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Project</span><span style="color:#000000;">.find(</span><span style="color:#008080;">:all</span><span style="color:#000000;">)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  etc</span><span style="color:#4f5b66;">...</span></pre>
+
 <p>The code in this sample block modifies the find_options by adding &ldquo;:include =&gt; :project&rdquo;. This causes ActiveRecord to use a JOIN to include columns from the project table in the query (in this sample app Project has_many Tasks, and each Task belongs_to a Project). Then it matches on the project name, in addition to the portion of the task name typed in by the user so far. This limits the auto complete values to just the tasks that belong to the given project:</p>
 <p><img src="http://patshaughnessy.net/assets/2009/3/14/filtered.png"></p>
 <p>When I have time during the next few days I&rsquo;ll add &ldquo;filtered_auto_complete_for&rdquo; to my forked version of the auto_complete plugin&hellip; first I need to write some unit tests for it, and be sure it works as intended.  After that, I&rsquo;ll post this sample app back on github and you can try it yourself.</p>

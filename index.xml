@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-07-27T10:26:31Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Summer School With The Rust Compiler</title></entry><link href="http://patshaughnessy.net2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="http://patshaughnessy.net2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-08-10T15:24:13Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Summer School With The Rust Compiler</title></entry><link href="http://patshaughnessy.net2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="http://patshaughnessy.net2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt; &lt;small&gt;(source: &lt;a href=&quot;https://twitter.com/steveklabnik/status/1022518806814617601&quot;&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
@@ -32,7 +32,7 @@ it in just a few seconds:&lt;/p&gt;
 &lt;/span&gt;&lt;/pre&gt;
 
 &lt;p&gt;When I ran it, the output was:&lt;/p&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ ruby int-loop.rb
 1
 2
@@ -59,7 +59,7 @@ one line of code to my example, &lt;span class=&quot;code&quot;&gt;i = i+1&lt;/s
 &lt;/span&gt;&lt;/pre&gt;
 
 &lt;p&gt;As I expected, Ruby printed out 2 through 4:&lt;/p&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ ruby int-loop.rb
 2
 3
@@ -88,7 +88,7 @@ to rewrite it in only a few minutes:&lt;/p&gt;
 &lt;p&gt;I had to type semicolons after each line and use a &lt;span
 class=&quot;code&quot;&gt;main&lt;/span&gt; function. A bit more typing, but really this is
 exactly the same program. Running this, of course, produced the same result:&lt;/p&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ rustc int-loop.rs &amp;&amp; ./int-loop
 1
 2
@@ -106,7 +106,7 @@ $ rustc int-loop.rs &amp;&amp; ./int-loop
 &lt;/pre&gt;
 &lt;h2&gt;Lesson One: Passing By Reference vs. Passing By Value&lt;/h2&gt;
 &lt;p&gt;Compiling this, the Rust compiler hit me over the head with Computer Science!&lt;/p&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ rustc int-loop.rs &amp;&amp; ./int-loop
 error[E0271]: type mismatch resolving `&lt;&amp;i32 as std::ops::Add&lt;i32&gt;&gt;::Output == &amp;i32`
   --&gt; int-loop.rs:4:14
@@ -126,7 +126,7 @@ message straight out of type theory! The error &lt;span class=&quot;code&quot;&g
 resolving `&amp;lt;&amp;amp;i32 as std::ops::Add&amp;gt;::Output == &amp;amp;i32`&lt;/span&gt; makes no sense to me at
 all.&lt;/p&gt;
 &lt;p&gt;I decided to take the compiler’s suggestion and run the explain command:&lt;/p&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ rustc --explain E0271
 This is because of a type mismatch between the associated type of some
 trait (e.g. `T::Bar`, where `T` implements `trait Quux { type Bar; }`)
@@ -138,7 +138,7 @@ didn’t resemble my code at all. What is a trait? What is an associated type? I
 didn’t use any of these more advanced Rust concepts in my simple script. Maybe
 I needed a PhD. in Computer Science even to try to use Rust?&lt;/p&gt;
 &lt;p&gt;Eventually, I figured it out. The key lines from the error message were:&lt;/p&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
  4 |         i = i+1;
    |              ^ expected i32, found &amp;i32
 &lt;/pre&gt;
@@ -167,7 +167,7 @@ the reference before using it. I changed &lt;span class=&quot;code&quot;&gt;i = 
 &lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;
 &lt;/pre&gt;
 &lt;p&gt;Then Rust slapped me in the face again with more Computer Science:&lt;/p&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ rustc int-loop.rs &amp;&amp; ./int-loop
 error[E0594]: cannot assign to immutable borrowed content `*i`
   --&gt; int-loop.rs:26:9
@@ -231,7 +231,7 @@ immutable by default. Because it was immutable, my code can’t change it.&lt;/p
 &lt;/pre&gt;
 &lt;h2&gt;Lesson Four: Declaring Side Effects&lt;/h2&gt;
 &lt;p&gt;Running the Rust compiler again, I got the same error along with a new warning:&lt;/p&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ rustc int-loop.rs &amp;&amp; ./int-loop
 error[E0594]: cannot assign to immutable borrowed content `*i`
   --&gt; int-loop.rs:14:9
@@ -273,7 +273,7 @@ forced me to declare that my code might change the array.&lt;/p&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;    }&lt;/span&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;
 &lt;/pre&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ rustc int-loop.rs &amp;&amp; ./int-loop
 2
 3
@@ -337,7 +337,7 @@ end
 puts &quot;----&quot;
 p array
 &lt;/pre&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ ruby int-loop.rb
 2
 3
@@ -363,7 +363,7 @@ end
 puts &quot;----&quot;
 p array
 &lt;/pre&gt;
-&lt;pre&gt;
+&lt;pre class=&quot;console&quot;&gt;
 $ ruby string-loop.rb
 one-mutated
 two-mutated
@@ -746,7 +746,6 @@ report that should have taken 5 minutes.&lt;/p&gt;
 &lt;i&gt; &lt;small&gt;(&lt;a href=&quot;https://www.amazon.com/Programming-Language-Brian-W-Kernighan/dp/0131101633/ref=pd_lpo_sbs_14_img_1?_encoding=UTF8&amp;psc=1&amp;refRID=J7H21QEX2A2NN3Y6EG00&quot;&gt;The C Programming Language&lt;/a&gt; and &lt;a href=&quot;https://nostarch.com/Rust&quot;&gt;The Rust Programming Language&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
 &lt;/div&gt;
 &lt;p&gt;Rust &lt;a href=&quot;https://www.rust-lang.org/en-US/&quot;&gt;describes itself&lt;/a&gt; as:&lt;/p&gt;
-&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 …a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety.
 &lt;/blockquote&gt;
@@ -2473,7 +2472,7 @@ to look for the number 42 in the assembly language code:&lt;/p&gt;
 &lt;/span&gt;&lt;/pre&gt;
 
 &lt;p&gt;Once again I’ll use &lt;a href=&quot;https://crystal-lang.org&quot;&gt;Crystal&lt;/a&gt; to compile my Ruby code:&lt;/p&gt;
-&lt;pre&gt;
+&lt;pre type=&quot;console&quot;&gt;
 crystal build add_forty_two.rb --emit asm
 &lt;/pre&gt;
 &lt;p&gt;Searching through the generated &lt;code&gt;add_forty_two.s file&lt;/code&gt;, I find the

@@ -76,27 +76,27 @@ Installing ri documentation for generate_from_diff-0.0.1...
 Installing RDoc documentation for generate_from_diff-0.0.1...</pre></div>
 </div><br>
 <p>Next, let&rsquo;s commit my new controller and routes.rb code changes:</p>
-<div class="CodeRay">
-  <div class="code"><pre>$ git add .
-<p>$ git status</p>
-<h1>On branch master</h1>
-<h1>Changes to be committed:</h1>
-<h1>(use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)</h1>
-<h1></h1>
-<h1><span class="s">new file:   app/controllers/build_info_controller.rb</span></h1>
-<h1><span class="s">new file:   app/helpers/build_info_helper.rb</span></h1>
-<h1><span class="s">modified:   config/routes.rb</span></h1>
-<h1><span class="s">new file:   test/functional/build_info_controller_test.rb</span></h1>
-<h1><span class="s">new file:   test/unit/helpers/build_info_helper_test.rb</span></h1>
-<h1></h1>
-<p>$ git commit -m&quot;Build info&quot;
+<pre>$ git add .
+
+$ git status
+# On branch master
+# Changes to be committed:
+#   (use &quot;git reset HEAD &lt;file&gt;...&quot; to unstage)
+#
+#        <span class="s">new file:   app/controllers/build_info_controller.rb</span>
+#        <span class="s">new file:   app/helpers/build_info_helper.rb</span>
+#        <span class="s">modified:   config/routes.rb</span>
+#        <span class="s">new file:   test/functional/build_info_controller_test.rb</span>
+#        <span class="s">new file:   test/unit/helpers/build_info_helper_test.rb</span>
+#
+
+$ git commit -m&quot;Build info&quot;
 Created commit 037ca3b: Build info
-5 files changed, 22 insertions(+), 0 deletions(-)
-create mode 100644 app/controllers/build_info_controller.rb
-create mode 100644 app/helpers/build_info_helper.rb
-create mode 100644 test/functional/build_info_controller_test.rb
-create mode 100644 test/unit/helpers/build_info_helper_test.rb</pre></div></p>
-</div><br>
+ 5 files changed, 22 insertions(+), 0 deletions(-)
+ create mode 100644 app/controllers/build_info_controller.rb
+ create mode 100644 app/helpers/build_info_helper.rb
+ create mode 100644 test/functional/build_info_controller_test.rb
+ create mode 100644 test/unit/helpers/build_info_helper_test.rb</pre>
 <p>One last detail: we need to edit the Gemfile to load generate_from_diff into this application:</p>
 <div class="CodeRay">
   <div class="code"><pre>source <span class="s"><span class="dl">'</span><span class="k">http://rubygems.org</span><span class="dl">'</span></span>

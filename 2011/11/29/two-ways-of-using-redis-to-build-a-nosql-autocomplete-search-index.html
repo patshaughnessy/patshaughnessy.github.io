@@ -12,9 +12,11 @@
   <img src="http://patshaughnessy.net/assets/2011/11/23/working-autocomplete.png"/>
 </div>
 <p>Traditionally Rails gems and plugins have implemented this on the server using a SQL statement similar to this:</p>
-<pre>
-SELECT first_name FROM people WHERE LOWER(name) LIKE "lau%"
-</pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">SELECT</span><span style="color:#000000;"> first_name </span><span style="color:#a71d5d;">FROM</span><span style="color:#000000;"> people </span><span style="color:#a71d5d;">WHERE </span><span style="color:#000000;">LOWER(name) </span><span style="color:#a71d5d;">LIKE </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">lau%</span><span style="color:#4f5b66;">&quot;
+</span></pre>
+
 <p>This SQL statement asks the database server to look through all of the rows in the “people” table, and to find just the people whose first name starts with the given letters. While this works just fine, it can slow down significantly if you have thousands or millions of records since the database needs to perform a string comparison to find the proper rows. You would likely have to instruct the database server to build an index on the first_name field... and hope that it supports fast string search operations with that index.</p>
 <h2>Creating an autocomplete index using a Redis sorted set</h2>
 <p><a href="http://twitter.com/antirez">Salvatore Sanfilippo (@antirez)</a>, the author of Redis, wrote a great article back in September 2010 called <a href="http://antirez.com/post/autocomplete-with-redis.html">Auto Complete with Redis</a>, which illustrates how to use a Redis Sorted Set object to implement an autocomplete solution. I strongly encourage you to read it to get all the details; he shows an actual solution implemented with Ruby, and also covers the computer science theory behind it’s performance and memory usage.</p>
@@ -38,12 +40,12 @@ talk<br/></p>
 <p>To learn more about Redis Sorted Sets and all of the available commands for them see <a href="http://redis.io/">redis.io</a>, which has a nicely implemented <a href="http://redis.io/commands">Redis command reference page</a>. The key concept behind sorted sets is that they do the sorting at insertion time - that is, the set is always sorted since each element is inserted into the proper location in the set.</p>
 <h2>Searching a sorted set for matching words</h2>
 <p>Now let’s suppose a user starts to type a few letters into a web form: “ta” for example. Antirez’s code would be able to find the matching words, “take” and “talk,” using the following simple Redis commands:</p>
-<pre>
+<pre type="console">
 redis 127.0.0.1:6379> ZRANK tasks ta
 (integer) 1
 </pre>
 <p>The <a href="http://redis.io/commands/zrank">ZRANK command</a> searches the given set and returns the index of the given value. Here it would return 1, since “ta” is the second value and Redis uses 0-based indexes.</p>
-<pre>
+<pre type="console">
 redis 127.0.0.1:6379> ZRANGE tasks 1 50
 1) "ta"
 2) "tak"
@@ -94,13 +96,13 @@ talk</p>
   <img src="http://patshaughnessy.net/assets/2011/11/29/set-elements-are-hash-keys.png"/>
 </div>
 <p>Now by calling the ZRANGE command to get all of the set’s elements (0 means start from the first element, and -1 means continue until the end)...</p>
-<pre>
+<pre type="console">
 redis 127.0.0.1:6379> ZRANGE soulmate-index:tasks:ta 0 -1
 1) "1"
 2) "2"
 </pre>
 <p>...Soulmate can get a list of ID values that are also keys into the phrase database hash. Finally Soulmate can load the matching phrases and return them, using the <a href="http://redis.io/commands/hmget">HMGET (hash multiple get) command</a>:</p>
-<pre>
+<pre type="console">
 redis 127.0.0.1:6379> HMGET soulmate-data:tasks 1 2
 1) "{\"term\":\"Take out the trash\",\"id\":1}"
 2) "{\"term\":\"Talk to the school bus driver\",\"id\":2}"
@@ -111,7 +113,7 @@ redis 127.0.0.1:6379> HMGET soulmate-data:tasks 1 2
   <img src="http://patshaughnessy.net/assets/2011/11/29/intersection.png"/>
 </div>
 <p>Here Soulmate uses Redis’s <a href="http://redis.io/commands/zinterstore">ZINTERSTORE command</a> to calculate the intersection between two sets:</p>
-<pre>
+<pre type="console">
 redis 127.0.0.1:6379> ZINTERSTORE soulmate-cache:tasks:bus|ta 2
                                   soulmate-index:tasks:ta soulmate-index:tasks:bus
 (integer) 1
@@ -125,7 +127,7 @@ redis 127.0.0.1:6379> ZRANGE soulmate-cache:tasks:bus|ta 0 -1
   <img src="http://patshaughnessy.net/assets/2011/11/29/cached-set.png"/>
 </div>
 <p>The intersection set was actually saved above in the call to ZINTERSTORE, and now to indicate that it should expire after 10 minutes (600 seconds) we would use:</p>
-<pre>
+<pre type="console">
 redis 127.0.0.1:6379> EXPIRE soulmate-cache:tasks:bus|ta 600
 (integer) 1
 </pre>

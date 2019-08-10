@@ -27,13 +27,13 @@
 </span></pre>
 
 <p>Now if I save that into a file called “simple.rb,” switch to Rubinius using RVM, and run the script I’ll get the number “5” as expected:</p>
-<pre>
+<pre type="console">
 $ rvm rbx-1.2.4-20110705
 $ ruby simple.rb
 5
 </pre>
 <p>Not very interesting, I know. But what is interesting is that when I ran simple.rb Rubinius created a new, hidden directory called “.rbx” with a strange, cryptically named file in it:</p>
-<pre>
+<pre type="console">
 $ ls -a
 .         ..        .rbx      simple.rb
 $ find .rbx
@@ -46,11 +46,11 @@ $ find .rbx
 <p><img src="http://patshaughnessy.net/assets/2012/2/15/rubinius-diagram.png" alt="Rubinius compiler" /></p>
 <p>On the top you can see that first Rubinius compiles your code into byte code, and then below later executes it using the Rubinius Virtual Machine, which can compile the byte code into native machine language. Rubinius also caches the byte code using the hexadecimal naming scheme I showed above, avoiding the need for the compile step entirely if the Ruby source code file didn’t change.</p>
 <p>As <a href="http://rubini.us/2011/03/17/running-ruby-with-no-ruby/">Brian Ford explained on the Rubinius blog</a>, you can actually run the Rubinius compiler directly like this:</p>
-<pre>
+<pre type="console">
 $ rbx compile simple.rb -o simple.bytecode
 </pre>
 <p>This compiles my Ruby code and saves the byte code in the specified file. If we look at the simple.bytecode file, we’ll see a series of alphanumeric tokens that don’t make any sense. But if you run the compiler using the “-B” option you can see an annotated version of the Rubinius byte code:</p>
-<pre>
+<pre type="console">
 $ rbx compile simple.rb -o simple.bytecode -B
 ============= :__script__ ==============
 Arguments:   0 required, 0 post, 0 total
@@ -97,7 +97,7 @@ Lines to IP: 2: -1..-1, 3: 0..5
 </table>
 </div>
 <p>Now let’s take a look at how JRuby compiles Ruby code; I’ll start by using RVM to switch over to JRuby, and then I’ll run the same simple.rb script:</p>
-<pre>
+<pre type="console">
 $ rvm jruby-head
 $ ruby simple.rb
 5
@@ -106,14 +106,14 @@ $ ruby simple.rb
 <p>Here's another diagram showing the two step process, this time for JRuby:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/2/15/jruby-diagram.png" alt="JRuby compiler" /></p>
 <p>Like with Rubinius, it’s possible to run the JRuby compiler directly using the “jrubyc” command... following the Java executable naming pattern (“java” -&gt; “javac”). Thanks to my friend <a href="http://www.alexrothenberg.com/">Alex Rothenberg</a> for pointing this out. Running “jrubyc” will create a Java .class file, which we can inspect using the Java decompiler like I did last week:</p>
-<pre>
+<pre type="console">
 $ jrubyc simple.rb
 $ ls
 simple.class simple.rb
 $ javap -c simple.class > simple.bytecode
 </pre>
 <p>Now the simple.bytecode file will contain an annotated version of the Java byte code the  JVM will execute. Unlike Rubinius, which creates byte code that is fairly clean, simple and easy to understand, Java byte code is much more cryptic and confusing. Searching through the simple.bytecode file for my method <span class="code">add_two</span>, I found the following snippet of byte code:</p>
-<pre>
+<pre type="console">
   public static org.jruby.runtime.builtin.IRubyObject method__1$RUBY$add_two(simple, org.jruby.runtime.Thread...
     Code:
        0: aload_3       

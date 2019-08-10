@@ -24,61 +24,57 @@
 <h2>Detailed example</h2>
 <p>To get things started, I just posted a single new scaffold on ScaffoldHub.org: the <a href="http://scaffoldhub.org/scaffolds/autocomplete">AutoComplete scaffold</a>. This scaffold looks the same as the standard Rails scaffolding code, except you can use type ahead/autocomplete on one of the text fields. I implemented it using the <a href="http://docs.jquery.com/Plugins/autocomplete">JQuery autocomplete plugin</a>.</p>
 <p>To run it, first just install the ScaffoldHub gem in your Rails 3 app by editing your Gemfile and adding this line:</p>
-<div class="CodeRay">
-  <div class="code"><pre>gem <span class="s"><span class="dl">'</span><span class="k">scaffoldhub</span><span class="dl">'</span></span></pre></div>
-</div>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">scaffoldhub</span><span style="color:#4f5b66;">&#39;
+</span></pre>
+
 <p>And of course then install it with bundler:</p>
-<div class="CodeRay">
-  <div class="code"><pre>$ bundle install
+<pre>$ bundle install
 Fetching source index for http://rubygems.org/
 Using rake (0.8.7) 
 Using abstract (1.0.0) 
-<p>... etc...</p>
-<p>Using railties (3.0.5)
-Using rails (3.0.5)</p>
-<div class='container'>Using scaffoldhub (0.0.3)<div class='overlay'></div></div>Using sqlite3 (1.3.3) 
-<span class="s">Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.</span>
-</pre></div>
-</div>
+
+... etc...
+
+Using railties (3.0.5) 
+Using rails (3.0.5) 
+Using scaffoldhub (0.0.3)
+Using sqlite3 (1.3.3) 
+Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
+</pre>
 <p>Now with the gem installed you will have a new generator called “scaffoldhub” available that uses the same syntax as the standard Rails scaffold generator, except for one additional option which specifies which scaffold to use. For example, to create a person model with a name field, you would use:</p>
-<div class="CodeRay">
-  <div class="code"><pre>rails generate scaffoldhub person name:string --scaffold autocomplete:name</pre></div>
-</div>
+<pre>rails generate scaffoldhub person name:string --scaffold autocomplete:name</pre>
 <p>Here the new --scaffold option indicates we want to use the autocomplete scaffold from scaffoldhub.org, and that we want the autocomplete behavior on the name field.</p>
 <p>When you run the scaffoldhub command above, you’ll see this output:</p>
-<div class="CodeRay">
-  <div class="code"><pre>$ rails generate scaffoldhub person name:string --scaffold autocomplete:name
+<pre>$ rails generate scaffoldhub person name:string --scaffold autocomplete:name
       invoke  active_record
-      <span class="s">create</span>    db/migrate/20110313231546_create_people.rb
-    <span class="s">download</span>    http://scaffoldhub.org/scaffolds/autocomplete/spec
-    <span class="s">download</span>    https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/model.rb
-      <span class="s">create</span>    app/models/person.rb
+      create    db/migrate/20110313231546_create_people.rb
+    download    http://scaffoldhub.org/scaffolds/autocomplete/spec
+    download    https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/model.rb
+      create    app/models/person.rb
       invoke    test_unit
-      <span class="s">create</span>      test/unit/person_test.rb
-      <span class="s">create</span>      test/fixtures/people.yml
-       <span class="s">route</span>  resources :people
+      create      test/unit/person_test.rb
+      create      test/fixtures/people.yml
+       route  resources :people
       invoke  scaffold_controller
-    <span class="s">download</span>    https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/controller.rb
-      <span class="s">create</span>    app/controllers/people_controller.rb
+    download    https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/controller.rb
+      create    app/controllers/people_controller.rb
       invoke    erb
-      <span class="s">create</span>      app/views/people
-    <span class="s">download</span>      https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/_form.html.erb
-      <span class="s">create</span>      app/views/people/_form.html.erb
-    <span class="s">download</span>      https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/edit.html.erb
-      <span class="s">create</span>      app/views/people/edit.html.erb
-    <span class="s">download</span>      https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/index.html.erb
-      <span class="s">create</span>      app/views/people/index.html.erb
-<p>...etc...</pre></div></p>
-</div>
+      create      app/views/people
+    download      https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/_form.html.erb
+      create      app/views/people/_form.html.erb
+    download      https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/edit.html.erb
+      create      app/views/people/edit.html.erb
+    download      https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/index.html.erb
+      create      app/views/people/index.html.erb
+
+...etc...</pre>
 <p>This looks similar to what the Rails scaffold generator displays, except you’ll notice a number of “download” lines. These indicate that the scaffoldhub gem is downloading the code needed to generate the autocomplete scaffolding. The first download line:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="s">download</span>    http://scaffoldhub.org/scaffolds/autocomplete/spec</pre></div>
-</div>
+<pre>download    http://scaffoldhub.org/scaffolds/autocomplete/spec</pre>
 <p>...actually gets the list of generator template files for autocomplete from scaffoldhub.org, while the remaining download lines:</p>
-<div class="CodeRay">
-  <div class="code"><pre><span class="s">download</span>    https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/model.rb
-<span class="s">create</span>      app/models/person.rb</pre></div>
-</div>
+<pre>download    https://github.com/patshaughnessy/scaffolds/raw/master/autocomplete/templates/model.rb
+create      app/models/person.rb</pre>
 <p>...get the actual generator template files.</p>
 <h2>More to come...</h2>
 <p>The next thing on my list to do is implement the login and contribute user interface for scaffoldhub.org. This should be straightforward, because all it will do is save the URL of the “scaffold spec” file I mentioned above, along with a screen shot and account information about who is posting the scaffold. Stay tuned here for more information and get ready to write your own scaffold!</p>
