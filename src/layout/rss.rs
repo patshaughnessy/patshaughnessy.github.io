@@ -12,7 +12,6 @@ use post::Post;
 pub fn render(all_posts: &Vec<Post>) -> String {
     let system_time = SystemTime::now();
     let now: DateTime<Utc> = system_time.into();
-    //let recent_posts = all_posts.iter().filter(|p| p.tag == post.tag || post.tag.is_none()).take(4);
     let rendered = html! {
       feed xmlns="http://www.w3.org/2005/Atom" {
         title { "Pat Shaughnessy" }
@@ -28,30 +27,32 @@ pub fn render(all_posts: &Vec<Post>) -> String {
             title {
               (post.title)
             }
-          }
-          link href={"http://patshaughnessy.net" (post.url)} rel="alternate" { }
-          id href={"http://patshaughnessy.net" (post.url)} rel="alternate" { }
-          published { 
-            (post.date.to_rfc3339_opts(SecondsFormat::Secs, true))
-          }
-          updated { 
-            (post.date.to_rfc3339_opts(SecondsFormat::Secs, true))
-          }
-          category {
-            @if let Some(ref t) = post.tag {
-                (t)
-            } @else {
-                ""
-            }
-          }
-          author {
-            name { "Pat Shaughnessy" }
-          }
-          summary {
-              (post.summary())
-          }
-          content {
-              (post.content)
+            // Please save this in a local variable
+              link href={"http://patshaughnessy.net/" (post.url)} rel="alternate" { }
+              id href={"http://patshaughnessy.net/" (post.url)} rel="alternate" { }
+              published { 
+                (post.date.to_rfc3339_opts(SecondsFormat::Secs, true))
+              }
+              updated { 
+                (post.date.to_rfc3339_opts(SecondsFormat::Secs, true))
+              }
+              category {
+                @if let Some(ref t) = post.tag {
+                    (t)
+                } @else {
+                    ""
+                }
+              }
+              author {
+                name { "Pat Shaughnessy" }
+              }
+              summary {
+                  // TODO: Has to be escaped HTML
+                  (post.summary())
+              }
+              content {
+                  (post.content)
+              }
           }
         }
       }
