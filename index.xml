@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-08-10T15:24:13Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Summer School With The Rust Compiler</title></entry><link href="http://patshaughnessy.net2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="http://patshaughnessy.net2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-08-12T18:42:06Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Summer School With The Rust Compiler</title><link href="http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt; &lt;small&gt;(source: &lt;a href=&quot;https://twitter.com/steveklabnik/status/1022518806814617601&quot;&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;A few months ago, I saw this tweet from Steve. I'm not even sure what
-&amp;quot;derridean</summary><content>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+&amp;quot;derridean</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt; &lt;small&gt;(source: &lt;a href=&quot;https://twitter.com/steveklabnik/status/1022518806814617601&quot;&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
@@ -376,11 +376,11 @@ value, but strings by reference. Updating each string inside the loop also
 updated that string inside the array. Now my program will have bugs, unless the
 point of running that loop was to mutate the array, and not just to print it
 out.&lt;/p&gt;
-</content><entry><title>From ActiveRecord to Diesel</title></entry><link href="http://patshaughnessy.net2018/6/9/from-activerecord-to-diesel" rel="alternate"></link><id href="http://patshaughnessy.net2018/6/9/from-activerecord-to-diesel" rel="alternate"></id><published>2018-06-09T00:00:00Z</published><updated>2018-06-09T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>From ActiveRecord to Diesel</title><link href="http://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel" rel="alternate"></link><id href="http://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel" rel="alternate"></id><published>2018-06-09T00:00:00Z</published><updated>2018-06-09T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/exercise.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Learning something new every day
 is exercise for your mind.&lt;/i&gt;&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg&quot;&gt;Jeremy Bowcock via Wikimedi</summary><content>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+    &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg&quot;&gt;Jeremy Bowcock via Wikimedi</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/exercise.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Learning something new every day
 is exercise for your mind.&lt;/i&gt;&lt;br/&gt;
@@ -739,9 +739,9 @@ something new. By taking 5 hours instead of 5 minutes to accomplish a simple
 task, I gained valuable insight and knowledge. I gave my mind the exercise it
 was so hungry for. And thankfully no one noticed it took me 5 hours to run a
 report that should have taken 5 minutes.&lt;/p&gt;
-</content><entry><title>How Rust Implements Tagged Unions</title></entry><link href="http://patshaughnessy.net2018/3/15/how-rust-implements-tagged-unions" rel="alternate"></link><id href="http://patshaughnessy.net2018/3/15/how-rust-implements-tagged-unions" rel="alternate"></id><published>2018-03-15T00:00:00Z</published><updated>2018-03-15T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>How Rust Implements Tagged Unions</title><link href="http://patshaughnessy.net/2018/3/15/how-rust-implements-tagged-unions" rel="alternate"></link><id href="http://patshaughnessy.net/2018/3/15/how-rust-implements-tagged-unions" rel="alternate"></id><published>2018-03-15T00:00:00Z</published><updated>2018-03-15T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/covers.png&quot;&gt;&lt;br/&gt;
-&lt;i&gt; &lt;small&gt;(&lt;a href=&quot;https://www.amazon.com/Programming-Language-Brian-W-Kernighan/dp/0131101633/ref=pd_lpo_sbs_14_img_1?_encoding=UTF8&amp;psc=1&amp;refRID=J7H21QEX2A2NN3Y6EG00&quot;&gt;The C Programming Language&lt;/a&gt; and &lt;a href=&quot;https://nostarch.com</summary><content>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;i&gt; &lt;small&gt;(&lt;a href=&quot;https://www.amazon.com/Programming-Language-Brian-W-Kernighan/dp/0131101633/ref=pd_lpo_sbs_14_img_1?_encoding=UTF8&amp;psc=1&amp;refRID=J7H21QEX2A2NN3Y6EG00&quot;&gt;The C Programming Language&lt;/a&gt; and &lt;a href=&quot;https://nostarch.com</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/covers.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt; &lt;small&gt;(&lt;a href=&quot;https://www.amazon.com/Programming-Language-Brian-W-Kernighan/dp/0131101633/ref=pd_lpo_sbs_14_img_1?_encoding=UTF8&amp;psc=1&amp;refRID=J7H21QEX2A2NN3Y6EG00&quot;&gt;The C Programming Language&lt;/a&gt; and &lt;a href=&quot;https://nostarch.com/Rust&quot;&gt;The Rust Programming Language&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
 &lt;/div&gt;
@@ -968,10 +968,10 @@ let&lt;/span&gt; will never be executed unless the internal tag value matches th
 writing code in C and Rust is very different. C encourages me to write
 dangerous, crashing code, while Rust prevents me from writing dangerous code in
 the first place.&lt;/p&gt;
-</content><entry><title>Learning Rust: If Let vs. Match</title></entry><link href="http://patshaughnessy.net2018/1/18/learning-rust-if-let-vs--match" rel="alternate"></link><id href="http://patshaughnessy.net2018/1/18/learning-rust-if-let-vs--match" rel="alternate"></id><published>2018-01-18T00:00:00Z</published><updated>2018-01-18T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Learning Rust: If Let vs. Match</title><link href="http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match" rel="alternate"></link><id href="http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match" rel="alternate"></id><published>2018-01-18T00:00:00Z</published><updated>2018-01-18T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/dictionary.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Human languages have similar words with different&lt;br/&gt; shades of meaning. Some computer languages do too.&lt;br/&gt;
-  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG&quot;&gt;Wikimedia Commons</summary><content>&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG&quot;&gt;Wikimedia Commons</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/dictionary.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Human languages have similar words with different&lt;br/&gt; shades of meaning. Some computer languages do too.&lt;br/&gt;
   &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
@@ -1246,13 +1246,13 @@ else clause.&lt;/p&gt;
 &lt;p&gt;Clearly the discriminant function is crucial - when I have time next, I’ll
 explore what discriminant means, where it’s implemented and how it works. Or if
 anyone from the Rust teams happens to read this, let us know.&lt;/p&gt;
-</content><entry><title>Looking Inside Postgres at a GiST Index</title></entry><link href="http://patshaughnessy.net2017/12/15/looking-inside-postgres-at-a-gist-index" rel="alternate"></link><id href="http://patshaughnessy.net2017/12/15/looking-inside-postgres-at-a-gist-index" rel="alternate"></id><published>2017-12-15T00:00:00Z</published><updated>2017-12-15T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Looking Inside Postgres at a GiST Index</title><link href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index" rel="alternate"></link><id href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index" rel="alternate"></id><published>2017-12-15T00:00:00Z</published><updated>2017-12-15T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/tree5.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt; What do Postgres GiST indexes look like? How are&lt;br/&gt;
   they similar or different from standard Postgres indexes?&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;In the last few posts in this series
-(&lt;a href=&quot;http://patshaughnessy.net/2017/12/11/trying-to-represe</summary><content>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+(&lt;a href=&quot;http://patshaughnessy.net/2017/12/11/trying-to-represe</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/tree5.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt; What do Postgres GiST indexes look like? How are&lt;br/&gt;
   they similar or different from standard Postgres indexes?&lt;/i&gt;
@@ -1605,12 +1605,12 @@ posts.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/postcard.png&quot;/&gt;&lt;/p&gt;
 &lt;p&gt;Do you save tree data in Postgres? Does your app take advantage of the LTREE
 extension? If so, you should send Oleg and Teodor a postcard! I just did.&lt;/p&gt;
-</content><entry><title>Manipulating Trees Using SQL and the Postgres LTREE Extension</title></entry><link href="http://patshaughnessy.net2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension" rel="alternate"></link><id href="http://patshaughnessy.net2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension" rel="alternate"></id><published>2017-12-14T00:00:00Z</published><updated>2017-12-14T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Manipulating Trees Using SQL and the Postgres LTREE Extension</title><link href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension" rel="alternate"></link><id href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension" rel="alternate"></id><published>2017-12-14T00:00:00Z</published><updated>2017-12-14T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/14/tree4.jpg&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;Yesterday&lt;/a&gt;,
 I used the &lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE&lt;/a&gt;
-extension to save a tree data structure </summary><content>&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
+extension to save a tree data structure </summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/14/tree4.jpg&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;&lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;Yesterday&lt;/a&gt;,
@@ -1900,13 +1900,13 @@ with Postgres GiST indexes. By using an index, Postgres can execute any of the
 SQL expressions I wrote above equally fast on 7000 records as it would on 7!
 How? The only way to find out is by &lt;a href=&quot;http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index&quot;&gt;Looking Inside Postgres at a GiST
 Index&lt;/a&gt;.&lt;/p&gt;
-</content><entry><title>Saving a Tree in Postgres Using LTREE</title></entry><link href="http://patshaughnessy.net2017/12/13/saving-a-tree-in-postgres-using-ltree" rel="alternate"></link><id href="http://patshaughnessy.net2017/12/13/saving-a-tree-in-postgres-using-ltree" rel="alternate"></id><published>2017-12-13T00:00:00Z</published><updated>2017-12-13T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Saving a Tree in Postgres Using LTREE</title><link href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree" rel="alternate"></link><id href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree" rel="alternate"></id><published>2017-12-13T00:00:00Z</published><updated>2017-12-13T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/tree3.jpg&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;In &lt;a href=&quot;http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension&quot;&gt;my last
 post&lt;/a&gt;,
 I showed you how to install and enable a Postgres extension called
-&lt;a href=&quot;https://www.postgresql.org/docs/current/stati</summary><content>&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
+&lt;a href=&quot;https://www.postgresql.org/docs/current/stati</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/tree3.jpg&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;In &lt;a href=&quot;http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension&quot;&gt;my last
@@ -2092,12 +2092,12 @@ LTREE
 Extension&lt;/a&gt;,
 I’ll show you how to use other LTREE’s operators and functions to work with
 tree data.&lt;/p&gt;
-</content><entry><title>Installing the Postgres LTREE Extension</title></entry><link href="http://patshaughnessy.net2017/12/12/installing-the-postgres-ltree-extension" rel="alternate"></link><id href="http://patshaughnessy.net2017/12/12/installing-the-postgres-ltree-extension" rel="alternate"></id><published>2017-12-12T00:00:00Z</published><updated>2017-12-12T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Installing the Postgres LTREE Extension</title><link href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension" rel="alternate"></link><id href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension" rel="alternate"></id><published>2017-12-12T00:00:00Z</published><updated>2017-12-12T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/12/tree2.jpg&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;Hidden inside of your Postgres server is code that provides special SQL
 operators and functions designed to support tree operations. It’s called the
-&lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE exte</summary><content>&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
+&lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE exte</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/12/tree2.jpg&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;Hidden inside of your Postgres server is code that provides special SQL
@@ -2199,13 +2199,13 @@ load ltree.so automatically.&lt;/p&gt;
 &lt;p&gt;Now that you have LTREE installed and enabled, you can read &lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;my next
 post&lt;/a&gt;, I’ll
 to learn how to use it.&lt;/p&gt;
-</content><entry><title>Trying to Represent a Tree Structure Using Postgres</title></entry><link href="http://patshaughnessy.net2017/12/11/trying-to-represent-a-tree-structure-using-postgres" rel="alternate"></link><id href="http://patshaughnessy.net2017/12/11/trying-to-represent-a-tree-structure-using-postgres" rel="alternate"></id><published>2017-12-11T00:00:00Z</published><updated>2017-12-11T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Trying to Represent a Tree Structure Using Postgres</title><link href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres" rel="alternate"></link><id href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres" rel="alternate"></id><published>2017-12-11T00:00:00Z</published><updated>2017-12-11T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/11/tree1.jpg&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;Suppose you had a hierarchical data structure in your application - how would
 you save it in a database? How would you represent a complex tree structure
 using flat rows and columns?&lt;/p&gt;
-&lt;p&gt;There are a few different, equally valid</summary><content>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;p&gt;There are a few different, equally valid</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/11/tree1.jpg&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;Suppose you had a hierarchical data structure in your application - how would
@@ -2424,13 +2424,13 @@ In my &lt;a href=&quot;http://patshaughnessy.net/2017/12/12/installing-the-postg
 post&lt;/a&gt;,
 I’ll show you how to install and use the &lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE Postgres
 extension&lt;/a&gt;.&lt;/p&gt;
-</content><entry><title>Pointers in C and x86 Assembly Language</title></entry><link href="http://patshaughnessy.net2017/1/20/pointers-in-c-and-x86-assembly-language" rel="alternate"></link><id href="http://patshaughnessy.net2017/1/20/pointers-in-c-and-x86-assembly-language" rel="alternate"></id><published>2017-01-20T00:00:00Z</published><updated>2017-01-20T00:00:00Z</updated><category></category><author><name>Pat Shaughnessy</name></author><summary>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Pointers in C and x86 Assembly Language</title><link href="http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language" rel="alternate"></link><id href="http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language" rel="alternate"></id><published>2017-01-20T00:00:00Z</published><updated>2017-01-20T00:00:00Z</updated><category></category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/ram.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;16GB of DDR random access memory&lt;br/&gt;
   my son used in his new gaming PC
 &lt;/i&gt;
 &lt;/div&gt;
-&lt;p&gt;Recently I’ve been trying to learn how to read x86 assembly language. In &lt;a href=&quot;http://patshaughnessy.net/2016/11/26/learning-to-read-x86-ass</summary><content>&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;p&gt;Recently I’ve been trying to learn how to read x86 assembly language. In &lt;a href=&quot;http://patshaughnessy.net/2016/11/26/learning-to-read-x86-ass</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/ram.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;16GB of DDR random access memory&lt;br/&gt;
   my son used in his new gaming PC
@@ -2805,4 +2805,4 @@ finally ready to read and understand a simple assembly language program. In my
 next point I’ll look at how my Crystal and C compilers assign memory addresses
 on the stack for local variables, and why they use a stack in the first place.
 Should be fun!&lt;/p&gt;
-</content></feed>
+</content></entry></feed>
