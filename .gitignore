@@ -2,3 +2,4 @@
 *.swp
 target
 tests/output_file.txt
+blogc

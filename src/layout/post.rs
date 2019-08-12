@@ -128,7 +128,7 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
                 ul {
                   @for (link_url, link_title) in recent_links {
                     li {
-                      a href=(link_url) {
+                      a href={ "/" (link_url) } {
                         (link_title)
                       }
                     }
