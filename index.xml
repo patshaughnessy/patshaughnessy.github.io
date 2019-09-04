@@ -1,4 +1,305 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-08-12T18:42:06Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Summer School With The Rust Compiler</title><link href="http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-09-04T14:25:49Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Rust to Build a Blog Site</title><link href="http://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></link><id href="http://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></id><published>2019-09-04T00:00:00Z</published><updated>2019-09-04T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2019/9/4/batteries.jpg&quot;&gt;&lt;br/&gt;
+&lt;i&gt; Rust comes with batteries included&lt;br/&gt;
+    &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Color-w-batteries.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;After “Hello World,” blog sites a</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2019/9/4/batteries.jpg&quot;&gt;&lt;br/&gt;
+&lt;i&gt; Rust comes with batteries included&lt;br/&gt;
+    &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Color-w-batteries.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;After “Hello World,” blog sites are the world’s second most unneeded
+application. If you want to write a blog, use Medium, Wordpress or just
+Twitter. The world doesn’t need another blog app.&lt;/p&gt;
+&lt;p&gt;However, like Hello World, building a static site generator is a great way to
+get your feet wet in a new programming language. Recently I rewrote &lt;a href=&quot;https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/src/lib.rs&quot;&gt;the script
+I use to generate this web
+site&lt;/a&gt;
+using Rust: I needed to update and fix my script, but really I was looking for
+an excuse to write Rust.  Despite its reputation as a difficult to learn,
+expert level language,  Rust turned out to be a great choice for the simple
+task of generating a few HTML files, quickly and reliably. Why? Not because of
+its sophisticated borrow checker or support for safe concurrency.&lt;/p&gt;
+&lt;p&gt;Rust was a great choice for me because I didn’t have to write most of the code.
+Rust’s dependency management and build tool,
+&lt;a href=&quot;https://doc.rust-lang.org/book/ch01-03-hello-cargo.html&quot;&gt;Cargo&lt;/a&gt;, allowed me to
+glue together open source Rust libraries called “crates” which do most of the
+work. The Rust community’s crate registry, &lt;a href=&quot;https://crates.io&quot;&gt;crates.io&lt;/a&gt;, has
+over 29,000 crates available.  Downloading, compiling and using them is dead
+simple. And writing a blog site using Rust turned out to be simple too.&lt;/p&gt;
+&lt;h2&gt;My Cargo.toml File&lt;/h2&gt;
+&lt;p&gt;I needed a few important features to generate this web site. I wanted my script
+to work like this for each blog post:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2019/9/4/flowchart.png&quot;/&gt;&lt;/p&gt;
+&lt;p&gt;For each blog post, My new Rust script had to: parse the markdown source file
+and convert it to HTML markup, highlight the syntax of my code snippets using
+&amp;lt;style&amp;gt; tags and CSS, and use a template to insert the HTML for each post
+into the surrounding web layout/design. Sounds like a lot of work, right?&lt;/p&gt;
+&lt;p&gt;Wrong. Other Rust developers smarter than me had already implemented all of
+this. All I had to do was find the crates I needed and add them to my
+Cargo.toml file:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;
+[dependencies]
+maud = &quot;*&quot;
+pulldown-cmark = &quot;*&quot;
+syntect = &quot;3.0&quot;
+&lt;/pre&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/raphlinus/pulldown-cmark&quot;&gt;Pulldown-cmark&lt;/a&gt; is a markdown
+parser crate, &lt;a href=&quot;https://github.com/trishume/syntect&quot;&gt;Syntect&lt;/a&gt; is a color syntax
+highlighting crate, and &lt;a href=&quot;https://github.com/lfairy/maud&quot;&gt;Maud&lt;/a&gt; is an HTML
+template crate. Actually, to be honest I ended up adding a few other crates to
+get my script to work:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;
+[dependencies]
+maud = &quot;\*&quot;
+pulldown-cmark = &quot;\*&quot;
+regex = &quot;\*&quot;
+lazy_static = &quot;\*&quot;
+syntect = &quot;3.0&quot;
+chrono = &quot;\*&quot;
+clap = &quot;\*&quot;
+ordinal = &quot;\*&quot;
+&lt;/pre&gt;
+&lt;p&gt;I’m not sure why, but the Rust standard library is very minimal. Features that
+are included in other languages, like regular expressions or date/time parsing,
+are handled by crates (e.g. regex and chrono).&lt;/p&gt;
+&lt;p&gt;In any case, all I had to do was build my project and Cargo downloaded
+everything I needed:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;
+$ cargo build --release
+    Updating crates.io index
+  Downloaded chrono v0.4.7
+  Downloaded clap v2.33.0
+  Downloaded maud v0.19.0
+  Downloaded lazy_static v1.2.0
+  Downloaded pulldown-cmark v0.2.0
+  Downloaded ordinal v0.2.2
+  Downloaded regex v1.1.0
+  Downloaded syntect v3.0.2
+  Downloaded libc v0.2.44
+  Downloaded num-integer v0.1.41
+  Downloaded num-traits v0.2.8
+  Downloaded time v0.1.42
+
+etc…
+   Compiling syntect v3.0.2
+   Compiling blogc v0.1.0 (/Users/pat/apps/patshaughnessy.github.io)
+    Finished release [optimized] target(s) in 2m 27s
+&lt;/pre&gt;
+&lt;p&gt;It couldn’t be easier! During the rest of this post, I’ll show you how I used
+these three crates: Pulldown-cmark, Syntect and Maud.&lt;/p&gt;
+&lt;h2&gt;Pulldown-cmark&lt;/h2&gt;
+&lt;p&gt;Now that my blog app included the Pulldown-mark crate, using it was just a
+matter of pasting in a few of lines of code from the &lt;a href=&quot;https://docs.rs/pulldown-cmark/0.5.3/pulldown_cmark/html/fn.push_html.html&quot;&gt;helpful example on
+docs.rs&lt;/a&gt;:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; parser &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Parser::new(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;markdown);
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; html &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;html::push_html(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; html, parser);
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;The first line created a &lt;span class=&quot;code&quot;&gt;Parser&lt;/span&gt; struct, passing in a
+reference to my markdown string. Then I created an empty, mutable target
+string, called &lt;span class=&quot;code&quot;&gt;html&lt;/span&gt;. Last, I called the &lt;span
+class=&quot;code&quot;&gt;push_html&lt;/span&gt; function which parsed the markdown source,
+converted it to HTML and saved it into &lt;span class=&quot;code&quot;&gt;html&lt;/span&gt;. I didn’t
+have to do any work whatsoever.&lt;/p&gt;
+&lt;p&gt;In fact, the only real work for me had to do with “header” strings present at
+the top of each post source file. For example, the
+&lt;a href=&quot;https://raw.githubusercontent.com/patshaughnessy/patshaughnessy.github.io/master/posts/2017-12-15-looking-inside-postgres-at-a-gist-index.markdown&quot;&gt;2017-12-15-looking-inside-postgres-at-a-gist-index.markdown&lt;/a&gt;
+file starts with:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;
+title: &quot;Looking Inside Postgres at a GiST Index&quot;
+date: 2017/12/15
+tag: the Postgres LTREE Extension
+
+etc…
+&lt;/pre&gt;
+&lt;p&gt;Here the first three lines are metadata values about the post and not part of
+the post content. So before calling Pulldown-mark, my script parses and
+removes these header lines:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;other_lines&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(lines: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Vec&amp;lt;String&amp;gt;) -&amp;gt; Vec&amp;lt;String&amp;gt; {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  lines.iter().skip_while(|l| is_header(l)).map(|l| l.to_string()).collect()
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Above the &lt;span class=&quot;code&quot;&gt;lines&lt;/span&gt; parameter is an array of strings,
+each a single line of text in the markdown source file. (More precisely, it’s a
+reference to a &lt;span class=&quot;code&quot;&gt;Vec&amp;lt;String&amp;gt;&lt;/span&gt;, not an array.) The code
+is fairly readable: &lt;span class=&quot;code&quot;&gt;other_lines&lt;/span&gt; creates an iterator
+over the lines, skips the first few header lines, and then collects the
+remaining lines into a second array which the function returns.&lt;/p&gt;
+&lt;p&gt;Here’s the complete &lt;span class=&quot;code&quot;&gt;html_from_markdown&lt;/span&gt; function,
+which calls &lt;span class=&quot;code&quot;&gt;other_lines&lt;/span&gt;, joins them together into a
+single large string, and then passes that to Pulldown-mark:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;html_from_markdown&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(lines: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Vec&amp;lt;String&amp;gt;) -&amp;gt; Result&amp;lt;String, InvalidPostError&amp;gt; {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; markdown &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; line &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;other_lines(lines) {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    markdown.push_str(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;line);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    markdown.push(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;\n&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; parser &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Parser::new(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;markdown);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; html &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  html::push_html(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; html, parser);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  Ok(with_delim_removed(with_highlighted_code_snippets(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;html)))
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Syntect&lt;/h2&gt;
+&lt;p&gt;If you read the code above carefully, you’ll notice &lt;span
+class=&quot;code&quot;&gt;html_from_markdown&lt;/span&gt; calls &lt;span
+class=&quot;code&quot;&gt;with_highlighted_code_snippets&lt;/span&gt; before returning the HTML
+for each post. This function performs color syntax highlighting.&lt;/p&gt;
+&lt;p&gt;The code snippets in each of my blog posts appear inside of &amp;lt;pre&amp;gt;…&amp;lt;/pre&amp;gt;
+tags.  And I use a “type” attribute to indicate the programming language of the
+snippet. For example:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;
+&amp;lt;pre type=&quot;ruby&quot;&gt;
+puts &quot;This is Ruby code I’m writing about…&quot;
+&amp;lt;/pre&gt;
+&lt;/pre&gt;
+&lt;p&gt;Like parsing markdown, syntax highlighting is a very complex task: The Syntect
+crate has to parse the given code snippet, determine the semantic meaning of
+each keyword in the snippet based on the provided programming language, and
+then insert the proper color information. Thank goodness I didn’t have to write
+that code!&lt;/p&gt;
+&lt;p&gt;But using Syntect was easy:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;pub fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;highlighted_html_for_language&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(snippet: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String, attributes: String) -&amp;gt; String {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  lazy_static! {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;static ref &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: SyntaxSet &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;SyntaxSet::load_from_folder(syntax_path()).unwrap();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;static ref &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: Theme &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;ThemeSet::get_theme(theme_path().as_path()).unwrap();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;static ref &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUBY_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;#39;static&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; SyntaxReference &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.find_syntax_by_extension(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;rb&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;).unwrap();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;static ref &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUST_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;#39;static&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; SyntaxReference &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.find_syntax_by_extension(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;rs&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;).unwrap();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;etc&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;...
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; attributes.contains(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ruby&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    highlighted_html_for_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;snippet, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUBY_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  } &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; attributes.contains(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;rust&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    highlighted_html_for_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;snippet, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUST_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;etc&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;...
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;First I used a &lt;span class=&quot;code&quot;&gt;lazy_static&lt;/span&gt; block to initialize a few
+constant values.
+(&lt;a href=&quot;https://github.com/rust-lang-nursery/lazy-static.rs&quot;&gt;lazy_static&lt;/a&gt; is another
+crate I didn’t have to write!) Rust executes this block once the first time
+it’s encountered and then never again. The values are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;span class=&quot;code&quot;&gt;SYNTAX_SET&lt;/span&gt;: These are the Sublime syntax files
+describing each programming language I need to colorize. vim is my editor,
+but I use Sublime for color syntax highlighting :) I just downloaded these
+files for the languages I needed and checked them into my app.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;span class=&quot;code&quot;&gt;THEME&lt;/span&gt;: These are the Sublime “theme” files, which
+select the colors to use for each type of code keyword. I found and adapted
+one of these files. They play the role of a CSS file, but use XML syntax.
+Weird, but not hard to figure out.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;span class=&quot;code&quot;&gt;RUBY_SYNTAX&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;RUST_SYNTAX&lt;/span&gt;,
+etc. The lazy block also looks up the syntax language file for each language.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Later my &lt;span class=&quot;code&quot;&gt;highlighted_html_for_language&lt;/span&gt; function
+checks which programming language my post displays, and calls &lt;span
+class=&quot;code&quot;&gt;syntect::html::highlighted_html_for_string&lt;/span&gt; with the proper
+values:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; attributes.contains(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ruby&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    highlighted_html_for_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;snippet, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUBY_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  } &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; attributes.contains(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;rust&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    highlighted_html_for_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;snippet, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUST_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;etc&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;...
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&quot;code&quot;&gt;attributes&lt;/span&gt; is the array of HTML attributes from the
+&amp;lt;pre&amp;gt; tag surrounding the code snippet in my post source. My app uses
+regular expressions to find the &amp;lt;pre&amp;gt;…&amp;lt;/pre&amp;gt; HTML blocks, parses the
+attributes and provides them to &lt;span
+class=&quot;code&quot;&gt;highlighted_html_for_language&lt;/span&gt;.&lt;/p&gt;
+&lt;h2&gt;Maud&lt;/h2&gt;
+&lt;p&gt;Now my script has HTML for each blog post. All I have to do now is save it in a
+series of HTML files. But first I needed a template engine for Rust, like ERB
+for Ruby or Mustache for node.js.&lt;/p&gt;
+&lt;p&gt;This turned out to be one of the most fun parts of this project. I rewrote &lt;a href=&quot;https://github.com/patshaughnessy/patshaughnessy.github.io/tree/master/src/layout&quot;&gt;my
+HTML
+markup&lt;/a&gt;
+using Maud &lt;span class=&quot;code&quot;&gt;@&lt;/span&gt; directives, like this:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if let &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Some(&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;ref&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; t) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; post.tag {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  div class&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;header&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;More on &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(t)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  div class&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;links&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    ul {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(link_url, link_title) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; recent_links {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        li {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          a href&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{ &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;/&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(link_url) } {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            (link_title)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Maud doesn’t parse the layout code at runtime, like ERB does in Ruby. Instead,
+the &lt;span class=&quot;code&quot;&gt;@if&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;@for&lt;/span&gt; directives
+above are macros. In fact, all of the HTML elements that appear above, like
+&lt;span class=&quot;code&quot;&gt;div&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;ul&lt;/span&gt;, are macros
+also. This means my Maud layout code is actually Rust code!  And that means the
+Rust compiler will check it and make sure it’s valid before it ever runs.&lt;/p&gt;
+&lt;p&gt;Converting my old ERB templates into Rust macros was a bit tedious, but it was
+a great way to review and clean up my HTML. In fact, I found a number of
+mistakes and errors in my HTML code that had been there for 10 years or longer.
+It was like showing my dirty laundry to the Rust compiler. By the time the
+compiler was done and let me compile my layout, it was very clean!&lt;/p&gt;
+&lt;h2&gt;What It Worth It?&lt;/h2&gt;
+&lt;p&gt;It took me several months on a spare time basis - an hour here an hour there -
+to rewrite my blog in Rust. An experienced Rust developer working full time
+could have done it in a day or two probably.&lt;/p&gt;
+&lt;p&gt;What did I get for all this effort? Now I have a script that compiles all 146
+of my markdown posts very quickly. My old Ruby script took 7.7 seconds to do
+this, while the new Rust script only takes 0.28 seconds! That’s over 27 times
+faster! In fact, the Rust code is so fast at parsing and compiling the markdown
+files that I don’t check which files need to be recompiled by comparing
+timestamps, i.e. what a Makefile would do during a build process. And I don’t
+process the posts in parallel. Why bother? By the time I pressed ENTER and
+looked up Rust was almost done building all 146 files in sequence, one after
+the other.&lt;/p&gt;
+&lt;p&gt;But what else did I get? The biggest improvement to my blog script, actually,
+wasn’t the performance. It was the error handling I added. I didn’t mention
+this above, but using the Rust standard library required me to use the
+&lt;span class=&quot;code&quot;&gt;Result&amp;lt;T&amp;gt;&lt;/span&gt; generic type. This, in turn, forced me to
+think about what might go wrong and what to do when it did go wrong. I’ll cover
+this in my next article.  I ended up with a script that was much more reliable
+and resilient to silly mistakes in my source files, and that gave me helpful
+error messages… all the while running 27 times faster.&lt;/p&gt;
+&lt;p&gt;However, the biggest benefit to rewriting my blog in Rust was that I clawed my
+way up the Rust learning curve a bit. But that wouldn’t have been possible
+without crates.io and Cargo. Using code from smarter, more seasoned Rust
+developers gave me a chance to build a useful app, even as a beginner. Cargo
+found, downloaded and compiled open source code from experts with just a few
+simple commands.&lt;/p&gt;
+</content></entry><entry><title>Summer School With The Rust Compiler</title><link href="http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt; &lt;small&gt;(source: &lt;a href=&quot;https://twitter.com/steveklabnik/status/1022518806814617601&quot;&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
@@ -2424,385 +2725,4 @@ In my &lt;a href=&quot;http://patshaughnessy.net/2017/12/12/installing-the-postg
 post&lt;/a&gt;,
 I’ll show you how to install and use the &lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE Postgres
 extension&lt;/a&gt;.&lt;/p&gt;
-</content></entry><entry><title>Pointers in C and x86 Assembly Language</title><link href="http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language" rel="alternate"></link><id href="http://patshaughnessy.net/2017/1/20/pointers-in-c-and-x86-assembly-language" rel="alternate"></id><published>2017-01-20T00:00:00Z</published><updated>2017-01-20T00:00:00Z</updated><category></category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/ram.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;16GB of DDR random access memory&lt;br/&gt;
-  my son used in his new gaming PC
-&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Recently I’ve been trying to learn how to read x86 assembly language. In &lt;a href=&quot;http://patshaughnessy.net/2016/11/26/learning-to-read-x86-ass</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/ram.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;16GB of DDR random access memory&lt;br/&gt;
-  my son used in his new gaming PC
-&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Recently I’ve been trying to learn how to read x86 assembly language. In &lt;a href=&quot;http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language&quot;&gt;my
-last
-post&lt;/a&gt;,
-I explored basic x86 syntax in a very simple program that used a few registers.
-But in that post I didn’t cover how instructions refer to values located in
-memory and not in a register. To be useful at all, x86 code must load data from
-memory into a register, and eventually save data from a register back into
-memory.&lt;/p&gt;
-&lt;p&gt;Assembly language instructions access values in memory by considering a
-register’s contents to be a memory address, and then dereferencing it the same
-way you would use a pointer in a C program. In fact, to me C and assembly
-language seem very similar in this way, which I suspect is not a coincidence.&lt;/p&gt;
-&lt;p&gt;Today I’ll read and try to understand a very simple x86 assembly language
-program that reads from and writes to memory. To make the x86 instructions a
-bit easier to follow, I’ll first rewrite them using C pointer syntax. If you’re
-an experienced C programmer, this will make the x86 code easy to read. Or if
-you’re not familiar with C, this is your chance to learn both C and x86 pointer
-syntax at the same time.&lt;/p&gt;
-&lt;h2&gt;Writing A Program That Accesses Memory&lt;/h2&gt;
-&lt;p&gt;But first, we need an example program that accesses memory. Where can I find
-one? Do I need to find some low level code from a device driver or operating
-system kernel? No, of course not! Every program you or I have ever written
-accesses memory. All I need to do is translate one of them into x86 assembly
-language.&lt;/p&gt;
-&lt;p&gt;I’ll use my Ruby example from last time, but with a new line of code that saves
-the constant value 42 into a local variable. After I compile it I’ll able able
-to look for the number 42 in the assembly language code:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;add_forty_two&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(n)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  a &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;42
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  n&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;a 
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Once again I’ll use &lt;a href=&quot;https://crystal-lang.org&quot;&gt;Crystal&lt;/a&gt; to compile my Ruby code:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;
-crystal build add_forty_two.rb --emit asm
-&lt;/pre&gt;
-&lt;p&gt;Searching through the generated &lt;code&gt;add_forty_two.s file&lt;/code&gt;, I find the
-&lt;code&gt;add\_forty\_two&lt;/code&gt; function, clean it up and paste its assembly language
-instructions back into my Ruby function:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;add_forty_two&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(n)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  pushq   &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp  
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  movq    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rsp, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  movl    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;edi, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;8&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  movl    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;$&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;42, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;4&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  movl    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;8&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp), &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;eax
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  addl    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;4&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp), &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;eax
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  popq    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp  
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  retq  
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;h2&gt;Assembly Language: The Script Your Computer Follows&lt;/h2&gt;
-&lt;p&gt;This code is quite literally the script my computer follows: What happens when
-I call &lt;code&gt;add_forty_two&lt;/code&gt;? How does my computer know what to do? How does it add 42
-to the given argument? It follows the script.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/the-tempest.png&quot;&gt;&lt;/p&gt;
-&lt;div style=&quot;padding: 0px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;i&gt;Trying to read x86 assembly language is a bit like&lt;br/&gt;
-trying to read an old Shakespearean manuscript&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;The problem is this script contains Old English words I don’t understand - and
-the words I do know are spelled differently. I can almost understand what this
-line of code means:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;movl    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;$&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;42, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;4&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp)
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;…but not quite. I can guess by reading my original Ruby code it’s probably
-saving 42 in the local variable &lt;code&gt;a&lt;/code&gt;. In my last post I learned that the “l”
-suffix in movl means the instruction will move a long, or 32 bit value, from
-one place to another. I also learned last time that the “$” prefix means the
-number 42 is a constant.&lt;/p&gt;
-&lt;p&gt;But where is &lt;code&gt;a&lt;/code&gt; located? And what does &lt;code&gt;-4(%rbp)&lt;/code&gt; mean? The surrounding
-instructions are worse; they use similar syntax but there are no clues as to
-what they are doing. Like a frustrated high school student trying to read &lt;em&gt;The
-Tempest&lt;/em&gt;, I’m at a loss.&lt;/p&gt;
-&lt;p&gt;I need some cliff notes. I need to see this assembly language script translated
-into standard, modern English, a language I understand.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/the-tempest-cleaned-up.png&quot;&gt;&lt;/p&gt;
-&lt;div style=&quot;padding: 0px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;i&gt;C code is like a modern, cleaned up copy of a Shakespeare&lt;br/&gt;
-play. Equally confusing but somewhat easier to read.&lt;/i&gt;
-&lt;/div&gt;
-&lt;h2&gt;Transcribing x86 Assembly Language into C&lt;/h2&gt;
-&lt;p&gt;To illustrate what I mean, I’ll rewrite each x86 instruction with the
-equivalent C syntax:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/transcribe.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;If you’re an experienced C programmer, the pseudocode on the right side should
-be somewhat more readable. You can see how the x86 instructions access memory
-by interpreting register values as memory addresses, and how instructions can
-also pre-decrement or post-increment these addresses. We’ve translated
-something completely unfamiliar into a format that is somewhat easier to
-follow.&lt;/p&gt;
-&lt;p&gt;If you’re not familiar with C, then skip down to the next section, where I’ll
-explain what three of these instructions do. You’ll learn what the x86 and C
-notation means, how they are different and how they are similar.&lt;/p&gt;
-&lt;h2&gt;C: A Mix of High And Low Level Notation&lt;/h2&gt;
-&lt;p&gt;But while my C pseudocode is syntactically correct, it makes no sense. Negative
-array indices are normally invalid in C, and, of course, a C program would
-never directly reference registers on the CPU directly like this to begin
-with.&lt;/p&gt;
-&lt;p&gt;In fact, a proper C program to add 42 would resemble the Ruby code I started
-with above:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;#include &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;stdio.h&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unsigned int &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;add_forty_two&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(n)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unsigned int&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; a &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;42&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;; 
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; a&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;n;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;printf&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;50 + 42 is &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;%d&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;add_forty_two&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;50&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;));
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;My point today is that C mixes high and low level language notation. The
-underlying features and capabilities of my x86 microprocessor leak through into
-C programming syntax. Writing in C, I can create functions, variables and
-return values like a high level language, but I can also drop down to the level
-my microprocessor operates at, accessing memory directly using pointers.&lt;/p&gt;
-&lt;p&gt;And knowing how to use C pointers, I’m one step closer to understanding x86
-assembly language. As we’ll see next, there are a few important differences
-between C and x86 notation which I need to understand carefully. But these are
-superficial. It turns out that simply by learning C I’ve also learned a lot
-about what my computer’s microprocessor is capable of.&lt;/p&gt;
-&lt;p&gt;In a future article I’ll try to figure out &lt;em&gt;why&lt;/em&gt; the x86 instructions above do
-what they do - how my compiler assigns local variables to locations on the
-stack, and what the stack is. But for today, let’s focus on the meaning of the
-x86 and C pointer notation.&lt;/p&gt;
-&lt;h2&gt;A Backwards, Inside Out Array&lt;/h2&gt;
-&lt;p&gt;Let’s start with the move instruction that copies 42 into a certain memory
-address. Here’s the C translation:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp[&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;42&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This line of code looks simple enough, but actually there are a couple of very
-odd things about it. First, I wrote the C array &lt;code&gt;rbp&lt;/code&gt; using the name of a
-register in my microprocessor. That is, I’m treating the &lt;code&gt;rbp&lt;/code&gt; register as if it
-were a series of values, an array, and not a single value.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array1.png&quot; width=432&gt;&lt;/p&gt;
-&lt;p&gt;Any C programmers reading along might not be surprised by this:
-In C an array is really just a pointer to a block of memory and not a
-collection of objects or elements like it would be in Python, Ruby or some
-other high level language. A recent blog article featured on Hacker News
-discusses what arrays really are in C: &lt;a href=&quot;https://blog.feabhas.com/2016/12/a-convenient-untruth&quot;&gt;A convenient
-untruth&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;The pointer itself is a number indicating where the memory block is located: a
-&lt;em&gt;memory address&lt;/em&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array2.png&quot; width=800&gt;&lt;/p&gt;
-&lt;p&gt;In x86 assembly language, the same move instruction appears this way:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;movl    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;$&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;42, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;4&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp)
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;To me, the assembly language syntax is inside out: Instead of writing the array
-name followed by the index in brackets, I write the index first, followed by
-the array name in parentheses:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array3.png&quot; width=432&gt;&lt;/p&gt;
-&lt;p&gt;The parentheses indicate the move instruction should consider the value in &lt;code&gt;rbp&lt;/code&gt;
-to be a memory address, that it should move the value 42 to the memory address
-referenced by &lt;code&gt;rbp&lt;/code&gt; (or actually to the memory address four bytes before the
-value of &lt;code&gt;rbp&lt;/code&gt;) and not into &lt;code&gt;rbp&lt;/code&gt; itself.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array4.png&quot; width=432&gt;&lt;/p&gt;
-&lt;p&gt;As you can see, the other odd thing about this array is that it uses a negative
-index. The &lt;code&gt;movl&lt;/code&gt; instruction copied 42 to a memory address that appeared before
-the start of the array - this array is not only inside-out, it’s backwards!&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array5.png&quot; width=558&gt;&lt;/p&gt;
-&lt;p&gt;In a C program, this would be a recipe for disaster. C programmers normally
-allocate memory for an array, and then access its elements using a positive (or
-zero) index value. Writing to a memory location using a negative index would
-overwrite memory located outside of the array, potentially causing a
-segmentation fault to occur immediately, or more likely causing my code to
-crash or misbehave later when it accessed this overwritten memory value.&lt;/p&gt;
-&lt;h2&gt;x86 Array Indices&lt;/h2&gt;
-&lt;p&gt;Reading the code above, you probably also noticed I wrote the C array using an
-index of -1, while the original x86 move instruction used -4. Why are these
-different? Why did I change the index values when I transcribed the assembly
-language into C?&lt;/p&gt;
-&lt;p&gt;The reason is that x86 assembly language instructions always use byte counts,
-while C arrays use an element count index instead. To understand what I mean,
-let’s write a C declaration for this imaginary array before using it:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unsigned int&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; rbp[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;100&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;42&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Because C is a statically typed language, I have to declare the type of the
-array elements when I declare the array. In this example, &lt;code&gt;unsigned int&lt;/code&gt; is
-equivalent to a 32-bit or 4 byte value, the same operand size used by the &lt;code&gt;movl&lt;/code&gt;
-instruction. So here I’ve declared &lt;code&gt;rbp&lt;/code&gt; as an array of 100 ints, using a memory
-segment containing a total of 4*100=400 bytes.&lt;/p&gt;
-&lt;p&gt;Now when I write &lt;code&gt;rbp[2]&lt;/code&gt; in C I access the element at position 2, or the third
-element:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array6.png&quot; width=447&gt;&lt;/p&gt;
-&lt;p&gt;But notice that because each int element consists of 4 bytes, the memory
-location of &lt;code&gt;rbp+2&lt;/code&gt; is actually 8 bytes larger than &lt;code&gt;rbp&lt;/code&gt;. The index 2 is an
-element count: (2 elements) * (4 bytes/element) = 8 bytes.&lt;/p&gt;
-&lt;p&gt;x86 assembly language, on the other hand, uses byte indexes. That means to
-access the same element in this array, I would write &lt;code&gt;8(%rbp)&lt;/code&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array7.png&quot; width=698&gt;&lt;/p&gt;
-&lt;p&gt;When you look at memory this way, from a detailed, physical point of view, the
-x86 byte count index makes more sense. &lt;code&gt;8(%rbp)&lt;/code&gt; is the address &lt;code&gt;rbp&lt;/code&gt; points to,
-plus 8 bytes. But this isn’t very convenient: Think of all the code you’ve
-written that uses arrays and their elements. Normally you don’t want to think
-about how many bytes each element uses in memory, and exactly how many bytes
-from the start of the array an element is located at. The C style of using an
-element count index makes much more sense.&lt;/p&gt;
-&lt;p&gt;In the backwards array from my example program, the &lt;code&gt;movl&lt;/code&gt; instruction was
-written as:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;movl    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;$&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;42, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;4&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp)
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This means “move the 4 byte long value 42 to a memory location 4 bytes before
-the address found in the &lt;code&gt;rbp&lt;/code&gt; register.”&lt;/p&gt;
-&lt;p&gt;But in C, I would write&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp[&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;42&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This means “Set the -1st element of the array to 42” - much more
-straightforward (although still a bit weird).&lt;/p&gt;
-&lt;h2&gt;Pushing a Value Onto The Stack&lt;/h2&gt;
-&lt;p&gt;Next let’s take a look at the first x86 instruction in my program:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;pushq   &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp  
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This instruction, &lt;code&gt;pushq&lt;/code&gt;, pushes a new value onto the top of the stack. Think of
-the stack as just a special array of values in memory. Reading the equivalent C
-code makes this a bit easier to follow:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;*--&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rsp &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; rbp;
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Here I wrote the C assignment using explicit pointer syntax: The pointer is the
-&lt;code&gt;rsp&lt;/code&gt; or &lt;em&gt;stack pointer&lt;/em&gt; register. The asterisk prefix is C notation for
-dereferencing a pointer: &lt;code&gt;*rsp&lt;/code&gt; refers to the value stored at the memory location
-&lt;code&gt;rsp&lt;/code&gt; points to, just as if I had written &lt;code&gt;rsp[0]&lt;/code&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array8.png&quot; width=698&gt;&lt;/p&gt;
-&lt;p&gt;Ignoring the minus signs for a moment, the C code &lt;code&gt;*rsp = rbp&lt;/code&gt; means: “copy the
-value of &lt;code&gt;rbp&lt;/code&gt; to the memory location whose address is contained in the &lt;code&gt;rsp&lt;/code&gt;
-register.”&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array9.png&quot; width=698&gt;&lt;/p&gt;
-&lt;p&gt;What about the minus signs? C programmers will know these indicate the pointer,
-in this case &lt;code&gt;rsp&lt;/code&gt;, should be decremented before its value is dereferenced. We
-write the minus signs before the pointer because the decrement operation
-happens before the pointer’s value is used. This is useful in this scenario
-because &lt;code&gt;rsp&lt;/code&gt; will continue to point to the top of the stack.&lt;/p&gt;
-&lt;p&gt;Imagine the &lt;code&gt;rsp&lt;/code&gt; pointer starts at &lt;code&gt;0x00007fff5fbff8f8&lt;/code&gt;. This is the top of the
-stack, initially:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array10.png&quot; width=698&gt;&lt;/p&gt;
-&lt;p&gt;Then we decrement &lt;code&gt;rsp&lt;/code&gt; so it points to a new top of the stack. The stack grows
-downward in x86 programs. Each time we push a value onto the stack we first
-decrement the stack pointer:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array11.png&quot; width=698&gt;&lt;/p&gt;
-&lt;p&gt;And then the assignment writes the value of &lt;code&gt;rbp&lt;/code&gt; to the top of the stack, using
-&lt;code&gt;rsp&lt;/code&gt; after it has been decremented:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/array12.png&quot; width=698&gt;&lt;/p&gt;
-&lt;p&gt;Notice another important detail here: The stack pointer is decremented by 8
-bytes, not 4 bytes as above. This is because the values we push onto the stack
-in this example are pointers, or 8 byte values. We’ll see why in a moment.&lt;/p&gt;
-&lt;p&gt;What about the x86 notation? Pushing a value onto the stack is such a common
-operation x86 microprocessors have a special instruction for it: &lt;code&gt;push&lt;/code&gt;.&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;pushq   &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rbp  
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Just like with &lt;code&gt;movl&lt;/code&gt;, the “q” suffix indicates how large the operand is, the
-size of the value that &lt;code&gt;push&lt;/code&gt; copies to the stack. In this case “q” indicates the
-value is a 64 bit or 8 byte value. That’s why each value on the stack in the
-diagram above takes 8 bytes. If my program had used the &lt;code&gt;pushl&lt;/code&gt; instruction, then
-it would have decremented the stack by only 4 bytes (a “long” instead of a
-“quad” value).&lt;/p&gt;
-&lt;p&gt;This behavior of automatically adjusting the amount of decrement according to
-the operand size is a convenient feature of x86 microprocessors. And it’s also
-the origin of the C language &lt;code&gt;--&lt;/code&gt; and &lt;code&gt;++&lt;/code&gt; operators. To see what I mean, take a
-second look at the equivalent C assignment code:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;*--&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rsp &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; rbp;
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;What does the &lt;code&gt;--&lt;/code&gt; pre-decrement operator subtract from the pointer &lt;code&gt;rsp&lt;/code&gt;? The
-answer is one element. If we imagine I declared &lt;code&gt;rsp&lt;/code&gt; a pointer to an 8 byte long
-value:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;unsigned long &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;*&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rsp;
-&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;*--&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rsp &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; rbp;
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;…then decrementing &lt;code&gt;rsp&lt;/code&gt; will subtract 8 bytes, enough for one unsigned long
-value to fit. The &lt;code&gt;--&lt;/code&gt; operator uses the size of the pointer’s referenced type to
-determine what value to subtract. And just like the &lt;code&gt;pushq&lt;/code&gt; x86 instruction, the
-C &lt;code&gt;--&lt;/code&gt; operator subtracts before the assignment occurs.&lt;/p&gt;
-&lt;p&gt;Why does the C &lt;code&gt;--&lt;/code&gt; operator function this way? Because the x86 assembly language
-functions in the same way. Because my computer’s microprocessor works that way.
-We’re seeing another example of how C’s behavior reflects the behavior and
-capability of my computer’s microprocessor.&lt;/p&gt;
-&lt;h2&gt;Popping a Value Off The Stack&lt;/h2&gt;
-&lt;p&gt;Here’s the last instruction in my example program:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;retq  
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This instruction, &amp;quot;return,&amp;quot; means the microprocessor should return to the
-calling function and continue execution from there. How does it work? Once
-again, let’s refer to the equivalent C assignment function to learn more:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rip &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= *&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rsp&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;++&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Here the C code copies the value from the memory location referenced by the &lt;code&gt;rsp&lt;/code&gt;
-pointer and saves it into the &lt;code&gt;rip&lt;/code&gt; register.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/pop1.png&quot; width=698&gt;&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;rip&lt;/code&gt; register is known as the &lt;em&gt;instruction pointer&lt;/em&gt;, which contains a very
-special and important value: the memory address of the next instruction my
-microprocessor should execute. This instruction copies an older value of &lt;code&gt;rip&lt;/code&gt;
-from the stack, and saves it into the &lt;code&gt;rip&lt;/code&gt; register again.&lt;/p&gt;
-&lt;p&gt;Each time my program calls a function, the assembly language code saves the
-current value of &lt;code&gt;rip&lt;/code&gt; on the stack and then sets &lt;code&gt;rip&lt;/code&gt; to a new value: the
-location of the called function. When that function is finished, my program
-then retrieves the old value of &lt;code&gt;rip&lt;/code&gt; from the stack, continuing execute from
-where it left off at the call site.&lt;/p&gt;
-&lt;p&gt;After copying the old value of &lt;code&gt;rip&lt;/code&gt; from the stack, my program has to increment
-the &lt;code&gt;rsp&lt;/code&gt; pointer in order to keep the &lt;code&gt;rsp&lt;/code&gt; register pointing to the top of the
-stack. And in just the same way &lt;code&gt;pushq&lt;/code&gt; did, &lt;code&gt;retq&lt;/code&gt; uses the “q” suffix to
-determine how many bytes to add to the stack pointer after the copy is
-finished.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/1/20/pop2.png&quot; width=698&gt;&lt;/p&gt;
-&lt;p&gt;Now we know where the C &lt;code&gt;++&lt;/code&gt; post-increment operator’s behavior comes from:
-assembly language. Just as &lt;code&gt;retq&lt;/code&gt; adds 8 bytes to &lt;code&gt;rsp&lt;/code&gt;, the C expression &lt;code&gt;*rsp++&lt;/code&gt;
-adds the size of 1 element to &lt;code&gt;rsp&lt;/code&gt; based on the type of the pointer’s referenced
-type:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unsigned long &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;*&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rsp;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rip &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= *&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rsp&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;++&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;/pre&gt;
-
-&lt;h2&gt;Next Time&lt;/h2&gt;
-&lt;p&gt;When I have time I'd like to write one more post about x86 syntax. Now that
-I’ve learned what register prefixes and instruction suffixes mean in x86 code,
-and how to write instructions that use register values as memory addresses, I’m
-finally ready to read and understand a simple assembly language program. In my
-next point I’ll look at how my Crystal and C compilers assign memory addresses
-on the stack for local variables, and why they use a stack in the first place.
-Should be fun!&lt;/p&gt;
 </content></entry></feed>
