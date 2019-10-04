@@ -1,9 +1,9 @@
 title: "How Rust Makes Error Handling Part of the Language"
-date: 2019/10/07
+date: 2019/10/03
 tag: Rust
 
 <div style="float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px">
-  <img src="http://localhost/assets/2019/10/7/fingers-toes.png"><br/>
+  <img src="http://patshaughnessy.net/assets/2019/10/3/fingers-toes.png"><br/>
 <i>In Spanish these are all “dedos,” while in English<br/>we can distinguish between fingers and toes. </i>
 </div>
 
@@ -23,18 +23,18 @@ What new words would I learn?
 
 ## Why Rust Was Difficult For Me
 
-I knew it would be a challenge to learn such a difficult language. I had heard
-horror stories about how difficult the Rust compiler can be to use, or about
-how confusing the ownership memory model and the borrow checker can be. And I
-was right: Rust is a very difficult language to learn. But not because of move
-semantics or memory management.
+I knew it would be a challenge to learn Rust. I had heard horror stories about
+how difficult the Rust compiler can be to use, or about how confusing the
+ownership memory model and the borrow checker can be. And I was right: Rust is
+a very difficult language to learn. But not because of move semantics or memory
+management.
 
 For me, the most challenging syntax in Rust had to do with simple error
 handling. Let’s take an example: opening and reading a text file. In Ruby, this
 is a one-liner and error handling is completely optional:
 
 <pre type="ruby">
-string = File.read("/path/to/file")
+string = File.read("foo.txt")
 </pre>
 
 In Ruby, <span class="code">File.read</span> returns a simple string. Will this
@@ -46,7 +46,7 @@ errors.
 Golang, at least, returns an error value explicitly when I try to read a file:
 
 <pre>
-b, err := ioutil.ReadFile(“/path/to/file“)
+b, err := ioutil.ReadFile("foo.txt")
 if err != nil {
     fmt.Print(err)
 } else {
@@ -54,13 +54,14 @@ if err != nil {
 }
 </pre>
 
-Here the Golang ioutil.ReadFile function returns two values: the string I want
-and also an error value. The Go compiler forces me to think about errors that
-might occur, at least for a moment. But error handling is still optional. I can
-simply choose to ignore the <span class="code">err</span> value entirely. Most
-C programs work in a similar fashion, returning an error code in some manner.
-And if I do choose to handle the error, I end up with verbose, messy code that
-checks for error codes over and over again.
+Here the Golang <span class="code">ioutil.ReadFile</span> function returns two
+values: the string I want and also an error value. The Go compiler forces me to
+think about errors that might occur, at least for a moment. But error handling
+is still optional. I can simply choose to ignore the <span
+class="code">err</span> value entirely. Most C programs work in a similar
+fashion, returning an error code in some manner.  And if I do choose to handle
+the error, I end up with verbose, messy code that checks for error codes over
+and over again.
 
 In Rust error handling in mandatory. Let’s try to rewrite the same example
 using Rust:
@@ -75,7 +76,7 @@ Right away I run into trouble when I try to compile this:
 
 <pre class="console">
 error[E0599]: no method named `read_to_string` found for type
-`std::result::Result<std::fs::File, std::io::Error>` in the current scope
+`std::result::Result&lt;std::fs::File, std::io::Error>` in the current scope
 </pre>
 
 What? What is the Rust compiler talking about? I can see there’s a <span
@@ -83,26 +84,24 @@ class="code">read_to_string</span> method on the <span class="code">File</span>
 struct [right in the
 documentation](https://doc.rust-lang.org/std/io/trait.Read.html#method.read_to_string)!
 (Actually the method is on the <span class="code">Read</span> trait which <span
-class="code">File</span> implements.)
-
-The problem is the <span class="code">File::open</span> function doesn’t return
-a file at all. It returns a value of type <span
-class="code">io::Result<File></span>. Reading the documentation, I see:
+class="code">File</span> implements.) The problem is the <span
+class="code">File::open</span> function doesn’t return a file at all. It
+returns a value of type <span class="code">io::Result&lt;File></span>:
 
 <pre type="rust">
 pub fn open<P: AsRef<Path>>(path: P) -> io::Result<File>
 </pre>
 
-How do I use this? What does <span class="code">io::Result<File></span> even
+How do I use this? What does <span class="code">io::Result&lt;File></span> even
 mean? When I try to write Rust code the way I write Ruby or Go code, I get
 cryptic errors and it doesn’t work.
 
 The problem is I’m trying to speak Rust the same way I speak in Ruby. Rust is a
 foreign language; I need to learn some vocabulary before I can try to talk to
-someone. This is why Rust is difficult to learn: It’s a foreign language that
+someone. This is why Rust is difficult to learn. It’s a foreign language that
 uses many words completely unfamiliar to most developers.
 
-## Types Are the Vocabulary of Programming Languages.
+## Types Are the Vocabulary of Programming Languages
 
 My wife is Spanish, and lucky for me she’s had the patience and the endurance
 to teach me and our kids Spanish over the years. As a native English speaker,
@@ -117,19 +116,19 @@ _dedos_ are located always seems obvious to them from the context.
 But I wonder: Do Spanish speakers have trouble learning English when it comes
 to fingers vs. toes? Do they ever say finger when they mean toe? The problem is
 not just learning a new word. You have to learn the meaning behind the word.
-The problem is English has a concept, a distinction, that Spanish doesn’t.
+English has a concept, a distinction, that Spanish doesn’t.
 
 Back to computer programming, the “words” we use in programming languages
 aren’t only syntax tokens like if, else, let, etc. They are the values that we
 pass around in our programs. And those values have types, even for loosely,
-dynamically types languages like Ruby.
+dynamically typed languages like Ruby.
 
 Aside from whatever formal definition Computer Science has for types, I simply
 think of a value’s type as it’s meaning or purpose. To understand what role a
 value plays in your program, you need to understand the concept behind its
 type. Just like the words finger and toe represent certain anatomical concepts
-in English, types like <span class="code">Result<T, E></span> or <span
-class="code">Option<T></span> represent programming concepts in Rust - concepts
+in English, types like <span class="code">Result&lt;T, E></span> or <span
+class="code">Option&lt;T></span> represent programming concepts in Rust - concepts
 that foreigners need to learn for the first time.
 
 <p></p>
@@ -145,28 +144,24 @@ concepts they can understand. (However, most modern linguists, [according to
 Wikipedia](https://en.wikipedia.org/wiki/Linguistic_relativity), don’t believe
 this is actually true.)
 
-Because Rust includes the <span class="code">Result<T, E></span> type, Rust
+Because Rust includes the <span class="code">Result</span> type, Rust
 programmers are empowered to talk about error handling in a very natural way.
-It’s part of their daily vocabulary. Rust programmers, in fact, often think
-about error handling precisely because they have the word <span
-class="code">Result<T, E></span>.
-
-Of course, native Spanish speakers, I’m guessing, have no trouble understanding
-the distinction between fingers and toes. But I certainly have trouble
-understanding the concept behind <span class="code">Result<T, E></span> in
-Rust, a foreign language I’m trying to learn.
+It’s part of their daily vocabulary. Of course, native Spanish speakers, I’m
+guessing, have no trouble understanding the distinction between fingers and
+toes. But I certainly have trouble understanding the concept behind <span
+class="code">Result</span> in Rust.
 
 ## If Rust is Spanish, then Haskell is Latin
 
-So what does <span class="code">Result<T, E></span> mean? What is a value of
-type <span class="code">Result<T, E></span>?
+So what does <span class="code">Result&lt;T, E></span> mean? What is a value of
+type <span class="code">Result&lt;T, E></span>?
 
-Just as human language borrow words from other languages - many Spanish words
-are taken from Latin or Arabic; English borrowed many words from French and
-German - programming languages borrow words and concepts from other, older
+Just as human language borrow words from other languages &mdash; many Spanish words
+are taken from Latin or Arabic while English borrowed many words from French and
+German &mdash; programming languages borrow words and concepts from other, older
 programming languages.
 
-Rust borrowed the concept behind the <span class="code">Result<T, E></span>
+Rust borrowed the concept behind the <span class="code">Result&lt;T, E></span>
 type from Haskell, a strongly typed functional programming language. Haskell
 includes a type called <span class="code">Either</span>:
 
@@ -181,9 +176,9 @@ other types: <span class="code">a</span> and <span class="code">b</span>.
 Drawing that type equation, this is how I visualize Haskell <span
 class="code">Either</span> values:
 
-<img src="http://localhost/assets/2019/10/7/left-or-right.png"><br/>
+<img src="http://patshaughnessy.net/assets/2019/10/3/left-or-right.png"><br/>
 
-But a single <span class="code">Either</span> value can only encapsulate either
+A single <span class="code">Either</span> value can only encapsulate _either_
 a value of type <span class="code">a</span> or a value of type <span
 class="code">b</span>:
 
@@ -195,27 +190,26 @@ class="code">b</span>:
   class="code">Right</span>, then it contains an inner value of type <span
   class="code">b</span>. This is written: <span class="code">Right b</span>
 
-The <span class="code">Either</span> type is also “monad,” because Haskell also
+The <span class="code">Either</span> type is also “monad,” because Haskell 
 provides certain functions that create and operate on <span
-class="code">Either</span> values. I won’t cover this concept here, because
-there are a number of great articles out there already about what monads are
-and how to use them. In Haskell, the <span class="code">Either</span> type is
-completely general, and you can use it to represent any programming concept you
-would like.
+class="code">Either</span> values. I won’t cover this concept here today, but
+when I have time I'll discuss monads and how they can be applied to error
+handling in a future post.
 
-Rust uses the same concept behind the <span class="code">Either</span> type in
-Haskell for a specific purpose: to implement error handling. If Haskell is
-Latin, then Rust is Spanish
-- a younger language that borrows some of the older languages’s vocabulary and
-  grammar.
+In Haskell, the <span class="code">Either</span> type is completely general,
+and you can use it to represent any programming concept you would like.  Rust
+uses the concept behind <span class="code">Either</span> for a specific
+purpose: to implement error handling. If Haskell is Latin, then Rust is
+Spanish, a younger language that borrows some of the older languages’s
+vocabulary and grammar.
 
-## Result<T, E> in Rust
+## Result&lt;T, E> in Rust
 
 In Rust, the <span class="code">Result</span> type encapsulates two other types
-like <span class="code">Either.</span> And a single <span
+like <span class="code">Either.</span> A single <span
 class="code">Result</span> value has either one of those types or the other:
 
-<img src="http://localhost/assets/2019/10/7/ok-or-err.png">
+<img src="http://patshaughnessy.net/assets/2019/10/3/ok-or-err.png">
 
 Instead of <span class="code">Left a</span> and <span class="code">Right
 b</span> like in Haskell, Rust uses the words <span class="code">Ok(T)</span>
@@ -223,23 +217,19 @@ and <span class="code">Err(E)</span>:
 
 - If the <span class="code">Result</span> value is <span
   class="code">Ok</span>, then it contains an inner value of type <span
-  class="code">T</span>. This is written: <span class="code">Ok(T)</span>
+  class="code">T</span>. This is written: <span class="code">Ok(T)</span>.
+  <span class="code">Ok(T)</span> means some operation was successful, and the
+  result of the operation is a value of type <span class="code">T</span>.
 
 - If the <span class="code">Either</span> value is <span
   class="code">Err,</span> then it contains an inner value of type <span
   class="code">E</span>. This is written: <span class="code">Err(E)</span>
-
-And in Rust these values have specific meanings related to error handling: A
-<span class="code">Result</span> value of <span class="code">Ok(T)</span> means
-some operation was successful, and the result of the operation is a value of
-type <span class="code">T</span>. Similarly, a <span class="code">Result</span>
-value of type <span class="code">Err(E)</span> means the operation was a
-failure, and the result of the operation is an error of type <span
-class="code">E</span>.
+  Similarly, this means the operation was a failure, and the result of the
+  operation is an error of type <span class="code">E</span>.
 
 Back to my open file example, the proper way to open a file and read it using
-Rust is to check the type of the <span class="code">Result</span> values
-returned by the Rust standard library functions:
+Rust is to check the <span class="code">Result</span> values returned by the
+Rust standard library functions:
 
 <pre type="rust">
 fn main() {
@@ -270,17 +260,17 @@ fn main() {
 }
 </pre>
 
-## The ? Macro In Rust
+## The ? Operator In Rust
 
 That last code snippet is quite a mouthful - error checking with Rust is even
 more tedious and verbose than it is using Go!
 
-Fortunately, Rust includes an operator (actually a macro, strictly speaking)
-that allows Rust programmers to abbreviate all of this logic. By appending the
-<span class="code">?</span> character to the call site of a function that
-returns a <span class="code">Result<T, E></span> value, Rust automatically
-generates code that checks the <span class="code">Result<T, E></span> value,
-and returns underlying <span class="code">T</span> value if the result is <span
+Fortunately, Rust includes an operator that allows Rust programmers to
+abbreviate all of this logic. By appending the <span class="code">?</span>
+character to the call site of a function that returns a <span
+class="code">Result&lt;T, E></span> value, Rust automatically generates code
+that checks the <span class="code">Result&lt;T, E></span> value, and returns
+underlying <span class="code">T</span> value if the result is <span
 class="code">Ok(T)</span>:
 
 <pre type="rust">
@@ -292,27 +282,29 @@ fn main() {
 </pre>
 
 Here, the use of <span class="code">?</span> after <span
-class="code">File::open(“foo.txt")?</span> tells the Rust compiler to check the
-return value of File::open for me automatically:
+class="code">File::open("foo.txt")</span> tells the Rust compiler to check the
+return value of <span class="code">File::open</span> for me automatically:
 
-<img src="http://localhost/assets/2019/10/7/success-or-failure.png"><br/>
+<img src="http://patshaughnessy.net/assets/2019/10/3/success-or-failure.png"><br/>
 
 If the return value of <span class="code">File::open</span> is <span
 class="code">Ok(T)</span>, then Rust assigns the inner <span
-class="code">T</span> value to file. If <span class="code">File::open</span>
-returns <span class="code">Err(E)</span>, then Rust jumps to the end of the
-main function immediately, and returns the inner <span class="code">E</span>
-value.
+class="code">T</span> value to <span class="code">file</span>. If <span
+class="code">File::open</span> returns <span class="code">Err(E)</span>, then
+Rust jumps to the end of the <span class="code">main</span> function
+immediately and returns.
 
 The program above is much more concise and easy to understand. The only problem
 is that it doesn’t work! When I try to compile this, I get:
 
 <pre class="console">
-error[E0277]: the `?` operator can only be used in a function that returns `Result` or `Option` (or another type that implements `std::ops::Try`)
+error[E0277]: the `?` operator can only be used in a function that returns `Result` or `Option`
+(or another type that implements `std::ops::Try`)
  --> src/main.rs:5:20
   |
 5 |     let mut file = File::open("foo.txt")?;
-  |                    ^^^^^^^^^^^^^^^^^^^^^^ cannot use the `?` operator in a function that returns `()`
+  |                    ^^^^^^^^^^^^^^^^^^^^^^ cannot use the `?` operator in
+  a function that returns `()`
   |
   = help: the trait `std::ops::Try` is not implemented for `()`
   = note: required by `std::ops::Try::from_error`
@@ -321,11 +313,11 @@ error[E0277]: the `?` operator can only be used in a function that returns `Resu
 ## Rust Programs Revolve Around Error Handling
 
 As the error message says, the problem here is that the <span
-class="code">?</span> macro generates code that will jump to the end of the
-main function and return the inner <span class="code">E</span> value, which is
-this example is of type <span class="code">std::io::Error</span>. The problem
-is that I haven’t declared a return value for main. Therefore the Rust compiler
-gives me an error:
+class="code">?</span> operator generates code that will jump to the end of the
+main function and return the <span class="code">Err(E)</span> value, where E is
+of type <span class="code">std::io::Error</span>. The problem is that I haven’t
+declared a return value for <span class="code">main</span>. Therefore the Rust
+compiler gives me an error:
 
 <pre class="console">
 the `?` operator can only be used in a function that returns `Result` or
@@ -333,7 +325,7 @@ the `?` operator can only be used in a function that returns `Result` or
 </pre>
 
 The function containing the use of the <span class="code">?</span> operator has
-to return a value of type <span class="code">Result<T, E></span> with a
+to return a value of type <span class="code">Result&lt;T, E></span> with a
 matching <span class="code">E</span> type in order for this to make sense. I
 have to extract my <span class="code">File</span> calls into a separate
 function, like this:
@@ -355,42 +347,33 @@ fn main() {
 </pre>
 
 Note the new <span class="code">read()</span> function above returns a value of
-type <span class="code">Result<String, std::io::Error></span>. This allows the
+type <span class="code">Result&lt;String, std::io::Error></span>. This allows the
 use of the <span class="code">?</span> operator to compile properly. For the
 happy path, if my code is able to find the “foo.txt” file and read it, then
 <span class="code">read()</span> returns <span
 class="code">Ok(contents)</span>. However, if there’s an error, <span
 class="code">read()</span> will return <span class="code">Err(e)</span>, where
 <span class="code">e</span> is a value of type <span
-class="code">std::io::Error</span>. Note the <span class="code">E</span>
-portion of the <span class="code">Result<T, E></span> return type of the inner
-function, <span class="code">File::open</span>, matches the <span
-class="code">E</span> portion of the <span class="code">Result<T, E></span>
-return type of the surrounding function. <span class="code">open</span> returns
-the same error type that read does:
+class="code">std::io::Error</span>. Note <span class="code">open</span> returns
+the same error type that <span class="code">read</span> does:
 
-<img src="http://localhost/assets/2019/10/7/error-types.png">
+<img src="http://patshaughnessy.net/assets/2019/10/3/error-types.png">
 
-This is where Rust shines. It allows for concise and readable error handling,
+This is where Rust shines. It allows for concise and readable error handling
 that is also thorough and correct. The Rust compiler checks for error handling
-completeness at compile time.
+completeness at _compile time_, before I ever run my program.
 
 Now that I’ve learned some vocabulary words, now that I can understand how
-native Rust speakers use the word Result<T, E>, I can have a Rust conversation
-about error handling. I can begin to think like Rust developers think. I can
-start to see things from their perspective.
+native Rust speakers use the word <span class="code">Result&lt;T, E></span>, I
+can have a Rust conversation about error handling. I can begin to think like
+Rust developers think. I can start to see things from their perspective.
 
-And I begin to realize that the Rust culture revolves around error handling.
-Because of words like <span class="code">Result<T, E></span> and <span
-class="code">?</span>, Rust makes it easy for developers to talk errors and how
-to handle them correctly.
-
-However, Rust programs tend to be designed with error handling in mind. Notice
-above how I had to extract a separate function that returned a value of type
-<span class="code">Result<T, E></span>, just because of the <span
-class="code">?</span> operator. The overall structure of my program is
-determined by error handling just as much as it’s determined by the nature of
-the task I’m trying to accomplish. Rust programmers think about errors and what
-might go wrong from the very beginning, from when they start writing code.
-Developers using other languages tend to think about errors and what might go
-wrong as an afterthought.
+And I begin to realize that Rust programs tend to be designed with error
+handling in mind. Notice above how I had to extract a separate function that
+returned a value of type <span class="code">Result&lt;T, E></span>, just
+because of the <span class="code">?</span> operator. The overall structure of
+my program is determined by error handling just as much as it’s determined by
+the nature of the task I’m trying to accomplish. Rust programmers think about
+errors and what might go wrong from the very beginning, from when they start
+writing code. To be honest, I've often thought about errors and what might go
+wrong as an afterthought, after I've written and deployed my code.
