@@ -23,6 +23,10 @@ code translated into low level machine instructions.
 
 But most importantly, learning about assembly language can be a lot of fun.
 
+*Update*: Akhmad Karimov just posted [a Russian translation of this
+article](https://vectorified.com/ru-x86-assembly-language) on his [web
+site](https://vectorified.com). 
+
 ## Usually Reading Assembly Language Is No Fun At All
 
 Unfortunately, most of us only see assembly language after something has gone
