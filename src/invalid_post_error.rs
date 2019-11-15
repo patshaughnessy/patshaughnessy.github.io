@@ -54,15 +54,9 @@ impl Error for InvalidPostError {
     }
 }
 
-impl From<std::num::ParseIntError> for InvalidPostError {
-    fn from(_: std::num::ParseIntError) -> InvalidPostError {
-        InvalidPostError::new("Unable to parse integer")
-    }
-}
-
 impl From<std::io::Error> for InvalidPostError {
     fn from(e: std::io::Error) -> InvalidPostError {
-        println!("{:?}", e);
-        InvalidPostError::new("TBD IO Error")
+        let message = format!("{}", e);
+        InvalidPostError::new(&message)
     }
 }
