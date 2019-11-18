@@ -54,39 +54,4 @@ Patterson ([@tenderlove](https://twitter.com/tenderlove)), a Ruby core
 committer, is taking time out of his busy schedule to review my text. I’m
 honored to have a chance to work with him on this.
 
-<div style="margin-top: 20px; margin-left: auto; margin-right: auto; width: 515px;">
-<img src="http://patshaughnessy.net/assets/2013/6/4/parsetree.png">
-</div>
-
-## Professionally edited
-
-No Starch isn’t just printing out my PDF file on paper, far from it! Instead, I’m
-working directly with Bill Pollock
-([@billpollock](https://twitter.com/billpollock)), the founder of No Starch
-Press, to completely rewrite it.
-
-The new text will be simpler, more direct and easier to read:
-
-<div style="margin-top: 20px; margin-left: auto; margin-right: auto; width: 489px;">
-<img src="http://patshaughnessy.net/assets/2013/6/4/edit1.png">
-</div>
-
-…have figure numbers and captions for all of my code samples and diagrams:
-
-<div style="margin-top: 20px; margin-left: auto; margin-right: auto; width: 381px;">
-<img src="http://patshaughnessy.net/assets/2013/6/4/figure6-21.png">
-</div>
-
-…and will give you more chances to take a break, put it down and continue reading later:
-
-<div style="margin-top: 20px; margin-left: auto; margin-right: auto; width: 500px;">
-<img src="http://patshaughnessy.net/assets/2013/6/4/edit2.png">
-</div>
-
-## Stay tuned
-
-Keep an eye on my blog this Summer for more information. I’ll post the new
-table of contents once I finalize that, and I’ll write another post when I know
-more about the release date. Thanks everyone for your interest and support over the past year! I’m having
-the time of my life writing this, and I know it will be a fun read for everyone
-curious how Ruby works “under the hood.”
+<div style="margin-top: 20px; margin-left: 

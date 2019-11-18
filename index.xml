@@ -1,4 +1,148 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-10-22T14:32:17Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>How Rust Makes Error Handling Part of the Language</title><link href="http://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></link><id href="http://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></id><published>2019-10-03T00:00:00Z</published><updated>2019-10-03T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-11-18T15:56:01Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Control Flow in Rust Using Result#and_then</title><link href="http://patshaughnessy.net/2019/11/16/control-flow-in-rust-using-resultand_then" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/16/control-flow-in-rust-using-resultand_then" rel="alternate"></id><published>2019-11-16T00:00:00Z</published><updated>2019-11-16T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://localhost/assets/2019/11/16/train-yard.jpeg&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
+  flow by checking for errors in a succinct, elegant way&lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;Using Rust for the first time, error handling was my biggest stumbling block. I
+couldn’t just c</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://localhost/assets/2019/11/16/train-yard.jpeg&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
+  flow by checking for errors in a succinct, elegant way&lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;Using Rust for the first time, error handling was my biggest stumbling block. I
+couldn’t just call a function and get the value I needed; I had to unwrap the
+value, checking for errors. I couldn’t just write the code I wanted to write; I
+had to think about generic types. Was this value a &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T,
+E&amp;gt;&lt;/span&gt; or just a T?  And the right T? The right E? It seemed like a
+confusing, overly elaborate way of writing a simple check for an error code.&lt;/p&gt;
+&lt;p&gt;But after a while, I started to get a feel for the basics of using &lt;span
+class=&quot;code&quot;&gt;Result&lt;/span&gt;. I learned how to unwrap the encapsulated values; how to check
+for errors. Then I discovered some of the combinator methods it provides, like
+&lt;span class=&quot;code&quot;&gt;map&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;or_else&lt;/span&gt; and &lt;span
+class=&quot;code&quot;&gt;ok&lt;/span&gt;. These methods made error handling fun - well, ok maybe
+that's a bit of an overstatement. They made using &lt;span
+class=&quot;code&quot;&gt;Result&lt;/span&gt; a bit easier, at least.&lt;/p&gt;
+&lt;p&gt;So far my favorite &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; combinator method is
+&lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt;. Using &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt;
+&lt;em&gt;is&lt;/em&gt; actually fun! For example, I wrote &lt;a href=&quot;https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/src/lib.rs#L43&quot;&gt;this Rust
+code&lt;/a&gt;
+to generate the static HTML pages for this blog site:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; params &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; CompileParams {all_posts: all_posts, output_path: output_path, draft: draft};
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Ok(params).and_then(compile_posts)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .and_then(compile_home_page)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .and_then(compile_rss_feed)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .map(|_output| count)
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;After first creating a struct containing the inputs for my blog compile functions, my Rust code:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;First tries to compile all the posts in my blog&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;And then&lt;/em&gt; if this was successful, it tries to compile the home page
+(index.html)&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;And then&lt;/em&gt; if this was successful, it tries to compile the RSS feed (index.xml)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If there was an error at any time in this process, it short circuits and stops.
+Here’s a flowchart that illustrates shows this control flow:&lt;/p&gt;
+&lt;div style=&quot;margin-top: 20px; margin-left: auto; margin-right: auto; width: 489px;&quot;&gt;
+&lt;img src=&quot;http://localhost/assets/2019/11/16/flowchart.png&quot;&gt;&lt;br/&gt;
+&lt;/div&gt;
+&lt;p&gt;The happy path is from top to bottom, along the left side. If any of the
+compile methods fail, &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; short circuits the
+happy path and jumps to the end.&lt;/p&gt;
+&lt;h2&gt;Matching Result Types&lt;/h2&gt;
+&lt;p&gt;To chain &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; methods together like this, I used
+the same input and output types for each of the compile methods:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_posts&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(params: CompileParams) -&amp;gt; Result&amp;lt;CompileParams, InvalidPostError&amp;gt;
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_home_page&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(params: CompileParams) -&amp;gt; Result&amp;lt;CompileParams, InvalidPostError&amp;gt;
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_rss_feed&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(params: CompileParams) -&amp;gt; Result&amp;lt;CompileParams, InvalidPostError&amp;gt;
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Each method expects a &lt;span class=&quot;code&quot;&gt;CompileParams&lt;/span&gt; struct, and
+returns one wrapped in &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt;. Rust unwraps the &lt;span
+class=&quot;code&quot;&gt;CompileParams&lt;/span&gt; from one call and passes it to the next.&lt;/p&gt;
+&lt;p&gt;I use &lt;span class=&quot;code&quot;&gt;InvalidPostError&lt;/span&gt; throughout my code to provide
+a consistent way to return errors. This was a bit of a challenge at first,
+until I realized it was easy to cast other types of errors into
+&lt;span class=&quot;code&quot;&gt;InvalidPostError&lt;/span&gt; like this:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;impl &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;From&amp;lt;std::io::Error&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;InvalidPostError {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;from&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(e: std::io::Error) -&amp;gt; InvalidPostError {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; message &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;format!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, e);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      InvalidPostError::new(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;message)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now the Rust compiler knows how to map a &lt;span
+class=&quot;code&quot;&gt;std::io::Error&lt;/span&gt; into an &lt;span
+class=&quot;code&quot;&gt;InvalidPostError&lt;/span&gt;.&lt;/p&gt;
+&lt;h2&gt;Error Handling the Old Fashioned Way&lt;/h2&gt;
+&lt;p&gt;Here’s the code I didn’t have to write. (This example uses Ruby; substitute
+your favorite language here which doesn't support &lt;a href=&quot;https://medium.com/@huund/monadic-error-handling-1e2ce66e3810&quot;&gt;monadic error
+handling&lt;/a&gt;.)&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; compile_posts
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; compile_home_page
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; compile_rss_feed
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Success!&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Error compiling RSS Feed&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Error compiling home page&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Error compiling a blog post&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;I didn’t have to write a series of if/else blocks. This would have been tedious
+to write and tedious to read. And I probably would have forgotten (or have been
+too lazy) to check one of the return values.&lt;/p&gt;
+&lt;p&gt;And I didn’t have to write this code either:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_posts
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;raise &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;InvalidPostError&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Failed compiling the posts&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_home_page
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;raise &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;InvalidPostError&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Failed compiling the home page&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_rss_feed
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;raise &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;InvalidPostError&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Failed compiling the RSS feed&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;begin
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  compile_posts
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  compile_home_page
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  compile_rss_feed
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Success&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;rescue &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;InvalidPostError =&amp;gt; e
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts e.message
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Once again this is fragile: I might raise the wrong exception type or not raise
+one at all. Or I might rescue the wrong type. Worse, there’s no indication at
+the call site for the compile methods what might happen.&lt;/p&gt;
+&lt;h2&gt;More Than Checking Errors&lt;/h2&gt;
+</content></entry><entry><title>How Rust Makes Error Handling Part of the Language</title><link href="http://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></link><id href="http://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></id><published>2019-10-03T00:00:00Z</published><updated>2019-10-03T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/fingers-toes.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt;In Spanish these are all “dedos,” while in English&lt;br/&gt;we can distinguish between fingers and toes. &lt;/i&gt;
 &lt;/div&gt;
@@ -2730,111 +2874,4 @@ LTREE
 Extension&lt;/a&gt;,
 I’ll show you how to use other LTREE’s operators and functions to work with
 tree data.&lt;/p&gt;
-</content></entry><entry><title>Installing the Postgres LTREE Extension</title><link href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension" rel="alternate"></link><id href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension" rel="alternate"></id><published>2017-12-12T00:00:00Z</published><updated>2017-12-12T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/12/tree2.jpg&quot;&gt;
-&lt;/div&gt;
-&lt;p&gt;Hidden inside of your Postgres server is code that provides special SQL
-operators and functions designed to support tree operations. It’s called the
-&lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE exte</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/12/tree2.jpg&quot;&gt;
-&lt;/div&gt;
-&lt;p&gt;Hidden inside of your Postgres server is code that provides special SQL
-operators and functions designed to support tree operations. It’s called the
-&lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE extension&lt;/a&gt;.
-I’m guessing this stands for &lt;em&gt;left-tree&lt;/em&gt;. In &lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;my next
-post&lt;/a&gt;, I’ll
-write about some of these functions and operators: what they do and how to use
-them.&lt;/p&gt;
-&lt;p&gt;But first, where is the LTREE extension? How can you install and start using it? Read on to
-find out.&lt;/p&gt;
-&lt;h2&gt;Testing Whether the LTREE Extension is Installed&lt;/h2&gt;
-&lt;p&gt;Depending on where you downloaded Postgres from and how you installed it, you
-may have already installed LTREE with Postgres. To find out, execute this SQL
-statement:&lt;/p&gt;
-&lt;pre&gt;
-=&gt; create extension ltree;
-CREATE EXTENSION
-&lt;/pre&gt;
-&lt;p&gt;If you see the “CREATE EXTENSION” message like this, then you’re all set! LTREE
-was already installed and you just enabled it. Skip to my next post to find out
-what it can do and how to use it.&lt;/p&gt;
-&lt;p&gt;Or if you see:&lt;/p&gt;
-&lt;pre&gt;
-=&gt; create extension ltree;
-ERROR:  extension &quot;ltree&quot; already exists
-&lt;/pre&gt;
-&lt;p&gt;…then your Postgres server already had LTREE enabled.&lt;/p&gt;
-&lt;p&gt;FYI The &lt;span class=&quot;code&quot;&gt;pg_available_extensions&lt;/span&gt; table will show you
-all the Postgres extensions that are available and installed in your server:&lt;/p&gt;
-&lt;pre&gt;
-select * from pg_available_extensions;
-
-  name   | default_version | installed_version |                     comment
----------+-----------------+-------------------+-------------------------------------------------
- ltree   | 1.1             | 1.1               | data type for hierarchical tree-like structures
- plpgsql | 1.0             | 1.0               | PL/pgSQL procedural language
-(2 rows)
-&lt;/pre&gt;
-&lt;p&gt;As you can see, “ltree” already appears in my server’s list. The value “1.1”
-for &lt;span class=&quot;code&quot;&gt;installed_version&lt;/span&gt; indicates that I’ve already
-enabled it too. This would have been blank before running the &lt;span
-class=&quot;code&quot;&gt;create extension ltree&lt;/span&gt; command above.&lt;/p&gt;
-&lt;p&gt;I originally installed a local copy of Postgres on my Mac using Homebrew, and I
-was happy to find that the Homebrew Postgres formula does include steps to
-build and install LTREE, after building the rest of the Postgres server. But I
-still needed to enable it using &lt;span class=&quot;code&quot;&gt;create extension&lt;/span&gt;.&lt;/p&gt;
-&lt;h2&gt;Using LTREE on a Shared Postgres Server&lt;/h2&gt;
-&lt;p&gt;Running the &lt;span class=&quot;code&quot;&gt;create extension ltree&lt;/span&gt; command may fail
-with this error message:&lt;/p&gt;
-&lt;pre&gt;
-=&gt; create extension ltree;
-ERROR:  permission denied to create extension &quot;ltree&quot;
-HINT:  Must be superuser to create this extension.
-&lt;/pre&gt;
-&lt;p&gt;Enabling Postgres extensions requires super user access. If you’re using a
-shared Postgres server and don’t have super-user access, you’ll need to find
-someone who does. Or you may just need to login to Postgres using the proper
-Postgres user account.&lt;/p&gt;
-&lt;h2&gt;How to Install the LTREE Extension&lt;/h2&gt;
-&lt;p&gt;Running the &lt;span class=&quot;code&quot;&gt;create extension&lt;/span&gt; command may also fail
-with this error message:&lt;/p&gt;
-&lt;pre&gt;
-=&gt; create extension ltree;
-ERROR:  could not open extension control file &quot;/usr/local/pgsql/share/extension/ltree.control&quot;: No such file or directory
-&lt;/pre&gt;
-&lt;p&gt;This error means the LTREE code isn’t even installed on your Postgres server.
-If you’re running on Linux and installed Postgres using a package manager, you
-may have to install a second package called “postgresql-contrib.”&lt;/p&gt;
-&lt;p&gt;If you installed Postgres from source yourself, then you will see this error
-message because the Postgres Makefile doesn’t compile and install LTREE by
-default. Don’t worry! It turns out the Postgres source tree already contains
-the code for LTREE and many other extensions in a subdirectory called
-“contrib.”&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/12/ltree-source.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;Compile it as follows:&lt;/p&gt;
-&lt;pre&gt;
-$ cd /path/to/postgres-9.6.5/contrib/ltree
-$ make
-
-gcc -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -Wno-unused-command-line-argument -O2  -DLOWER_NODE -I. -I. -I../../src/include   -c -o ltree_io.o ltree_io.c
-
-etc…
-
-$ sudo make install
-
-/bin/sh ../../config/install-sh -c -d '/usr/local/pgsql/lib'
-/bin/sh ../../config/install-sh -c -d '/usr/local/pgsql/share/extension'
-/bin/sh ../../config/install-sh -c -d '/usr/local/pgsql/share/extension'
-/usr/bin/install -c -m 755  ltree.so '/usr/local/pgsql/lib/ltree.so'
-/usr/bin/install -c -m 644 ./ltree.control '/usr/local/pgsql/share/extension/'
-/usr/bin/install -c -m 644 ./ltree--1.1.sql ./ltree--1.0--1.1.sql ./ltree--unpackaged--1.0.sql  ‘/usr/local/pgsql/share/extension/'
-&lt;/pre&gt;
-&lt;p&gt;You can see above the install step copied the ltree.so library into my Postgres
-server’s lib directory: /usr/local/pgsql/lib, and ran a couple other commands
-as well. Now I can run the &lt;span class=&quot;code&quot;&gt;create extension ltree&lt;/span&gt;
-command as shown above. I don’t even need to restart Postgres; it will find and
-load ltree.so automatically.&lt;/p&gt;
-&lt;p&gt;Now that you have LTREE installed and enabled, you can read &lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;my next
-post&lt;/a&gt;, I’ll
-to learn how to use it.&lt;/p&gt;
 </content></entry></feed>
