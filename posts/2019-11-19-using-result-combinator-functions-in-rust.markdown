@@ -1,25 +1,22 @@
-title: "Control Flow in Rust Using Result#and_then"
-date: 2019/11/16
+title: "Using Result Combinator Functions in Rust"
+date: 2019/11/19
 tag: Rust
 
 <div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px">
-  <img src="http://localhost/assets/2019/11/16/train-yard.jpeg"><br/>
+  <img src="http://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg"><br/>
   <i>Rust’s Result type can help you control your program’s<br/>
   flow by checking for errors in a succinct, elegant way</i>
 </div>
 
-Using Rust for the first time, error handling was my biggest stumbling block. I
-couldn’t just call a function and get the value I needed; I had to unwrap the
-value, checking for errors. I couldn’t just write the code I wanted to write; I
-had to think about generic types. Was this value a <span class="code">Result<T,
-E></span> or just a T?  And the right T? The right E? It seemed like a
-confusing, overly elaborate way of writing a simple check for an error code.
+Using Rust for the first time, error handling was my biggest stumbling block.
+Was this value a <span class="code">Result<T, E></span> or just a T?  And the
+right T? The right E? I couldn’t just write the code I wanted to write. It
+was confusing and overly elaborate.
 
 But after a while, I started to get a feel for the basics of using <span
-class="code">Result</span>. I learned how to unwrap the encapsulated values; how to check
-for errors. Then I discovered some of the combinator methods it provides, like
-<span class="code">map</span>, <span class="code">or_else</span> and <span
-class="code">ok</span>. These methods made error handling fun - well, ok maybe
+class="code">Result</span>. I discovered that the combinator methods Result
+provides, like <span class="code">map</span>, <span class="code">or_else</span>
+and <span class="code">ok</span>, made error handling fun. Well, maybe
 that's a bit of an overstatement. They made using <span
 class="code">Result</span> a bit easier, at least.
 
@@ -37,7 +34,7 @@ Ok(params).and_then(compile_posts)
           .map(|_output| count)
 </pre>
 
-After first creating a struct containing the inputs for my blog compile functions, my Rust code:
+After creating a struct containing the inputs for compile functions, my code:
 * First tries to compile all the posts in my blog
 * _And then_ if this was successful, it tries to compile the home page
 (index.html)
@@ -46,8 +43,8 @@ After first creating a struct containing the inputs for my blog compile function
 If there was an error at any time in this process, it short circuits and stops.
 Here’s a flowchart that illustrates shows this control flow:
 
-<div style="margin-top: 20px; margin-left: auto; margin-right: auto; width: 489px;">
-<img src="http://localhost/assets/2019/11/16/flowchart.png"><br/>
+<div style="margin-left: auto; margin-right: auto; width:235px">
+<img src="http://patshaughnessy.net/assets/2019/11/19/flowchart.png">
 </div>
 
 The happy path is from top to bottom, along the left side. If any of the
@@ -82,27 +79,23 @@ until I realized it was easy to cast other types of errors into
 
 <pre type="rust">
 impl From<std::io::Error> for InvalidPostError {
-  fn from(e: std::io::Error) -> InvalidPostError {
-      let message = format!("{}", e);
-      InvalidPostError::new(&message)
-  }
+    fn from(e: std::io::Error) -> InvalidPostError {
+        let message = format!("{}", e);
+        InvalidPostError::new(&message)
+    }
 }
 </pre>
 
-Now the Rust compiler knows how to map a <span
-class="code">std::io::Error</span> into an <span
-class="code">InvalidPostError</span>.
+Now the Rust compiler knows how to map a <span class="code">std::io::Error</span> into an <span class="code">InvalidPostError</span>.
 
 ## Error Handling the Old Fashioned Way
 
-Here’s the code I didn’t have to write. (This example uses Ruby; substitute
-your favorite language here which doesn't support [monadic error
-handling](https://medium.com/@huund/monadic-error-handling-1e2ce66e3810).)
+Here’s the code I didn’t have to write:
 
-<pre type="ruby">
-if compile_posts
-  if compile_home_page
-    if compile_rss_feed
+<pre type="rust">
+if compile_posts(params)
+  if compile_home_page(params)
+    if compile_rss_feed(params)
       puts "Success!"
     else
       puts "Error compiling RSS Feed"
@@ -122,22 +115,22 @@ too lazy) to check one of the return values.
 And I didn’t have to write this code either:
 
 <pre type="ruby">
-def compile_posts
+def compile_posts(params)
   raise InvalidPostError.new("Failed compiling the posts")
 end
 
-def compile_home_page
+def compile_home_page(params)
   raise InvalidPostError.new("Failed compiling the home page")
 end
 
-def compile_rss_feed
+def compile_rss_feed(params)
   raise InvalidPostError.new("Failed compiling the RSS feed")
 end
 
 begin
-  compile_posts
-  compile_home_page
-  compile_rss_feed
+  compile_posts(params)
+  compile_home_page(params)
+  compile_rss_feed(params)
   puts "Success"
 rescue InvalidPostError => e
   puts e.message
@@ -146,33 +139,33 @@ end
 
 Once again this is fragile: I might raise the wrong exception type or not raise
 one at all. Or I might rescue the wrong type. Worse, there’s no indication at
-the call site for the compile methods what might happen.
+the call site what might happen.
 
 To be honest, I probably won’t bother handling errors at all for a simple Ruby
 script like this. If an exception happens someday while building my blog site,
-then I’ll deal with it then. Probably the exception’s backtrace and message
-will make it obvious what the problem might be.
-
-## Result: Both Thorough and Succinct
-
-The best thing about using <span class="code">and_then</span> and the other
-powerful functions Result provides, is that they lead to very terse, readable
-code. Compare the Ruby version with no error checking:
-
-<pre type="rust">
-compile_posts
-compile_home_page
-compile_rss_feed
-</pre>
-
-With the Rust version that has thorough, exhaustive error checking enforced at compile time:
+then I’ll deal with it then. I’d probably just write this code:
 
 <pre type="ruby">
+compile_posts(params)
+compile_home_page(params)
+compile_rss_feed(params)
+puts "Success"
+</pre>
+
+## Error Handling That Gets Out Of Your Way
+
+Combining results together using <span class="code">and_then</span> and other
+<span class="code">Result</span> functions enables me to write error checking
+code in a natural, succinct way:
+
+<pre type="rust">
 Ok(params).and_then(compile_posts)
           .and_then(compile_home_page)
           .and_then(compile_rss_feed)
 </pre>
 
-The Rust version looks just as simple as the Ruby version, but don’t be fooled.
-The Rust <span class="code">and_then</span> function provides me a simple way
-to structure my control flow around error handling
+This is just as simple to read as the Ruby version above that doesn’t check for
+any errors. While it’s harder to write, having the Rust compiler check my
+thought process as I piece together different code paths is a huge help.
+Learning to use and get along with the Rust compiler is worth it: You end up
+with code that is both readable and correct.
