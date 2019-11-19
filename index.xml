@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-11-19T15:55:22Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Combining Results Together Using and_then</title><link href="http://patshaughnessy.net/2019/11/19/combining-results-together-using-and_then" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/19/combining-results-together-using-and_then" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-11-19T18:11:45Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Result Combinator Functions in Rust</title><link href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
   flow by checking for errors in a succinct, elegant way&lt;/i&gt;
@@ -12,7 +12,7 @@ Was this v</summary><content type="html">&lt;div style=&quot;float: right; paddi
 &lt;p&gt;Using Rust for the first time, error handling was my biggest stumbling block.
 Was this value a &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt; or just a T?  And the
 right T? The right E? I couldn’t just write the code I wanted to write. It
-was confusing and overly elaborate.&lt;/p&gt;
+felt confusing and overly elaborate.&lt;/p&gt;
 &lt;p&gt;But after a while, I started to get a feel for the basics of using &lt;span
 class=&quot;code&quot;&gt;Result&lt;/span&gt;. I discovered that the combinator methods Result
 provides, like &lt;span class=&quot;code&quot;&gt;map&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;or_else&lt;/span&gt;
@@ -20,12 +20,16 @@ and &lt;span class=&quot;code&quot;&gt;ok&lt;/span&gt;, made error handling fun.
 that's a bit of an overstatement. They made using &lt;span
 class=&quot;code&quot;&gt;Result&lt;/span&gt; a bit easier, at least.&lt;/p&gt;
 &lt;p&gt;So far my favorite &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; combinator method is
-&lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt;. Using &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt;
-&lt;em&gt;is&lt;/em&gt; actually fun! For example, I wrote &lt;a href=&quot;https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/src/lib.rs#L43&quot;&gt;this Rust
+&lt;a
+href=&quot;https://doc.rust-lang.org/std/result/enum.Result.html#method.and_then&quot;&gt;&lt;span
+class=&quot;code&quot;&gt;and_then&lt;/span&gt;&lt;/a&gt;. Using &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; &lt;em&gt;is&lt;/em&gt;
+actually fun! For example, I wrote &lt;a href=&quot;https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/src/lib.rs#L43&quot;&gt;this Rust
 code&lt;/a&gt;
 to generate the static HTML pages for this blog site:&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; count &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; all_posts.len();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;all_posts.sort_by_key(|p| Reverse(p.date));
 &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; params &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; CompileParams {all_posts: all_posts, output_path: output_path, draft: draft};
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Ok(params).and_then(compile_posts)
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .and_then(compile_home_page)
@@ -33,17 +37,19 @@ to generate the static HTML pages for this blog site:&lt;/p&gt;
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .map(|_output| count)
 &lt;/span&gt;&lt;/pre&gt;
 
-&lt;p&gt;After creating a struct containing the inputs for compile functions, my code:&lt;/p&gt;
+&lt;p&gt;Ignoring the details about sorting and counting, my code:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;First tries to compile all the posts in my blog&lt;/li&gt;
+&lt;li&gt;First creates a struct holding input parameters, and wraps it using &lt;span class=&quot;code&quot;&gt;Ok(params)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;And then&lt;/em&gt; tries to compile all the posts in my blog, passing in the input parameters&lt;/li&gt;
 &lt;li&gt;&lt;em&gt;And then&lt;/em&gt; if this was successful, it tries to compile the home page
 (index.html)&lt;/li&gt;
 &lt;li&gt;&lt;em&gt;And then&lt;/em&gt; if this was successful, it tries to compile the RSS feed (index.xml)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;If there was an error at any time in this process, it short circuits and stops.
-Here’s a flowchart that illustrates shows this control flow:&lt;/p&gt;
+Here’s a flowchart that illustrates this control flow:&lt;/p&gt;
 &lt;div style=&quot;margin-left: auto; margin-right: auto; width:235px&quot;&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/flowchart-sized.png&quot;&gt;
+&lt;br/&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/flowchart.png&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;The happy path is from top to bottom, along the left side. If any of the
 compile methods fail, &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; short circuits the
@@ -85,22 +91,24 @@ until I realized it was easy to cast other types of errors into
 
 &lt;p&gt;Now the Rust compiler knows how to map a &lt;span class=&quot;code&quot;&gt;std::io::Error&lt;/span&gt; into an &lt;span class=&quot;code&quot;&gt;InvalidPostError&lt;/span&gt;.&lt;/p&gt;
 &lt;h2&gt;Error Handling the Old Fashioned Way&lt;/h2&gt;
-&lt;p&gt;Here’s the code I didn’t have to write:&lt;/p&gt;
+&lt;p&gt;Here’s the code I didn’t have to write: (This is Ruby; substitute your favorite
+PL that doesn't support &lt;a href=&quot;https://medium.com/@huund/monadic-error-handling-1e2ce66e3810&quot;&gt;monadic error
+handling&lt;/a&gt;.)&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;compile_posts(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;compile_home_page(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;compile_rss_feed(params)
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; compile_posts(params)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; compile_home_page(params)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; compile_rss_feed(params)
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Success!&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Error compiling RSS Feed&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Error compiling home page&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
 &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Error compiling a blog post&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
 &lt;/span&gt;&lt;/pre&gt;
 
 &lt;p&gt;I didn’t have to write a series of if/else blocks. This would have been tedious
@@ -145,7 +153,7 @@ then I’ll deal with it then. I’d probably just write this code:&lt;/p&gt;
 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Success&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
 &lt;/span&gt;&lt;/pre&gt;
 
-&lt;h2&gt;Error Handling That Gets Out Of Your Way&lt;/h2&gt;
+&lt;h2&gt;Rust Error Handling: Easy To Read, Hard To Write&lt;/h2&gt;
 &lt;p&gt;Combining results together using &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; and other
 &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; functions enables me to write error checking
 code in a natural, succinct way:&lt;/p&gt;

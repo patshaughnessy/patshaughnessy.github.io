@@ -11,7 +11,7 @@ tag: Rust
 Using Rust for the first time, error handling was my biggest stumbling block.
 Was this value a <span class="code">Result<T, E></span> or just a T?  And the
 right T? The right E? I couldn’t just write the code I wanted to write. It
-was confusing and overly elaborate.
+felt confusing and overly elaborate.
 
 But after a while, I started to get a feel for the basics of using <span
 class="code">Result</span>. I discovered that the combinator methods Result
@@ -21,12 +21,16 @@ that's a bit of an overstatement. They made using <span
 class="code">Result</span> a bit easier, at least.
 
 So far my favorite <span class="code">Result</span> combinator method is
-<span class="code">and_then</span>. Using <span class="code">and_then</span>
-_is_ actually fun! For example, I wrote [this Rust
+<a
+href="https://doc.rust-lang.org/std/result/enum.Result.html#method.and_then"><span
+class="code">and_then</span></a>. Using <span class="code">and_then</span> _is_
+actually fun! For example, I wrote [this Rust
 code](https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/src/lib.rs#L43)
 to generate the static HTML pages for this blog site:
 
 <pre type="rust">
+let count = all_posts.len();
+all_posts.sort_by_key(|p| Reverse(p.date));
 let params = CompileParams {all_posts: all_posts, output_path: output_path, draft: draft};
 Ok(params).and_then(compile_posts)
           .and_then(compile_home_page)
@@ -34,16 +38,18 @@ Ok(params).and_then(compile_posts)
           .map(|_output| count)
 </pre>
 
-After creating a struct containing the inputs for compile functions, my code:
-* First tries to compile all the posts in my blog
+Ignoring the details about sorting and counting, my code:
+* First creates a struct holding input parameters, and wraps it using <span class="code">Ok(params)</span>
+* _And then_ tries to compile all the posts in my blog, passing in the input parameters
 * _And then_ if this was successful, it tries to compile the home page
 (index.html)
 * _And then_ if this was successful, it tries to compile the RSS feed (index.xml)
 
 If there was an error at any time in this process, it short circuits and stops.
-Here’s a flowchart that illustrates shows this control flow:
+Here’s a flowchart that illustrates this control flow:
 
 <div style="margin-left: auto; margin-right: auto; width:235px">
+<br/>
 <img src="http://patshaughnessy.net/assets/2019/11/19/flowchart.png">
 </div>
 
@@ -90,9 +96,11 @@ Now the Rust compiler knows how to map a <span class="code">std::io::Error</span
 
 ## Error Handling the Old Fashioned Way
 
-Here’s the code I didn’t have to write:
+Here’s the code I didn’t have to write: (This is Ruby; substitute your favorite
+PL that doesn't support [monadic error
+handling](https://medium.com/@huund/monadic-error-handling-1e2ce66e3810).)
 
-<pre type="rust">
+<pre type="ruby">
 if compile_posts(params)
   if compile_home_page(params)
     if compile_rss_feed(params)
@@ -152,7 +160,7 @@ compile_rss_feed(params)
 puts "Success"
 </pre>
 
-## Error Handling That Gets Out Of Your Way
+## Rust Error Handling: Easy To Read, Hard To Write
 
 Combining results together using <span class="code">and_then</span> and other
 <span class="code">Result</span> functions enables me to write error checking
