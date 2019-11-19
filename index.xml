@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-11-18T15:56:01Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Control Flow in Rust Using Result#and_then</title><link href="http://patshaughnessy.net/2019/11/16/control-flow-in-rust-using-resultand_then" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/16/control-flow-in-rust-using-resultand_then" rel="alternate"></id><published>2019-11-16T00:00:00Z</published><updated>2019-11-16T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-11-19T01:41:12Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Control Flow in Rust Using Result#and_then</title><link href="http://patshaughnessy.net/2019/11/16/control-flow-in-rust-using-resultand_then" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/16/control-flow-in-rust-using-resultand_then" rel="alternate"></id><published>2019-11-16T00:00:00Z</published><updated>2019-11-16T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://localhost/assets/2019/11/16/train-yard.jpeg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
   flow by checking for errors in a succinct, elegant way&lt;/i&gt;
@@ -141,7 +141,32 @@ too lazy) to check one of the return values.&lt;/p&gt;
 &lt;p&gt;Once again this is fragile: I might raise the wrong exception type or not raise
 one at all. Or I might rescue the wrong type. Worse, there’s no indication at
 the call site for the compile methods what might happen.&lt;/p&gt;
-&lt;h2&gt;More Than Checking Errors&lt;/h2&gt;
+&lt;p&gt;To be honest, I probably won’t bother handling errors at all for a simple Ruby
+script like this. If an exception happens someday while building my blog site,
+then I’ll deal with it then. Probably the exception’s backtrace and message
+will make it obvious what the problem might be.&lt;/p&gt;
+&lt;h2&gt;Result: Both Thorough and Succinct&lt;/h2&gt;
+&lt;p&gt;The best thing about using &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; and the other
+powerful functions Result provides, is that they lead to very terse, readable
+code. Compare the Ruby version with no error checking:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;compile_posts
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;compile_home_page
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;compile_rss_feed
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;With the Rust version that has thorough, exhaustive error checking enforced at compile time:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Ok(params).and_then(compile_posts)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .and_then(compile_home_page)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .and_then(compile_rss_feed)
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;The Rust version looks just as simple as the Ruby version, but don’t be fooled.
+The Rust &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; function provides me a simple way
+to structure my control flow around error handling&lt;/p&gt;
 </content></entry><entry><title>How Rust Makes Error Handling Part of the Language</title><link href="http://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></link><id href="http://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></id><published>2019-10-03T00:00:00Z</published><updated>2019-10-03T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/fingers-toes.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt;In Spanish these are all “dedos,” while in English&lt;br/&gt;we can distinguish between fingers and toes. &lt;/i&gt;

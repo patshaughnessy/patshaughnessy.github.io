@@ -148,4 +148,31 @@ Once again this is fragile: I might raise the wrong exception type or not raise
 one at all. Or I might rescue the wrong type. Worse, there’s no indication at
 the call site for the compile methods what might happen.
 
-## More Than Checking Errors
+To be honest, I probably won’t bother handling errors at all for a simple Ruby
+script like this. If an exception happens someday while building my blog site,
+then I’ll deal with it then. Probably the exception’s backtrace and message
+will make it obvious what the problem might be.
+
+## Result: Both Thorough and Succinct
+
+The best thing about using <span class="code">and_then</span> and the other
+powerful functions Result provides, is that they lead to very terse, readable
+code. Compare the Ruby version with no error checking:
+
+<pre type="rust">
+compile_posts
+compile_home_page
+compile_rss_feed
+</pre>
+
+With the Rust version that has thorough, exhaustive error checking enforced at compile time:
+
+<pre type="ruby">
+Ok(params).and_then(compile_posts)
+          .and_then(compile_home_page)
+          .and_then(compile_rss_feed)
+</pre>
+
+The Rust version looks just as simple as the Ruby version, but don’t be fooled.
+The Rust <span class="code">and_then</span> function provides me a simple way
+to structure my control flow around error handling
