@@ -1,4 +1,276 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2019-11-19T18:11:45Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Result Combinator Functions in Rust</title><link href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2020-01-16T15:46:54Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/17/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/17/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-17T00:00:00Z</published><updated>2020-01-17T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://localhost/assets/2020/1/17/traffic-light.jpg&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
+easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
+  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20111210.jpg</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://localhost/assets/2020/1/17/traffic-light.jpg&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
+easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
+  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20111210.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
+&lt;/div&gt;
+&lt;p&gt;Imagine if you had a text file containing thousands of URLs:&lt;/p&gt;
+&lt;pre&gt;
+$ cat urls.txt
+https://example.com/1.html
+https://example.com/2.html
+https://example.com/3.html
+
+etc...
+
+https://example.com/99999.html
+https://example.com/100000.html
+&lt;/pre&gt;
+&lt;p&gt;…and you needed to download all of those HTML pages efficiently. How would you
+do it? Maybe a shell script using &lt;span class=&quot;code&quot;&gt;xargs&lt;/span&gt; and &lt;span
+class=&quot;code&quot;&gt;curl&lt;/span&gt;? Maybe a simple Golang program? Go’s powerful
+concurrency features would work well for this.&lt;/p&gt;
+&lt;p&gt;Instead, I decided to try to use Rust. I’ve read a lot about safe concurrency
+in Rust, but I’ve never tried it. I also wanted to learn what Rust’s new
+“async/await” feature was all about. This seemed like the perfect task for
+asynchronous Rust code.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;TL/DR&lt;/em&gt;: &lt;a href=&quot;&quot;&gt;Here’s the code&lt;/a&gt;. The rest of this post will explain how it works.&lt;/p&gt;
+&lt;h2&gt;Reqwest: Rust’s Asynchronous HTTP Client&lt;/h2&gt;
+&lt;p&gt;The &lt;a href=&quot;https://github.com/seanmonstar/reqwest&quot;&gt;reqwest&lt;/a&gt; crate is a high level,
+easy to use HTTP client, written by &lt;a href=&quot;https://seanmonstar.com&quot;&gt;Sean McArthur&lt;/a&gt;.
+He just updated it to work with &lt;a href=&quot;https://tokio.rs&quot;&gt;Tokio&lt;/a&gt;, Rust’s new
+async/await engine, so this is the perfect time to try using it. Here’s the
+example from the readme:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;use &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;std::collections::HashMap;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#[tokio::main]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;async &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() -&amp;gt; Result&amp;lt;(), Box&amp;lt;dyn std::error::Error&amp;gt;&amp;gt; {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; resp &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;reqwest::get(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://httpbin.org/ip&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        .await&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        .json::&amp;lt;HashMap&amp;lt;String, String&amp;gt;&amp;gt;()
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        .await&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{:#?}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, resp);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    Ok(())
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;This version downloads some JSON and parses it. Notice the new &lt;span
+class=&quot;code&quot;&gt;async&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; keywords. The
+main function is &lt;span class=&quot;code&quot;&gt;async&lt;/span&gt; - this means that the function
+becomes part of a large state machine run by Tokio. When you mark a function
+asynchronous, you can then call &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; inside it,
+which will pause that function temporarily, allowing other asynchronous
+functions to run on the same thread.&lt;/p&gt;
+&lt;p&gt;I decided to modify this to print out the number of bytes downloaded instead; you could
+easily change it to save the data to a file or do whatever you want.&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; path &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://httpbin.org/ip&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;reqwest::get(path).await {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    Ok(resp) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; resp.text().await {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            Ok(text) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;RESPONSE: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt; bytes from &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, text.len(), path);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR reading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR downloading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Ok(())
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is a two step process:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;First I call &lt;span class=&quot;code&quot;&gt;get(path)&lt;/span&gt; to send the HTTP GET request. Then I use &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; to wait for
+the request to finish and return a result.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Second, if the request was successful, I call &lt;span
+class=&quot;code&quot;&gt;resp.text()&lt;/span&gt; to get the content of the response body. And
+I wait again while that is loaded.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I handle the errors explicitly and always return a unit result &lt;span
+class=&quot;code&quot;&gt;Ok(())&lt;/span&gt; because that makes the code below simpler
+when I start downloading more than one page concurrently.&lt;/p&gt;
+&lt;p&gt;Visually, I can draw the &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and &lt;span
+class=&quot;code&quot;&gt;text&lt;/span&gt; calls like this:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/get-and-text.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;First I call &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and wait, then I call &lt;span
+class=&quot;code&quot;&gt;text&lt;/span&gt; and wait.&lt;/p&gt;
+&lt;p&gt;But what is asynchronous about this? This reads like normal, single threaded
+code. I do one thing, then I do another.&lt;/p&gt;
+&lt;h2&gt;Sending 3 Concurrent Requests&lt;/h2&gt;
+&lt;p&gt;The magic happens when I have more than one request I want to make in parallel. Let’s use three hard coded path strings:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; paths &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;vec![
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://example.com/1.html&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.to_string(),
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://example.com/2.html&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.to_string(),
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://example.com/3.html&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.to_string(),
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;To download the 3 HTML files in parallel, I spawn three Tokio “tasks” and wait
+for them all to complete. (This requires adding the futures crate to
+Cargo.toml, which implements &lt;span class=&quot;code&quot;&gt;join_all&lt;/span&gt;.)&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;// Iterate over the paths.
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; tasks: Vec&amp;lt;JoinHandle&amp;lt;Result&amp;lt;(), ()&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;vec![];
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; path &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; paths {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;// Copy each path into a new string
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;// that can be consumed/captured by the task closure
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; path &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; path.clone();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;// Create a Tokio task for each path
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    tasks.push(tokio::spawn(async &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;move &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;reqwest::get(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;path).await {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            Ok(resp) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; resp.text().await {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    Ok(text) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                        println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;RESPONSE: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt; bytes from &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, text.len(), path);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR reading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR downloading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        Ok(())
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }));
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;// Wait for them all to finish
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Started &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt; tasks. Waiting...&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, tasks.len());
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;join_all(tasks).await;
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Each Tokio task is a closure passed to the &lt;span
+class=&quot;code&quot;&gt;tokio::spawn&lt;/span&gt; function, marked &lt;span class=&quot;code&quot;&gt;async
+move&lt;/span&gt;. I create a copy of each path, using &lt;span
+class=&quot;code&quot;&gt;path.clone()&lt;/span&gt;, so the closure has its own copy of the path
+string with its own lifetime.&lt;/p&gt;
+&lt;p&gt;The complex type annotation on the tasks array indicates what each call to
+spawn returns: a &lt;span class=&quot;code&quot;&gt;JoinHandle&lt;/span&gt; enclosing a &lt;span
+class=&quot;code&quot;&gt;Result&lt;/span&gt;. To keep things simple, I handle all errors in the
+closure and just return Ok(()). This means each &lt;span
+class=&quot;code&quot;&gt;JoinHandle&lt;/span&gt; contains a trivial result: &lt;span
+class=&quot;code&quot;&gt;Result&amp;lt;(), ()&amp;gt;&lt;/span&gt;. I could have written the closure to return
+some value and/or some error value instead.&lt;/p&gt;
+&lt;p&gt;After the loop is finished and all three tasks have been spawned, I call &lt;span
+class=&quot;code&quot;&gt;join_all(tasks).await&lt;/span&gt; to wait for them all to finish.&lt;/p&gt;
+&lt;h2&gt;Asynchronous vs Multithreaded&lt;/h2&gt;
+&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://localhost/assets/2020/1/17/traffic-light2.jpg&quot;&gt;&lt;br/&gt;
+  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Traffic_lights,_Zl%C3%ADn.JPG&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
+&lt;/div&gt;
+&lt;p&gt;At first glance, it looks like this code is spawning three different threads. I
+even call a spawn function. A multithreaded download might look like this:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/multithreaded.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;We have 3 paths, so we have 3 threads. Each thread calls &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and waits, and
+then calls &lt;span class=&quot;code&quot;&gt;text&lt;/span&gt; and waits.&lt;/p&gt;
+&lt;p&gt;However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
+entirely new thread for each task, it runs all three tasks on the same thread.
+I imagine that would look like this:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/one-thread.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Each time I call &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt;, Rust stops one task and
+starts another using the same thread. In fact, depending on how long it takes
+for each task to complete, they might be run in a different order:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/different-order.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;There’s no way to predict ahead of time what order the tasks will run it.
+That’s why I needed to copy each path string above; each task needs it own copy
+of the string with its own independent lifetime because it might be run at any
+time.&lt;/p&gt;
+&lt;p&gt;The only guarantee I have is that the &lt;span class=&quot;code&quot;&gt;join_all&lt;/span&gt; call
+at the bottom will block until all of the tasks have finished; that is, until
+all of the futures I pushed onto the tasks array have completed.&lt;/p&gt;
+&lt;h2&gt;Sending 100,000 Concurrent Requests&lt;/h2&gt;
+&lt;p&gt;I can scale this up to 100,000 requests by reading the URLs in from a file instead:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;read_lines&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(path: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;str&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) -&amp;gt; Result&amp;lt;Vec&amp;lt;String&amp;gt;, Box&amp;lt;dyn Error&amp;gt;&amp;gt; {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;File::open(path)&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; reader &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;BufReader::new(file);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    Ok(
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        reader.lines().filter_map(Result::ok).collect()
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    )
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#[tokio::main]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;async &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() -&amp;gt; Result&amp;lt;(), Box&amp;lt;dyn Error&amp;gt;&amp;gt; {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; paths: Vec&amp;lt;String&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;read_lines(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;urls.txt&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;etc&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;...
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;When I tried this out for the first time I was excited: How long would it take
+to download 100,000 HTML pages simultaneously like this? Would it be 100,000x
+faster than downloading one file? I typed &lt;span class=&quot;code&quot;&gt;cargo run
+--release&lt;/span&gt; to build my code in release mode and get the best possible
+performance out of Rust. Asynchronous code, zero cost abstractions, no garbage
+collector, this was going to be great!&lt;/p&gt;
+&lt;p&gt;Of course, it didn’t work.&lt;/p&gt;
+&lt;p&gt;What happened? The problem is my laptop can’t open so many concurrent network
+connections. And even if it could, the web server might not be able to handle
+them either.&lt;/p&gt;
+&lt;p&gt;Using my thread/task diagram, launching all 100,000 tasks might look like this:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/simultaneous.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;I spawn 100,000 tasks all on to the same thread, and Tokio starts executing
+them all. Each time my code above calls &lt;span
+class=&quot;code&quot;&gt;get(&amp;amp;path).await&lt;/span&gt;, Tokio pauses that task and starts
+another, which calls &lt;span class=&quot;code&quot;&gt;get(&amp;amp;path).await&lt;/span&gt; again, opening
+yet another HTTP request. My laptop quickly runs out of network resources and
+these tasks start to fail.&lt;/p&gt;
+&lt;h2&gt;Sending a Buffered, Concurrent Stream of 100,000 Requests&lt;/h2&gt;
+&lt;p&gt;Instead, I need to limit the number of concurrent Tokio tasks - the number of
+concurrent HTTP requests. I need the diagram to look something like this:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/buffered.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;After the first 8 tasks are started, the first 8 blue boxes on the left, Tokio
+waits for at least one of them to complete before starting a 9th task. I
+indicate this with the “max concurrency” arrow.&lt;/p&gt;
+&lt;p&gt;Once one of the first 8 calls to &lt;span class=&quot;code&quot;&gt;reqwest::get&lt;/span&gt;
+completes, Tokio is free to run a 9th task. The first &amp;quot;pop from buffer&amp;quot; arrow.
+And once that 9th task or any other task completes, Tokio starts a 10th task,
+etc., in this manner processing all 100,000 tasks 8 at a time.&lt;/p&gt;
+&lt;p&gt;To achieve this, I can use &lt;span class=&quot;code&quot;&gt;StreamExt&lt;/span&gt; trait’s &lt;a
+href=&quot;https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.5/futures/stream/trait.StreamExt.html#method.buffer_unordered&quot;&gt;&lt;span
+class=&quot;code&quot;&gt;buffer_unordered&lt;/span&gt;&lt;/a&gt; function:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; fetches &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;futures::stream::iter(
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    paths.into_iter().map(|path| {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        async &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;move &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;reqwest::get(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;path).await {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                Ok(resp) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; resp.text().await {
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                        Ok(text) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                            println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;RESPONSE: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt; bytes from &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, text.len(), path);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                        }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                        Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR reading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR downloading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;})
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;).buffer_unordered(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;8&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;).collect::&amp;lt;Vec&amp;lt;()&amp;gt;&amp;gt;();
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Waiting...&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;);
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;fetches.await;
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;First I create an iterator which maps all of the paths to my closures, and passes
+them to &lt;span class=&quot;code&quot;&gt;futures::stream::iter&lt;/span&gt;.
+This will create a list of futures, each one executing my closure.&lt;/p&gt;
+&lt;p&gt;At the bottom I call &lt;span class=&quot;code&quot;&gt;buffer_unordered&lt;/span&gt; and pass in 8.  The
+code in &lt;span class=&quot;code&quot;&gt;buffer_unordered&lt;/span&gt; will execute up to 8 futures
+from the stream concurrently, and then start to buffer the remaining futures.
+As each task completes, each HTTP request in my example, &lt;span
+class=&quot;code&quot;&gt;buffer_unordered&lt;/span&gt; will pull another task out of its buffer
+and execute it.&lt;/p&gt;
+&lt;p&gt;This code will slowly but steadily iterate over the 100,000 URLs downloading
+them in parallel. Experimenting with this, I’ve been able to open about 80
+concurrent requests without getting errors, taking about&lt;/p&gt;
+</content></entry><entry><title>Using Result Combinator Functions in Rust</title><link href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
   flow by checking for errors in a succinct, elegant way&lt;/i&gt;
@@ -2709,196 +2981,4 @@ with Postgres GiST indexes. By using an index, Postgres can execute any of the
 SQL expressions I wrote above equally fast on 7000 records as it would on 7!
 How? The only way to find out is by &lt;a href=&quot;http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index&quot;&gt;Looking Inside Postgres at a GiST
 Index&lt;/a&gt;.&lt;/p&gt;
-</content></entry><entry><title>Saving a Tree in Postgres Using LTREE</title><link href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree" rel="alternate"></link><id href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree" rel="alternate"></id><published>2017-12-13T00:00:00Z</published><updated>2017-12-13T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/tree3.jpg&quot;&gt;
-&lt;/div&gt;
-&lt;p&gt;In &lt;a href=&quot;http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension&quot;&gt;my last
-post&lt;/a&gt;,
-I showed you how to install and enable a Postgres extension called
-&lt;a href=&quot;https://www.postgresql.org/docs/current/stati</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/tree3.jpg&quot;&gt;
-&lt;/div&gt;
-&lt;p&gt;In &lt;a href=&quot;http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension&quot;&gt;my last
-post&lt;/a&gt;,
-I showed you how to install and enable a Postgres extension called
-&lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE&lt;/a&gt;. LTREE
-allows me to save, query on and manipulate trees or hierarchical data
-structures using a relational database table. &lt;a href=&quot;http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension&quot;&gt;As we’ll see&lt;/a&gt;, using LTREE I can
-count leaves, cut off branches, and climb up and down trees easily - all using
-SQL right inside my application’s existing Postgres database!&lt;/p&gt;
-&lt;p&gt;But trees are natural, haphazard, branching structures with countless leaves,
-while database tables are man-made rectangles full of numbers and text. How can
-I possibly save a beautiful tree structure into an ugly, boring database table?&lt;/p&gt;
-&lt;h2&gt;Path Enumeration&lt;/h2&gt;
-&lt;p&gt;Let’s return to the example tree from the &lt;a href=&quot;http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres&quot;&gt;first
-post&lt;/a&gt;
-in this series:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/11/example-tree.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;The LTREE extension uses the &lt;em&gt;path enumeration&lt;/em&gt; algorithm, which calls for each
-node in the tree to record the path from the root you would have to follow to
-reach that node.&lt;/p&gt;
-&lt;p&gt;For example, to find &lt;span class=&quot;code&quot;&gt;G&lt;/span&gt; starting from &lt;span
-class=&quot;code&quot;&gt;A&lt;/span&gt;, the root, I would move down to &lt;span
-class=&quot;code&quot;&gt;B&lt;/span&gt;, and then down again to &lt;span class=&quot;code&quot;&gt;G&lt;/span&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/tree-path1.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;So the path to &lt;span class=&quot;code&quot;&gt;G&lt;/span&gt; is:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/path1.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;Here’s another example:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/tree-path2.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;This time I’ve traced a path from &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt; to &lt;span
-class=&quot;code&quot;&gt;D&lt;/span&gt;, via &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt;. So the path of &lt;span
-class=&quot;code&quot;&gt;D&lt;/span&gt; is:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/path2.png&quot;&gt;&lt;/p&gt;
-&lt;h2&gt;Saving Tree Paths Using LTREE&lt;/h2&gt;
-&lt;p&gt;To use LTREE, I need to create a column to hold these paths. For my example
-tree, I’ll use the same table I did before, but instead of the &lt;span
-class=&quot;code&quot;&gt;parent_id&lt;/span&gt; column I’ll use a &lt;span class=&quot;code&quot;&gt;path&lt;/span&gt;
-column:&lt;/p&gt;
-&lt;pre&gt;
-create table tree(
-    id serial primary key,
-    letter char,
-    path ltree
-);
-create index tree_path_idx on tree using gist (path);
-&lt;/pre&gt;
-&lt;p&gt;I chose the name &lt;span class=&quot;code&quot;&gt;path&lt;/span&gt;; I could have picked any name
-here. However, notice the &lt;span class=&quot;code&quot;&gt;path&lt;/span&gt; column uses a Postgres
-data type called &lt;span class=&quot;code&quot;&gt;ltree&lt;/span&gt; - the LTREE extension provides
-this special new type.  And also notice I created a special &lt;span
-class=&quot;code&quot;&gt;gist&lt;/span&gt; index on the &lt;span class=&quot;code&quot;&gt;path&lt;/span&gt; column;
-more on this later!&lt;/p&gt;
-&lt;p&gt;Next, I save the path of each tree node into the &lt;span class=&quot;code&quot;&gt;path&lt;/span&gt;
-column, encoded as a series of strings joined together by periods. For example
-to save the path of &lt;span class=&quot;code&quot;&gt;G&lt;/span&gt; into my table I use this insert
-statement:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/insert1.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;And to save the path to node D I write:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/13/insert2.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;Following this pattern, I can save my entire tree using these insert
-statements, one for each node in my tree:&lt;/p&gt;
-&lt;pre&gt;
-insert into tree (letter, path) values ('A', 'A');
-insert into tree (letter, path) values ('B', 'A.B');
-insert into tree (letter, path) values ('C', 'A.C');
-insert into tree (letter, path) values ('D', 'A.C.D');
-insert into tree (letter, path) values ('E', 'A.C.E');
-insert into tree (letter, path) values ('F', 'A.C.F');
-insert into tree (letter, path) values ('G', 'A.B.G');
-&lt;/pre&gt;
-&lt;p&gt;The root node, &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt;, contains the simplest path &lt;span
-class=&quot;code&quot;&gt;A&lt;/span&gt;. Its two child nodes, &lt;span class=&quot;code&quot;&gt;B&lt;/span&gt; and
-&lt;span class=&quot;code&quot;&gt;C&lt;/span&gt;, use paths &lt;span class=&quot;code&quot;&gt;A.B&lt;/span&gt; and &lt;span
-class=&quot;code&quot;&gt;A.C&lt;/span&gt;; the child nodes under &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt; use
-paths &lt;span class=&quot;code&quot;&gt;A.C.D&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;A.C.E&lt;/span&gt;, etc.
-You get the idea.&lt;/p&gt;
-&lt;h2&gt;The Ancestor Operator: @&amp;gt;&lt;/h2&gt;
-&lt;p&gt;Now for the fun part: LTREE provides a series of new SQL operators that allow
-me to query and manipulate tree data structures. The most powerful of these is
-&lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt;, the “ancestor” operator. It tests whether one path is an ancestor of
-another.&lt;/p&gt;
-&lt;p&gt;Returning to my question from &lt;a href=&quot;http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres&quot;&gt;the first post in this
-series&lt;/a&gt;,
-what if I needed to know how many children &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt; had,
-recursively? That is, what if I needed to count its children, grandchildren,
-great-grandchildren, etc.? Earlier we saw that using a &lt;span
-class=&quot;code&quot;&gt;parent_id&lt;/span&gt; column this would require an ever increasing
-number of SQL statements:&lt;/p&gt;
-&lt;pre&gt;
-select count(*) from tree where parent_id = ID;
-select count(*) from tree where parent_id in (CHILD IDs);
-select count(*) from tree where parent_id in (GRANDCHILD IDs);
-select count(*) from tree where parent_id in (GREAT-GRANDCHILD IDs);
-select count(*) from tree where parent_id in (GREAT_GREAT-GRANDCHILD IDs);
-
-etc.
-&lt;/pre&gt;
-&lt;p&gt;&lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; solves this problem for us. I can now recursively
-count the total number of nodes under any given parent like this:&lt;/p&gt;
-&lt;pre&gt;
-select count(*) from tree where PARENT-PATH @&gt; path;
-&lt;/pre&gt;
-&lt;p&gt;In my example, this SQL would return the number of nodes, recursively, under
-the root node &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt;:&lt;/p&gt;
-&lt;pre&gt;
-select count(*) from tree where 'A' @&gt; path;
-count 
--------
-7
-(1 row)
-&lt;/pre&gt;
-&lt;p&gt;LTREE counts the parent node itself, so the total count is 7, not 6. That is,
-&lt;span class=&quot;code&quot;&gt;A @&amp;gt; A&lt;/span&gt; evaluates to true. Another example; this
-returns the count of tree nodes under and including &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt;:&lt;/p&gt;
-&lt;pre&gt;
-select count(*) from tree where ‘A.C' @&gt; path;
-count 
--------
-4
-(1 row)
-&lt;/pre&gt;
-&lt;p&gt;Or I could have written these predicates in the opposite order using &lt;span
-class=&quot;code&quot;&gt;&amp;lt;@&lt;/span&gt;:&lt;/p&gt;
-&lt;pre&gt;
-select count(*) from tree where path &lt;@ 'A';
-select count(*) from tree where path &lt;@ 'A.C';
-&lt;/pre&gt;
-&lt;p&gt;As you can see, the &lt;span class=&quot;code&quot;&gt;&amp;lt;@&lt;/span&gt; and &lt;span
-class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; operators treat the &lt;span class=&quot;code&quot;&gt;path&lt;/span&gt;
-column, the column I defined with the &lt;span class=&quot;code&quot;&gt;ltree&lt;/span&gt; data
-type, as simple strings. But there’s some magic going on here: The path values
-are not simple strings. Although I typed them in as strings, &lt;span
-class=&quot;code&quot;&gt;&amp;lt;@&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; efficiently determine
-whether or not one path is an ancestor of another.&lt;/p&gt;
-&lt;p&gt;And the &lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; ancestor operator is just one way of using
-&lt;span class=&quot;code&quot;&gt;ltree&lt;/span&gt; columns; the LTREE extension provides a long list of powerful
-operators and functions!  For a complete list, see
-&lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;https://www.postgresql.org/docs/current/static/ltree.html&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;In &lt;a href=&quot;http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension&quot;&gt;my next post&lt;/a&gt;, I’ll explore more of these functions and show you how to
-perform some tree operations that I’ve found useful.&lt;/p&gt;
-&lt;h2&gt;Maybe You’re Not Impressed&lt;/h2&gt;
-&lt;p&gt;However, thinking about the path strings for a moment, it’s fairly obvious
-whether one path is an ancestor of another. For example, it’s clear that &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt; and
-A.C are ancestors of A.C.D, while A.B is not. In fact, it looks like all the &lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt;
-operator does it check whether the string on the left (the ancestor) is a
-prefix or leading substring inside the string on the right (the descendant).&lt;/p&gt;
-&lt;p&gt;In fact, you might not be very impressed by LTREE, so far. The &lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; operator
-seems like a fancy way of performing a simple string operation. I could have
-written SQL code to determine that A is an ancestor of A.C.D myself. I probably
-would have used one of Postgres’s &lt;a href=&quot;https://www.postgresql.org/docs/current/static/functions-string.html&quot;&gt;many string
-functions&lt;/a&gt;
-to achieve this, maybe something like this:&lt;/p&gt;
-&lt;pre&gt;
-select count(*) from tree where strpos(path::varchar, 'A') = 1
-&lt;/pre&gt;
-&lt;p&gt;Postgres would calculate the answer for my 7-node example tree very quickly.
-But to calculate this count, internally Postgres would have to iterate over all
-the records in my table (this is called a &lt;em&gt;full table scan&lt;/em&gt; or &lt;em&gt;sequence scan&lt;/em&gt; in
-DB jargon) and calculate the &lt;span class=&quot;code&quot;&gt;strpos&lt;/span&gt; function on each
-row. If my tree had thousands or millions of rows, then this SQL statement
-would take a long time to finish.&lt;/p&gt;
-&lt;h2&gt;Enabling the Real Magic: Using a GiST Index with LTREE&lt;/h2&gt;
-&lt;p&gt;The power of the &lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; operator is that it allows
-Postgres to search &lt;em&gt;efficiently&lt;/em&gt; across an entire tree using an index. Saying
-this in a more technical way: The &lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; operator
-integrates with Postgres’s GiST index API to find and match descendant nodes.
-To take advantage of this technology, be sure to create a GiST index on your
-&lt;span class=&quot;code&quot;&gt;ltree&lt;/span&gt; column, for example like this:&lt;/p&gt;
-&lt;pre&gt;
-create index tree_path_idx on tree using gist (path);
-&lt;/pre&gt;
-&lt;p&gt;What is a “GiST” index? How does it help LTREE find and count tree nodes
-efficiently? Read the &lt;a href=&quot;http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index&quot;&gt;last post in this
-series&lt;/a&gt;
-to find out. There I describe the Generalized Search Index (GiST) project,
-explore the Computer Science behind GiST and look at how LTREE uses GiST to
-make fast tree operations inside of Postgres possible.&lt;/p&gt;
-&lt;h2&gt;What’s Next?&lt;/h2&gt;
-&lt;p&gt;But before we dive into LTREE’s internal implementation, first we should see
-what else LTREE can do. So far I’ve shown you how to count descendant tree
-nodes. Tomorrow in my next post, &lt;a href=&quot;http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension&quot;&gt;Manipulating Trees Using SQL and the Postgres
-LTREE
-Extension&lt;/a&gt;,
-I’ll show you how to use other LTREE’s operators and functions to work with
-tree data.&lt;/p&gt;
 </content></entry></feed>
