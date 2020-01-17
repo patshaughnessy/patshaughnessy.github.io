@@ -20,6 +20,7 @@ https://example.com/100000.html
 do it? Maybe a shell script using <span class="code">xargs</span> and <span
 class="code">curl</span>? Maybe a simple Golang program? Go’s powerful
 concurrency features would work well for this.</p>
+<div style="clear: both"></div>
 <p>Instead, I decided to try to use Rust. I’ve read a lot about safe concurrency
 in Rust, but I’ve never tried it. I also wanted to learn what Rust’s new
 “async/await” feature was all about. This seemed like the perfect task for
@@ -80,7 +81,7 @@ the request to finish and return a result.</p>
 </li>
 <li>
 <p>Second, if the request was successful, I call <span
-class="code">resp.text()</span> to get the content of the response body. And
+class="code">resp.text()</span> to get the contents of the response body. And
 I wait again while that is loaded.</p>
 </li>
 </ul>
@@ -145,10 +146,11 @@ class="code">tokio::spawn</span> function, marked <span class="code">async
 move</span>. I create a copy of each path, using <span
 class="code">path.clone()</span>, so the closure has its own copy of the path
 string with its own lifetime.</p>
-<p>The complex type annotation on the tasks array indicates what each call to
-spawn returns: a <span class="code">JoinHandle</span> enclosing a <span
-class="code">Result</span>. To keep things simple, I handle all errors in the
-closure and just return Ok(()). This means each <span
+<p>The complex type annotation on the <span class="code">tasks</span> array
+indicates what each call to <span class="code">spawn</span> returns: a <span
+class="code">JoinHandle</span> enclosing a <span class="code">Result</span>. To
+keep things simple, I handle all errors in the closure and just return <span
+class="code">Ok(())</span>.  This means each <span
 class="code">JoinHandle</span> contains a trivial result: <span
 class="code">Result&lt;(), ()&gt;</span>. I could have written the closure to return
 some value and/or some error value instead.</p>
@@ -166,7 +168,7 @@ even call a spawn function. A multithreaded download might look like this:</p>
 then calls <span class="code">text</span> and waits.</p>
 <p>However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
 entirely new thread for each task, it runs all three tasks on the same thread.
-I imagine that would look like this:</p>
+I imagine three tasks running on one thread like this:</p>
 <p><img src="http://localhost/assets/2020/1/17/one-thread.png"></p>
 <p>Each time I call <span class="code">await</span>, Rust stops one task and
 starts another using the same thread. In fact, depending on how long it takes

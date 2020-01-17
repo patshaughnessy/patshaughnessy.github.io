@@ -28,6 +28,8 @@ do it? Maybe a shell script using <span class="code">xargs</span> and <span
 class="code">curl</span>? Maybe a simple Golang program? Go’s powerful
 concurrency features would work well for this.
 
+<div style="clear: both"></div>
+
 Instead, I decided to try to use Rust. I’ve read a lot about safe concurrency
 in Rust, but I’ve never tried it. I also wanted to learn what Rust’s new
 “async/await” feature was all about. This seemed like the perfect task for
@@ -90,7 +92,7 @@ This is a two step process:
   the request to finish and return a result.
 
 * Second, if the request was successful, I call <span
-  class="code">resp.text()</span> to get the content of the response body. And
+  class="code">resp.text()</span> to get the contents of the response body. And
   I wait again while that is loaded.
 
 I handle the errors explicitly and always return a unit result <span
@@ -161,10 +163,11 @@ move</span>. I create a copy of each path, using <span
 class="code">path.clone()</span>, so the closure has its own copy of the path
 string with its own lifetime.
 
-The complex type annotation on the tasks array indicates what each call to
-spawn returns: a <span class="code">JoinHandle</span> enclosing a <span
-class="code">Result</span>. To keep things simple, I handle all errors in the
-closure and just return Ok(()). This means each <span
+The complex type annotation on the <span class="code">tasks</span> array
+indicates what each call to <span class="code">spawn</span> returns: a <span
+class="code">JoinHandle</span> enclosing a <span class="code">Result</span>. To
+keep things simple, I handle all errors in the closure and just return <span
+class="code">Ok(())</span>.  This means each <span
 class="code">JoinHandle</span> contains a trivial result: <span
 class="code">Result<(), ()></span>. I could have written the closure to return
 some value and/or some error value instead.
@@ -189,7 +192,7 @@ then calls <span class="code">text</span> and waits.
 
 However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
 entirely new thread for each task, it runs all three tasks on the same thread.
-I imagine that would look like this:
+I imagine three tasks running on one thread like this:
 
 <img src="http://localhost/assets/2020/1/17/one-thread.png">
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2020-01-16T15:46:54Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/17/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/17/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-17T00:00:00Z</published><updated>2020-01-17T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2020-01-17T06:54:45Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/17/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/17/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-17T00:00:00Z</published><updated>2020-01-17T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://localhost/assets/2020/1/17/traffic-light.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
 easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
@@ -24,6 +24,7 @@ https://example.com/100000.html
 do it? Maybe a shell script using &lt;span class=&quot;code&quot;&gt;xargs&lt;/span&gt; and &lt;span
 class=&quot;code&quot;&gt;curl&lt;/span&gt;? Maybe a simple Golang program? Go’s powerful
 concurrency features would work well for this.&lt;/p&gt;
+&lt;div style=&quot;clear: both&quot;&gt;&lt;/div&gt;
 &lt;p&gt;Instead, I decided to try to use Rust. I’ve read a lot about safe concurrency
 in Rust, but I’ve never tried it. I also wanted to learn what Rust’s new
 “async/await” feature was all about. This seemed like the perfect task for
@@ -84,7 +85,7 @@ the request to finish and return a result.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Second, if the request was successful, I call &lt;span
-class=&quot;code&quot;&gt;resp.text()&lt;/span&gt; to get the content of the response body. And
+class=&quot;code&quot;&gt;resp.text()&lt;/span&gt; to get the contents of the response body. And
 I wait again while that is loaded.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
@@ -149,10 +150,11 @@ class=&quot;code&quot;&gt;tokio::spawn&lt;/span&gt; function, marked &lt;span cl
 move&lt;/span&gt;. I create a copy of each path, using &lt;span
 class=&quot;code&quot;&gt;path.clone()&lt;/span&gt;, so the closure has its own copy of the path
 string with its own lifetime.&lt;/p&gt;
-&lt;p&gt;The complex type annotation on the tasks array indicates what each call to
-spawn returns: a &lt;span class=&quot;code&quot;&gt;JoinHandle&lt;/span&gt; enclosing a &lt;span
-class=&quot;code&quot;&gt;Result&lt;/span&gt;. To keep things simple, I handle all errors in the
-closure and just return Ok(()). This means each &lt;span
+&lt;p&gt;The complex type annotation on the &lt;span class=&quot;code&quot;&gt;tasks&lt;/span&gt; array
+indicates what each call to &lt;span class=&quot;code&quot;&gt;spawn&lt;/span&gt; returns: a &lt;span
+class=&quot;code&quot;&gt;JoinHandle&lt;/span&gt; enclosing a &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt;. To
+keep things simple, I handle all errors in the closure and just return &lt;span
+class=&quot;code&quot;&gt;Ok(())&lt;/span&gt;.  This means each &lt;span
 class=&quot;code&quot;&gt;JoinHandle&lt;/span&gt; contains a trivial result: &lt;span
 class=&quot;code&quot;&gt;Result&amp;lt;(), ()&amp;gt;&lt;/span&gt;. I could have written the closure to return
 some value and/or some error value instead.&lt;/p&gt;
@@ -170,7 +172,7 @@ even call a spawn function. A multithreaded download might look like this:&lt;/p
 then calls &lt;span class=&quot;code&quot;&gt;text&lt;/span&gt; and waits.&lt;/p&gt;
 &lt;p&gt;However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
 entirely new thread for each task, it runs all three tasks on the same thread.
-I imagine that would look like this:&lt;/p&gt;
+I imagine three tasks running on one thread like this:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/one-thread.png&quot;&gt;&lt;/p&gt;
 &lt;p&gt;Each time I call &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt;, Rust stops one task and
 starts another using the same thread. In fact, depending on how long it takes
