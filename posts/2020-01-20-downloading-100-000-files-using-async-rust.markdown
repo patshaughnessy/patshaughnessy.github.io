@@ -316,7 +316,7 @@ This code will slowly but steadily iterate over the 100,000 URLs, downloading
 them in parallel. Experimenting with this, it doesn’t seem to matter very much
 exactly what level of concurrency I pick. I found the best performance when I
 picked a concurrency of 50. Using 50 concurrent Tokio tasks, it took about 30
-minutes to all one hundred thousand HTML files.
+minutes to download all one hundred thousand HTML files.
 
 However, none of that matters. I’m not measuring the performance of Rust, Tokio
 or Reqwest. These numbers have more to do with the web server and network
