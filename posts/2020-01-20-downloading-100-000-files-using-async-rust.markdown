@@ -1,9 +1,9 @@
 title: "Downloading 100,000 Files Using Async Rust"
-date: 2020/1/17
+date: 2020/1/20
 tag: Rust
 
 <div style="float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px">
-  <img src="http://localhost/assets/2020/1/17/traffic-light.jpg"><br/>
+  <img src="http://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg"><br/>
   <i>Rust's new async/await feature makes it <br/>
 easy to stop and start asynchronous tasks</i><br/>
   <small>(from: <a href="https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20111210.jpg">Wikimedia Commons</a>)</small></i> 
@@ -35,15 +35,20 @@ in Rust, but I’ve never tried it. I also wanted to learn what Rust’s new
 “async/await” feature was all about. This seemed like the perfect task for
 asynchronous Rust code.
 
-*TL/DR*: [Here’s the code](). The rest of this post will explain how it works.
+*TL/DR*: [Here’s the
+code](https://gist.github.com/patshaughnessy/27b1611e2c912346b929df97998d488d).
+The rest of this post will explain how it works.
 
-## Reqwest: Rust’s Asynchronous HTTP Client
+## Getting Started With Reqwest
 
-The [reqwest](https://github.com/seanmonstar/reqwest) crate is a high level,
-easy to use HTTP client, written by [Sean McArthur](https://seanmonstar.com).
-He just updated it to work with [Tokio](https://tokio.rs), Rust’s new
-async/await engine, so this is the perfect time to try using it. Here’s the
-example from the readme:
+There are many different Rust HTTP clients to choose from, and [apparently some
+controversy](https://medium.com/@shnatsel/smoke-testing-rust-http-clients-b8f2ee5db4e6)
+about which works best. Because I’m a Rust newbie, I decided simply to pick the most
+popular: [reqwest](https://github.com/seanmonstar/reqwest). Request is a high
+level, easy to use HTTP client, written by [Sean
+McArthur](https://seanmonstar.com/). He just updated it to work with Tokio,
+Rust’s new async/await engine, so this is the perfect time to try using it.
+Here’s the example from the readme:
 
 <pre type="rust">
 use std::collections::HashMap;
@@ -102,7 +107,7 @@ when I start downloading more than one page concurrently.
 Visually, I can draw the <span class="code">get</span> and <span
 class="code">text</span> calls like this:
 
-<img src="http://localhost/assets/2020/1/17/get-and-text.png">
+<img src="http://patshaughnessy.net/assets/2020/1/20/get-and-text.png">
 
 First I call <span class="code">get</span> and wait, then I call <span
 class="code">text</span> and wait.
@@ -178,14 +183,14 @@ class="code">join_all(tasks).await</span> to wait for them all to finish.
 ## Asynchronous vs Multithreaded
 
 <div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px">
-  <img src="http://localhost/assets/2020/1/17/traffic-light2.jpg"><br/>
+  <img src="http://patshaughnessy.net/assets/2020/1/20/traffic-light2.jpg"><br/>
   <small>(from: <a href="https://commons.wikimedia.org/wiki/File:Traffic_lights,_Zl%C3%ADn.JPG">Wikimedia Commons</a>)</small></i> 
 </div>
 
 At first glance, it looks like this code is spawning three different threads. I
 even call a spawn function. A multithreaded download might look like this:
 
-<img src="http://localhost/assets/2020/1/17/multithreaded.png">
+<img src="http://patshaughnessy.net/assets/2020/1/20/multithreaded.png">
 
 We have 3 paths, so we have 3 threads. Each thread calls <span class="code">get</span> and waits, and
 then calls <span class="code">text</span> and waits.
@@ -194,13 +199,13 @@ However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
 entirely new thread for each task, it runs all three tasks on the same thread.
 I imagine three tasks running on one thread like this:
 
-<img src="http://localhost/assets/2020/1/17/one-thread.png">
+<img src="http://patshaughnessy.net/assets/2020/1/20/one-thread.png">
 
 Each time I call <span class="code">await</span>, Rust stops one task and
 starts another using the same thread. In fact, depending on how long it takes
 for each task to complete, they might be run in a different order:
 
-<img src="http://localhost/assets/2020/1/17/different-order.png">
+<img src="http://patshaughnessy.net/assets/2020/1/20/different-order.png">
 
 There’s no way to predict ahead of time what order the tasks will run it.
 That’s why I needed to copy each path string above; each task needs it own copy
@@ -247,7 +252,7 @@ them either.
 
 Using my thread/task diagram, launching all 100,000 tasks might look like this:
 
-<img src="http://localhost/assets/2020/1/17/simultaneous.png">
+<img src="http://patshaughnessy.net/assets/2020/1/20/simultaneous.png">
 
 I spawn 100,000 tasks all on to the same thread, and Tokio starts executing
 them all. Each time my code above calls <span
@@ -261,7 +266,7 @@ these tasks start to fail.
 Instead, I need to limit the number of concurrent Tokio tasks - the number of
 concurrent HTTP requests. I need the diagram to look something like this:
 
-<img src="http://localhost/assets/2020/1/17/buffered.png">
+<img src="http://patshaughnessy.net/assets/2020/1/20/buffered.png">
 
 After the first 8 tasks are started, the first 8 blue boxes on the left, Tokio
 waits for at least one of them to complete before starting a 9th task. I
@@ -309,6 +314,15 @@ As each task completes, each HTTP request in my example, <span
 class="code">buffer_unordered</span> will pull another task out of its buffer
 and execute it.
 
-This code will slowly but steadily iterate over the 100,000 URLs downloading
-them in parallel. Experimenting with this, I’ve been able to open about 80
-concurrent requests without getting errors, taking about
+This code will slowly but steadily iterate over the 100,000 URLs, downloading
+them in parallel. Experimenting with this, it doesn’t seem to matter very much
+exactly what level of concurrency I pick. I found the best performance when I
+picked a concurrency of 50. Using 50 concurrent Tokio tasks, it took about 30
+minutes to all one hundred thousand HTML files.
+
+However, none of that matters. I’m not measuring the performance of Rust, Tokio
+or Reqwest. These numbers have more to do with the web server and network
+connection I’m using. The real performance here was my own developer
+performance: With just a few lines of code I was able to write an asynchronous
+I/O program that can scale as much as I would like. The async and await
+keywords make this code easy to write and easy to read.

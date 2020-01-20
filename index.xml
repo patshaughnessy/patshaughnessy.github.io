@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2020-01-17T06:54:45Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/17/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/17/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-17T00:00:00Z</published><updated>2020-01-17T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://localhost/assets/2020/1/17/traffic-light.jpg&quot;&gt;&lt;br/&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2020-01-20T17:00:04Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-20T00:00:00Z</published><updated>2020-01-20T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
 easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
-  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20111210.jpg</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://localhost/assets/2020/1/17/traffic-light.jpg&quot;&gt;&lt;br/&gt;
+  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_201</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
 easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
   &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20111210.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
@@ -29,13 +29,18 @@ concurrency features would work well for this.&lt;/p&gt;
 in Rust, but I’ve never tried it. I also wanted to learn what Rust’s new
 “async/await” feature was all about. This seemed like the perfect task for
 asynchronous Rust code.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;TL/DR&lt;/em&gt;: &lt;a href=&quot;&quot;&gt;Here’s the code&lt;/a&gt;. The rest of this post will explain how it works.&lt;/p&gt;
-&lt;h2&gt;Reqwest: Rust’s Asynchronous HTTP Client&lt;/h2&gt;
-&lt;p&gt;The &lt;a href=&quot;https://github.com/seanmonstar/reqwest&quot;&gt;reqwest&lt;/a&gt; crate is a high level,
-easy to use HTTP client, written by &lt;a href=&quot;https://seanmonstar.com&quot;&gt;Sean McArthur&lt;/a&gt;.
-He just updated it to work with &lt;a href=&quot;https://tokio.rs&quot;&gt;Tokio&lt;/a&gt;, Rust’s new
-async/await engine, so this is the perfect time to try using it. Here’s the
-example from the readme:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;TL/DR&lt;/em&gt;: &lt;a href=&quot;https://gist.github.com/patshaughnessy/27b1611e2c912346b929df97998d488d&quot;&gt;Here’s the
+code&lt;/a&gt;.
+The rest of this post will explain how it works.&lt;/p&gt;
+&lt;h2&gt;Getting Started With Reqwest&lt;/h2&gt;
+&lt;p&gt;There are many different Rust HTTP clients to choose from, and &lt;a href=&quot;https://medium.com/@shnatsel/smoke-testing-rust-http-clients-b8f2ee5db4e6&quot;&gt;apparently some
+controversy&lt;/a&gt;
+about which works best. Because I’m a Rust newbie, I decided simply to pick the most
+popular: &lt;a href=&quot;https://github.com/seanmonstar/reqwest&quot;&gt;reqwest&lt;/a&gt;. Request is a high
+level, easy to use HTTP client, written by &lt;a href=&quot;https://seanmonstar.com/&quot;&gt;Sean
+McArthur&lt;/a&gt;. He just updated it to work with Tokio,
+Rust’s new async/await engine, so this is the perfect time to try using it.
+Here’s the example from the readme:&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;
 &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;use &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;std::collections::HashMap;
@@ -94,7 +99,7 @@ class=&quot;code&quot;&gt;Ok(())&lt;/span&gt; because that makes the code below 
 when I start downloading more than one page concurrently.&lt;/p&gt;
 &lt;p&gt;Visually, I can draw the &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and &lt;span
 class=&quot;code&quot;&gt;text&lt;/span&gt; calls like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/get-and-text.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/get-and-text.png&quot;&gt;&lt;/p&gt;
 &lt;p&gt;First I call &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and wait, then I call &lt;span
 class=&quot;code&quot;&gt;text&lt;/span&gt; and wait.&lt;/p&gt;
 &lt;p&gt;But what is asynchronous about this? This reads like normal, single threaded
@@ -162,22 +167,22 @@ some value and/or some error value instead.&lt;/p&gt;
 class=&quot;code&quot;&gt;join_all(tasks).await&lt;/span&gt; to wait for them all to finish.&lt;/p&gt;
 &lt;h2&gt;Asynchronous vs Multithreaded&lt;/h2&gt;
 &lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://localhost/assets/2020/1/17/traffic-light2.jpg&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/traffic-light2.jpg&quot;&gt;&lt;br/&gt;
   &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Traffic_lights,_Zl%C3%ADn.JPG&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
 &lt;/div&gt;
 &lt;p&gt;At first glance, it looks like this code is spawning three different threads. I
 even call a spawn function. A multithreaded download might look like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/multithreaded.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/multithreaded.png&quot;&gt;&lt;/p&gt;
 &lt;p&gt;We have 3 paths, so we have 3 threads. Each thread calls &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and waits, and
 then calls &lt;span class=&quot;code&quot;&gt;text&lt;/span&gt; and waits.&lt;/p&gt;
 &lt;p&gt;However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
 entirely new thread for each task, it runs all three tasks on the same thread.
 I imagine three tasks running on one thread like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/one-thread.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/one-thread.png&quot;&gt;&lt;/p&gt;
 &lt;p&gt;Each time I call &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt;, Rust stops one task and
 starts another using the same thread. In fact, depending on how long it takes
 for each task to complete, they might be run in a different order:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/different-order.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/different-order.png&quot;&gt;&lt;/p&gt;
 &lt;p&gt;There’s no way to predict ahead of time what order the tasks will run it.
 That’s why I needed to copy each path string above; each task needs it own copy
 of the string with its own independent lifetime because it might be run at any
@@ -216,7 +221,7 @@ collector, this was going to be great!&lt;/p&gt;
 connections. And even if it could, the web server might not be able to handle
 them either.&lt;/p&gt;
 &lt;p&gt;Using my thread/task diagram, launching all 100,000 tasks might look like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/simultaneous.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/simultaneous.png&quot;&gt;&lt;/p&gt;
 &lt;p&gt;I spawn 100,000 tasks all on to the same thread, and Tokio starts executing
 them all. Each time my code above calls &lt;span
 class=&quot;code&quot;&gt;get(&amp;amp;path).await&lt;/span&gt;, Tokio pauses that task and starts
@@ -226,7 +231,7 @@ these tasks start to fail.&lt;/p&gt;
 &lt;h2&gt;Sending a Buffered, Concurrent Stream of 100,000 Requests&lt;/h2&gt;
 &lt;p&gt;Instead, I need to limit the number of concurrent Tokio tasks - the number of
 concurrent HTTP requests. I need the diagram to look something like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://localhost/assets/2020/1/17/buffered.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/buffered.png&quot;&gt;&lt;/p&gt;
 &lt;p&gt;After the first 8 tasks are started, the first 8 blue boxes on the left, Tokio
 waits for at least one of them to complete before starting a 9th task. I
 indicate this with the “max concurrency” arrow.&lt;/p&gt;
@@ -269,9 +274,17 @@ from the stream concurrently, and then start to buffer the remaining futures.
 As each task completes, each HTTP request in my example, &lt;span
 class=&quot;code&quot;&gt;buffer_unordered&lt;/span&gt; will pull another task out of its buffer
 and execute it.&lt;/p&gt;
-&lt;p&gt;This code will slowly but steadily iterate over the 100,000 URLs downloading
-them in parallel. Experimenting with this, I’ve been able to open about 80
-concurrent requests without getting errors, taking about&lt;/p&gt;
+&lt;p&gt;This code will slowly but steadily iterate over the 100,000 URLs, downloading
+them in parallel. Experimenting with this, it doesn’t seem to matter very much
+exactly what level of concurrency I pick. I found the best performance when I
+picked a concurrency of 50. Using 50 concurrent Tokio tasks, it took about 30
+minutes to all one hundred thousand HTML files.&lt;/p&gt;
+&lt;p&gt;However, none of that matters. I’m not measuring the performance of Rust, Tokio
+or Reqwest. These numbers have more to do with the web server and network
+connection I’m using. The real performance here was my own developer
+performance: With just a few lines of code I was able to write an asynchronous
+I/O program that can scale as much as I would like. The async and await
+keywords make this code easy to write and easy to read.&lt;/p&gt;
 </content></entry><entry><title>Using Result Combinator Functions in Rust</title><link href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
