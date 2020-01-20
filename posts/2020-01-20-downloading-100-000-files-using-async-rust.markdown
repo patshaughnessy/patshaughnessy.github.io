@@ -246,11 +246,9 @@ collector, this was going to be great!
 
 Of course, it didn’t work.
 
-What happened? The problem is my laptop can’t open so many concurrent network
-connections. And even if it could, the web server might not be able to handle
-them either.
-
-Using my thread/task diagram, launching all 100,000 tasks might look like this:
+What happened? The problem is the web server can't handle so many concurrent network
+connections. Using my thread/task diagram, launching all 100,000 tasks might
+look like this:
 
 <img src="http://patshaughnessy.net/assets/2020/1/20/simultaneous.png">
 
@@ -324,5 +322,6 @@ However, none of that matters. I’m not measuring the performance of Rust, Toki
 or Reqwest. These numbers have more to do with the web server and network
 connection I’m using. The real performance here was my own developer
 performance: With just a few lines of code I was able to write an asynchronous
-I/O program that can scale as much as I would like. The async and await
-keywords make this code easy to write and easy to read.
+I/O program that can scale as much as I would like. The <span
+class="code">async</span> and <span class="code">await</span> keywords make
+this code easy to write and easy to read.

@@ -213,10 +213,9 @@ faster than downloading one file? I typed <span class="code">cargo run
 performance out of Rust. Asynchronous code, zero cost abstractions, no garbage
 collector, this was going to be great!</p>
 <p>Of course, it didn’t work.</p>
-<p>What happened? The problem is my laptop can’t open so many concurrent network
-connections. And even if it could, the web server might not be able to handle
-them either.</p>
-<p>Using my thread/task diagram, launching all 100,000 tasks might look like this:</p>
+<p>What happened? The problem is the web server can't handle so many concurrent network
+connections. Using my thread/task diagram, launching all 100,000 tasks might
+look like this:</p>
 <p><img src="http://patshaughnessy.net/assets/2020/1/20/simultaneous.png"></p>
 <p>I spawn 100,000 tasks all on to the same thread, and Tokio starts executing
 them all. Each time my code above calls <span
@@ -279,8 +278,9 @@ minutes to all one hundred thousand HTML files.</p>
 or Reqwest. These numbers have more to do with the web server and network
 connection I’m using. The real performance here was my own developer
 performance: With just a few lines of code I was able to write an asynchronous
-I/O program that can scale as much as I would like. The async and await
-keywords make this code easy to write and easy to read.</p>
+I/O program that can scale as much as I would like. The <span
+class="code">async</span> and <span class="code">await</span> keywords make
+this code easy to write and easy to read.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Downloading 100,000 Files Using Async Rust';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';

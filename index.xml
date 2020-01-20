@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2020-01-20T17:00:04Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-20T00:00:00Z</published><updated>2020-01-20T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2020-01-20T17:08:40Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-20T00:00:00Z</published><updated>2020-01-20T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
 easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
@@ -217,10 +217,9 @@ faster than downloading one file? I typed &lt;span class=&quot;code&quot;&gt;car
 performance out of Rust. Asynchronous code, zero cost abstractions, no garbage
 collector, this was going to be great!&lt;/p&gt;
 &lt;p&gt;Of course, it didn’t work.&lt;/p&gt;
-&lt;p&gt;What happened? The problem is my laptop can’t open so many concurrent network
-connections. And even if it could, the web server might not be able to handle
-them either.&lt;/p&gt;
-&lt;p&gt;Using my thread/task diagram, launching all 100,000 tasks might look like this:&lt;/p&gt;
+&lt;p&gt;What happened? The problem is the web server can't handle so many concurrent network
+connections. Using my thread/task diagram, launching all 100,000 tasks might
+look like this:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/simultaneous.png&quot;&gt;&lt;/p&gt;
 &lt;p&gt;I spawn 100,000 tasks all on to the same thread, and Tokio starts executing
 them all. Each time my code above calls &lt;span
@@ -283,8 +282,9 @@ minutes to all one hundred thousand HTML files.&lt;/p&gt;
 or Reqwest. These numbers have more to do with the web server and network
 connection I’m using. The real performance here was my own developer
 performance: With just a few lines of code I was able to write an asynchronous
-I/O program that can scale as much as I would like. The async and await
-keywords make this code easy to write and easy to read.&lt;/p&gt;
+I/O program that can scale as much as I would like. The &lt;span
+class=&quot;code&quot;&gt;async&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; keywords make
+this code easy to write and easy to read.&lt;/p&gt;
 </content></entry><entry><title>Using Result Combinator Functions in Rust</title><link href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
