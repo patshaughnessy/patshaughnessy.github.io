@@ -172,8 +172,15 @@ even call a spawn function. A multithreaded download might look like this:</p>
 <p>We have 3 paths, so we have 3 threads. Each thread calls <span class="code">get</span> and waits, and
 then calls <span class="code">text</span> and waits.</p>
 <p>However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
-entirely new thread for each task, it runs all three tasks on the same thread.
-I imagine three tasks running on one thread like this:</p>
+entirely new thread for each task, it runs all three tasks on the same thread.</p>
+<p><em>Update</em> Wesley Moore <a href="https://twitter.com/wezm/status/1219734031857635329">pointed out on
+Twitter</a> that: &quot;Tokio
+multiplexes m tasks into a pool of n threads so it’s able to use all available
+cores. (M:N threading).&quot; It looks like Tokio supports both a Basic (single
+threaded) and Threaded (thread pool) Scheduler; see <a href="https://docs.rs/tokio/0.2.10/tokio/runtime/index.html#threaded-scheduler">the
+docs</a>
+for more information.</p>
+<p>I imagine three tasks running on one thread like this:</p>
 <p><img src="http://patshaughnessy.net/assets/2020/1/20/one-thread.png"></p>
 <p>Each time I call <span class="code">await</span>, Rust stops one task and
 starts another using the same thread. In fact, depending on how long it takes
@@ -273,7 +280,7 @@ and execute it.</p>
 them in parallel. Experimenting with this, it doesn’t seem to matter very much
 exactly what level of concurrency I pick. I found the best performance when I
 picked a concurrency of 50. Using 50 concurrent Tokio tasks, it took about 30
-minutes to all one hundred thousand HTML files.</p>
+minutes to download all one hundred thousand HTML files.</p>
 <p>However, none of that matters. I’m not measuring the performance of Rust, Tokio
 or Reqwest. These numbers have more to do with the web server and network
 connection I’m using. The real performance here was my own developer

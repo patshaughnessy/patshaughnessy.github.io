@@ -197,6 +197,15 @@ then calls <span class="code">text</span> and waits.
 
 However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
 entirely new thread for each task, it runs all three tasks on the same thread.
+
+*Update* Wesley Moore [pointed out on
+Twitter](https://twitter.com/wezm/status/1219734031857635329) that: "Tokio
+multiplexes m tasks into a pool of n threads so it’s able to use all available
+cores. (M:N threading)." It looks like Tokio supports both a Basic (single
+threaded) and Threaded (thread pool) Scheduler; see [the
+docs](https://docs.rs/tokio/0.2.10/tokio/runtime/index.html#threaded-scheduler)
+for more information.
+
 I imagine three tasks running on one thread like this:
 
 <img src="http://patshaughnessy.net/assets/2020/1/20/one-thread.png">
