@@ -198,7 +198,7 @@ then calls <span class="code">text</span> and waits.
 However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
 entirely new thread for each task, it runs all three tasks on the same thread.
 
-*Update* Wesley Moore [pointed out on
+*Update*: Wesley Moore [pointed out on
 Twitter](https://twitter.com/wezm/status/1219734031857635329) that: "Tokio
 multiplexes m tasks into a pool of n threads so it’s able to use all available
 cores. (M:N threading)." It looks like Tokio supports both a Basic (single

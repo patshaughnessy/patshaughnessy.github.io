@@ -173,7 +173,7 @@ even call a spawn function. A multithreaded download might look like this:</p>
 then calls <span class="code">text</span> and waits.</p>
 <p>However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
 entirely new thread for each task, it runs all three tasks on the same thread.</p>
-<p><em>Update</em> Wesley Moore <a href="https://twitter.com/wezm/status/1219734031857635329">pointed out on
+<p><em>Update</em>: Wesley Moore <a href="https://twitter.com/wezm/status/1219734031857635329">pointed out on
 Twitter</a> that: &quot;Tokio
 multiplexes m tasks into a pool of n threads so it’s able to use all available
 cores. (M:N threading).&quot; It looks like Tokio supports both a Basic (single
