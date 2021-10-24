@@ -54,7 +54,7 @@ HTML/ERB files and used a gem called
 process of creating the PDF, EPUB and MOBI target files from them. Bookshop, in
 turn, uses a tool called <a href="http://www.princexml.com">PrinceXML</a> to create the
 PDF file:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/11/27/pdf-build.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/11/27/pdf-build.png"/>
 <p>As you can see, Bookshop is essentially a Ruby static site generator like
 <a href="http://jekyllrb.com">Jekyll</a> or <a href="http://middlemanapp.com">Middleman</a>: you use
 it to run a series of ERB transformations that produce static HTML and CSS.
@@ -82,7 +82,7 @@ page numbers in the lower left corner for left side pages:</p>
 series of CSS templates to get me started, containing a series of example CSS
 styles I could use for page numbers, the table of contents and more.</p>
 <p>Next, here’s how Bookshop creates the EPUB file:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/11/27/epub-build.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/11/27/epub-build.png"/>
 <p>You can see here that the EPUB is essentially a ZIP file containing the static
 HTML/CSS source code, along with a few mysterious XML files (content.opf,
 toc.ncx, etc.) that contain the book’s table of contents, a list of your HTML
@@ -96,7 +96,7 @@ fun, practical video by Paul Salvette might be worth watching:
 <p>Finally, Bookshop launches Amazon’s <a href="http://www.amazon.com/gp/feature.html?ie=UTF8&amp;docId=1000765211">KindleGen
 utility</a> to
 generate the MOBI file from the EPUB file:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/11/27/mobi-build.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/11/27/mobi-build.png"/>
 <h2>Customizing Bookshop</h2>
 <p>To make my life easier, I ended up customizing Bookshop to support code syntax
 highlighting (using <a href="http://coderay.rubychan.de">Coderay</a>) and to allow Markdown as the source file format
@@ -130,7 +130,7 @@ Under a Microscope</a> in a PDF
 file. For my first attempt, I rendered my diagrams as PNG images and then
 included them in my HTML using &lt;img&gt; tags, as I normally do for blog posts.
 PrinceXML then produced a PDF file that looked like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/11/27/blurry-text.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/11/27/blurry-text.png"/>
 <p>While this isn’t horrible, you can see the “YARV internal stack,”
 “rb_control_frame_t” and other text in my diagram at the bottom is blurry and
 somewhat disappointing to look at. The text above, which originally came from
@@ -145,10 +145,10 @@ possible the scaling is performed by PrinceXML when the PDF file is generated.</
 solution: since PDF is internally a vector based format, why not render my
 diagrams using a vector based image file format? After paying some extra money
 to upgrade to Omnigraffle Pro, I was able to use the “File -&gt; Export” command:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/11/27/file-export.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/11/27/file-export.png"/>
 <p>… and then select the “SVG vector drawing” file type (the standard version of
 Omnigraffle doesn’t support this):</p>
-<p><img src="http://patshaughnessy.net/assets/2012/11/27/file-type.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/11/27/file-type.png"/>
 <p>Now the real magic happens: when I include an SVG image in my HTML using a
 standard &lt;img&gt; tag, PrinceXML generates a PDF file that includes the vector
 commands to render the diagram! In fact, I also noticed that PrinceXML includes
@@ -160,7 +160,7 @@ prince: used font: Menlo, Regular
 </pre>
 <p>Here’s what same diagram looks like in the final version of <a href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
 Microscope</a>:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/11/27/correct-text.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/11/27/correct-text.png"/>
 <p>The reason this looks better is that the end user PDF viewer app, Apple Preview,
 Adobe Reader, iBooks or whatever software your reader has, draws the diagram
 text at the proper size at the moment the reader opens the page, using the font

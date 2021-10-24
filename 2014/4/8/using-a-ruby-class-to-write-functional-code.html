@@ -42,7 +42,7 @@ value in the timesheet data.</p>
 predictable value based on some input and doesn’t have any side effects. These
 will be <em>pure</em> functions: They will always return the same result given the same
 arguments. You know that if you pass a line from my timesheet, <span
-class="code">last_name</span> will always return “Shaughnessy.” You’ve turned
+  class="code">last_name</span> will always return “Shaughnessy.” You’ve turned
 the problem around; you’ve phrased the problem as a series of questions rather
 than as a list of instructions.</p>
 <p>Refactoring <span class="code">parse1</span> above, you implement the
@@ -51,7 +51,7 @@ functions, at least in a somewhat verbose and ugly fashion:</p>
 <h2>Testing Pure Functions</h2>
 <p>As a Certified ScrumMaster™, you believe in TDD and other extreme
 programming practices. Originally, while writing <span
-class="code">parse1</span> above, it didn’t even occur to you to write tests
+  class="code">parse1</span> above, it didn’t even occur to you to write tests
 (and if it had, it would have been very difficult).  However, now after
 breaking the problem up into a series of functions, it seems natural to write
 tests for them.</p>
@@ -74,7 +74,7 @@ functions in a very natural, readable way. Ruby at its best. As an added bonus,
 the tests now also pass!</p>
 <p>However, your functions aren’t so pretty. There is a lot of obvious
 duplication: The <span class="code">office</span>, <span
-class="code">employee_id</span> and <span class="code">last_name</span>
+  class="code">employee_id</span> and <span class="code">last_name</span>
 functions all call <span class="code">line.split(',')</span>. To fix this, you
 decide to extract <span class="code">line.split(',')</span> into a separate
 function, removing the duplication:</p>
@@ -88,7 +88,7 @@ around the loop, your code passes the same line to <span
 class="code">employee_id</span>, <span class="code">office</span> and <span
 class="code">last_name</span>. Now Ruby will call the <span class="code">values</span> function over and
 over again. This is unnecessary and needless; in fact, our original <span
-class="code">parse1</span> code didn’t have this problem. By introducing
+  class="code">parse1</span> code didn’t have this problem. By introducing
 functions we have slowed down our code.</p>
 <p>However, because these are simple, pure functions, you know they will always
 return the same value given the same input argument, the same line of text in
@@ -167,8 +167,8 @@ class="code">@line</span> variable. In fact, they can return different values
 even though they take no arguments at all.</p>
 <p>But I believe these are technicalities. You haven’t lost the benefits of
 functional programming with this refactoring. While the methods of <span
-class="code">Line</span> depend on external state (<span
-class="code">@line</span> and <span class="code">@values</span>), that state
+  class="code">Line</span> depend on external state (<span
+  class="code">@line</span> and <span class="code">@values</span>), that state
 isn’t located very far away. It’s still easy to predict, understand and test
 what these small functions do. Also, while <span class="code">@line</span> is
 technically a mutable string that you change in your program, in practice it
@@ -201,14 +201,14 @@ and finally process each object using your parse functions.</p>
 languages such as Haskell and Clojure. What’s interesting here is how Ruby
 objects are the perfect target for these operations. You’ve used a Ruby class
 to implement a functional programming pattern.</p>
-<p><br/>
 <br/>
-<b>Update:</b> <a href="https://twitter.com/orend">Oren Dobzinski</a> suggested adding a
+<br/>
+<b>Update:</b> [Oren Dobzinski](https://twitter.com/orend) suggested adding a
 <span class="code">to_s</span> method to <span class="code">Line</span>, which
 would allow us to push the object pipeline idea even further. Thanks Oren! See
-Dave Thomas's article <a href="http://pragdave.me/blog/2014/02/11/telling-asking-and-the-power-of-jargon/">Telling, Asking, and the Power of
-Jargon</a>
-for more background on &quot;Tell, Don't Ask.&quot;</p>
+Dave Thomas's article [Telling, Asking, and the Power of
+Jargon](http://pragdave.me/blog/2014/02/11/telling-asking-and-the-power-of-jargon/)
+for more background on "Tell, Don't Ask."
 <p><img src="http://patshaughnessy.net/assets/2014/4/8/parse5.png"><br/></p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2014/4/8/using-a-ruby-class-to-write-functional-code'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Using a Ruby Class To Write Functional Code';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;

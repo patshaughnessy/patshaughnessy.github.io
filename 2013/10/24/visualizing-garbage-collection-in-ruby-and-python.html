@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Visualizing Garbage Collection in Ruby and Python - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Visualizing Garbage Collection in Ruby and Python</h1><div class="metadata"><span class="date">October 24th 2013</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Visualizing Garbage Collection in Ruby and Python">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p><b></p>
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Visualizing Garbage Collection in Ruby and Python - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Visualizing Garbage Collection in Ruby and Python</h1><div class="metadata"><span class="date">October 24th 2013</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Visualizing Garbage Collection in Ruby and Python">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><b>
   <p>
   Note: This post is based on a presentation I just did at <a href="http://13.rupy.eu">RuPy</a> in Budapest.
   Instead of just posting my slides I thought it would be more useful if I wrote
@@ -8,7 +8,7 @@ presentation</a>. FYI I’m planning to
 do a <a href="https://www.youtube.com/watch?v=yl_zYzPiDto">similar presentation
 at RubyConf</a>, except I’ll remove the Python info, and instead compare how GC
 works inside of MRI vs.  JRuby and Rubinius.</p>
-  <p> For a more detailed explanation of GC in Ruby and of Ruby internals
+<p> For a more detailed explanation of GC in Ruby and of Ruby internals
   generally, see my upcoming book, <a href="http://nostarch.com/rum">Ruby Under
   a Microscope</a>, due out very soon from No Starch Press.</p> </b>
 <div style="float: left; padding: 7px 30px 10px 0px; text-align: center; margin-top: 20px">
@@ -197,7 +197,7 @@ known as the <em>free bitmap</em> to keep track of which objects are marked or n
 <p>Ruby saves the free bitmap in a separate memory location in order to take full
 advantage of Unix copy-on-write optimization. For more information on this, see
 my article <a
-href="http://patshaughnessy.net/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why
+  href="http://patshaughnessy.net/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why
 You Should Be Excited About Garbage Collection in Ruby 2.0.</a></p>
 <p>If the marked objects are live, the remaining, unmarked objects must be garbage,
 meaning they are no longer being used by our code. I’ll show the garbage objects

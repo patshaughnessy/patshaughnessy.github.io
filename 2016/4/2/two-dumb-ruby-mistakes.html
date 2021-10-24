@@ -1,7 +1,7 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Two Dumb Ruby Mistakes - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Two Dumb Ruby Mistakes</h1><div class="metadata"><span class="date">April 2nd 2016</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2016/4/2/two-dumb-ruby-mistakes" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Two Dumb Ruby Mistakes">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 0px 0px 20px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2016/4/2/rope-climber.jpg"><br/>
   <i>Coding is like climbing: You need equipment<br/> that will catch you when you make a mistake.<br/>
-    <small>(source: <a href="https://commons.wikimedia.org/wiki/File:Free_climbing_20060701.jpg">Elke Wetzig via Wikimedia Commons</a>)</small></i>
+	<small>(source: <a href="https://commons.wikimedia.org/wiki/File:Free_climbing_20060701.jpg">Elke Wetzig via Wikimedia Commons</a>)</small></i>
 </div>
 <p>Most Ruby blog posts show you examples of code you should write: how to solve a
 certain problem, how to use some library or gem, how Ruby itself works. But
@@ -33,7 +33,7 @@ insult count:</p>
 
 <p>A couple of weeks ago (using different data of course) I wrote this line of
 code to search for a specific element in the array:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/4/2/mistake1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2016/4/2/mistake1.png"/>
 <div style="clear: both"></div>
 <p>What I wanted was the first person in the array named “Marco.” Instead when I
 ran the code what I got was the first element of the array, but with the first
@@ -45,7 +45,7 @@ name set to “Marco:”</p>
 </span></pre>
 
 <p>Of course, I should have known better. The proper line of code is:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/4/2/correct1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2016/4/2/correct1.png"/>
 <p>I should have used <span class="code">==</span> instead of <span
 class="code">=</span>. What a dumb mistake. I can’t believe I wrote this code;
 how embarrassing! I’m sure you all saw the problem right away, and maybe a few
@@ -54,14 +54,14 @@ when I ran the incorrect code, just to be sure we thoroughly understand the
 problem.</p>
 <p>Ruby started with the <span class="code">candidates</span> array, and called
 the <span class="code">find</span> method on it:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/4/2/array1.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2016/4/2/array1.svg"/>
 <p>The <span class="code">find</span> method is actually a member of the <span
 class="code">Enumerable</span> module, which Ruby includes automatically into
 the <span class="code">Array</span> class. When <span class="code">find</span>
 ran, it iterated over the elements of the array and called the block I
 provided, passing in each element. The first element was the “Ted Cruz” person
 object:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/4/2/call-block1.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2016/4/2/call-block1.svg"/>
 <p>Now the block executed. And my dumb mistake came into play. What I intended was
 for the block to return whether or not the first name of the given person was
 equal to “Marco.” If the first name was “Marco” then <span
@@ -73,7 +73,7 @@ class="code">false</span>.</p>
 <p>But my block didn’t check whether the person is named “Marco;” instead, it
 called the <span class="code">Person#first_name=</span> method, setting the
 person’s name to “Marco!”</p>
-<p><img src="http://patshaughnessy.net/assets/2016/4/2/set-first-name.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2016/4/2/set-first-name.svg"/>
 <p>And now, to make matters worse, the block returned the value returned by
 <span class="code">Person#first_name=</span>, which was the string “Marco,” the new value of the first
 name attribute. Because Ruby considered “Marco” to be <em>truthy</em>, <span class="code">Enumerable#find</span>
@@ -84,7 +84,7 @@ Cruz, renamed to Marco Cruz. What a mess.</p>
 <div style="float: right; padding: 0px 0px 20px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2016/4/2/bouldering.jpg"><br/>
   <i> As a developer, you’re always just one<br/> keystroke away from falling off a cliff.  <br/>
-    <small>(source: <a href="https://commons.wikimedia.org/wiki/File:Bouldering.jpg">DecafGrub47393 via Wikimedia Commons</a>)</small></i>
+	<small>(source: <a href="https://commons.wikimedia.org/wiki/File:Bouldering.jpg">DecafGrub47393 via Wikimedia Commons</a>)</small></i>
 </div>
 <p>Think about this for a moment: I used the <span class="code">find</span>
 method, which called a block and expected that block to return <span
@@ -129,7 +129,7 @@ using different data, of course, but we can translate the problem to our
 candidate data set easily.</p>
 <p>Suppose I wanted to find the candidate with the maximum number of insults.
 Easy, right? Here’s the line of code I wrote:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/4/2/mistake2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2016/4/2/mistake2.png"/>
 <p>Can you spot the problem here? When I run that code I don’t get Donald Trump, who has the most insults. Instead, I get:</p>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">
@@ -140,7 +140,7 @@ Easy, right? Here’s the line of code I wrote:</p>
 <p>Again a simple, dumb mistake. I should have called <span
 class="code">max_by</span>, instead of <span class="code">max</span>. Here’s
 the correct code:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/4/2/correct2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2016/4/2/correct2.png"/>
 <p><span class="code">Enumerable#max_by</span> does what I thought <span
 class="code">Enumerable#max</span> would do: It sorts the values returned by
 the block, and then returns the object corresponding to the maximum value.
@@ -157,11 +157,11 @@ class="code">Enumerable#max</span> did, just as we did before with <span
 class="code">Enumerable#find</span>.</p>
 <p>Again Ruby started by calling <span class="code">Enumerable#max</span> on the
 candidates array:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/4/2/array2.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2016/4/2/array2.svg"/>
 <p>And again, just like </span>find</span>, <span class="code">max</span> iterates
 over the array elements. However, instead of passing each person to the block
 one at a time, it actually passes the array elements in pairs:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/4/2/call-block2.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2016/4/2/call-block2.svg"/>
 <p>Why did Ruby pass two <span class="code">Person</span> objects to my block?
 <span class="code">Enumerable#max</span> searches for the array element - not
 the return value of a block - which has the maximum value. It assumes that the
@@ -259,7 +259,7 @@ return values.</p>
 <div style="float: right; padding: 70px 0px 30px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2016/4/2/carabiner.jpg"><br/>
   <i>Your coding equipment should catch you<br/>when you make a mistake and fall.</i><br/>
-    <small>(source: <a
+	<small>(source: <a
 href="https://commons.wikimedia.org/wiki/File:Carabiner.jpg">Marcin Jahr via
 Wikimedia Commons</a>)</small></i> </div>
 <p>Once again, Ruby erred on the side of convenience, and assumed I knew what I

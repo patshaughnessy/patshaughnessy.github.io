@@ -132,7 +132,7 @@ Fetching source index from http://rubygems.org/
 Using rake (0.8.7) from system gems 
 Using abstract (1.0.0) from bundler gems 
 <p>etc…</p>
-<p>Installing paperclip (2.3.1.1) from rubygems repository at http://rubygems.org/</p>
+<p>Installing paperclip (2.3.1.1) from rubygems repository at http://rubygems.org/ </p>
 <p>etc…</pre></div></p>
 </div><br>
 <p>Bundler indicated that it found the official version of Paperclip on rubygems.org, downloaded and installed it. It also told us we have version 2.3.1.1. Let&rsquo;s use the bundle show command and take a look at where Paperclip was installed to:</p>
@@ -145,10 +145,10 @@ Using abstract (1.0.0) from bundler gems
    <div class="code"><pre>$ rails generate paperclip user avatar
 DEPRECATION WARNING: RAILS_ROOT is deprecated! Use Rails.root instead. (called from expand_path at /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/paperclip-2.3.1.1/lib/paperclip.rb:39)
 /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/paperclip-2.3.1.1/lib/paperclip.rb:39:in `expand_path': can't convert #<Class:0x16a87d0> into String (TypeError)
-    from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/paperclip-2.3.1.1/lib/paperclip.rb:39
-    from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/bundler-0.9.25/lib/bundler/runtime.rb:46:in `require'
-    from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/bundler-0.9.25/lib/bundler/runtime.rb:46:in `require'
-    from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/bundler-0.9.25/lib/bundler/runtime.rb:41:in `each'</pre></div>
+	from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/paperclip-2.3.1.1/lib/paperclip.rb:39
+	from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/bundler-0.9.25/lib/bundler/runtime.rb:46:in `require'
+	from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/bundler-0.9.25/lib/bundler/runtime.rb:46:in `require'
+	from /Users/pat/.rvm/gems/ruby-1.8.7-p249/gems/bundler-0.9.25/lib/bundler/runtime.rb:41:in `each'</pre></div>
     </div><br>
 <p>Still broken! It looks like I&rsquo;m just not running code that was intended to be used with Rails 3.</p>
 <p><a name="fact5"></a><b>Fact 5: You can install a gem from a specific git repository branch</b></p>
@@ -172,8 +172,8 @@ Using rake (0.8.7) from system gems
 Using abstract (1.0.0) from bundler gems 
 <p>…etc…</p>
 <p>Using paperclip (2.3.2.beta1)
-from git://github.com/thoughtbot/paperclip.git (at rails3)</p>
-</pre></div>
+from git://github.com/thoughtbot/paperclip.git (at rails3)
+</pre></div></p>
 </div><br>
 <p>Hmm&hellip; interesting. Bundler is showing that it&rsquo;s downloaded Paperclip from the github repository, and that it got the code at the head of the rails3 branch. Another interesting detail here is that I apparently now have version &ldquo;2.3.2 beta1&rdquo; of Paperclip. This is a good sign, since I have a more recent version than 2.3.1.1 (the rubygems.org version) and also it seems that Thoughtbot is actively working on it since it&rsquo;s labeled &ldquo;beta1.&rdquo;</p>
 <p>If we run bundle show again, we can see that Bundler has saved a special copy of Paperclip downloaded from github, along with the git commit id and branch of the version I have:</p>

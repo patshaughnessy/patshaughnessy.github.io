@@ -11,7 +11,7 @@
 <p>In this chapter I’m going to answer these questions by exploring how Ruby works internally. Looking at exactly how Ruby implements objects, classes and modules can give you some insight into how they were intended to be used, and into how to write object oriented programs using Ruby.</p>
 <h2>What’s inside a Ruby object?</h2>
 <p>Ruby saves all of your custom objects inside a C memory structure called <span class="code">RObject</span>, which looks like this in Ruby 1.9 and 2.0:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/7/26/ruby-object.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/7/26/ruby-object.png"/>
 <p>On the left is a pointer to the <span class="code">RObject</span> structure. Internally Ruby always refers to any value using these <span class="code">VALUE</span> pointers. On the right you can see the <span class="code">RObject</span> value is divided into two halves: <span class="code">RBasic</span> and <span class="code">RObject</span>. The <span class="code">RBasic</span> section contains information that all values use, not only objects: a set of boolean values called <span class="code">flags</span> which store a variety of internal, technical values and also a class pointer, called <span class="code">klass</span>. The class pointer indicates which class this object is an instance of. At the bottom in the <span class="code">RObject</span> specific portion Ruby saves an array of instance variables that this object instance contains using two values: <span class="code">numiv</span>, the instance variable count, and <span class="code">ivptr</span>, a pointer to an array of values.</p>
 <div style="float: right; padding: 0px 0px 0px 30px">
   <table cellpadding="0" cellspacing="0" border="0">
@@ -56,18 +56,18 @@
  => #&lt;Mathematician:0x007fabdb850690 @first_name="Euclid">
 </pre>
 <p>Now let’s take a look at Ruby’s C memory structures in a bit more detail - when you run this simple script, Ruby will create one <span class="code">RClass</span> structure and two <span class="code">RObject</span> structures:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/7/26/script-and-objects.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/7/26/script-and-objects.png"/>
 <p>I’ll cover how Ruby implements classes with the <span class="code">RClass</span> structure in the next section, but here is how Ruby saves the the mathematician information in the two <span class="code">RObject</span> structures in more detail:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/7/26/more-detail.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/7/26/more-detail.png"/>
 <p>You can see each of the <span class="code">klass</span> values point to the <span class="code">Mathematician</span> <span class="code">RClass</span> structure, and each <span class="code">RObject</span> structure has a separate array of instance variables. Both arrays contain <span class="code">VALUE</span> pointers, the same pointer that Ruby uses to refer to the <span class="code">RObject</span> structure. One of the objects contains two instance variables, while the other contains only one.</p>
 <p>This is how Ruby saves custom classes, like my <span class="code">Mathematician</span> class, in <span class="code">RObject</span> structures. But we all know that every Ruby value, including basic data types such as integers, strings or symbols, are also objects. The Ruby source code internally refers to these built in types as “generic” types. How does Ruby store these generic objects? Do they also use the <span class="code">RObject</span> structure? The answer is no: internally Ruby uses a different C memory structure to save values for each of its generic data types, and not <span class="code">RObject</span>. For example, Ruby saves string values in <span class="code">RString</span> structures, arrays in <span class="code">RArray</span> structures and regular expressions in <span class="code">RRegexp</span> structures, etc. Ruby only uses <span class="code">RObject</span> to save instances of custom object classes that you create, and for a few custom object classes Ruby creates internally as well.</p>
 <p>However, all of these different structures share the same <span class="code">RBasic</span> information that we saw in <span class="code">RObject</span>:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/7/26/three-structs.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/7/26/three-structs.png"/>
 <p>Since the <span class="code">RBasic</span> structure contains the class pointer, each of these generic data types is also an object - they are all instances of some Ruby class, indicated by the class pointer saved inside of <span class="code">RBasic</span>.</p>
 <p>As a performance optimization, Ruby saves small integers, symbols and a few other simple values without any structure at all. Ruby saves these values right inside the <span class="code">VALUE</span> pointer:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/7/26/value-pointer.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/7/26/value-pointer.png"/>
 <p>That is, these <span class="code">VALUE</span>s are not pointers at all; instead they are the values themselves. For these simple data types, there is no class pointer. Instead Ruby remembers the class using a series of bit flags saved in the first few bits of the <span class="code">VALUE</span>. For example, all integers have the <span class="code">FIXNUM_FLAG</span> bit set, like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/7/26/value-pointer-with-flag.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/7/26/value-pointer-with-flag.png"/>
 <p>Whenever the <span class="code">FIXNUM_FLAG</span> is set, Ruby knows this <span class="code">VALUE</span> is really a small integer, an instance of the <span class="code">Fixnum</span> class, and not a pointer to a value structure. There is also a similar bit flag to indicate if the <span class="code">VALUE</span> is a symbol, and values such as <span class="code">nil</span>, <span class="code">true</span> and <span class="code">false</span> also have special values.</p>
 <p>It’s easy to see that integers, strings and other generic values are all objects using IRB:</p>
 <pre type="console">
@@ -103,7 +103,7 @@ $ irb
 </pre>
 <p>You can repeat the same exercise using symbols, arrays, or any Ruby value whatsoever. Every Ruby value is an object, and every object contains a class pointer and an array of instance variables.</p>
 <p>Internally, Ruby uses a bit of a hack to save instance variables for generic objects - that is, for objects that don’t use an <span class="code">RObject</span> structure. When you save an instance variable in a generic object, Ruby saves it in a special hash called the <span class="code">generic_iv_table</span>. This hash maintains a map between generic objects and pointers to other hashes that contain each object’s instance variables. For my <span class="code">str</span> string example above, this would look like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/7/26/generic-iv-table.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/7/26/generic-iv-table.png"/>
 <h2>Experiment 3-1: How long does it take to save a new instance variable?</h2>
 <p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
 <h2>Deducing what’s inside the RClass structure</h2>

@@ -31,16 +31,16 @@ faint: the Postgres sequence scan algorithm was mindlessly looping over all of
 the records in the users table! Recall in <a href="http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals">my last
 post</a>
 we had executed this simple SQL statement to find Captain Nemo:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/select-users.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/select-users.png"/>
 <p>Postgres first parsed, analyzed and planned the query. Then
 <a href="http://doxygen.postgresql.org/nodeSeqscan_8c.html#af80d84501ff7621d2ef6249b148e7f44">ExecSeqScan</a>,
 the C function inside of Postgres that implements the sequence scan (SEQSCAN)
 plan node, quickly found Captain Nemo:</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/>
 <p>But then inexplicably Postgres continued to loop through the entire user table,
 comparing each name to “Captain Nemo,” even though we had already found what we
 were looking for!</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/>
 <p>Imagine if our users table had millions of records; this could take a very long
 time. Of course, we could have avoided this by removing the sort and rewriting
 our query to accept the first name, but the deeper problem here is the
@@ -51,12 +51,12 @@ are we doing wrong? There must be a better way!</p>
 <p>The answer is simple: We forgot to create an Index. Let’s do that now.</p>
 <h2>Creating an Index</h2>
 <p>Creating an index is straightforward - we just need to run this command:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/create-index.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/create-index.png"/>
 <p>As Ruby developers, of course, we would use the <span class="code">add_index</span> ActiveRecord
 migration instead; this would run the same <span class="code">CREATE INDEX</span> command behind the
 scenes. When we rerun our select statement, Postgres will create a plan tree as usual -
 but this time the plan tree will be slightly different:</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/11/11/indexscan-plan.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/11/11/indexscan-plan.png"/>
 <p>Notice at the bottom Postgres now uses INDEXSCAN instead of SEQSCAN. Unlike
 SEQSCAN, INDEXSCAN won’t iterate over the entire users table. Instead, it will
 use the index we just created to find and return the Captain Nemo records
@@ -72,12 +72,12 @@ quickly and efficiently.</p>
 <p>We can get started with a look at the
 <a href="http://www.postgresql.org/docs/9.3/static/sql-createindex.html">documentation</a>
 for the CREATE INDEX command.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/documentation.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/documentation.png"/>
 <p>Here you can see all of the options we can use to create an index, such as
 <span class="code">UNIQUE</span> and <span class="code">CONCURRENTLY</span>. Notice there’s an option called <span class="code">USING method</span>. This
 tells Postgres what kind of index we want. Farther down the same page is some
 information about <span class="code">method</span>, the argument to the <span class="code">USING</span> keyword:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/method.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/method.png"/>
 <p>It turns out Postgres implements four different types of indexes. You can use
 them for different types of data and in different situations. Because we didn’t
 specify <span class="code">USING</span> at all, our <span
@@ -86,10 +86,10 @@ the default type.</p>
 <p>This is our first clue: a Postgres index is a B-Tree. But what is a B-Tree?
 Where can we find one? Inside of Postgres, of course! Let’s search the Postgres
 C source code for files containing “btree:”</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/find.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/find.png"/>
 <p>The key result is in bold: “./backend/access/nbtree.” Inside this directory is
 a README file; let’s read it:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/readme.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/readme.png"/>
 <div style="float: right; padding: 7px 0px 70px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/11/11/atlantis.png"><br/>
   <i>Nemo found the lost continent of Atlantis<br/>next to an underwater
@@ -113,11 +113,11 @@ Concurrent Operations on B-Trees</a>, by Lehman and Yao.</p>
 in 1981. I’ll discuss this a bit later. But they start with a simple
 introduction to the B-Tree data structure, which was actually invented 9 years
 earlier in 1972. One of their diagrams shows an example of a simple B-Tree:</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/11/11/figure2.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/11/11/figure2.png"/>
 <p>The term B-Tree actually stands for “balanced tree.” B-Trees make searching
 easy and fast. For example, if we wanted to search for the value 53 in this
 example, we first start at the root node which contains the value 40:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/node1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/node1.png"/>
 <p>We compare our target value of 53 with the value we find in the tree node. Is
 53 greater than or less than 40? Because 53 is greater than 40 we follow the
 pointer down to the right. If we were searching for 29, we would go down to the
@@ -125,16 +125,16 @@ left. Pointers on the right lead to larger values; pointers on the left to
 smaller ones.</p>
 <p>Following the pointer down the tree to the next child tree node, we encounter a
 node that contains 2 values:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/node2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/node2.png"/>
 <p>This time we compare 53 with both 47 and 62, and find that 47 &lt; 53 &lt; 62. Note
 the values in the tree node are sorted, so this will be easy to do. This time
 we follow the center pointer down.</p>
 <p>Now we get to another tree node, this one with 3 values in it:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/node3.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/node3.png"/>
 <p>Looking through the sorted list of numbers, we find 51 &lt; 53 &lt; 56, and follow
 the second of four pointers down.</p>
 <p>Finally, we come to a leaf node in the tree:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/node4.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/node4.png"/>
 <p>And we’ve found the value 53!</p>
 <p>B-Trees speed up searches because:</p>
 <ul>
@@ -153,14 +153,14 @@ from 1981!</p>
 <p>When we executed the <span class="code">CREATE INDEX</span> command, Postgres
 saved all of the names from our users table into a B-Tree. These became the
 keys of the tree. Here’s what a node inside a Postgres B-Tree index looks like:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data1.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data1.svg"/>
 <p>Each entry in the index consists of a C structure called <span class="code">IndexTupleData</span>, and is
 followed by a bitmap and a value. Postgres uses the bitmap to record whether
 any of the index attributes in a key are NULL, to save space. The actual values
 in the index appear after the bitmap.</p>
 <p>Let’s take a closer look at the <span class="code">IndexTupleData</span>
 structures:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data2.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data2.svg"/>
 <p>Above you can see each IndexTupleData structure contains:</p>
 <ul>
 <li><span class="code">t_tid</span>: This is a pointer to either another index
@@ -173,7 +173,7 @@ values.</li>
 </ul>
 <p>To understand this better, let’s show a few entries from our <span
 class="code">index_users_on_name</span> index:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data3.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/index-tuple-data3.svg"/>
 <p>Now I’ve replaced “value” with some names from my users table. The upper tree
 node includes the keys “Dr. Edna Kunde” and “Julius Powlowski,” while the lower
 tree node contains “Julius Powlowski” and “Juston Quitzon.” Notice that, unlike
@@ -197,13 +197,13 @@ refer to the itup.h C header file:</p>
 </p>
 <h2>Finding the B-Tree Node Containing Captain Nemo</h2>
 <p>Now let’s return to our original SELECT statement again:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/select-users.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/select-users.png"/>
 <p>How exactly does Postgres search our <span
 class="code">index_users_on_name</span> index for “Captain Nemo?” Why is
 using the index faster than the sequence scan we saw in my last post? To find
 out, let’s zoom out a bit and take a look at some of the user names in our
 index:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/root-names1.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/root-names1.svg"/>
 <p>This is the root node of the <span class="code">index_users_on_name</span>
 B-Tree. I’ve turned the tree on its side so the names would fit. You can see 4
 names and a NULL value. Postgres created this root node when I created
@@ -220,7 +220,7 @@ are more or less evenly distributed in alphabetical order.</p>
 <p>Because we’re searching for Captain Nemo, Postgres follows the first, top arrow
 to the right. This is because Captain Nemo comes before Dr. Edna Kunde
 alphabetically:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/root-names2.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/root-names2.svg"/>
 <p>You can see on the right that Postgres has found the B-Tree node that contains
 Captain Nemo. For my test I added 1000 names to the users table; this child
 node in the B-Tree contained about 200 names (240 actually). The B-Tree has
@@ -244,18 +244,18 @@ class="code">_bt_search</span> function.</p>
 <p>Now that Postgres has narrowed down the search to a B-Tree node containing
 about 200 names, it still has to find Captain Nemo… how does it do this? Does
 it perform a sequence scan on this shorter list?</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/binary-search1.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/binary-search1.svg"/>
 <p>No. To search for a key value inside of a tree node, Postgres switches to use a
 binary search algorithm. It starts by comparing the key that appears at the 50%
 position in the tree node with “Captain Nemo:”</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/binary-search2.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/binary-search2.svg"/>
 <p>Because Captain Nemo comes after Breana Witting alphabetically, Postgres
 jumps down to the 75% position and performs another comparison:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/binary-search3.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/binary-search3.svg"/>
 <p>This time Captain Nemo comes before Curtis Wolf, so Postgres jumps back a bit.
 Skipping a few more steps (it actually took Postgres 8 comparisons to find
 Captain Nemo in my example), Postgres eventually finds what we are looking for:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/binary-search4.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/binary-search4.svg"/>
 <p>To learn more about exactly how Postgres searches for a value in a single
 B-Tree node, read the <span class="code">_bt_binsrch</span> function:</p>
 <p>
@@ -305,7 +305,7 @@ tree even while a second thread is splitting a node without locking the
 entire index:</p>
 </li>
 </ul>
-<p><img src="http://patshaughnessy.net/assets/2014/11/11/right-arrow.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/11/11/right-arrow.png"/>
 <h2>Don’t Be Afraid To Explore Beneath The Surface</h2>
 <div style="float: right; padding: 22px 0px 70px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/11/11/at-the-helm.png"><br/>

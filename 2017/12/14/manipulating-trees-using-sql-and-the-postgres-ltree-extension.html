@@ -15,7 +15,7 @@ I’ll look at how LTREE works under the hood, at the Computer Science that make
 all of this possible.</p>
 <h2>My Example Tree Again</h2>
 <p>Here’s the tree I’ve been working with during the last few blog posts:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png"></p>
+<img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png">
 <p><a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">In my last
 post</a>,
 I saved this tree in my database using a series of insert statements:</p>
@@ -36,7 +36,7 @@ select count(*) from tree where 'A.C' @> path;
 <h2>Cutting Off a Branch</h2>
 <p>But suppose I wanted to remove these nodes from the tree entirely; that is,
 suppose I wanted to “cut off this branch” of the tree, so to speak:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/14/cut-branch.png"/></p>
+<img src="http://patshaughnessy.net/assets/2017/12/14/cut-branch.png"/>
 <p>How can I do this? Simple! I just use a SQL delete statement:</p>
 <pre>
 delete from tree where 'A.C' @> path;
@@ -48,7 +48,7 @@ statements as in select statements.</p>
 table. That is, I want two trees: the original <span class="code">A</span> tree
 and a new tree consisting of the <span class="code">C</span> branch “replanted”
 as a new root:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/></p>
+<img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
 <p>Thinking about this for a moment, moving some nodes from one location to
 another in my tree means I’ll need to update their path values somehow in my
 table. That is, I’ll need to use an update statement and not a select or delete
@@ -149,7 +149,7 @@ made the SQL language I already know how to use even more powerful.</p>
 <p>Now let’s return to the question of moving a branch into a new tree. As this
 diagram shows, I want to delete <span class="code">C</span> and its children
 from the <span class="code">A</span> tree, and move them to a new location:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/></p>
+<img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
 <p>Earlier I considered moving the nodes using a single update statement for each:</p>
 <pre>
 update tree set path = 'C' where path = 'A.C';
@@ -187,7 +187,7 @@ the branch we want to replant isn’t already a root.</p>
 location in my tree to some other location, not necessary to the root? This is
 a more general problem. For example, suppose I want to move the <span
 class="code">C</span> branch under <span class="code">G</span>, like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/14/moving.png"/></p>
+<img src="http://patshaughnessy.net/assets/2017/12/14/moving.png"/>
 <p>To write a formula for this transformation using SQL, we need to use one more
 important LTREE operator: the <span class="code">||</span> or concatenation
 operator. Let’s try it out with an example first:</p>

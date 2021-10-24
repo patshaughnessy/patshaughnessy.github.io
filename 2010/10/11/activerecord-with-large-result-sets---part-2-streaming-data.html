@@ -101,7 +101,7 @@ User Load (22.0ms)  SELECT &quot;users&quot;.* FROM &quot;users&quot; WHERE (&qu
 User Load (21.7ms)  SELECT &quot;users&quot;.* FROM &quot;users&quot; WHERE (&quot;users&quot;.&quot;id&quot; &gt; 24632) ORDER BY users.id ASC LIMIT 1000
 User Load (0.2ms)  SELECT &quot;users&quot;.* FROM &quot;users&quot; WHERE (&quot;users&quot;.&quot;id&quot; &gt; 25632) ORDER BY users.id ASC LIMIT 1000
 <p>etc...</p>
-</pre></div>
+<p></pre></div></p>
 </div><br></p>
 <p>Here the last record loaded by the first SQL query had an id of 16632, and find_each added 1000 to that id value each time to obtain the next 1000 users.</p>
 <h2>Streaming data on your machine with Rails 3 and Mongrel</h2>
@@ -144,8 +144,8 @@ ruby-1.8.7-p302 ?>  end
   format.xml  { render &lt;span class=&quot;sy&quot;&gt;:xml&lt;/span&gt; =&amp;gt; &lt;span class=&quot;iv&quot;&gt;@users&lt;/span&gt; }
 &lt;span class=&quot;r&quot;&gt;end&lt;/span&gt;
 </code></pre>
-<p><span class="r">end</span></p>
-</pre></div>
+<p><span class="r">end</span>
+</pre></div></p>
 </div><br></p>
 <p>As I explained above, this will load all of the user records into memory at one time. By using a <a href="http://patshaughnessy.net/2010/9/28/ruby187gc-patch">GC patched version of the Ruby interpreter</a>, we can see how much memory this will take:</p>
 <div class="CodeRay">
@@ -207,8 +207,8 @@ etc...</pre></div>
 <div class='container'>gem <span class="s"><span class="dl">'</span><span class="k">mongrel</span><span class="dl">'</span></span><span class='overlay'></span></div>
 <span class="c"># Bundle edge Rails instead:</span>
 <p><span class="c"># gem 'rails', :git =&gt; 'git://github.com/rails/rails.git'</span></p>
-<p>gem <span class="s"><span class="dl">'</span><span class="k">sqlite3-ruby</span><span class="dl">'</span></span>, <span class="sy">:require</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">sqlite3</span><span class="dl">'</span></span></p>
-</pre></div>
+<p>gem <span class="s"><span class="dl">'</span><span class="k">sqlite3-ruby</span><span class="dl">'</span></span>, <span class="sy">:require</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">sqlite3</span><span class="dl">'</span></span>
+</pre></div></p>
 </div><br></p>
 <p>And then use bundler to install it if necessary:
 <div class="CodeRay">

@@ -112,8 +112,8 @@ etc...
 <span class="ta">&lt;tr&gt;</span>
 <span class="ta">&lt;th&gt;</span>Amount<span class="ta">&lt;/th&gt;</span>
 <span class="ta">&lt;th&gt;</span>Transaction<span class="ta">&lt;/th&gt;</span></p>
-<p>etc...</p>
-</pre></div>
+<p>etc...
+</pre></div></p>
 </div><br/>
 <p>Aside from the important accessKey and the amazonPaymentsAccountId values, you might have noticed there&rsquo;s another value called &ldquo;signature,&rdquo; along with &ldquo;signatureVersion&rdquo; and &ldquo;signatureMethod.&rdquo; As I mentioned above, the signature is actually an encrypted hash of all of the other form values. When users submit the form, Amazon will check that all of the form parameters are valid by comparing them against the signature value. The problem is that for Amazon &ldquo;valid&rdquo; means equal to what you entered on the Amazon create button form earlier - not what is actually valid for your site or business rules.</p>
 <p>To make the Amazon Simple Pay form work with different payment amounts and with different return URLs (e.g. &ldquo;localhost:3000&rdquo; vs. your production hostname) we can&rsquo;t use this signature security scheme... at least not for now. Later in a future blog post I&rsquo;ll show a way to dynamically generate the signature value each time the payment form is submitted.</p>
@@ -140,8 +140,8 @@ etc...
 <span class="ta">&lt;tr&gt;</span>
 <span class="ta">&lt;th&gt;</span>Amount<span class="ta">&lt;/th&gt;</span>
 <span class="ta">&lt;th&gt;</span>Transaction<span class="ta">&lt;/th&gt;</span></p>
-<p>etc...</p>
-</pre></div>
+<p>etc...
+</pre></div></p>
 </div>
 <br/>
 <p>Next let&rsquo;s add a new route for confirming payments; edit config/routes.rb:</p>
@@ -150,7 +150,7 @@ etc...
 <p>resources <span class="sy">:payments</span>
 <span class="container">match <span class="s"><span class="dl">'</span><span class="k">confirm_payment</span><span class="dl">'</span></span> =&gt; <span class="s"><span class="dl">'</span><span class="k">payments#confirm</span><span class="dl">'</span></span><span class='overlay'></span></span></p>
 <p>etc...</pre></div></p>
-  </div><br>
+</div><br>
 <p>And now let&rsquo;s write a new action in the payments controller for this; edit app/controllers/payments_controller.rb:</p>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">

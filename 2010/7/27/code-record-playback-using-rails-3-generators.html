@@ -62,8 +62,8 @@ etc...</pre></div>
 <div class="CodeRay">
   <div class="code"><pre><span class="co">FirstApp</span>::<span class="co">Application</span>.routes.draw <span class="r">do</span> |map|
 <p>match <span class="s"><span class="dl">'</span><span class="k">build_info</span><span class="dl">'</span></span> =&gt; <span class="s"><span class="dl">'</span><span class="k">build_info#index</span><span class="dl">'</span></span></p>
-<p>...etc...</p>
-</pre></div>
+<p>...etc...
+</pre></div></p>
 </div><br>
 <p>This is somewhat silly, but it&rsquo;s simple enough to use as an example here. Now if I run my app I&rsquo;ll get this fascinating page:</p>
 <p><img src="http://patshaughnessy.net/assets/2010/7/27/Picture_1.png"/></p>
@@ -162,8 +162,8 @@ index 0000000..c44d83e
 @@ -0,0 +1,5 @@
 +class BuildInfoController &lt; ApplicationController
 +  def index
-<p>...etc...</p>
-</pre></div>
+<p>...etc...
+</pre></div></p>
 </div><br>
 <p>This produces a list of all the text changes that were made from one revision (HEAD~1) to another (HEAD). These are then saved into a file called &ldquo;build_info.patch,&rdquo; saved inside the new generator.</p>
 <p>Later, the text differences, the &ldquo;patch,&rdquo; are applied to whatever new or existing files are found relative to the current directory when you run the generator. This copies the new controller file as well as the new route inside of routes.rb into the other application. The patch file is applied using this command:</p>

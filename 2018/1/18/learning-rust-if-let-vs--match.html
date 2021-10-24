@@ -34,7 +34,7 @@ I’ll take a look at how Rust compiles <span class="code">if let</span> and
 <h2>If Let Compares a Pattern with a Value</h2>
 <p>The idea behind <span class="code">if let</span> is that it compares a pattern
 with a value:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/1/18/pattern-value.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/1/18/pattern-value.png"/>
 <p>In this example <span class="code">if let</span> compares the pattern <span
 class="code">Some(3)</span> with the value <span
 class="code">some_u8_value</span>. If there’s a match, <span class="code">if
@@ -75,7 +75,7 @@ fn main() {
 </pre>
 <p>To write this all I had to do was move things around a bit in my <span
 class="code">if let</span> code snippet from above:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/1/18/if-let-match.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/1/18/if-let-match.png"/>
 <p>Because there was no else clause for the <span class="code">if let</span>
 statement, I used <span class="code">None =&gt; ()</span> in match.</p>
 <p>Saving this code in match.rs and running it I got the same result:</p>

@@ -14,8 +14,8 @@ class is more than sufficient.</p>
 corner of the language. Today I’d like to shed some light on <span class="code">Bignum</span> by looking
 at how Ruby represents integers internally inside the <span class="code">Fixnum</span> and <span class="code">Bignum</span>
 classes. What’s the largest integer that fits inside a <span
-class="code">Fixnum</span>; just how big is a <span
-class="code">Bignum</span>?</p>
+  class="code">Fixnum</span>; just how big is a <span
+  class="code">Bignum</span>?</p>
 <p>Also, it turns out that Ruby 2.1 contains an important new change for the
 <span class="code">Bignum</span> class: support for the <a href="https://gmplib.org">GNU Multiple Precision Arithmetic Library (GMP)</a> library.
 In my next post, I’ll take a look at mathematical theory and history behind
@@ -59,7 +59,7 @@ integers. Here’s how the value -10,000 would be saved inside your Ruby program
 <p><img src="http://patshaughnessy.net/assets/2014/1/9/twos-complement-ruby.png"><br/></p>
 <p>Note the first bit on the left, the sign bit, is set to 1. This indicates this
 is a negative integer. Ruby still sets the lowest bit, <span
-class="code">FIXNUM_FLAG</span>, to 1. The other bits contain the value
+  class="code">FIXNUM_FLAG</span>, to 1. The other bits contain the value
 itself. To calculate a two’s complement value for a negative integer, your
 microprocessor adds one to the absolute value (getting 10,001 in this example)
 and then reverses the zeroes and ones. This is equivalent to subtracting the
@@ -74,7 +74,7 @@ corresponding assembly language instructions by removing and then re-adding
 <span class="code">FIXNUM_FLAG</span> internally as needed. This design only
 works, however, for integer values that are small enough to fit into a single
 64-bit word. We can see what the largest positive <span
-class="code">Fixnum</span> integer must be by setting all 62 of the middle
+  class="code">Fixnum</span> integer must be by setting all 62 of the middle
 bits to one, like this:</p>
 <p><img src="http://patshaughnessy.net/assets/2014/1/9/largest-value.png"><br/></p>
 <p>Here we have a zero on the left (indicating this is a positive integer) and a
@@ -103,7 +103,7 @@ addresses that end in zero, that are <em>aligned</em>. This means the <span clas
 zero, is actually also part of the pointer’s value.)</p>
 <h2>The RBignum Structure</h2>
 <p>Now let’s take a closer look at the <span class="code">RBignum</span> C structure and find out what’s
-inside it. Here’s how Ruby saves the value 4611686018427387904 internally:</p>
+inside it. Here’s how Ruby saves the value 4611686018427387904 internally: </p>
 <p><img src="http://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/></p>
 <p>On the left, you can see <span class="code">RBignum</span> contains an inner structure called <span class="code">RBasic</span>,
 which contains internal, technical values used by all Ruby objects. Below that
@@ -137,7 +137,7 @@ one, Ruby first copies the 62 bits in the target value into a new <span class="c
 value on the left, and the most significant 30 into the second digit value on
 the right (there is space for two leading zeroes in the second digit value).</p>
 <p>Once Ruby has copied 4611686018427387903 into a new <span
-class="code">RBignum</span> structure, it can then use a special algorithm
+  class="code">RBignum</span> structure, it can then use a special algorithm
 implemented in bignum.c to perform an addition operation on the new Bignum. Now
 there is enough room to hold the 63-bit result, 4611686018427387904 (diagram copied from above):</p>
 <p><img src="http://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/></p>
@@ -146,10 +146,10 @@ there is enough room to hold the 63-bit result, 4611686018427387904 (diagram cop
   <li>Ruby saves the sign bit inside the <span class="code">RBasic</span>
   structure, and not in the binary digit values themselves. This saves a bit of
   space, and makes the code inside bignum.c simpler.</li>
-  <li>Ruby also doesn’t need to save the <span class="code">FIXNUM_FLAG</span>
+<li>Ruby also doesn’t need to save the <span class="code">FIXNUM_FLAG</span>
   in the digits, since it already knows this is a <span
     class="code">Bignum</span> value and not a <span class="code">Fixnum</span>.</li>
-  <li>For small <span class="code">Bignum</span>’s, Ruby saves memory and time
+<li>For small <span class="code">Bignum</span>’s, Ruby saves memory and time
 by storing the digits values right inside the <span class="code">RBignum</span> structure itself, using a
 C <i>union</i> trick. I don’t have time to explain that here today, but you can see
 how the same optimization works for strings in my article <a href="http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a>.</li>

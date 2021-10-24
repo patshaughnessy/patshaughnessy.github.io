@@ -147,12 +147,12 @@ Toto GET a tag page
 <div class="CodeRay"> 
   <div class="code"><pre>...etc...
 <p><span class="r">case</span> route.size
-<span class="r">when</span> <span class="i">1</span>..<span class="i">3</span>
+<span class="r">when</span> <span class="i">1</span>..<span class="i">3</span> 
 context[archives(route * <span class="s"><span class="dl">'</span><span class="k">-</span><span class="dl">'</span></span>), <span class="sy">:archives</span>]</p>
 <div class='container'>  <span class="r">when</span> <span class="i">4</span> 
     context[article(route), <span class="sy">:article</span>]<span class='overlay'></span></div>  <span class="r">else</span> http <span class="i">400</span> 
 <span class="r">end</span> 
-<p>...etc...</pre></div></p>
+<p>...etc...</pre></div> </p>
 </div> 
 <p>...returning this value:</p>
 <div class="CodeRay"> 
@@ -254,7 +254,7 @@ Toto GET a tag page
       <span class="co">Article</span>.new article, <span class="iv">@config</span> 
     <span class="r">end</span> : []
 <p><span class="r">return</span> <span class="sy">:archives</span> =&gt; <span class="co">Archives</span>.new(entries, <span class="iv">@config</span>)
-<span class="r">end</span></pre></div></p>
+<span class="r">end</span></pre></div> </p>
 </div> 
 <p>This code is called to generate the index page for a Toto blog (e.g. <a href="http://patshaughnessy.net">http://patshaughnessy.net</a>), and also the year/month archives pages by providing a value for the filter parameter. It returns a single Archives object which contains an array of Article objects.</p>
 <p>And here’s my version:</p>

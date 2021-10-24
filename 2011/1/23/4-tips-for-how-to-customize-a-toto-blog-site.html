@@ -21,16 +21,16 @@ toto</pre></div>
 <div class="CodeRay"><pre><div class='container'>require <span class="s"><span class="dl">'</span><span class="k">bundler</span><span class="dl">'</span></span> 
 <span class="co">Bundler</span>.setup<span class='overlay'></span></div>
 require <span class="s"><span class="dl">'</span><span class="k">toto</span><span class="dl">'</span></span> 
-<p><span class="c"># Rack config</span>
-use <span class="co">Rack</span>::<span class="co">Static</span>, <span class="sy">:urls</span> =&gt; [<span class="s"><span class="dl">'</span><span class="k">/css</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/js</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/images</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/favicon.ico</span><span class="dl">'</span></span>], <span class="sy">:root</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">public</span><span class="dl">'</span></span>
-use <span class="co">Rack</span>::<span class="co">CommonLogger</span></p>
+<p><span class="c"># Rack config</span> 
+use <span class="co">Rack</span>::<span class="co">Static</span>, <span class="sy">:urls</span> =&gt; [<span class="s"><span class="dl">'</span><span class="k">/css</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/js</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/images</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/favicon.ico</span><span class="dl">'</span></span>], <span class="sy">:root</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">public</span><span class="dl">'</span></span> 
+use <span class="co">Rack</span>::<span class="co">CommonLogger</span> </p>
 <p>etc...</pre></div></p>
 <p>And now replace the .gems file</p>
 <div class="CodeRay"><pre>$ rm .gems</pre></div>
 <p>...with a Gemfile:</p>
 <div class="CodeRay"><pre>source <span class="s"><span class="dl">&quot;</span><span class="k">http://rubygems.org</span><span class="dl">&quot;</span></span> 
-<p>gem <span class="s"><span class="dl">&quot;</span><span class="k">builder</span><span class="dl">&quot;</span></span>
-gem <span class="s"><span class="dl">&quot;</span><span class="k">rdiscount</span><span class="dl">&quot;</span></span>
+<p>gem <span class="s"><span class="dl">&quot;</span><span class="k">builder</span><span class="dl">&quot;</span></span> 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">rdiscount</span><span class="dl">&quot;</span></span> 
 gem <span class="s"><span class="dl">&quot;</span><span class="k">toto</span><span class="dl">&quot;</span></span>, <span class="sy">:path</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">../customized_toto</span><span class="dl">'</span></span></pre></div></p>
 <p>Here along with the builder and rdiscount gems, I’ve indicated to bundler that it should use a copy of Toto on my local hard drive in a folder called “customized_toto.” At this point you should fork the Toto repo on GitHub and clone it on your machine into the “customized_toto” folder for example:</p>
 <div class="CodeRay"><pre>$ cd ..
@@ -47,8 +47,8 @@ Using bundler (1.0.0)
 <span class="s">Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.</span></pre></div>
 <p>When you’re ready to push your site to Heroku, you will just replace the “:path =&gt;” location with your github repo URL, using the “:git” option. For example, here’s the Gemfile from this site’s Heroku app:</p>
 <div class="CodeRay"><pre>source <span class="s"><span class="dl">&quot;</span><span class="k">http://rubygems.org</span><span class="dl">&quot;</span></span> 
-<p>gem <span class="s"><span class="dl">&quot;</span><span class="k">builder</span><span class="dl">&quot;</span></span>
-gem <span class="s"><span class="dl">&quot;</span><span class="k">rdiscount</span><span class="dl">&quot;</span></span>
+<p>gem <span class="s"><span class="dl">&quot;</span><span class="k">builder</span><span class="dl">&quot;</span></span> 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">rdiscount</span><span class="dl">&quot;</span></span> 
 gem <span class="s"><span class="dl">&quot;</span><span class="k">toto</span><span class="dl">&quot;</span></span>, <span class="sy">:git</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">https://github.com/patshaughnessy/toto.git</span><span class="dl">'</span></span></pre></div></p>
 <p>Heroku now supports bundler, and will automatically run bundle install on the server after you push your blog site there. Without bundler, using different versions of the Toto gem would be much more of a hassle.</p>
 <h2><a id="tip2"></a>Run with Shotgun</h2>
@@ -66,8 +66,8 @@ $ shotgun</pre></div>
 <p>As Dmitry Fadeyev pointed out in his helpful post <a href="http://fadeyev.net/2010/05/10/getting-started-with-toto/">Getting Started With Toto, a Tiny WordPress Killer</a>, if you’re migrating from a different blog engine the <a href="https://github.com/jtrupiano/rack-rewrite">Rack-Rewrite</a> gem by John Trupiano is a great way to redirect URL patterns from your old site into what Toto expects. You can also use it like me to shorten URLs for some posts. Rack-Rewrite is a helpful piece of rack middleware that applies Apache rewrite rules to HTTP requests coming through the Rack stack. This means it can be used to redirect or change URL patterns before they hit the Toto code, and avoid the need to change Toto at all for this purpose.</p>
 <p>With bundler it’s very easy to add Rack-Rewrite... all you need to do is add a line to your Gemfile like this:</p>
 <div class="CodeRay"><pre>source <span class="s"><span class="dl">&quot;</span><span class="k">http://rubygems.org</span><span class="dl">&quot;</span></span> 
-<p>gem <span class="s"><span class="dl">&quot;</span><span class="k">builder</span><span class="dl">&quot;</span></span>
-gem <span class="s"><span class="dl">&quot;</span><span class="k">rdiscount</span><span class="dl">&quot;</span></span>
+<p>gem <span class="s"><span class="dl">&quot;</span><span class="k">builder</span><span class="dl">&quot;</span></span> 
+gem <span class="s"><span class="dl">&quot;</span><span class="k">rdiscount</span><span class="dl">&quot;</span></span> 
 <span class='container'>gem <span class="s"><span class="dl">&quot;</span><span class="k">rack-rewrite</span><span class="dl">&quot;</span></span><span class='overlay'></span></span>
 gem <span class="s"><span class="dl">&quot;</span><span class="k">toto</span><span class="dl">&quot;</span></span>, <span class="sy">:git</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">https://github.com/yourname/toto.git</span><span class="dl">'</span></span></pre></div></p>
 <p>... and then run bundle install again:</p>
@@ -106,7 +106,7 @@ Toto GET /
 <p>etc...</pre></div></p>
 <p>However, I actually got this exception the first time I started working with the Toto Riot tests:</p>
 <div class="CodeRay"><pre>/test/../lib/toto.rb:174:in `to_xml': ./test/../lib/ext/ext.rb:43:in `utc': time out of range (ArgumentError)
-    from ./test/../lib/ext/ext.rb:43:in `iso8601'
+	from ./test/../lib/ext/ext.rb:43:in `iso8601'
 etc...</pre></div>
 <p>The problem here is that one of the test articles uses a date in the distant past (1900), which Ruby 1.8.7 chokes on... if you run Ruby 1.9 it will work fine. If you want to use Ruby 1.8.7, you just need to change the test article’s date to something more recent like 1990:</p>
 <div class="CodeRay"><pre>$ cd test/articles

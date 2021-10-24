@@ -5,8 +5,8 @@
 </table>
 </div>
 <p>Back in February the <a href="http://seatgeek.com/">SeatGeek</a> team open sourced a gem they call <a href="https://github.com/seatgeek/soulmate">Soulmate</a> that implements autocomplete using a <a href="http://redis.io/">Redis</a> back end. “Soulmate finishes your sentences” as they say on their Github readme page. You can see it in action on <a href="http://seatgeek.com/">SeatGeek.com</a>. Soulmate is very useful: many of us need type ahead search behavior and using Redis is a great way to make it fast and snappy. But more importantly, Soulmate is a great example of how to create an index in Redis ahead of time, allowing for very fast lookups later. Take a few minutes to learn how Soulmate works; chances are you’ll be able to use the same approach in your own app with a completely different data set.</p>
-<p><br/>
-I'll get started today by showing you step by step how to setup a new Rails 3.1 app with Soulmate and Redis, using the jQuery UI autocomplete widget. <a href="http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index">Next week I’ll follow this up with a second article</a> on the details of exactly how Soulmate’s Redis caching algorithm works. But before we start building the sample app, let’s learn something about the Soulmate gem....</p>
+<br/>
+I'll get started today by showing you step by step how to setup a new Rails 3.1 app with Soulmate and Redis, using the jQuery UI autocomplete widget. [Next week I’ll follow this up with a second article](http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index) on the details of exactly how Soulmate’s Redis caching algorithm works. But before we start building the sample app, let’s learn something about the Soulmate gem....
 <h2>How Soulmate was intended to work</h2>
 <p>Here’s a conceptual diagram showing how you would normally use Soulmate:</p>
 <p><img src="http://patshaughnessy.net/assets/2011/11/23/soulmate-as-intended.png" alt="How Soulmate was intended to work" /></p>

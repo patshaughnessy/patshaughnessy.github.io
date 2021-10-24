@@ -28,7 +28,7 @@ C unions, how they work and why they are dangerous. Then I’ll show you how Rus
 enums improve on them.</p>
 <h2>C Unions</h2>
 <p>Unions are one of the most dangerous features of C. Here’s an example:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/union1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/union1.png"/>
 <p>Here the union <span class="code">num_or_str</span> saves either a number or
 a character pointer but not both. (A union can contain any number of members;
 for simplicity my example union has only two.) On the right I show how the C
@@ -44,11 +44,11 @@ and <span class="code">str</span> in this example, are known as <em>variants</em
 variant you set in the union. If you save one type of value but then access the
 other, your program will crash.</p>
 <p>For example this code works fine:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/c-code1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/c-code1.png"/>
 <p>But if you forget <span class="code">a_number</span> contains a number, and use
 <span class="code">a_number</span> as a string instead, your program will
 crash:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/c-code2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/c-code2.png"/>
 <p>Notice the C compiler didn’t help me here at all. It didn’t display any sort of
 warning or error when I wrote <span class="code">a_number.str</span>. It
 silently allowed me to write dangerous code; in fact, union syntax encouraged
@@ -65,7 +65,7 @@ valid using an integer value saved right next to the union in memory. This
 integer is known as a tag, and the combination of the tag and the union is a
 <em>tagged union</em>.</p>
 <p>Here’s an example:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/tagged_union.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/tagged_union.png"/>
 <p>On the right side I’ve allocated some memory right before the union for the tag
 using a struct. C structs, unlike unions, allocate enough memory to store all
 of their members at once. Note: Using two bytes to save a small integer value
@@ -75,12 +75,12 @@ remains the same.</p>
 <p>Now when I save an integer in an instance of the union I can also set the tag
 to the value 1, for example, which I decide will mean that <span
 class="code">a_number</span> contains a number:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/c-code3.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/c-code3.png"/>
 <p>And if I want to save a string instead, I set the tag to 2, for example:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/c-code4.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/c-code4.png"/>
 <p>Later when I access the tagged union, I first check the tag before deciding
 which variant I can access:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/c-code5.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/c-code5.png"/>
 <p>Of course, tagged unions are not foolproof. I invented the tag values 1 and 2
 and wrote the code that checks for them. There’s nothing to prevent me from
 forgetting to save the tag value, saving the wrong tag value or misinterpreting
@@ -96,20 +96,20 @@ write dangerous, crashing C code before long.</p>
 <p>Rust implements tagged unions using the <span class="code">enum</span> keyword.
 For example, to declare a Rust enum type equivalent to the C tagged union above
 I write:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/rust-enum1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/rust-enum1.png"/>
 <p>The questions for today are: Why are enums equivalent to tagged unions in C?
 And: What should I draw on the right side? What would I see if I could find and
 examine an enum in the memory space of a running Rust process?</p>
 <h2>Saving a Rust Enum</h2>
 <p>To find out, let’s create an instance of <span class="code">NumOrStr</span>:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/rust-enum2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/rust-enum2.png"/>
 <p>Notice that instead of 4, I’ve saved a more recognizable value, 1234. Now, if I
 compile it with the <span class="code">-—emit asm</span> flag:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/rust-emit-asm.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/rust-emit-asm.png"/>
 <p>…Rust generates a file called union.s which contains the assembly language
 version of my program. If I open union.s and search for 1234, the integer value
 I saved above, I see:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/asm1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/asm1.png"/>
 <p>I’ve found it; here are the x86 assembly language instructions that initialize
 <span class="code">a_number</span>. These show me exactly how Rust represents
 enums in memory, how Rust implements tagged unions.</p>
@@ -128,7 +128,7 @@ generates aren’t written using Intel x86 syntax, but with GAS x86 syntax
 instead.)</p>
 <p>Here’s a diagram showing what the first <span class="code">movw</span>
 instruction moves:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/asm2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/asm2.png"/>
 <p>It turns out that <span class="code">movw</span> stands for “move a word.” A
 word is defined as 16 bits, or 2 bytes. There are a few different variations on
 move, <span class="code">movb</span>, <span class="code">movw</span>, <span
@@ -138,7 +138,7 @@ byte, 2 bytes, 4 bytes or 8 bytes respectively.</p>
 this case zero: <span class="code">$0</span>. Now we can see the first
 instruction above is moving 2 bytes containing the value zero. Similarly, the
 second instruction is moving 2 bytes containing the value 1234:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/asm3.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/asm3.png"/>
 <h2>The rbp Register</h2>
 <p>But where are these <span class="code">movw</span> instructions moving these
 values to? To understand that we need to understand the odd <span
@@ -164,7 +164,7 @@ running.</p>
 <h2>How Rust Saves an Integer Enum Variant</h2>
 <p>Taking a step back for a moment, here’s what we’ve learned so far. When I save
 an enum value containing an integer, Rust saves <em>two</em> values, 0 and 1234:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/save1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/save1.png"/>
 <p>What does the <span class="code">0</span> mean? Rust records a zero to indicate
 that <span class="code">a_number</span> uses the <span
 class="code">NumOrStr::Num</span> variant. In other words, <span
@@ -177,10 +177,10 @@ class="code">Num(i16)</span>, and we saw Rust used a movw to save that also.</p>
 <p>But what about the other variant, the string? When I save a string in <span
 class="code">NumOrStr</span>, what does Rust do? To find out, I’ll replace my
 main function from above with this line of code:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/save2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/save2.png"/>
 <p>The I’ll compile it again using the <span class="code">--emit asm</span>
 option. Now I find this assembly language code in the union.s file:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/asm4.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/asm4.png"/>
 <p>Unfortunately this code snippet is much more complex: It first calls <span
 class="code">String::from</span> passing a string literal, and then saves the
 string into the enum via a method called <span
@@ -189,15 +189,15 @@ class="code">drop_in_place</span>. This is much harder to understand.</p>
 program using LLDB, and inspect the memory <span class="code">a_string</span>
 occupies. I found that Rust used 26 bytes to represent the string variant,
 starting with a 16 bit word containing 1:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/save3.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/save3.png"/>
 <p>This is again the tag; in this case <span class="code">1</span> means <span
 class="code">a_string</span> uses the <span class="code">NumOrStr::Str</span>
 variant. Following this I found a pointer to the string itself:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/save4.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/save4.png"/>
 <p>Pointers on a 64-bit microprocessor occupy 8 bytes and contain the memory
 address of something, in this case my string &quot;This is a test.” After the
 pointer I found two 64 bit values, each containing 15:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/save5.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/save5.png"/>
 <p>These are two attributes of the string: its capacity and length. By inspecting
 my process's memory I’ve started to learn a bit about how Rust manages memory
 for strings.</p>
@@ -205,16 +205,16 @@ for strings.</p>
 the same pattern. Rust saves an integer value, the tag, indicating which
 variant this instance of the enum uses. Then Rust saves the enum variant’s
 payload in the memory that follows:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/save6.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/save6.png"/>
 <h2>Tagged Unions in Rust and C</h2>
 <p>Let’s review by declaring a tagged union in C and Rust:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/review1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/review1.png"/>
 <p>On the left using C, I have to include the tag explicitly in a surrounding
 struct. Rust handles this for me automatically, saving the tag value inside the
 enum alongside the enum’s value. The code looks very different, but as we saw above
 the implementations are_ identical_.</p>
 <p>Using a tagged union looks somewhat similar in C and Rust:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/3/15/review2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/3/15/review2.png"/>
 <p>But there are very important differences here! Using C, I need to remember to
 check the tag and to use the proper variant inside the union. The Rust
 compiler, on the other hand, checks the tag for me automatically and won’t

@@ -140,11 +140,11 @@ code. Code that asks the computer for what you need, not code that tells the
 computer what to do.</p>
 <p>But, as we’ve seen, you don’t need to abandon Ruby to write functional code.</p>
 <p><b>Update:</b> Simon Kröger and Josh Cheek both suggested using <span
-class="code">drop_while</span>, which gives us an even more readable,
+  class="code">drop_while</span>, which gives us an even more readable,
 functional solution:</p>
 <p><img src="http://patshaughnessy.net/assets/2014/2/10/eight.png"><br/></p>
 <p>I also decided to rename the <span class="code">after</span> method to <span
-class="code">lines_after</span>, based on the comments from TenderGlove and
+  class="code">lines_after</span>, based on the comments from TenderGlove and
 John Kary. I agree with them <span class="code">after</span> would make more sense if I
 called it as a method on an object containing the lines (e.g. <span class="code">lines.after</span>). But as a simple
 function like in this example <span class="code">lines_after</span> is more
@@ -162,14 +162,14 @@ classes that are more independent and decoupled one from the other.</p>
 <p>The Ask, Don’t Tell policy applies equally well to functional programming and
 object oriented programming. At a lower level, it helps us write more terse,
 functional Ruby methods. Stepping back, it can also help us design object
-oriented applications that are easier to maintain and extend.</p>
+oriented applications that are easier to maintain and extend. </p>
 <p><b>Update #2:</b> Apparently I’ve (unknowingly) conflated “Ask, Don’t Tell” with the
 “Tell, Don’t Ask,” advice Dave Thomas has been giving us for years to make a
 different but related point about object oriented design.  Dave explains here:
 <a href="http://pragdave.me/blog/2014/02/11/telling-asking-and-the-power-of-jargon/">Telling, Asking, and the Power of
 Jargon</a>.
 He also disagrees with my opinion that the <span
-class="code">parse_lines</span> example was written in a functional style.</p>
+  class="code">parse_lines</span> example was written in a functional style.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2014/2/10/use-an-ask-dont-tell-policy-with-ruby'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Use An Ask, Don’t Tell Policy With Ruby';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';

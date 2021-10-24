@@ -82,7 +82,7 @@ them all into Ruby objects just so I can iterate through them in the
 <p>My mistake was to let my data out of the database. Instead, I should have asked
 the database do the work for me.</p>
 <p>Let’s take a closer look at how <span class="code">latest_comment</span> works:</p>
-<p><img src="http://patshaughnessy.net/assets/2015/6/18/filter-sort.png"/></p>
+<img src="http://patshaughnessy.net/assets/2015/6/18/filter-sort.png"/>
 <p>On the right, I start with all of the comments in the database, tens of
 thousands of them let’s say. Next, I need to search for the comments associated
 with my post, filtering on the <span class="code">post_id</span> column. This
@@ -92,7 +92,7 @@ filtered comments and take the last one, yielding the latest one on the left.</p
 database, but the sorting in Ruby. In between, the entire subset of comments
 for a post have to be transmitted from the database server to my Ruby
 application server:</p>
-<p><img src="http://patshaughnessy.net/assets/2015/6/18/ruby-sort.png"/></p>
+<img src="http://patshaughnessy.net/assets/2015/6/18/ruby-sort.png"/>
 <p>To transmit all of these records, the database needs to serialize them to some
 binary format, which my Ruby code (or my DB driver actually) later needs to
 unpack. Finally, ActiveRecord has to convert this binary data into Ruby
@@ -125,7 +125,7 @@ trick:</p>
 <p>This will run much faster than my previous solution, because my database only
 transmits one comment record over the network to my Ruby server: the latest
 one. And Ruby only creates one Ruby object, for the latest comment:</p>
-<p><img src="http://patshaughnessy.net/assets/2015/6/18/db-sort.png"/></p>
+<img src="http://patshaughnessy.net/assets/2015/6/18/db-sort.png"/>
 <p>Now highly optimized C code, running on the same server that holds the comments
 table data, filters the comments by post, and sorts the matches by timestamp.
 This code has been used and tested by millions of developers around the world
@@ -205,7 +205,7 @@ UPDATE "posts" SET "latest_comment_author" = $1, "updated_at" = $2 WHERE "posts"
 class="code">each</span>, I’ve triggered this series of repeated SQL commands.
 Now I’m transmitting all of the post data, and then more data back and forth
 for each post between my database and my Ruby application:</p>
-<p><img src="http://patshaughnessy.net/assets/2015/6/18/ruby-iterate.png"/></p>
+<img src="http://patshaughnessy.net/assets/2015/6/18/ruby-iterate.png"/>
 <p>Just like my previous code, this migration will perform poorly. If I have just
 a few posts it probably doesn’t matter. But imagine if there are thousands or
 even 100,000s of post records: This migration might take minutes or even hours
@@ -241,7 +241,7 @@ repeated in my log file. But there’s an important difference: This SQL code
 doesn’t refer to hard coded post id values, such as 1 or 2. Here I’ve updated
 all of the posts with a single command!</p>
 <p>How does this work? Let’s take a look:</p>
-<p><img src="http://patshaughnessy.net/assets/2015/6/18/db-iterate.png"/></p>
+<img src="http://patshaughnessy.net/assets/2015/6/18/db-iterate.png"/>
 <p>Using a SQL migration, my Ruby code sends a single SQL command to the database
 server, which is transmitted over the network to the database. Then, on the
 right, my database server performs the same iteration over the posts table,
@@ -262,7 +262,7 @@ statement. Why does my database need to execute the select over and over again?<
 subquery</a>, because the inner
 <span class="code">SELECT</span> uses a value from the outer query. Here’s the
 SQL again:</p>
-<p><img src="http://patshaughnessy.net/assets/2015/6/18/correlated-subquery.png"/></p>
+<img src="http://patshaughnessy.net/assets/2015/6/18/correlated-subquery.png"/>
 <p>Notice the inner <span class="code">SELECT</span> statement refers to <span
 class="code">posts.id</span>, a value from the surrounding <span
 class="code">UPDATE</span> statement.  This requires the database server to

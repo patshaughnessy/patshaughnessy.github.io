@@ -7,22 +7,22 @@ turns out this isn’t a single optimization that the core team has added for
 short strings. Instead, they’ve used the same technique in many other places as
 well. For example, if you create an array with only one, two or three elements,
 it’s much faster than if you create an array with four or more elements:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/array-chart.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/array-chart.png"/>
 <p>Or if you create a Struct object, it’s much faster when there are three or
 fewer attributes:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/struct-setup.png"/>
-<img src="http://patshaughnessy.net/assets/2013/2/8/struct-chart.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/struct-setup.png"/>
+<img src="http://patshaughnessy.net/assets/2013/2/8/struct-chart.png"/>
 <p>The same pattern also appears if you create large integer values using the
 Bignum class:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/bignum-chart.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/bignum-chart.png"/>
 <p>Even your own Ruby objects are faster if they contain three or fewer
 instance variables:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/ivars.png"/></p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/object-chart.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/ivars.png"/>
+<img src="http://patshaughnessy.net/assets/2013/2/8/object-chart.png"/>
 <p>Finally, here’s the data showing the same optimization for Ruby strings that I
 wrote about last year - you can see strings containing 23 or fewer characters
 are faster:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/string-chart.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/string-chart.png"/>
 <p>So should you stop and refactor all of your code to use small arrays, short
 strings, and objects with fewer than four instance variables? Of course not!
 That’s obviously ridiculous.</p>
@@ -60,31 +60,31 @@ objects corresponding to the shorter bars in the charts above - are handled
 differently than larger objects. This is such a common pattern that I consider
 it an <em>MRI idiom</em>. In order to understand how many of the built in functions in
 the <span class="code">String</span>, <span class="code">Array</span>, <span
-class="code">Struct</span>, or <span class="code">Bignum</span> classes work
+  class="code">Struct</span>, or <span class="code">Bignum</span> classes work
 you need to understand the coding pattern behind this optimization. And, as we
 saw above, Ruby also uses this pattern when handling instance variables in your
 own classes.</p>
 <p>I call these smaller, faster objects “Embedded Objects,” based on the name of
 certain C constants used inside of Ruby. For example, here’s the C code that
 Ruby uses to create a new array of a certain size or “capacity:”</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/ary_new.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/ary_new.png"/>
 <p>As you can see arrays longer than <span class="code">RARRAY_EMBED_LEN_MAX</span> are handled
 differently than shorter arrays. What’s the value of <span class="code">RARRAY_EMBED_LEN_MAX</span>? It
 turns out it is 3. This explains the behavior in the chart above.</p>
 <p>Here’s another example - whenever you increase the size of a string, for
 example by calling <span class="code">String#&lt;&lt;</span> or <span
-class="code">String#insert</span>, Ruby uses this code:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/rb_str_modify_expand.png"/></p>
+  class="code">String#insert</span>, Ruby uses this code:</p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/rb_str_modify_expand.png"/>
 <p>Here again, we can see Ruby handles longer strings differently than shorter
 strings, using the value <span class="code">RSTRING_EMBED_LEN_MAX.</span> What
 is this set to? Well, from the performance chart above we know it must be 23.</p>
 <p>Finally, here’s the code Ruby uses to create new <span
-class="code">Struct</span> objects:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/struct_alloc.png"/></p>
+  class="code">Struct</span> objects:</p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/struct_alloc.png"/>
 <p>Once again you can see structs with fewer than <span
-class="code">RSTRUCT_EMBED_LEN_MAX</span> members are handled differently
+  class="code">RSTRUCT_EMBED_LEN_MAX</span> members are handled differently
 than structs with more attributes. What’s the value of <span
-class="code">RSTRUCT_EMBED_LEN_MAX?</span> It must be 3, based on the chart
+  class="code">RSTRUCT_EMBED_LEN_MAX?</span> It must be 3, based on the chart
 above.</p>
 <p>These are just three simple examples; if you go and look you’ll find that these
 “EMBED” constants appear in many places inside Ruby’s implementation of these 4
@@ -94,14 +94,14 @@ Ruby core team had to write to handle embedded objects differently - to make
 your code run a few microseconds faster!</p>
 <p>To summarize, here are the 5 C constants Ruby uses as a threshold for embedded
 objects, and their values:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/defines.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/defines.png"/>
 <p>You can find these values in the include/ruby/ruby.h file. As you can see,
 each of these corresponds to one of the performance pattern you see in the
 charts above. For the Bignum class, Ruby uses the <span
-class="code">RBIGNUM_EMBED_LEN_MAX</span> value to keep track of how many
+  class="code">RBIGNUM_EMBED_LEN_MAX</span> value to keep track of how many
 <span class="code">BDIGIT</span> structures will fit into a single <span
-class="code">RBignum</span> structure.  Ruby uses these <span
-class="code">BDIGIT</span> structures to hold large integer values, and
+  class="code">RBignum</span> structure.  Ruby uses these <span
+  class="code">BDIGIT</span> structures to hold large integer values, and
 allocates more of them as necessary to represent very large integers.</p>
 <h2>The C “union” keyword</h2>
 <p>Above I showed a few places where these “EMBED” constants appear in Ruby’s
@@ -111,14 +111,14 @@ weeks
 ago</a>,
 Ruby represents every array object using the <span class="code">RArray</span>
 structure:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/union.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/union.png"/>
 <p>Here I’ve shown the <span class="code">RArray</span> struct separated into two
 pieces: the top rectangle shows how larger arrays with 4 or more elements save
 their data, and the lower rectangle shows how shorter array with three or fewer
 elements work.  The key to this is the <span class="code">union</span> keyword,
 which is a trick you can use in the C language to indicate the same memory
 segment can be used in more than one way:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/rarray-memory.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/rarray-memory.png"/>
 <p>By using the <span class="code">union</span> keyword, the C compiler allows you
 to access either the values on the top via the <span class="code">heap</span>
 structure, the first member of the union, or the values on the bottom, inside
@@ -130,19 +130,19 @@ Ruby uses a series of C macros to access the data inside an array, string or
 most other built in object types. The Ruby core team, fortunately, also uses
 these macros to hide some of the complexity around embedded objects.</p>
 <p>To see what I mean, here’s the definition of the <span
-class="code">RARRAY_PTR</span> macro  - Ruby uses this to get a pointer to an
+  class="code">RARRAY_PTR</span> macro  - Ruby uses this to get a pointer to an
 array’s elements:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/2/8/rarray-ptr.png"/></p>
+<img src="http://patshaughnessy.net/assets/2013/2/8/rarray-ptr.png"/>
 <p>Every time Ruby needs access to the contents of an array, it runs the code
 found inside this macro: First, it uses a second macro, <span
-class="code">RBASIC</span>, to get access to some internal flags stored
+  class="code">RBASIC</span>, to get access to some internal flags stored
 inside the inner <span class="code">RBasic</span> structure. One of these flags
 is called <span class="code">RARRAY_EMBED_FLAG</span>. If <span
-class="code">RARRAY_EMBED_FLAG</span> is set, then Ruby knows this array is
+  class="code">RARRAY_EMBED_FLAG</span> is set, then Ruby knows this array is
 an embedded object, and therefore looks for the array’s elements in <span
-class="code">as.ary</span> - or the array located right inside the <span
-class="code">RArray</span> struct. If <span
-class="code">RARRAY_EMBED_FLAG</span> is not set, then Ruby looks for the
+  class="code">as.ary</span> - or the array located right inside the <span
+  class="code">RArray</span> struct. If <span
+  class="code">RARRAY_EMBED_FLAG</span> is not set, then Ruby looks for the
 array’s elements in the usual way by following the <span class="code">ptr</span> pointer to another
 memory block in the heap.</p>
 <h2>Learn the idiom once and use it many times</h2>

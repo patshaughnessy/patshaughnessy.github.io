@@ -150,16 +150,16 @@ class="code">b</span>:</p>
 <ul>
 <li>
 <p>If the <span class="code">Either</span> value is <span
-class="code">Left</span>, then it contains an inner value of type <span
-class="code">a</span>. This is written: <span class="code">Left a</span></p>
+  class="code">Left</span>, then it contains an inner value of type <span
+  class="code">a</span>. This is written: <span class="code">Left a</span></p>
 </li>
 <li>
 <p>If the <span class="code">Either</span> value is <span
-class="code">Right</span>, then it contains an inner value of type <span
-class="code">b</span>. This is written: <span class="code">Right b</span></p>
+  class="code">Right</span>, then it contains an inner value of type <span
+  class="code">b</span>. This is written: <span class="code">Right b</span></p>
 </li>
 </ul>
-<p>The <span class="code">Either</span> type is also “monad,” because Haskell
+<p>The <span class="code">Either</span> type is also “monad,” because Haskell 
 provides certain functions that create and operate on <span
 class="code">Either</span> values. I won’t cover this concept here today, but
 when I have time I'll discuss monads and how they can be applied to error
@@ -174,22 +174,22 @@ vocabulary and grammar.</p>
 <p>In Rust, the <span class="code">Result</span> type encapsulates two other types
 like <span class="code">Either.</span> A single <span
 class="code">Result</span> value has either one of those types or the other:</p>
-<p><img src="http://patshaughnessy.net/assets/2019/10/3/ok-or-err.png"></p>
+<img src="http://patshaughnessy.net/assets/2019/10/3/ok-or-err.png">
 <p>Instead of <span class="code">Left a</span> and <span class="code">Right
 b</span> like in Haskell, Rust uses the words <span class="code">Ok(T)</span>
 and <span class="code">Err(E)</span>:</p>
 <ul>
 <li>
 <p>If the <span class="code">Result</span> value is <span
-class="code">Ok</span>, then it contains an inner value of type <span
-class="code">T</span>. This is written: <span class="code">Ok(T)</span>.
+  class="code">Ok</span>, then it contains an inner value of type <span
+  class="code">T</span>. This is written: <span class="code">Ok(T)</span>.
 <span class="code">Ok(T)</span> means some operation was successful, and the
 result of the operation is a value of type <span class="code">T</span>.</p>
 </li>
 <li>
 <p>If the <span class="code">Either</span> value is <span
-class="code">Err,</span> then it contains an inner value of type <span
-class="code">E</span>. This is written: <span class="code">Err(E)</span>
+  class="code">Err,</span> then it contains an inner value of type <span
+  class="code">E</span>. This is written: <span class="code">Err(E)</span>
 Similarly, this means the operation was a failure, and the result of the
 operation is an error of type <span class="code">E</span>.</p>
 </li>
@@ -313,7 +313,7 @@ class="code">read()</span> will return <span class="code">Err(e)</span>, where
 <span class="code">e</span> is a value of type <span
 class="code">std::io::Error</span>. Note <span class="code">open</span> returns
 the same error type that <span class="code">read</span> does:</p>
-<p><img src="http://patshaughnessy.net/assets/2019/10/3/error-types.png"></p>
+<img src="http://patshaughnessy.net/assets/2019/10/3/error-types.png">
 <p>This is where Rust shines. It allows for concise and readable error handling
 that is also thorough and correct. The Rust compiler checks for error handling
 completeness at <em>compile time</em>, before I ever run my program.</p>

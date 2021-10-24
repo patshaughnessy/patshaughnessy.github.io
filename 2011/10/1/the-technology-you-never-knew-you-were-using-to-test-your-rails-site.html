@@ -48,13 +48,13 @@ htmlDocPtr	htmlReadMemory (const char * buffer,
       const char * encoding, 
       int options)
 </pre>
-parse an XML in-memory document and build a tree.<br/>
+<p>parse an XML in-memory document and build a tree.<br/>
 <i>buffer</i>: a pointer to a char array<br/>
 <i>size</i>: the size of the array<br/>
 <i>URL</i>: the base URL to use for the document<br/>
 <i>encoding</i>: the document encoding, or NULL<br/>
 <i>options</i>: a combination of htmlParserOption(s)<br/>
-<i>Returns</i>: the resulting document tree<br/>
+<i>Returns</i>: the resulting document tree<br/></p>
 <p>This C function is what actually parses the HTML text, and is located inside the Libxml2 library. You can see its declaration inside the HTMLparser.h header file, which on my machine is located in /usr/include/libxml2/libxml/HTMLparser.h. Depending on how you installed Libxml2 (homebrew, macports, from source) this will be located in a different location.</p>
 <p>This is called from the Nokogiri Ruby gem’s C extension code, in the <a href="https://github.com/tenderlove/nokogiri/blob/master/ext/nokogiri/html_document.c#L98">ext/nokogiri/html_document.c</a> file:</p>
 <pre style="background-color:#ffffff;">

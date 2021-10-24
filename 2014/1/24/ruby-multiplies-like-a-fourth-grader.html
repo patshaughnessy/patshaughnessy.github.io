@@ -18,11 +18,9 @@ multiplication algorithm you learned in elementary school!</p>
 <p>We all remember multiplication tables: memorizing them was either a fun mental
 exercise - or a painful form of torture - depending on our mathematical
 aptitude and the personality of our grade school teacher. Regardless, there
-were two reasons for memorizing simple products such as 5 x 6 = 30 or 9 x 7 =</p>
-<ol start="63">
-<li>First, these simple problems occur frequently; and second, they help us
-later when multiplying larger numbers.</li>
-</ol>
+were two reasons for memorizing simple products such as 5 x 6 = 30 or 9 x 7 =
+63.  First, these simple problems occur frequently; and second, they help us
+later when multiplying larger numbers.</p>
 <p>Maybe you flunked out of school before the fourth grade, or more likely you’ve
 become so dependent on your iPhone’s calculator app you don’t remember how to
 multiply by hand. Before we look at how Ruby multiplies numbers, let’s review
@@ -89,12 +87,10 @@ calculate 5x6 and to return the product 30, shown as binary at the bottom.</p>
 <h2>A Fourth Grader That Knows Hexadecimal</h2>
 <p>Ruby multiplies large numbers exactly the same way you and I do, using the
 classic long multiplication algorithm. We use long multiplication to multiply
-numbers larger than 12, since the multiplication tables we memorized went up to</p>
-<ol start="12">
-<li>Ruby uses long multiplication for numbers that don’t fit into a <span class="code">Fixnum</span>
+numbers larger than 12, since the multiplication tables we memorized went up to
+12. Ruby uses long multiplication for numbers that don’t fit into a <span class="code">Fixnum</span>
 object - numbers so large that a single machine language instruction can’t
-process them.</li>
-</ol>
+process them.</p>
 <p>Here’s an example problem:</p>
 <p><img src="http://patshaughnessy.net/assets/2014/1/24/hex-sample1.png"><br/></p>
 <p>The number 29 fits into a <span class="code">Fixnum</span> no problem, but 10000000000000000000 does not.

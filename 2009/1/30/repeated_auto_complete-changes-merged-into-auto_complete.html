@@ -65,7 +65,7 @@ content_tag(&quot;div&quot;, &quot;&quot;, :id =&gt; &quot;#{object}<em>#{method
 auto_complete_field(
 &quot;#{object}</em>#{method}&quot;,
 {
-:url =&gt; { :action =&gt; &quot;auto_complete_for</em>#{object}_#{method}&quot; }
+:url =&gt; { :action =&gt; &quot;auto_complete_for</em>#{object}_#{method}&quot; } 
 }.update(completion_options))
 end</pre></p>
 <p>Here I&rsquo;ve introduced a new utility function called &ldquo;auto_complete_field_with_style_and_script&rdquo; that generates the same Javascript and style sheet for the view as before, but instead calls a block to generate the actual text field. Then I changed text_field_with_auto_complete to call this, providing a block to make the call to &ldquo;text_field&rdquo; in ActionView::Helpers::FormHelper with the proper names and options.</p>

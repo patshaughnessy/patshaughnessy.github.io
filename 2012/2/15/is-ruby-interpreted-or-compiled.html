@@ -44,7 +44,7 @@ $ find .rbx
 <p>This vaguely reminds me of how git saves the git repository data in a hidden folder called “.git,” also using cryptic hexadecimal names. What we are looking at here is a compiled version of simple.rb: the “a7fc1eb2e...” file contains my Ruby code converted into Rubinius byte code.</p>
 <p>Whenever you run a Ruby script, Rubinius uses a two step process to compile and run your code:</p>
 <p><img src="http://patshaughnessy.net/assets/2012/2/15/rubinius-diagram.png" alt="Rubinius compiler" /></p>
-<p>On the top you can see that first Rubinius compiles your code into byte code, and then below later executes it using the Rubinius Virtual Machine, which can compile the byte code into native machine language. Rubinius also caches the byte code using the hexadecimal naming scheme I showed above, avoiding the need for the compile step entirely if the Ruby source code file didn’t change.</p>
+<p>On the top you can see that first Rubinius compiles your code into byte code, and then below later executes it using the Rubinius Virtual Machine, which can compile the byte code into native machine language. Rubinius also caches the byte code using the hexadecimal naming scheme I showed above, avoiding the need for the compile step entirely if the Ruby source code file didn’t change. </p>
 <p>As <a href="http://rubini.us/2011/03/17/running-ruby-with-no-ruby/">Brian Ford explained on the Rubinius blog</a>, you can actually run the Rubinius compiler directly like this:</p>
 <pre type="console">
 $ rbx compile simple.rb -o simple.bytecode

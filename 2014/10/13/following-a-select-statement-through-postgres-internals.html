@@ -2,14 +2,14 @@
   <img src="http://patshaughnessy.net/assets/2014/10/13/engine-room.png"><br/>
   <i>Captain Nemo takes Professor Aronnax on a tour<br/>of the engine room, a fascinating description<br/>of future technology from an 1870 perspective.</i>
 </div>
-<p><b>
+<b>
 This is the third of a series of four posts based on a presentation I did at the
-<a href="http://www.baruco.org">Barcelona Ruby Conference</a> called “20,000 Leagues Under
+[Barcelona Ruby Conference](http://www.baruco.org) called “20,000 Leagues Under
 ActiveRecord.” (posts:
-<a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">one</a>
-<a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements">two</a>
-<a href="http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes">four</a>
-and <a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4">video</a>).</b></p>
+[one](http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
+[two](http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements)
+[four](http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
+and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).</b>
 <p>Preparing for this presentation over the Summer, I decided to read through
 parts of the PostgreSQL C source code. I executed a very simple select
 statement and watched what Postgres did with it using LLDB, a C debugger. How
@@ -28,7 +28,7 @@ internally by following me on a journey deep inside a tool you use everyday.</p>
 <p>Here’s the example query from <a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">the first half of my
 presentation</a>;
 we’ll follow Postgres as it searches for Captain Nemo:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/9/23/sql.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/9/23/sql.png"/>
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/10/13/maps.png"><br/>
   <i>Professor Aronnax and Captain Nemo<br/>plot the course of the Nautilus.</i>
@@ -41,7 +41,7 @@ the surface.</p>
 <p>What does Postgres do with this SQL string? How does it understand what we
 meant? How does it know what data we are looking for?</p>
 <p>Postgres processes each SQL command we send it using a four step process.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/10/13/4-steps.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/10/13/4-steps.png"/>
 <p>In the first step, Postgres <em>parses</em> our SQL statement and converts it into a
 series of C memory structures, a <em>parse tree</em>. Next Postgres <em>analyzes and
 rewrites</em> our query, optimizing and simplifying it using a series of complex
@@ -89,7 +89,7 @@ I go through a detailed example of the LALR parse algorithm used by Bison and
 Ruby. Postgres parses SQL statements in exactly the same way.</p>
 <p>Using LLDB and enabling some C logging code, I observed the Postgres parser
 produce this parse tree for our Captain Nemo query:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/10/13/parse-tree.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/10/13/parse-tree.png"/>
 <p>At the top is a node representing the entire SQL statement, and below that are
 child nodes or branches that represent the different portions of the SQL
 statement syntax: the target list (a list of columns), the from clause (a list
@@ -122,7 +122,7 @@ the <a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecor
 presentation</a>
 ActiveRecord generated our Captain Nemo select statement when we executed this
 Ruby query:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/>
 <p>We saw that ActiveRecord internally created an AST when we called methods such
 as <span class="code">where</span> and <span class="code">first</span>. Later
 (see the <a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements">second
@@ -176,7 +176,7 @@ could reduce the number of sub-select clauses or joins to produce a simpler
 query that runs faster.</p>
 <p>For our simple select statement, here’s the query tree that <span
 class="code">pg_analyze_and_rewrite</span> produces:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/10/13/query-tree.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/10/13/query-tree.png"/>
 <p>I don’t pretend to understand the detailed algorithms behind <span
 class="code">pg_analyze_and_rewrite</span>. I simply observed that for our
 example the query tree largely resembled the parse tree. This means the
@@ -186,7 +186,7 @@ select statement was so straightforward Postgres wasn’t able to simplify it fu
 a plan. This involves generating a third tree of nodes that form a list of
 instructions for Postgres to follow. Here’s the plan tree for our select
 statement.</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/plan-tree.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/plan-tree.png"/>
 <p>Imagine that each node in the plan tree is a machine or worker of some
 kind. The plan tree resembles a pipeline of data or a conveyor belt in a
 factory. In my simple example there is only one branch in the tree. Each node
@@ -215,7 +215,7 @@ class="code">total_cost</span> values in each plan node. Postgres uses these
 values to estimate how long the plan will take to complete. You don’t have
 to use a C debugger to see the execution plan for your query. Just prepend the
 SQL <span class="code">EXPLAIN</span> command to your query, like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/10/13/explain.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/10/13/explain.png"/>
 <p>This is a powerful way to understand what Postgres is doing internally with one
 of your queries, and why it might be slow or inefficient - despite the
 sophisticated planning algorithms in <span class="code">pg_plan_queries</span>.</p>
@@ -232,20 +232,20 @@ class="code">LIMIT</span> SQL command, which limits the result set to the
 specified number of records. The same plan node also implements the <span
 class="code">OFFSET</span> command, which starts the result set window at the
 specified row.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/10/13/limit1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/10/13/limit1.png"/>
 <p>The first time Postgres calls the Limit node, it calculates what the limit and
 offset values should be, because they might be set to the result of some
 dynamic calculation. In our example, offset is 0 and limit is 1.</p>
 <p>Next, the Limit plan node repeatedly calls the subplan, in our case Sort,
 counting until it reaches the offset value:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/10/13/limit2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/10/13/limit2.png"/>
 <p>In our example the offset value is zero, so this loop will load the first data
 value and stop iterating. Then Postgres returns the last data value loaded from
 the subplan to the calling or upper plan. For us, this will be that first value
 from the subplan.</p>
 <p>Finally when Postgres continues to call the Limit node, it will pass the data
 values through from the subplan one at a time:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/10/13/limit3.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/10/13/limit3.png"/>
 <p>In our example, because the limit value is 1 Limit will immediately return NULL
 indicating to the upper plan there is no more data available.</p>
 <p>Postgres implements the Limit node using code in a file called nodeLimit.c</p>
@@ -272,7 +272,7 @@ Sort node, which appears below Limit in the plan.</p>
 that appears under Limit in the plan tree. Sort loads data values from its
 subplan and returns them to its calling plan, Limit. Here’s what Sort does when
 the Limit node calls it for the first time, to get the first data value:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/10/13/sort1.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/10/13/sort1.png"/>
 <p>You can see that Sort functions very differently from Limit. It immediately
 loads all of the available data from the subplan into a buffer, before
 returning anything. Then it sorts the buffer using the
@@ -280,7 +280,7 @@ returning anything. Then it sorts the buffer using the
 returns the first sorted value.</p>
 <p>For the second and subsequent calls, Sort simply returns additional values from
 the sorted buffer, and never needs to call the subplan again:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/10/13/sort2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2014/10/13/sort2.png"/>
 <p>The Sort plan node is implemented by a C function called ExecSort:</p>
 <p>
 <div class="sign">
@@ -304,16 +304,16 @@ means to look through the values in a table, returning values that match a
 given filter. To understand how the scan works with our filter, let’s step
 through an imaginary users table filled with fake names, looking for Captain
 Nemo.</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan1.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan1.png"/>
 <p>Postgres starts at the first record in a table (known as a <em>relation</em> in the
 Postgres source code) and executes the boolean expression from the plan tree.
 In simple terms, Postgres asks the question: “Is this Captain Nemo?” Because
 Laurianne Goodwin is not Captain Nemo, Postgres steps down to the next record.</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan2.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan2.png"/>
 <p>No, Candace is also not Captain Nemo. Postgres continues:</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan3.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan3.png"/>
 <p>… and eventually finds Captain Nemo!</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/>
 <p>Postgres implements the SeqScan node using a C function called ExecSeqScan.</p>
 <p>
 <div class="sign">
@@ -339,7 +339,7 @@ string back to our Rails application and ActiveRecord can create a Ruby object.
 We can finally return to the surface of our application.</p>
 <p>But Postgres doesn’t stop! Instead of simply returning, Postgres continues to
 scan through the users table, even though we’ve already found Captain Nemo:</p>
-<p><img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/></p>
+<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/>
 <div style="float: right; padding: 117px 0px 70px 30px; text-align: center;">
   <img src="http://patshaughnessy.net/assets/2014/10/13/suffocating.png"><br/>
   <i>While returning from the South Pole, the air<br/> supply inside the Nautilus began to run out.</i>

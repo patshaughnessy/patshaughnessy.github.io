@@ -1,4 +1,198 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2020-01-22T15:48:08Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-20T00:00:00Z</published><updated>2020-01-20T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-10-24T00:23:55Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>To Learn a New Language, Read Its Standard Library</title><link href="http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></link><id href="http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></id><published>2021-10-23T00:00:00Z</published><updated>2021-10-23T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;If I was learning to read English as a foreign language,&lt;br/&gt; I would need something simple to get started.&lt;br/&gt;
+  &lt;small&gt;(from The Remarkable Story of Chicken Little, 1840)&lt;/small&gt;&lt;/i&gt; 
+&lt;/div&gt;
+&lt;p&gt;The best way to learn a </summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;If I was learning to read English as a foreign language,&lt;br/&gt; I would need something simple to get started.&lt;br/&gt;
+  &lt;small&gt;(from The Remarkable Story of Chicken Little, 1840)&lt;/small&gt;&lt;/i&gt; 
+&lt;/div&gt;
+&lt;p&gt;The best way to learn a new programming language, just like a human language,
+is from example. To learn how to write code you first need to read someone
+else’s code. But who is the best person to learn from? Which code should we
+read? Where should we look to find it?&lt;/p&gt;
+&lt;p&gt;This year in my spare time I was learning about
+&lt;a href=&quot;https://crystal-lang.org&quot;&gt;Crystal&lt;/a&gt;. I had played around with some simple
+scripts, but I wanted to learn more. Then I stumbled on to Crystal’s &lt;a href=&quot;https://github.com/crystal-lang/crystal/tree/master/src&quot;&gt;standard
+library&lt;/a&gt;. I was
+relieved to see that Crystal’s core classes are implemented using Crystal
+itself!&lt;/p&gt;
+&lt;p&gt;Crystal’s standard library is clear, simple, concise and well documented.
+Reading Crystal’s internal implementation of Array or Hash is like reading
+a fairy tale in a children’s book. Anyone can understand it, even people
+without a Ph.D. in Computer Science or systems programming experience.&lt;/p&gt;
+&lt;h2&gt;At First Glance, Crystal Is Ruby&lt;/h2&gt;
+&lt;p&gt;At first glance, when I read Crystal’s &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr&quot;&gt;Array
+implementation&lt;/a&gt;,
+I thought I was reading a Ruby program:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;class &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Array&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(T)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;include &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Indexable&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;::Mutable(T)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;include &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Comparable(Array)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Size of an Array that we consider small to do linear scans or other optimizations.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;private &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;SMALL_ARRAY_SIZE &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;16
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The size of this array.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Int32
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The capacity of `@buffer`.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Note that, because `@buffer` moves on shift, the actual
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# capacity (the allocated memory) starts at `@buffer - @offset_to_buffer`.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The actual capacity is also given by the `remaining_capacity` internal method.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;capacity &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Int32
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Offset to the buffer that was originally allocated, and which needs to
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# be reallocated on resize. On shift this value gets increased, together with
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# `@buffer`. To reach the root buffer you have to do `@buffer - @offset_to_buffer`,
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# and this is also provided by the `root_buffer` internal method.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;offset_to_buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Int32 &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The buffer where elements start.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Pointer(T)
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;There are lots of familiar keywords, like &lt;code&gt;class&lt;/code&gt;, &lt;code&gt;include&lt;/code&gt; and &lt;code&gt;private&lt;/code&gt;. I also
+see Ruby’s &lt;code&gt;@&lt;/code&gt; character indicating an instance variable. This code is about 100x
+easier to read vs. &lt;a href=&quot;https://github.com/ruby/ruby/blob/master/array.c&quot;&gt;Ruby’s own C implementation of
+Array&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Along with the familiar Ruby-like syntax, notice the helpful comments. Even
+though I’ve just started reading I can already make an educated guess at how
+Crystal arrays function internally. I can see there’s a pointer to memory which
+holds the array elements, and that the code keeps track of the capacity of this
+memory along with the actual size of the array. Finally, reading the comment for
+&lt;code&gt;offset_to_buffer&lt;/code&gt; I can imagine there are some optimizations related to adding
+and removing elements. The comment is both helpful and intriguing.&lt;/p&gt;
+&lt;p&gt;But I’m not reading Ruby code. There are important differences here: generic
+type syntax and most importantly each of the instance variables is declared
+with a static type known at compile time. How do I use static types in Crystal?
+What types are available? What about the generic type parameter &lt;code&gt;T&lt;/code&gt;? Should I
+use that in my own Crystal code? What other syntax differences vs. Ruby are
+there?&lt;/p&gt;
+&lt;p&gt;The best way to learn how to write Crystal code is simply to scroll down and
+read one of the Array methods.&lt;/p&gt;
+&lt;h2&gt;Array#uniq&lt;/h2&gt;
+&lt;p&gt;Here’s how Crystal finds the unique elements of an array:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;uniq
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;dup
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Heuristic: for a small array it&amp;#39;s faster to do a linear scan
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# than creating a Hash to find out duplicates.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;SMALL_ARRAY_SIZE
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Array(T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    each &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary.includes?(elem)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Convert the Array into a Hash and then ask for its values
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  to_lookup_hash.values
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;The first three lines handle the trivial case of when an array is empty or
+contains only one element:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;dup
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Obviously in this case, there are no duplicate elements and &lt;code&gt;Array#uniq&lt;/code&gt; should
+simply return the original array. One important detail: Crystal uses &lt;code&gt;dup&lt;/code&gt; to
+return a copy of the array. This reminds me that in Ruby &lt;code&gt;uniq&lt;/code&gt; returns a copy
+of the receiver, while &lt;code&gt;uniq!&lt;/code&gt; mutates the receiver. My guess is that Crystal
+implements Array methods in the same way…&lt;/p&gt;
+&lt;p&gt;The second passage is an optimization:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Heuristic: for a small array it&amp;#39;s faster to do a linear scan
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# than creating a Hash to find out duplicates.
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;SMALL_ARRAY_SIZE
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Array(T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  each &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary.includes?(elem)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;For small arrays (16 or fewer elements) Crystal iterates over them and removes
+duplicates using a simple algorithm. I’ll take a look at how that works in a
+moment.&lt;/p&gt;
+&lt;p&gt;The final line of code handles arrays with 17 or more elements:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Convert the Array into a Hash and then ask for its values
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;to_lookup_hash.values
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;As you might guess, Crystal removes duplicate values from larger arrays using a
+hash. I'll dive into the details about how this works in my next post.&lt;/p&gt;
+&lt;h2&gt;Arrays With 16 Or Fewer Elements&lt;/h2&gt;
+&lt;p&gt;But first, let’s take a closer look at case #2 from above, when the array
+contains 16 or fewer elements. First, Crystal creates a new, empty array called
+ary:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Array(T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note the generic type syntax &lt;code&gt;Array(T).new&lt;/code&gt;. This tells the Crystal compiler
+that the new array, what will become the return value from &lt;code&gt;Array#uniq&lt;/code&gt;, will
+only contain elements of the same type as the original array.&lt;/p&gt;
+&lt;p&gt;Ruby developers will find the rest of this code easy to follow…&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;each &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary.includes?(elem)
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Crystal calls &lt;code&gt;each&lt;/code&gt; to iterate over all the elements in the receiver, the
+array we are calling &lt;code&gt;uniq&lt;/code&gt; on. Then using &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt;, Crystal appends each of the
+original array’s elements to the new array, unless the new array already
+contains a given element.&lt;/p&gt;
+&lt;p&gt;Like Ruby, Crystal implements the &lt;code&gt;includes?&lt;/code&gt; method inside the &lt;code&gt;Enumerable&lt;/code&gt;
+module. Crystal arrays are enumerable because of the &lt;code&gt;include Indexable::Mutable(T)&lt;/code&gt; statement we read above. (&lt;code&gt;Indexable::Mutable&lt;/code&gt; includes
+&lt;code&gt;Indexable&lt;/code&gt; which includes &lt;code&gt;Enumerable&lt;/code&gt;). You can find Crystal’s implementation
+of &lt;code&gt;includes?&lt;/code&gt; (not &lt;code&gt;include?&lt;/code&gt; as in Ruby) in
+&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/enumerable.cr&quot;&gt;enumerable.cr&lt;/a&gt;:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;includes?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(obj) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Bool
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  any? { &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;e&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; e &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;==&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; obj }
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here the &lt;code&gt;any?&lt;/code&gt; method calls the given block once for each element in the
+array, and returns true if the block returns true for any of the elements. In
+other words, this code searches the array in a linear fashion, one element at a
+time. Crystal’s development team has decided that it’s faster to filter out
+repeated elements from small arrays by repeatedly searching the array using
+linear scans. Since there are never more than 16 elements, those scans won’t
+take too much time.&lt;/p&gt;
+&lt;h2&gt;Simple and Concise&lt;/h2&gt;
+&lt;p&gt;You might be thinking: This is an incredibly simple algorithm; anyone could have
+written this code! Why bother writing a blog post about this?&lt;/p&gt;
+&lt;p&gt;That’s exactly my point: This is simple and concise code. I could have written
+it - you could have also. There’s nothing superfluous, not an extra word here.
+Just enough code to get the job done. And there’s no noise… no macros, no odd C
+memory tricks, no weird bitwise mask operations. This is the kind of code I
+need to read now when I’m learning how to use Crystal. As a side benefit, I
+also get to learn how Crystal works internally.&lt;/p&gt;
+&lt;p&gt;But what happens for longer arrays, with 100s or 1000s of elements? How does
+Crystal remove duplicates from longer arrays efficiently? I'll take a look at
+how that works in my next post.&lt;/p&gt;
+</content></entry><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-20T00:00:00Z</published><updated>2020-01-20T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
 easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
@@ -90,7 +284,7 @@ the request to finish and return a result.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Second, if the request was successful, I call &lt;span
-class=&quot;code&quot;&gt;resp.text()&lt;/span&gt; to get the contents of the response body. And
+  class=&quot;code&quot;&gt;resp.text()&lt;/span&gt; to get the contents of the response body. And
 I wait again while that is loaded.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
@@ -99,7 +293,7 @@ class=&quot;code&quot;&gt;Ok(())&lt;/span&gt; because that makes the code below 
 when I start downloading more than one page concurrently.&lt;/p&gt;
 &lt;p&gt;Visually, I can draw the &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and &lt;span
 class=&quot;code&quot;&gt;text&lt;/span&gt; calls like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/get-and-text.png&quot;&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/get-and-text.png&quot;&gt;
 &lt;p&gt;First I call &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and wait, then I call &lt;span
 class=&quot;code&quot;&gt;text&lt;/span&gt; and wait.&lt;/p&gt;
 &lt;p&gt;But what is asynchronous about this? This reads like normal, single threaded
@@ -172,7 +366,7 @@ class=&quot;code&quot;&gt;join_all(tasks).await&lt;/span&gt; to wait for them al
 &lt;/div&gt;
 &lt;p&gt;At first glance, it looks like this code is spawning three different threads. I
 even call a spawn function. A multithreaded download might look like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/multithreaded.png&quot;&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/multithreaded.png&quot;&gt;
 &lt;p&gt;We have 3 paths, so we have 3 threads. Each thread calls &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and waits, and
 then calls &lt;span class=&quot;code&quot;&gt;text&lt;/span&gt; and waits.&lt;/p&gt;
 &lt;p&gt;However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
@@ -185,11 +379,11 @@ threaded) and Threaded (thread pool) Scheduler; see &lt;a href=&quot;https://doc
 docs&lt;/a&gt;
 for more information.&lt;/p&gt;
 &lt;p&gt;I imagine three tasks running on one thread like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/one-thread.png&quot;&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/one-thread.png&quot;&gt;
 &lt;p&gt;Each time I call &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt;, Rust stops one task and
 starts another using the same thread. In fact, depending on how long it takes
 for each task to complete, they might be run in a different order:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/different-order.png&quot;&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/different-order.png&quot;&gt;
 &lt;p&gt;There’s no way to predict ahead of time what order the tasks will run it.
 That’s why I needed to copy each path string above; each task needs it own copy
 of the string with its own independent lifetime because it might be run at any
@@ -227,7 +421,7 @@ collector, this was going to be great!&lt;/p&gt;
 &lt;p&gt;What happened? The problem is the web server can't handle so many concurrent network
 connections. Using my thread/task diagram, launching all 100,000 tasks might
 look like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/simultaneous.png&quot;&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/simultaneous.png&quot;&gt;
 &lt;p&gt;I spawn 100,000 tasks all on to the same thread, and Tokio starts executing
 them all. Each time my code above calls &lt;span
 class=&quot;code&quot;&gt;get(&amp;amp;path).await&lt;/span&gt;, Tokio pauses that task and starts
@@ -237,7 +431,7 @@ these tasks start to fail.&lt;/p&gt;
 &lt;h2&gt;Sending a Buffered, Concurrent Stream of 100,000 Requests&lt;/h2&gt;
 &lt;p&gt;Instead, I need to limit the number of concurrent Tokio tasks - the number of
 concurrent HTTP requests. I need the diagram to look something like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/buffered.png&quot;&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/buffered.png&quot;&gt;
 &lt;p&gt;After the first 8 tasks are started, the first 8 blue boxes on the left, Tokio
 waits for at least one of them to complete before starting a 9th task. I
 indicate this with the “max concurrency” arrow.&lt;/p&gt;
@@ -620,16 +814,16 @@ class=&quot;code&quot;&gt;b&lt;/span&gt;:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;If the &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; value is &lt;span
-class=&quot;code&quot;&gt;Left&lt;/span&gt;, then it contains an inner value of type &lt;span
-class=&quot;code&quot;&gt;a&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Left a&lt;/span&gt;&lt;/p&gt;
+  class=&quot;code&quot;&gt;Left&lt;/span&gt;, then it contains an inner value of type &lt;span
+  class=&quot;code&quot;&gt;a&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Left a&lt;/span&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;If the &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; value is &lt;span
-class=&quot;code&quot;&gt;Right&lt;/span&gt;, then it contains an inner value of type &lt;span
-class=&quot;code&quot;&gt;b&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Right b&lt;/span&gt;&lt;/p&gt;
+  class=&quot;code&quot;&gt;Right&lt;/span&gt;, then it contains an inner value of type &lt;span
+  class=&quot;code&quot;&gt;b&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Right b&lt;/span&gt;&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;The &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; type is also “monad,” because Haskell
+&lt;p&gt;The &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; type is also “monad,” because Haskell 
 provides certain functions that create and operate on &lt;span
 class=&quot;code&quot;&gt;Either&lt;/span&gt; values. I won’t cover this concept here today, but
 when I have time I'll discuss monads and how they can be applied to error
@@ -644,22 +838,22 @@ vocabulary and grammar.&lt;/p&gt;
 &lt;p&gt;In Rust, the &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; type encapsulates two other types
 like &lt;span class=&quot;code&quot;&gt;Either.&lt;/span&gt; A single &lt;span
 class=&quot;code&quot;&gt;Result&lt;/span&gt; value has either one of those types or the other:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/ok-or-err.png&quot;&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/ok-or-err.png&quot;&gt;
 &lt;p&gt;Instead of &lt;span class=&quot;code&quot;&gt;Left a&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;Right
 b&lt;/span&gt; like in Haskell, Rust uses the words &lt;span class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;
 and &lt;span class=&quot;code&quot;&gt;Err(E)&lt;/span&gt;:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;If the &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; value is &lt;span
-class=&quot;code&quot;&gt;Ok&lt;/span&gt;, then it contains an inner value of type &lt;span
-class=&quot;code&quot;&gt;T&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;.
+  class=&quot;code&quot;&gt;Ok&lt;/span&gt;, then it contains an inner value of type &lt;span
+  class=&quot;code&quot;&gt;T&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;.
 &lt;span class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt; means some operation was successful, and the
 result of the operation is a value of type &lt;span class=&quot;code&quot;&gt;T&lt;/span&gt;.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;If the &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; value is &lt;span
-class=&quot;code&quot;&gt;Err,&lt;/span&gt; then it contains an inner value of type &lt;span
-class=&quot;code&quot;&gt;E&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Err(E)&lt;/span&gt;
+  class=&quot;code&quot;&gt;Err,&lt;/span&gt; then it contains an inner value of type &lt;span
+  class=&quot;code&quot;&gt;E&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Err(E)&lt;/span&gt;
 Similarly, this means the operation was a failure, and the result of the
 operation is an error of type &lt;span class=&quot;code&quot;&gt;E&lt;/span&gt;.&lt;/p&gt;
 &lt;/li&gt;
@@ -783,7 +977,7 @@ class=&quot;code&quot;&gt;read()&lt;/span&gt; will return &lt;span class=&quot;c
 &lt;span class=&quot;code&quot;&gt;e&lt;/span&gt; is a value of type &lt;span
 class=&quot;code&quot;&gt;std::io::Error&lt;/span&gt;. Note &lt;span class=&quot;code&quot;&gt;open&lt;/span&gt; returns
 the same error type that &lt;span class=&quot;code&quot;&gt;read&lt;/span&gt; does:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/error-types.png&quot;&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/error-types.png&quot;&gt;
 &lt;p&gt;This is where Rust shines. It allows for concise and readable error handling
 that is also thorough and correct. The Rust compiler checks for error handling
 completeness at &lt;em&gt;compile time&lt;/em&gt;, before I ever run my program.&lt;/p&gt;
@@ -832,7 +1026,7 @@ simple. And writing a blog site using Rust turned out to be simple too.&lt;/p&gt
 &lt;h2&gt;My Cargo.toml File&lt;/h2&gt;
 &lt;p&gt;I needed a few important features to generate this web site. I wanted my script
 to work like this for each blog post:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2019/9/4/flowchart.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2019/9/4/flowchart.png&quot;/&gt;
 &lt;p&gt;For each blog post, My new Rust script had to: parse the markdown source file
 and convert it to HTML markup, highlight the syntax of my code snippets using
 &amp;lt;style&amp;gt; tags and CSS, and use a template to insert the HTML for each post
@@ -1250,10 +1444,10 @@ integers, but my code expected an actual integer, not a reference to an
 integer. But what are references, exactly?&lt;/p&gt;
 &lt;p&gt;Running my code above, Ruby passed each integer from the array to my code as a
 simple value:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;185&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png&quot;/&gt;&lt;/p&gt;
+&lt;img width=&quot;185&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png&quot;/&gt;
 &lt;p&gt;But Rust passed each integer from the array as a reference, or in other words
 as a pointer to the value itself:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;287&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png&quot;/&gt;&lt;/p&gt;
+&lt;img width=&quot;287&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png&quot;/&gt;
 &lt;p&gt;In Ruby, of course, I didn’t have to worry about references, pointers or even
 types, so none of this came up. Or at least that’s what I thought at the time.&lt;/p&gt;
 &lt;h2&gt;Lesson Two: Borrowed Values&lt;/h2&gt;
@@ -1296,7 +1490,7 @@ by the &lt;span class=&quot;code&quot;&gt;main&lt;/span&gt; function. When the &
 class=&quot;code&quot;&gt;main&lt;/span&gt; function goes out of scope, Rust frees the memory for
 that array automatically. In this diagram, the red arrow shows where Rust
 allocates the array (at the top), and where Rust frees it (at the bottom):&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;339&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png&quot;/&gt;&lt;/p&gt;
+&lt;img width=&quot;339&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png&quot;/&gt;
 &lt;p&gt;You can think of the red arrow as the “lifetime” of the array. When I pass a
 value from one spot to another, when I call a function or a closure, I can
 either “move” that value to the new function, or the function can ”borrow” it.
@@ -1304,7 +1498,7 @@ In this example, the call to &lt;span class=&quot;code&quot;&gt;iter()&lt;/span&
 elements inside the array, passing a reference to each element into the
 closure. The blue array in this diagram indicates each element of the array,
 &lt;span class=&quot;code&quot;&gt;i&lt;/span&gt;, is a borrowed value inside the closure:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;334&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/rust-borrow.png&quot;/&gt;&lt;/p&gt;
+&lt;img width=&quot;334&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/rust-borrow.png&quot;/&gt;
 &lt;h2&gt;Lesson Three: Immutable vs. Mutable Values&lt;/h2&gt;
 &lt;p&gt;But using borrowed values isn’t the problem here. The problem is that my code
 tries to change them, or mutate them:&lt;/p&gt;
@@ -1483,11 +1677,11 @@ out.&lt;/p&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/exercise.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Learning something new every day
 is exercise for your mind.&lt;/i&gt;&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg&quot;&gt;Jeremy Bowcock via Wikimedi</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+	&lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg&quot;&gt;Jeremy Bowcock via Wikimedia C</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/exercise.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Learning something new every day
 is exercise for your mind.&lt;/i&gt;&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg&quot;&gt;Jeremy Bowcock via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+	&lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg&quot;&gt;Jeremy Bowcock via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;As software developers we’re paid to be professional learners. People hire us
 (or should hire us) for what we are capable of learning, not for what we
@@ -1576,12 +1770,12 @@ Hello, world!
 World” with just a few commands.&lt;/p&gt;
 &lt;p&gt;Cargo placed the source code in a Rust file called src/main.rs, which looks
 like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/hello-world.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/hello-world.png&quot;/&gt;
 &lt;p&gt;As a comparison, I show the equivalent Ruby code below in pink. Pretty simple.&lt;/p&gt;
 &lt;h2&gt;From Gemfile to Cargo.toml&lt;/h2&gt;
 &lt;p&gt;I knew my script needed to connect to Postgres and execute a SQL statement, so
 I added Diesel as a dependency to my Cargo.toml file:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/cargo-toml.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/cargo-toml.png&quot;/&gt;
 &lt;p&gt;Cargo is a dependency manager similar to Ruby’s &lt;a href=&quot;https://bundler.io&quot;&gt;Bundler&lt;/a&gt;.
 The Cargo.toml file lists the Rust libraries, or “crates,” that my script will
 use. It plays the same role as the Gemfile does for Ruby projects.&lt;/p&gt;
@@ -1605,7 +1799,7 @@ thing I need to do is open a connection to Postgres. After that, I can figure
 out how to execute my report.&lt;/p&gt;
 &lt;p&gt;Here’s how I did it - again I show the Rust code in grey and the equivalent
 Ruby code below in pink:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/connect.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/connect.png&quot;/&gt;
 &lt;p&gt;The Rust code is fairly simple and easy to understand: It just passes a
 Postgres connection string to &lt;span
 class=&quot;code&quot;&gt;PgConnection::establish&lt;/span&gt;. One interesting and important
@@ -1613,7 +1807,7 @@ detail here is the call to &lt;span class=&quot;code&quot;&gt;expect&lt;/span&gt
 class=&quot;code&quot;&gt;PgConnection::establish&lt;/span&gt; returns a &lt;span
 class=&quot;code&quot;&gt;ConnectionResult&lt;T&gt;&lt;/span&gt; value, which is derived from the
 &lt;a href=&quot;https://doc.rust-lang.org/std/result/enum.Result.html&quot;&gt;Result enum&lt;/a&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;200&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/result.png&quot;/&gt;&lt;/p&gt;
+&lt;img width=&quot;200&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/result.png&quot;/&gt;
 &lt;p&gt;As &lt;em&gt;The Rust Programming Language&lt;/em&gt;
 &lt;a href=&quot;https://doc.rust-lang.org/book/second-edition/ch09-00-error-handling.html&quot;&gt;explains&lt;/a&gt;,
 &lt;span class=&quot;code&quot;&gt;expect&lt;/span&gt; checks whether the result value contains &lt;span
@@ -1659,7 +1853,7 @@ Postgres table, and the names and types of each of the table’s columns. Notice
 that I provided two command line parameters: the Postgres connection string and
 my database table name.&lt;/p&gt;
 &lt;p&gt;The Diesel macros resemble the original SQL definition of my Postgres table:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;676&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/sql-to-macro.png&quot;/&gt;&lt;/p&gt;
+&lt;img width=&quot;676&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/sql-to-macro.png&quot;/&gt;
 &lt;p&gt;Diesel used &lt;span class=&quot;code&quot;&gt;Int4&lt;/span&gt; for the primary key column, and
 &lt;span class=&quot;code&quot;&gt;Nullable&amp;lt;Varchar&amp;gt;&lt;/span&gt; for each of the Postgres varchar
 string columns. &lt;span class=&quot;code&quot;&gt;Nullable&lt;/span&gt; must mean that my Postgres
@@ -1671,7 +1865,7 @@ specify &lt;span class=&quot;code&quot;&gt;NOT NULL&lt;/span&gt; for these colum
 &lt;p&gt;Next, using these macros as a guide, I wrote a Rust struct to serve as my
 database model. An instance of this struct was going to represent each row in
 my Postgres table:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;692&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/macro-to-model.png&quot;/&gt;&lt;/p&gt;
+&lt;img width=&quot;692&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/macro-to-model.png&quot;/&gt;
 &lt;p&gt;Just as Diesel mapped each Postgres column type to a Rust macro with the
 corresponding type, I had to choose a Rust type for each Postgres column in my
 new struct. For the id column, I picked Rust’s &lt;span class=&quot;code&quot;&gt;i32&lt;/span&gt;
@@ -1679,7 +1873,7 @@ integer type. This made sense because the &lt;span class=&quot;code&quot;&gt;Int
 implied a 4 byte or 32 bit integer value. And for each of the string columns, I
 chose the Rust &lt;span class=&quot;code&quot;&gt;String&lt;/span&gt; type.&lt;/p&gt;
 &lt;p&gt;Finally, I pasted all of this into my main.rs source code file, as follows:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/model.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/model.png&quot;/&gt;
 &lt;p&gt;Reading this over, the Ruby version is much more concise. In Rust I specified
 the name and type of each column, while in Ruby ActiveRecord figured all of
 that out for me. (Although as I mentioned above, I could have asked Diesel to
@@ -1688,7 +1882,7 @@ detect the column types automatically also.)&lt;/p&gt;
 &lt;p&gt;Now after all of this setup, I’m finally ready to execute my report. Here’s the
 Rust code I wrote inside the &lt;span class=&quot;code&quot;&gt;main()&lt;/span&gt; function, following the call to
 &lt;span class=&quot;code&quot;&gt;PgConnection::establish&lt;/span&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/trying.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/trying.png&quot;/&gt;
 &lt;p&gt;It took me a while to figure out the proper syntax, especially the bits that
 use generic type notation, like &lt;span class=&quot;code&quot;&gt;Vec&amp;lt;User&amp;gt;&lt;/span&gt; and &lt;span
 class=&quot;code&quot;&gt;Vec&amp;lt;&amp;amp;str&amp;gt;&lt;/span&gt;. Also the &lt;span
@@ -1762,18 +1956,18 @@ that it shouldn’t make assumptions about what’s in the data set.&lt;/p&gt;
 way of saving null values in my User struct. The problem, what the Rust
 compiler was trying to tell me, was that my User struct could not handle nulls
 as written. I needed to use an option type instead:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;693&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/option-model.png&quot;/&gt;&lt;/p&gt;
+&lt;img width=&quot;693&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/option-model.png&quot;/&gt;
 &lt;p&gt;Like the &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; enum we saw above, &lt;span
 class=&quot;code&quot;&gt;Option&lt;/span&gt; is an enum that can contain either &lt;span
 class=&quot;code&quot;&gt;Some&lt;/span&gt; or &lt;span class=&quot;code&quot;&gt;None&lt;/span&gt;… i.e. a null value:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;170&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/option.png&quot;/&gt;&lt;/p&gt;
+&lt;img width=&quot;170&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/option.png&quot;/&gt;
 &lt;p&gt;To learn more about the &lt;span class=&quot;code&quot;&gt;Option&lt;/span&gt; type, read &lt;a href=&quot;https://doc.rust-lang.org/book/second-edition/ch06-01-defining-an-enum.html#the-option-enum-and-its-advantages-over-null-values&quot;&gt;Chapter
 6&lt;/a&gt;
 from &lt;em&gt;The Rust Programming Language&lt;/em&gt;.&lt;/p&gt;
 &lt;p&gt;After changing my &lt;span class=&quot;code&quot;&gt;User&lt;/span&gt; struct, I then had to rework
 the closure inside of &lt;span class=&quot;code&quot;&gt;partition&lt;/span&gt;. Here’s what I ended
 up with:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/unwrap.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/unwrap.png&quot;/&gt;
 &lt;p&gt;I wrote &lt;span class=&quot;code&quot;&gt;if let Some(ref name)&lt;/span&gt; to check whether or not
 the last name of each user struct was null. In other words, I “unwrapped” the
 last name. The &lt;span class=&quot;code&quot;&gt;ref&lt;/span&gt; keyword satisfies Rust’s borrow
@@ -1811,7 +2005,7 @@ $ ruby main.rb
 Connected.
 main.rb:18:in `block in \&lt;main\&gt;': undefined method `split' for nil:NilClass (NoMethodError)
 &lt;/pre&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/fix-ruby.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/fix-ruby.png&quot;/&gt;
 &lt;p&gt;Rewriting my Ruby code in Rust revealed a bug I never knew I had. As shown
 above, I had to rework my Ruby code to check for a null last name inside the
 block, similar to what I wrote in Rust. Even though it required more typing and
@@ -1874,7 +2068,7 @@ C unions, how they work and why they are dangerous. Then I’ll show you how Rus
 enums improve on them.&lt;/p&gt;
 &lt;h2&gt;C Unions&lt;/h2&gt;
 &lt;p&gt;Unions are one of the most dangerous features of C. Here’s an example:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/union1.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/union1.png&quot;/&gt;
 &lt;p&gt;Here the union &lt;span class=&quot;code&quot;&gt;num_or_str&lt;/span&gt; saves either a number or
 a character pointer but not both. (A union can contain any number of members;
 for simplicity my example union has only two.) On the right I show how the C
@@ -1890,11 +2084,11 @@ and &lt;span class=&quot;code&quot;&gt;str&lt;/span&gt; in this example, are kno
 variant you set in the union. If you save one type of value but then access the
 other, your program will crash.&lt;/p&gt;
 &lt;p&gt;For example this code works fine:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code1.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code1.png&quot;/&gt;
 &lt;p&gt;But if you forget &lt;span class=&quot;code&quot;&gt;a_number&lt;/span&gt; contains a number, and use
 &lt;span class=&quot;code&quot;&gt;a_number&lt;/span&gt; as a string instead, your program will
 crash:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code2.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code2.png&quot;/&gt;
 &lt;p&gt;Notice the C compiler didn’t help me here at all. It didn’t display any sort of
 warning or error when I wrote &lt;span class=&quot;code&quot;&gt;a_number.str&lt;/span&gt;. It
 silently allowed me to write dangerous code; in fact, union syntax encouraged
@@ -1911,7 +2105,7 @@ valid using an integer value saved right next to the union in memory. This
 integer is known as a tag, and the combination of the tag and the union is a
 &lt;em&gt;tagged union&lt;/em&gt;.&lt;/p&gt;
 &lt;p&gt;Here’s an example:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/tagged_union.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/tagged_union.png&quot;/&gt;
 &lt;p&gt;On the right side I’ve allocated some memory right before the union for the tag
 using a struct. C structs, unlike unions, allocate enough memory to store all
 of their members at once. Note: Using two bytes to save a small integer value
@@ -1921,12 +2115,12 @@ remains the same.&lt;/p&gt;
 &lt;p&gt;Now when I save an integer in an instance of the union I can also set the tag
 to the value 1, for example, which I decide will mean that &lt;span
 class=&quot;code&quot;&gt;a_number&lt;/span&gt; contains a number:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code3.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code3.png&quot;/&gt;
 &lt;p&gt;And if I want to save a string instead, I set the tag to 2, for example:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code4.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code4.png&quot;/&gt;
 &lt;p&gt;Later when I access the tagged union, I first check the tag before deciding
 which variant I can access:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code5.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code5.png&quot;/&gt;
 &lt;p&gt;Of course, tagged unions are not foolproof. I invented the tag values 1 and 2
 and wrote the code that checks for them. There’s nothing to prevent me from
 forgetting to save the tag value, saving the wrong tag value or misinterpreting
@@ -1942,20 +2136,20 @@ write dangerous, crashing C code before long.&lt;/p&gt;
 &lt;p&gt;Rust implements tagged unions using the &lt;span class=&quot;code&quot;&gt;enum&lt;/span&gt; keyword.
 For example, to declare a Rust enum type equivalent to the C tagged union above
 I write:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/rust-enum1.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/rust-enum1.png&quot;/&gt;
 &lt;p&gt;The questions for today are: Why are enums equivalent to tagged unions in C?
 And: What should I draw on the right side? What would I see if I could find and
 examine an enum in the memory space of a running Rust process?&lt;/p&gt;
 &lt;h2&gt;Saving a Rust Enum&lt;/h2&gt;
 &lt;p&gt;To find out, let’s create an instance of &lt;span class=&quot;code&quot;&gt;NumOrStr&lt;/span&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/rust-enum2.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/rust-enum2.png&quot;/&gt;
 &lt;p&gt;Notice that instead of 4, I’ve saved a more recognizable value, 1234. Now, if I
 compile it with the &lt;span class=&quot;code&quot;&gt;-—emit asm&lt;/span&gt; flag:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/rust-emit-asm.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/rust-emit-asm.png&quot;/&gt;
 &lt;p&gt;…Rust generates a file called union.s which contains the assembly language
 version of my program. If I open union.s and search for 1234, the integer value
 I saved above, I see:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm1.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm1.png&quot;/&gt;
 &lt;p&gt;I’ve found it; here are the x86 assembly language instructions that initialize
 &lt;span class=&quot;code&quot;&gt;a_number&lt;/span&gt;. These show me exactly how Rust represents
 enums in memory, how Rust implements tagged unions.&lt;/p&gt;
@@ -1974,7 +2168,7 @@ generates aren’t written using Intel x86 syntax, but with GAS x86 syntax
 instead.)&lt;/p&gt;
 &lt;p&gt;Here’s a diagram showing what the first &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt;
 instruction moves:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm2.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm2.png&quot;/&gt;
 &lt;p&gt;It turns out that &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt; stands for “move a word.” A
 word is defined as 16 bits, or 2 bytes. There are a few different variations on
 move, &lt;span class=&quot;code&quot;&gt;movb&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt;, &lt;span
@@ -1984,7 +2178,7 @@ byte, 2 bytes, 4 bytes or 8 bytes respectively.&lt;/p&gt;
 this case zero: &lt;span class=&quot;code&quot;&gt;$0&lt;/span&gt;. Now we can see the first
 instruction above is moving 2 bytes containing the value zero. Similarly, the
 second instruction is moving 2 bytes containing the value 1234:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm3.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm3.png&quot;/&gt;
 &lt;h2&gt;The rbp Register&lt;/h2&gt;
 &lt;p&gt;But where are these &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt; instructions moving these
 values to? To understand that we need to understand the odd &lt;span
@@ -2010,7 +2204,7 @@ running.&lt;/p&gt;
 &lt;h2&gt;How Rust Saves an Integer Enum Variant&lt;/h2&gt;
 &lt;p&gt;Taking a step back for a moment, here’s what we’ve learned so far. When I save
 an enum value containing an integer, Rust saves &lt;em&gt;two&lt;/em&gt; values, 0 and 1234:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save1.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save1.png&quot;/&gt;
 &lt;p&gt;What does the &lt;span class=&quot;code&quot;&gt;0&lt;/span&gt; mean? Rust records a zero to indicate
 that &lt;span class=&quot;code&quot;&gt;a_number&lt;/span&gt; uses the &lt;span
 class=&quot;code&quot;&gt;NumOrStr::Num&lt;/span&gt; variant. In other words, &lt;span
@@ -2023,10 +2217,10 @@ class=&quot;code&quot;&gt;Num(i16)&lt;/span&gt;, and we saw Rust used a movw to 
 &lt;p&gt;But what about the other variant, the string? When I save a string in &lt;span
 class=&quot;code&quot;&gt;NumOrStr&lt;/span&gt;, what does Rust do? To find out, I’ll replace my
 main function from above with this line of code:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save2.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save2.png&quot;/&gt;
 &lt;p&gt;The I’ll compile it again using the &lt;span class=&quot;code&quot;&gt;--emit asm&lt;/span&gt;
 option. Now I find this assembly language code in the union.s file:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm4.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm4.png&quot;/&gt;
 &lt;p&gt;Unfortunately this code snippet is much more complex: It first calls &lt;span
 class=&quot;code&quot;&gt;String::from&lt;/span&gt; passing a string literal, and then saves the
 string into the enum via a method called &lt;span
@@ -2035,15 +2229,15 @@ class=&quot;code&quot;&gt;drop_in_place&lt;/span&gt;. This is much harder to und
 program using LLDB, and inspect the memory &lt;span class=&quot;code&quot;&gt;a_string&lt;/span&gt;
 occupies. I found that Rust used 26 bytes to represent the string variant,
 starting with a 16 bit word containing 1:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save3.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save3.png&quot;/&gt;
 &lt;p&gt;This is again the tag; in this case &lt;span class=&quot;code&quot;&gt;1&lt;/span&gt; means &lt;span
 class=&quot;code&quot;&gt;a_string&lt;/span&gt; uses the &lt;span class=&quot;code&quot;&gt;NumOrStr::Str&lt;/span&gt;
 variant. Following this I found a pointer to the string itself:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save4.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save4.png&quot;/&gt;
 &lt;p&gt;Pointers on a 64-bit microprocessor occupy 8 bytes and contain the memory
 address of something, in this case my string &amp;quot;This is a test.” After the
 pointer I found two 64 bit values, each containing 15:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save5.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save5.png&quot;/&gt;
 &lt;p&gt;These are two attributes of the string: its capacity and length. By inspecting
 my process's memory I’ve started to learn a bit about how Rust manages memory
 for strings.&lt;/p&gt;
@@ -2051,16 +2245,16 @@ for strings.&lt;/p&gt;
 the same pattern. Rust saves an integer value, the tag, indicating which
 variant this instance of the enum uses. Then Rust saves the enum variant’s
 payload in the memory that follows:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save6.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save6.png&quot;/&gt;
 &lt;h2&gt;Tagged Unions in Rust and C&lt;/h2&gt;
 &lt;p&gt;Let’s review by declaring a tagged union in C and Rust:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/review1.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/review1.png&quot;/&gt;
 &lt;p&gt;On the left using C, I have to include the tag explicitly in a surrounding
 struct. Rust handles this for me automatically, saving the tag value inside the
 enum alongside the enum’s value. The code looks very different, but as we saw above
 the implementations are_ identical_.&lt;/p&gt;
 &lt;p&gt;Using a tagged union looks somewhat similar in C and Rust:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/review2.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/review2.png&quot;/&gt;
 &lt;p&gt;But there are very important differences here! Using C, I need to remember to
 check the tag and to use the proper variant inside the union. The Rust
 compiler, on the other hand, checks the tag for me automatically and won’t
@@ -2110,7 +2304,7 @@ I’ll take a look at how Rust compiles &lt;span class=&quot;code&quot;&gt;if le
 &lt;h2&gt;If Let Compares a Pattern with a Value&lt;/h2&gt;
 &lt;p&gt;The idea behind &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; is that it compares a pattern
 with a value:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/pattern-value.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/pattern-value.png&quot;/&gt;
 &lt;p&gt;In this example &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; compares the pattern &lt;span
 class=&quot;code&quot;&gt;Some(3)&lt;/span&gt; with the value &lt;span
 class=&quot;code&quot;&gt;some_u8_value&lt;/span&gt;. If there’s a match, &lt;span class=&quot;code&quot;&gt;if
@@ -2151,7 +2345,7 @@ fn main() {
 &lt;/pre&gt;
 &lt;p&gt;To write this all I had to do was move things around a bit in my &lt;span
 class=&quot;code&quot;&gt;if let&lt;/span&gt; code snippet from above:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/if-let-match.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/if-let-match.png&quot;/&gt;
 &lt;p&gt;Because there was no else clause for the &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt;
 statement, I used &lt;span class=&quot;code&quot;&gt;None =&amp;gt; ()&lt;/span&gt; in match.&lt;/p&gt;
 &lt;p&gt;Saving this code in match.rs and running it I got the same result:&lt;/p&gt;
@@ -2354,13 +2548,13 @@ anyone from the Rust teams happens to read this, let us know.&lt;/p&gt;
   &lt;i&gt; What do Postgres GiST indexes look like? How are&lt;br/&gt;
   they similar or different from standard Postgres indexes?&lt;/i&gt;
 &lt;/div&gt;
-&lt;p&gt;In the last few posts in this series
-(&lt;a href=&quot;http://patshaughnessy.net/2017/12/11/trying-to-represe</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;p&gt;In the last few posts in this series 
+(&lt;a href=&quot;http://patshaughnessy.net/2017/12/11/trying-to-repres</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/tree5.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt; What do Postgres GiST indexes look like? How are&lt;br/&gt;
   they similar or different from standard Postgres indexes?&lt;/i&gt;
 &lt;/div&gt;
-&lt;p&gt;In the last few posts in this series
+&lt;p&gt;In the last few posts in this series 
 (&lt;a href=&quot;http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres&quot;&gt;one&lt;/a&gt;,
 &lt;a href=&quot;http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension&quot;&gt;two&lt;/a&gt;,
 &lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;three&lt;/a&gt;
@@ -2399,7 +2593,7 @@ on a small table like this will always be fast. Today I’d like to imagine a
 much larger tree to explore the benefits indexes can provide; suppose instead I
 have a tree containing hundreds or thousands of records in the &lt;span
 class=&quot;code&quot;&gt;path&lt;/span&gt; column:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/table.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/table.png&quot;/&gt;
 &lt;p&gt;Now suppose I search for a single tree node using a select statement:&lt;/p&gt;
 &lt;pre&gt;
 select letter from tree where path = 'A.B.T.V'
@@ -2407,7 +2601,7 @@ select letter from tree where path = 'A.B.T.V'
 &lt;p&gt;Without an index on this table, Postgres has to resort to a &lt;em&gt;sequence scan&lt;/em&gt;,
 which is a technical way of saying that Postgres has to iterate over all of the
 records in the table:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/table2.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/table2.png&quot;/&gt;
 &lt;p&gt;For each and every record in the table, Postgres executes a comparison &lt;span
 class=&quot;code&quot;&gt;p == q&lt;/span&gt; where &lt;span class=&quot;code&quot;&gt;p&lt;/span&gt; is the value of
 the path column for each record in the table, and &lt;span class=&quot;code&quot;&gt;q&lt;/span&gt;
@@ -2426,10 +2620,10 @@ see a performance problem with a SQL statement in your application, the first
 thing you should check for is a missing index. But why? Why does creating an
 index speed up searches, exactly? The reason is that an index is a sorted copy
 of the target column’s data:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index1.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index1.png&quot;/&gt;
 &lt;p&gt;By sorting the values ahead of time, Postgres can search through them much more
 quickly. It uses a binary search algorithm:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index2.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index2.png&quot;/&gt;
 &lt;p&gt;Postgres starts by checking the value in the middle of the index. If the stored
 value (&lt;span class=&quot;code&quot;&gt;p&lt;/span&gt;) is too large and is greater than the query
 (&lt;span class=&quot;code&quot;&gt;q&lt;/span&gt;), if &lt;span class=&quot;code&quot;&gt;p &amp;gt; q&lt;/span&gt;, it moves up
@@ -2442,7 +2636,7 @@ or records.&lt;/p&gt;
 save all of the sorted data values in a single memory segment. Instead,
 Postgres indexes (and indexes inside of any relational database system) save
 values in a &lt;em&gt;binary or balanced tree&lt;/em&gt; (B-Tree):&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index3.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index3.png&quot;/&gt;
 &lt;p&gt;Now my values are saved in a series of different memory segments arranged in a
 tree structure. Dividing the index up into pieces allows Postgres to manage
 memory properly while saving possibly millions of values in the index. Note
@@ -2453,7 +2647,7 @@ Postgres
 Indexes&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Now Postgres uses repeated binary searches, one for each memory segment in the
 B-Tree, to find a value:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index4.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index4.png&quot;/&gt;
 &lt;p&gt;Each value in the parent or root segment is really a pointer to a child
 segment. Postgres first searches the root segment using a binary search to find
 the right pointer, and then jumps down to the child segment to find the actual
@@ -2571,7 +2765,7 @@ insert into tree (letter, path) values ('P', 'A.B.R.P');
 &lt;/pre&gt;
 &lt;p&gt;To get things started, Postgres will allocate a new memory segment for the GiST
 index and insert my five records:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist1.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist1.png&quot;/&gt;
 &lt;p&gt;If I search now using the ancestor operator:&lt;/p&gt;
 &lt;pre&gt;
 select count(*) from tree where path &lt;@ 'A.B.T'
@@ -2579,10 +2773,10 @@ select count(*) from tree where path &lt;@ 'A.B.T'
 &lt;p&gt;…Postgres will simply iterate over the records in the same order I inserted
 then, and call the &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; function for each
 one. Here again is what the GiST API calls for the Consistent function to do:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/consistent.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/consistent.png&quot;/&gt;
 &lt;p&gt;In this case Postgres will compare &lt;span class=&quot;code&quot;&gt;p &amp;lt;@ A.B.T&lt;/span&gt; for
 each of these five records:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist2.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist2.png&quot;/&gt;
 &lt;p&gt;Because the values of &lt;span class=&quot;code&quot;&gt;p&lt;/span&gt;, the tree page keys, are
 simple path strings, &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; directly
 compares them with &lt;/span&gt;A.B.T&lt;/span&gt; and determines immediately whether each
@@ -2592,14 +2786,14 @@ over all the values, just like a sequence scan.&lt;/p&gt;
 &lt;p&gt;Now suppose I start to add more and more records to my table. Postgres can fit
 up to 136 LTREE records into the root GiST memory segment, and index scans
 function the same way as a sequence scan by checking all the values.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist3.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist3.png&quot;/&gt;
 &lt;p&gt;But if I insert one more record, the 137th record doesn’t fit. At this point
 Postgres has to do something different:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist4.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist4.png&quot;/&gt;
 &lt;p&gt;Now Postgres “splits” the memory segment to make room for more values. It
 creates two new child memory segments and pointers to them from the parent or
 root segment.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist5.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist5.png&quot;/&gt;
 &lt;p&gt;What does Postgres do next? What does it place into each child segment?
 Postgres leaves this decision to the GiST API, to the LTREE extension, by
 calling the the &lt;span class=&quot;code&quot;&gt;ltree_picksplit&lt;/span&gt; function. Here again
@@ -2613,7 +2807,7 @@ each half into one of the two new child segments. Note that GiST indexes don’t
 normally sort their contents; however, GiST indexes created specifically by the
 LTREE extension do because of the way &lt;span class=&quot;code&quot;&gt;ltree_picksplit&lt;/span&gt;
 works. We’ll see why it sorts the data in a moment.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist6.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist6.png&quot;/&gt;
 &lt;p&gt;Now Postgres has to decide what to leave in the root segment. To do this, it
 calls the Union GiST API:&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
@@ -2622,7 +2816,7 @@ calls the Union GiST API:&lt;/p&gt;
 &lt;p&gt;In this example, each of the child segments is a set S. And the &lt;span
 class=&quot;code&quot;&gt;ltree_union&lt;/span&gt; function has to return a “union” value for each
 child segment that describes somehow what values are present in that segment:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist7.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist7.png&quot;/&gt;
 &lt;p&gt;Oleg and Teodor decided this union value should be a pair of left/right values
 indicating the minimum and maximum tree branches inside of which all of the
 values fit alphabetically. This is why the &lt;span
@@ -2631,13 +2825,13 @@ because the first child segment contains the sorted values from &lt;span
 class=&quot;code&quot;&gt;A.B.C.B&lt;/span&gt; through &lt;span class=&quot;code&quot;&gt;A.B.M.Z&lt;/span&gt;, the
 left/right union becomes &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt; and &lt;span
 class=&quot;code&quot;&gt;A.B.M&lt;/span&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist8.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist8.png&quot;/&gt;
 &lt;p&gt;Note &lt;span class=&quot;code&quot;&gt;A.B.M&lt;/span&gt; is sufficient here to form a union value
 excluding &lt;span class=&quot;code&quot;&gt;A.B.N.X&lt;/span&gt; and all the following values; LTREE
 doesn’t need to save &lt;span class=&quot;code&quot;&gt;A.B.M.Z&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;Similarly, the left/right union for the second child segment becomes &lt;span
 class=&quot;code&quot;&gt;A.B.N/A.B.X&lt;/span&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist9.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist9.png&quot;/&gt;
 &lt;p&gt;This is what a GiST index looks like. Or, what an LTREE GiST index looks like,
 specifically. The power of the GiST API is that anyone can use it to create a
 Postgres index for any type of data. Postgres will always use the same pattern:
@@ -2662,14 +2856,14 @@ select count(*) from tree where path &lt;@ 'A.B.T'
 &lt;p&gt;To execute this using the GiST index, Postgres iterates over the union values
 in the root memory segment and calls the &lt;span
 class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; function for each one:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/consistent.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/consistent.png&quot;/&gt;
 &lt;p&gt;Now Postgres passes each union value to &lt;span
 class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; to calculate the &lt;span class=&quot;code&quot;&gt;p &amp;lt;@
 q&lt;/span&gt; formula. The code inside of &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt;
 then returns &amp;quot;MAYBE&amp;quot; if &lt;span class=&quot;code&quot;&gt;q &amp;gt;
 left&lt;/span&gt;, and &lt;span class=&quot;code&quot;&gt;q &amp;lt; right&lt;/span&gt;. Otherwise it returns
 &amp;quot;NO.&amp;quot;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist10.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist10.png&quot;/&gt;
 &lt;p&gt;In this example you can see &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; finds
 that the query &lt;span class=&quot;code&quot;&gt;A.B.T&lt;/span&gt;, or &lt;span class=&quot;code&quot;&gt;q&lt;/span&gt;,
 &lt;em&gt;maybe&lt;/em&gt; is located inside the second child memory segment, but not the first one.&lt;/p&gt;
@@ -2682,7 +2876,7 @@ child segment, so it skips down to the second union structure.&lt;/p&gt;
 true and &lt;span class=&quot;code&quot;&gt;q &amp;lt; A.B.X&lt;/span&gt; true. Therefore it returns &lt;span
 class=&quot;code&quot;&gt;MAYBE&lt;/span&gt;, meaning the search continues in the lower child
 segment:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist11.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist11.png&quot;/&gt;
 &lt;p&gt;Note Postgres never had to search the first child segment: The tree structure
 limits the comparisons necessary to just the values that might match &lt;span
 class=&quot;code&quot;&gt;p &amp;lt;@ A.B.T&lt;/span&gt;.&lt;/p&gt;
@@ -2705,302 +2899,7 @@ examples of SQL searches on tree data, including some which use the &lt;span
 class=&quot;code&quot;&gt;LTREE[]&lt;/span&gt; data type I didn’t have time to cover in these blog
 posts.&lt;/p&gt;
 &lt;p&gt;But most importantly, they included this note at the bottom:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/postcard.png&quot;/&gt;&lt;/p&gt;
+&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/postcard.png&quot;/&gt;
 &lt;p&gt;Do you save tree data in Postgres? Does your app take advantage of the LTREE
 extension? If so, you should send Oleg and Teodor a postcard! I just did.&lt;/p&gt;
-</content></entry><entry><title>Manipulating Trees Using SQL and the Postgres LTREE Extension</title><link href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension" rel="alternate"></link><id href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension" rel="alternate"></id><published>2017-12-14T00:00:00Z</published><updated>2017-12-14T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/14/tree4.jpg&quot;&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;Yesterday&lt;/a&gt;,
-I used the &lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE&lt;/a&gt;
-extension to save a tree data structure </summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/14/tree4.jpg&quot;&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;Yesterday&lt;/a&gt;,
-I used the &lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE&lt;/a&gt;
-extension to save a tree data structure in a Postgres table. After saving the
-tree, I used the &lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; or ancestor operator to count the
-number of descendant nodes on a given branch.&lt;/p&gt;
-&lt;p&gt;But that’s not all LTREE can do. Today I’ll show you how to delete, move and
-copy branches from one place to another in your tree, using &lt;span
-class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; in combination with other LTREE functions. After that,
-in &lt;a href=&quot;http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index&quot;&gt;my last post in this
-series&lt;/a&gt;,
-I’ll look at how LTREE works under the hood, at the Computer Science that makes
-all of this possible.&lt;/p&gt;
-&lt;h2&gt;My Example Tree Again&lt;/h2&gt;
-&lt;p&gt;Here’s the tree I’ve been working with during the last few blog posts:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/11/example-tree.png&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;In my last
-post&lt;/a&gt;,
-I saved this tree in my database using a series of insert statements:&lt;/p&gt;
-&lt;pre&gt;
-insert into tree (letter, path) values ('A', 'A');
-insert into tree (letter, path) values ('B', 'A.B');
-insert into tree (letter, path) values ('C', 'A.C');
-insert into tree (letter, path) values ('D', 'A.C.D');
-insert into tree (letter, path) values ('E', 'A.C.E');
-insert into tree (letter, path) values ('F', 'A.C.F');
-insert into tree (letter, path) values ('G', 'A.B.G');
-&lt;/pre&gt;
-&lt;p&gt;And we saw how easy it is to count the number of tree nodes in a given branch
-using the &lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; operator:&lt;/p&gt;
-&lt;pre&gt;
-select count(*) from tree where 'A.C' @&gt; path;
-&lt;/pre&gt;
-&lt;h2&gt;Cutting Off a Branch&lt;/h2&gt;
-&lt;p&gt;But suppose I wanted to remove these nodes from the tree entirely; that is,
-suppose I wanted to “cut off this branch” of the tree, so to speak:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/14/cut-branch.png&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;How can I do this? Simple! I just use a SQL delete statement:&lt;/p&gt;
-&lt;pre&gt;
-delete from tree where 'A.C' @&gt; path;
-&lt;/pre&gt;
-&lt;p&gt;As you can see, I can use &lt;span class=&quot;code&quot;&gt;@&amp;gt;&lt;/span&gt; equally well in delete
-statements as in select statements.&lt;/p&gt;
-&lt;h2&gt;Replanting a Branch as a New Tree&lt;/h2&gt;
-&lt;p&gt;Now suppose I want to keep this branch, and save it as a separate tree in my
-table. That is, I want two trees: the original &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt; tree
-and a new tree consisting of the &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt; branch “replanted”
-as a new root:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/14/replanting.png&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;Thinking about this for a moment, moving some nodes from one location to
-another in my tree means I’ll need to update their path values somehow in my
-table. That is, I’ll need to use an update statement and not a select or delete
-statement.  But how? Writing an update statement is easy enough, but how do I
-know what the new path of each tree node will be? Let’s take &lt;span
-class=&quot;code&quot;&gt;C&lt;/span&gt; as an example. Because &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt; will
-become the root node of my new tree, I want to change its path from &lt;span
-class=&quot;code&quot;&gt;A.C&lt;/span&gt; to just &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt;:&lt;/p&gt;
-&lt;pre&gt;
-update tree set path = 'C' where path = 'A.C';
-&lt;/pre&gt;
-&lt;p&gt;And I will want to update &lt;span class=&quot;code&quot;&gt;D&lt;/span&gt;, one of &lt;span
-class=&quot;code&quot;&gt;C&lt;/span&gt;’s children, in a similar way:&lt;/p&gt;
-&lt;pre&gt;
-update tree set path = 'C.D' where path = 'A.C.D';
-&lt;/pre&gt;
-&lt;p&gt;I could write a separate update statement for each node, just 4 SQL statements
-for my example. But imagine I had 100s or 1000s of nodes in my tree. Updating
-the records one SQL statement at a time would require repeated network
-connections from my application to Postgres, slowing down the overall operation
-tremendously.&lt;/p&gt;
-&lt;p&gt;Instead, I need to update the path of &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt; and each of
-its descendants all in a single operation. But how can I do this? Two LTREE
-functions, &lt;span class=&quot;code&quot;&gt;NLEVEL()&lt;/span&gt; and &lt;span
-class=&quot;code&quot;&gt;SUBPATH()&lt;/span&gt;, can help.&lt;/p&gt;
-&lt;h2&gt;The NLEVEL Function&lt;/h2&gt;
-&lt;p&gt;First, &lt;span class=&quot;code&quot;&gt;NLEVEL&lt;/span&gt;. As you might guess, this returns the
-number of levels in a given path string:&lt;/p&gt;
-&lt;pre&gt;
-select letter, path, nlevel(path) from tree;
-
-letter | path  | nlevel 
--------+-------+--------
-A      | A     |      1
-B      | A.B   |      2
-C      | A.C   |      2
-D      | A.C.D |      3
-E      | A.C.E |      3
-F      | A.C.F |      3
-G      | A.B.G |      3
-(7 rows)
-&lt;/pre&gt;
-&lt;p&gt;Looking at this, it’s easy to understand what the function returns: For a root
-node like &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;NLEVEL&lt;/span&gt; returns 1.
-For &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt;’s child nodes, &lt;span class=&quot;code&quot;&gt;A.B&lt;/span&gt;
-and &lt;span class=&quot;code&quot;&gt;A.C&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;NLEVEL&lt;/span&gt; returns 2,
-and for the grandchild nodes it returns 3. It simply counts the number of
-levels in each path string; internally, it parses the path string for period
-characters.&lt;/p&gt;
-&lt;p&gt;Before we continue, consider one subtle but important point. Notice that I was
-able to calculate &lt;span class=&quot;code&quot;&gt;NLEVEL&lt;/span&gt; on &lt;em&gt;all of the records&lt;/em&gt; in
-the tree table with a single SQL statement! Postgres applied the function to
-all of the matching paths for me. The power of LTREE’s functions is that they
-seamlessly integrate with SQL, harnessing and extending the power of Postgres.&lt;/p&gt;
-&lt;h2&gt;The SUBPATH Function&lt;/h2&gt;
-&lt;p&gt;LTREE provides another new SQL function that will also help us write a general
-tree path formula: &lt;span class=&quot;code&quot;&gt;SUBPATH&lt;/span&gt;. As you might guess, this
-returns a selected substring from a given path. Let’s try running it on my
-example tree:&lt;/p&gt;
-&lt;pre&gt;
-select letter, subpath(path, 1) from tree;
-ERROR:  invalid positions
-STATEMENT:  select letter, subpath(path, 1) from tree;
-&lt;/pre&gt;
-&lt;p&gt;Oops - I’ve done something wrong here. Calling &lt;span class=&quot;code&quot;&gt;SUBPATH(path,
-1)&lt;/span&gt; returns the portion of the path starting with offset 1. Not a
-character offset, but a &lt;em&gt;path offset&lt;/em&gt;. So &lt;span class=&quot;code&quot;&gt;SUBPATH(path,
-1)&lt;/span&gt; drops the first level of the path, &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt; in my
-tree, and returns the remaining portion of each path starting from the second
-path element. Internally, LTREE parses the periods for me, drops the requested
-number of path levels and removes the extra leading period.&lt;/p&gt;
-&lt;p&gt;In the statement above, the error was caused by the root node in the tree:
-&lt;span class=&quot;code&quot;&gt;A&lt;/span&gt;.  This path has only one level, and so LTREE
-returns an error in this case.&lt;/p&gt;
-&lt;p&gt;Let’s try using &lt;span class=&quot;code&quot;&gt;SUBPATH&lt;/span&gt; only on the &lt;span
-class=&quot;code&quot;&gt;C&lt;/span&gt; branch, the branch we want to move:&lt;/p&gt;
-&lt;pre&gt;
-select letter, subpath(path, 1) from tree where path &lt;@ 'A.C';
-letter | subpath 
--------+---------
-C      | C
-D      | C.D
-E      | C.E
-F      | C.F
-(4 rows)
-&lt;/pre&gt;
-&lt;p&gt;Now I get only four records in the result, one for &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt;
-and one for each node that appears under &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt;. And you
-can see the &lt;span class=&quot;code&quot;&gt;subpath&lt;/span&gt; column contains the portion of
-the path that appears after &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt;, for each of these 4
-records.&lt;/p&gt;
-&lt;p&gt;And again, notice that I was able to execute the &lt;span
-class=&quot;code&quot;&gt;SUBPATH&lt;/span&gt; function on all 4 tree records I wanted to, in a
-single operation. This time, the &lt;span class=&quot;code&quot;&gt;SUBPATH&lt;/span&gt; function
-worked in concert with the &lt;span class=&quot;code&quot;&gt;&amp;lt;@&lt;/span&gt; operator. LTREE has
-made the SQL language I already know how to use even more powerful.&lt;/p&gt;
-&lt;h2&gt;Moving Tree Nodes Using One UPDATE Statement&lt;/h2&gt;
-&lt;p&gt;Now let’s return to the question of moving a branch into a new tree. As this
-diagram shows, I want to delete &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt; and its children
-from the &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt; tree, and move them to a new location:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/14/replanting.png&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;Earlier I considered moving the nodes using a single update statement for each:&lt;/p&gt;
-&lt;pre&gt;
-update tree set path = 'C' where path = 'A.C';
-update tree set path = 'C.D' where path = 'A.C.D';
-update tree set path = 'C.E' where path = 'A.C.E';
-update tree set path = 'C.F' where path = 'A.C.F';
-&lt;/pre&gt;
-&lt;p&gt;Now that I know about &lt;span class=&quot;code&quot;&gt;SUBPATH&lt;/span&gt;, it’s easy to write a
-single SQL update statement that will move all 4 nodes in the &lt;span
-class=&quot;code&quot;&gt;C&lt;/span&gt; branch in one operation:&lt;/p&gt;
-&lt;pre&gt;
-update tree set path = subpath(path, 1) where path &lt;@ 'A.C';
-&lt;/pre&gt;
-&lt;p&gt;I use &lt;span class=&quot;code&quot;&gt;where path &amp;lt;@ 'A.C'&lt;/span&gt; to scope the update to the
-&lt;span class=&quot;code&quot;&gt;C&lt;/span&gt; branch, and I use &lt;span class=&quot;code&quot;&gt;subpath(path,
-1)&lt;/span&gt; to remove the &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt; root element from the path
-of &lt;span class=&quot;code&quot;&gt;C&lt;/span&gt; and each of its descendants.&lt;/p&gt;
-&lt;p&gt;I can generalize this a bit more using the &lt;span class=&quot;code&quot;&gt;NLEVEL&lt;/span&gt;
-function also:&lt;/p&gt;
-&lt;pre&gt;
-update tree set path = subpath(path, nlevel('A.C')-1) where path &lt;@ 'A.C';
-&lt;/pre&gt;
-&lt;p&gt;This follows because &lt;span class=&quot;code&quot;&gt;nlevel('A.C') = 2&lt;/span&gt;, and
-therefore, &lt;span class=&quot;code&quot;&gt;nlevel('A.C')-1&lt;/span&gt; returns the same formula
-we had above. Replacing &lt;span class=&quot;code&quot;&gt;A.C&lt;/span&gt; with “BRANCH_PATH” I
-arrive at a general formula for “replanting” a branch as a new tree using a
-single SQL statement:&lt;/p&gt;
-&lt;pre&gt;
-update tree set path = subpath(path, nlevel(BRANCH_PATH)-1) where path &lt;@ BRANCH_PATH
-&lt;/pre&gt;
-&lt;p&gt;…assuming &lt;span class=&quot;code&quot;&gt;nlevel(BRANCH_PATH) &amp;gt; 1&lt;/span&gt;, that is assuming
-the branch we want to replant isn’t already a root.&lt;/p&gt;
-&lt;h2&gt;The || Concatenation Operator&lt;/h2&gt;
-&lt;p&gt;This seems somewhat useful, but what if I want to move a branch from one
-location in my tree to some other location, not necessary to the root? This is
-a more general problem. For example, suppose I want to move the &lt;span
-class=&quot;code&quot;&gt;C&lt;/span&gt; branch under &lt;span class=&quot;code&quot;&gt;G&lt;/span&gt;, like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/14/moving.png&quot;/&gt;&lt;/p&gt;
-&lt;p&gt;To write a formula for this transformation using SQL, we need to use one more
-important LTREE operator: the &lt;span class=&quot;code&quot;&gt;||&lt;/span&gt; or concatenation
-operator. Let’s try it out with an example first:&lt;/p&gt;
-&lt;pre&gt;
-select 'A.B.G' || path as concatenated from tree;
-concatenated 
---------------
-A.B.G.A
-A.B.G.A.B
-A.B.G.A.C
-A.B.G.A.C.D
-A.B.G.A.C.E
-A.B.G.A.C.F
-A.B.G.A.B.G
-(7 rows)
-&lt;/pre&gt;
-&lt;p&gt;You can see LTREE has automatically added &lt;span class=&quot;code&quot;&gt;A.B.G&lt;/span&gt; along
-with a period separator to each path in my table. And it has done this for all
-the paths in my table in a single operation.&lt;/p&gt;
-&lt;h2&gt;Moving a Branch&lt;/h2&gt;
-&lt;p&gt;Now using &lt;span class=&quot;code&quot;&gt;||&lt;/span&gt; I can write a single SQL statement to
-move a tree branch from one location to another. First, of course, I need to
-scope the SQL operation to the target branch using the ancestor operator:&lt;/p&gt;
-&lt;pre&gt;
-select 'A.B.G' || path as concatenated from tree where path &lt;@ 'A.C';
-concatenated 
----------------
-A.B.G.A.C
-A.B.G.A.C.D
-A.B.G.A.C.E
-A.B.G.A.C.F
-(4 rows)
-&lt;/pre&gt;
-&lt;p&gt;I get the same results as above, but now only for the tree nodes I want to
-move.&lt;/p&gt;
-&lt;p&gt;But my next problem is the new paths above start with &lt;span
-class=&quot;code&quot;&gt;A.B.G.A.C&lt;/span&gt;…. Instead, I want them to be &lt;span
-class=&quot;code&quot;&gt;A.B.G.C&lt;/span&gt;…. I need to remove that extra &lt;span
-class=&quot;code&quot;&gt;A&lt;/span&gt; character from the new paths, using the &lt;span
-class=&quot;code&quot;&gt;SUBPATH&lt;/span&gt; operator:&lt;/p&gt;
-&lt;pre&gt;
-select 'A.B.G' || subpath(path, 1) as concatenated from tree where path &lt;@ 'A.C';
-concatenated 
---------------
-A.B.G.C
-A.B.G.C.D
-A.B.G.C.E
-A.B.G.C.F
-(4 rows)
-&lt;/pre&gt;
-&lt;p&gt;And finally, converting this into an update statement:&lt;/p&gt;
-&lt;pre&gt;
-update tree set path = 'A.B.G' || subpath(path, 1) where path &lt;@ 'A.C'
-&lt;/pre&gt;
-&lt;p&gt;…I have the single SQL statement I need!&lt;/p&gt;
-&lt;p&gt;And generalizing this, we arrive at a SQL formula you could use in your own
-Postgres database:&lt;/p&gt;
-&lt;pre&gt;
-update tree set path = DESTINATION_PATH || subpath(path, nlevel(SOURCE_PATH)-1)
-where path &lt;@ SOURCE_PATH;
-&lt;/pre&gt;
-&lt;h2&gt;Copying a Branch&lt;/h2&gt;
-&lt;p&gt;One last puzzle: How can I copy a tree branch instead of moving it? I just use
-an insert SQL statement instead of update. Simple, right?&lt;/p&gt;
-&lt;p&gt;But how, exactly? I need to insert multiple rows, one record for each node in
-the branch I copy. Again, I could write a series of insert statements like
-this:&lt;/p&gt;
-&lt;pre&gt;
-insert into tree (letter, path) values ('C', 'A.B.G.C');
-insert into tree (letter, path) values ('D', 'A.B.G.C.D');
-insert into tree (letter, path) values ('E', 'A.B.G.C.E');
-insert into tree (letter, path) values ('F', 'A.B.G.C.F');
-&lt;/pre&gt;
-&lt;p&gt;But using LTREE functions and operators, I can achieve this using a single SQL
-statement! I just have to write SQL that will insert the result of a select,
-like this:&lt;/p&gt;
-&lt;pre&gt;
-insert into tree (letter, path) (
-    select letter, 'A.B.G' || subpath(path, 1) from tree where 'A.C' @&gt; path
-)
-&lt;/pre&gt;
-&lt;p&gt;Executing this, Postgres will first find all the nodes inside the branch I want
-to copy, and recalculate their paths. Then it will insert that result set into
-the tree as a copy, leaving my original branch unchanged!&lt;/p&gt;
-&lt;p&gt;By writing this tree-related logic using LTREE operators in SQL, I ask Postgres
-to do all of the hard work of manipulating and copying the path strings for me.
-I don’t have to write application code to keep track of these strings, and no
-data needs to be transmitted back and forth between my application server and
-the database server.&lt;/p&gt;
-&lt;h2&gt;What’s Next? LTREE Internals&lt;/h2&gt;
-&lt;p&gt;In my last post about LTREE, I’ll look closely at how it works internally. It’s
-easy enough to imagine how simple functions like &lt;span
-class=&quot;code&quot;&gt;NLEVEL&lt;/span&gt;, || or &lt;span class=&quot;code&quot;&gt;SUBPATH&lt;/span&gt; work.
-That’s not the interesting part for me. These functions are shorthand for
-fairly simple string operations.&lt;/p&gt;
-&lt;p&gt;The special sauce that makes LTREE such a powerful tool is that it integrates
-with Postgres GiST indexes. By using an index, Postgres can execute any of the
-SQL expressions I wrote above equally fast on 7000 records as it would on 7!
-How? The only way to find out is by &lt;a href=&quot;http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index&quot;&gt;Looking Inside Postgres at a GiST
-Index&lt;/a&gt;.&lt;/p&gt;
 </content></entry></feed>

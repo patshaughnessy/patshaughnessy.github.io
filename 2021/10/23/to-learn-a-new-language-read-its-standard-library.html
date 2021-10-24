@@ -1,0 +1,197 @@
+<!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>To Learn a New Language, Read Its Standard Library - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>To Learn a New Language, Read Its Standard Library</h1><div class="metadata"><span class="date">October 23rd 2021</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="To Learn a New Language, Read Its Standard Library">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px">
+  <img src="http://patshaughnessy.net/assets/2021/10/23/chicken-little.png"><br/>
+  <i>If I was learning to read English as a foreign language,<br/> I would need something simple to get started.<br/>
+  <small>(from The Remarkable Story of Chicken Little, 1840)</small></i> 
+</div>
+<p>The best way to learn a new programming language, just like a human language,
+is from example. To learn how to write code you first need to read someone
+else’s code. But who is the best person to learn from? Which code should we
+read? Where should we look to find it?</p>
+<p>This year in my spare time I was learning about
+<a href="https://crystal-lang.org">Crystal</a>. I had played around with some simple
+scripts, but I wanted to learn more. Then I stumbled on to Crystal’s <a href="https://github.com/crystal-lang/crystal/tree/master/src">standard
+library</a>. I was
+relieved to see that Crystal’s core classes are implemented using Crystal
+itself!</p>
+<p>Crystal’s standard library is clear, simple, concise and well documented.
+Reading Crystal’s internal implementation of Array or Hash is like reading
+a fairy tale in a children’s book. Anyone can understand it, even people
+without a Ph.D. in Computer Science or systems programming experience.</p>
+<h2>At First Glance, Crystal Is Ruby</h2>
+<p>At first glance, when I read Crystal’s <a href="https://github.com/crystal-lang/crystal/blob/master/src/array.cr">Array
+implementation</a>,
+I thought I was reading a Ruby program:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Array</span><span style="color:#000000;">(T)
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">include </span><span style="color:#008080;">Indexable</span><span style="color:#000000;">::Mutable(T)
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">include </span><span style="color:#000000;">Comparable(Array)
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Size of an Array that we consider small to do linear scans or other optimizations.
+</span><span style="color:#000000;">  </span><span style="color:#795da3;">private </span><span style="color:#000000;">SMALL_ARRAY_SIZE </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">16
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># The size of this array.
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">size </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">Int32
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># The capacity of `@buffer`.
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Note that, because `@buffer` moves on shift, the actual
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># capacity (the allocated memory) starts at `@buffer - @offset_to_buffer`.
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># The actual capacity is also given by the `remaining_capacity` internal method.
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">capacity </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">Int32
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Offset to the buffer that was originally allocated, and which needs to
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># be reallocated on resize. On shift this value gets increased, together with
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># `@buffer`. To reach the root buffer you have to do `@buffer - @offset_to_buffer`,
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># and this is also provided by the `root_buffer` internal method.
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">offset_to_buffer </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">Int32 </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">0
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># The buffer where elements start.
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">buffer </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">Pointer(T)
+</span></pre>
+
+<p>There are lots of familiar keywords, like <code>class</code>, <code>include</code> and <code>private</code>. I also
+see Ruby’s <code>@</code> character indicating an instance variable. This code is about 100x
+easier to read vs. <a href="https://github.com/ruby/ruby/blob/master/array.c">Ruby’s own C implementation of
+Array</a>.</p>
+<p>Along with the familiar Ruby-like syntax, notice the helpful comments. Even
+though I’ve just started reading I can already make an educated guess at how
+Crystal arrays function internally. I can see there’s a pointer to memory which
+holds the array elements, and that the code keeps track of the capacity of this
+memory along with the actual size of the array. Finally, reading the comment for
+<code>offset_to_buffer</code> I can imagine there are some optimizations related to adding
+and removing elements. The comment is both helpful and intriguing.</p>
+<p>But I’m not reading Ruby code. There are important differences here: generic
+type syntax and most importantly each of the instance variables is declared
+with a static type known at compile time. How do I use static types in Crystal?
+What types are available? What about the generic type parameter <code>T</code>? Should I
+use that in my own Crystal code? What other syntax differences vs. Ruby are
+there?</p>
+<p>The best way to learn how to write Crystal code is simply to scroll down and
+read one of the Array methods.</p>
+<h2>Array#uniq</h2>
+<p>Here’s how Crystal finds the unique elements of an array:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">uniq
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> size </span><span style="color:#4f5b66;">&lt;= </span><span style="color:#d08770;">1
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">return </span><span style="color:#000000;">dup
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Heuristic: for a small array it&#39;s faster to do a linear scan
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># than creating a Hash to find out duplicates.
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> size </span><span style="color:#4f5b66;">&lt;= </span><span style="color:#000000;">SMALL_ARRAY_SIZE
+</span><span style="color:#000000;">    ary </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">Array(T).</span><span style="color:#795da3;">new
+</span><span style="color:#000000;">    each </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">elem</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">      ary </span><span style="color:#4f5b66;">&lt;&lt;</span><span style="color:#000000;"> elem </span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> ary.includes?(elem)
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">return</span><span style="color:#000000;"> ary
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Convert the Array into a Hash and then ask for its values
+</span><span style="color:#000000;">  to_lookup_hash.values
+</span><span style="color:#a71d5d;">end
+</span></pre>
+
+<p>The first three lines handle the trivial case of when an array is empty or
+contains only one element:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> size </span><span style="color:#4f5b66;">&lt;= </span><span style="color:#d08770;">1
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">return </span><span style="color:#000000;">dup
+</span><span style="color:#a71d5d;">end
+</span></pre>
+
+<p>Obviously in this case, there are no duplicate elements and <code>Array#uniq</code> should
+simply return the original array. One important detail: Crystal uses <code>dup</code> to
+return a copy of the array. This reminds me that in Ruby <code>uniq</code> returns a copy
+of the receiver, while <code>uniq!</code> mutates the receiver. My guess is that Crystal
+implements Array methods in the same way…</p>
+<p>The second passage is an optimization:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a7adba;"># Heuristic: for a small array it&#39;s faster to do a linear scan
+</span><span style="color:#a7adba;"># than creating a Hash to find out duplicates.
+</span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> size </span><span style="color:#4f5b66;">&lt;= </span><span style="color:#000000;">SMALL_ARRAY_SIZE
+</span><span style="color:#000000;">  ary </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">Array(T).</span><span style="color:#795da3;">new
+</span><span style="color:#000000;">  each </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">elem</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">    ary </span><span style="color:#4f5b66;">&lt;&lt;</span><span style="color:#000000;"> elem </span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> ary.includes?(elem)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">return</span><span style="color:#000000;"> ary
+</span><span style="color:#a71d5d;">end
+</span></pre>
+
+<p>For small arrays (16 or fewer elements) Crystal iterates over them and removes
+duplicates using a simple algorithm. I’ll take a look at how that works in a
+moment.</p>
+<p>The final line of code handles arrays with 17 or more elements:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a7adba;"># Convert the Array into a Hash and then ask for its values
+</span><span style="color:#000000;">to_lookup_hash.values
+</span></pre>
+
+<p>As you might guess, Crystal removes duplicate values from larger arrays using a
+hash. I'll dive into the details about how this works in my next post.</p>
+<h2>Arrays With 16 Or Fewer Elements</h2>
+<p>But first, let’s take a closer look at case #2 from above, when the array
+contains 16 or fewer elements. First, Crystal creates a new, empty array called
+ary:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">ary </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">Array(T).</span><span style="color:#795da3;">new
+</span></pre>
+
+<p>Note the generic type syntax <code>Array(T).new</code>. This tells the Crystal compiler
+that the new array, what will become the return value from <code>Array#uniq</code>, will
+only contain elements of the same type as the original array.</p>
+<p>Ruby developers will find the rest of this code easy to follow…</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#000000;">each </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">elem</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">  ary </span><span style="color:#4f5b66;">&lt;&lt;</span><span style="color:#000000;"> elem </span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> ary.includes?(elem)
+</span><span style="color:#a71d5d;">end
+</span></pre>
+
+<p>Crystal calls <code>each</code> to iterate over all the elements in the receiver, the
+array we are calling <code>uniq</code> on. Then using <code>&lt;&lt;</code>, Crystal appends each of the
+original array’s elements to the new array, unless the new array already
+contains a given element.</p>
+<p>Like Ruby, Crystal implements the <code>includes?</code> method inside the <code>Enumerable</code>
+module. Crystal arrays are enumerable because of the <code>include Indexable::Mutable(T)</code> statement we read above. (<code>Indexable::Mutable</code> includes
+<code>Indexable</code> which includes <code>Enumerable</code>). You can find Crystal’s implementation
+of <code>includes?</code> (not <code>include?</code> as in Ruby) in
+<a href="https://github.com/crystal-lang/crystal/blob/master/src/enumerable.cr">enumerable.cr</a>:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">
+</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">includes?</span><span style="color:#000000;">(obj) </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">Bool
+</span><span style="color:#000000;">  any? { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">e</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> e </span><span style="color:#4f5b66;">==</span><span style="color:#000000;"> obj }
+</span><span style="color:#a71d5d;">end
+</span></pre>
+
+<p>Here the <code>any?</code> method calls the given block once for each element in the
+array, and returns true if the block returns true for any of the elements. In
+other words, this code searches the array in a linear fashion, one element at a
+time. Crystal’s development team has decided that it’s faster to filter out
+repeated elements from small arrays by repeatedly searching the array using
+linear scans. Since there are never more than 16 elements, those scans won’t
+take too much time.</p>
+<h2>Simple and Concise</h2>
+<p>You might be thinking: This is an incredibly simple algorithm; anyone could have
+written this code! Why bother writing a blog post about this?</p>
+<p>That’s exactly my point: This is simple and concise code. I could have written
+it - you could have also. There’s nothing superfluous, not an extra word here.
+Just enough code to get the job done. And there’s no noise… no macros, no odd C
+memory tricks, no weird bitwise mask operations. This is the kind of code I
+need to read now when I’m learning how to use Crystal. As a side benefit, I
+also get to learn how Crystal works internally.</p>
+<p>But what happens for longer arrays, with 100s or 1000s of elements? How does
+Crystal remove duplicates from longer arrays efficiently? I'll take a look at
+how that works in my next post.</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'To Learn a New Language, Read Its Standard Library';</script></div><script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="http://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());</script></div><div class="twocol last" id="right"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a href="https://twitter.com/pat_shaughnessy" class="twitter-follow-button" data-show-count="false" data-show-screen-name="false">Follow @pat_shaughnessy</a><script>
+                      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+                    </script><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy">@pat_shaughnessy</a></li></ul></div><div class="header">Buy my book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Crystal</div><div class="links"><ul></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div></div><div class="row" id="copyright"><p>Content and UI design &copy; 2019 Pat Shaughnessy</p></div></div></body></html>

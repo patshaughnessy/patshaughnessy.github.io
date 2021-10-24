@@ -48,17 +48,17 @@ $ code_buddy
       <span class="s">create</span>  app/controllers/application_controller.rb
       <span class="s">create</span>  app/helpers/application_helper.rb
 <p>... etc ...</p>
-<p>$ cd code_buddy_example/</pre></div></p>
+<p>$ cd code_buddy_example/</pre></div> </p>
 </div></p>
 <p>And let&rsquo;s go ahead and add CodeBuddy to the development environment right away in the Gemfile:</p>
 <p><div class="CodeRay"> 
   <div class="code"><pre>source <span class="s"><span class="dl">'</span><span class="k">http://rubygems.org</span><span class="dl">'</span></span> 
-<p>gem <span class="s"><span class="dl">'</span><span class="k">rails</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">3.0.3</span><span class="dl">'</span></span>
-group <span class="sy">:development</span> <span class="r">do</span>
-gem <span class="s"><span class="dl">'</span><span class="k">code_buddy</span><span class="dl">'</span></span>
-<span class="r">end</span></p>
-<p>etc...</p>
-</pre></div> 
+<p>gem <span class="s"><span class="dl">'</span><span class="k">rails</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">3.0.3</span><span class="dl">'</span></span> 
+group <span class="sy">:development</span> <span class="r">do</span> 
+gem <span class="s"><span class="dl">'</span><span class="k">code_buddy</span><span class="dl">'</span></span> 
+<span class="r">end</span> </p>
+<p>etc...
+</pre></div> </p>
 </div></p>
 <p>And now I&rsquo;ll install it using bundler:</p>
 <p><div class="CodeRay"> 
@@ -74,11 +74,11 @@ Using builder (2.1.2)
 <span class='container'>Using tilt (1.1)<span class='overlay'></span></span>
 <span class='container'>Using sinatra (1.1.0)<span class='overlay'></span></span>
 <span class='container'>Installing code_buddy (0.0.6)<span class='overlay'></span></span>
-Using thor (0.14.6)
-Using railties (3.0.3)</p>
+Using thor (0.14.6) 
+Using railties (3.0.3) </p>
 <p>... etc ...</p>
 <p><span class="s">Your bundle is complete! Use <code>bundle show [gemname]</code> to see where a bundled gem...</p>
-<p>Your bundle was installed to <code>/Users/pat/.rvm/gems/ruby-1.8.7-p302</code></span></pre></div></p>
+<p>Your bundle was installed to <code>/Users/pat/.rvm/gems/ruby-1.8.7-p302</code></span></pre></div> </p>
 </div></p>
 <p>You can see the CodeBuddy gem was installed, along with a few others CodeBuddy depends on like Sinatra and Coderay. We use Coderay to provide the Ruby syntax color highlighting.</p>
 <p>Now before I go any farther, let&rsquo;s take a look at the Rack middleware stack:</p>

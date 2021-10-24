@@ -2,7 +2,7 @@
   <img src="http://patshaughnessy.net/assets/2018/6/9/exercise.jpg"><br/>
 <i> Learning something new every day
 is exercise for your mind.</i><br/>
-    <small>(source: <a href="https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg">Jeremy Bowcock via Wikimedia Commons</a>)</small></i>
+	<small>(source: <a href="https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg">Jeremy Bowcock via Wikimedia Commons</a>)</small></i>
 </div>
 <p>As software developers we’re paid to be professional learners. People hire us
 (or should hire us) for what we are capable of learning, not for what we
@@ -91,12 +91,12 @@ Hello, world!
 World” with just a few commands.</p>
 <p>Cargo placed the source code in a Rust file called src/main.rs, which looks
 like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/6/9/hello-world.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/6/9/hello-world.png"/>
 <p>As a comparison, I show the equivalent Ruby code below in pink. Pretty simple.</p>
 <h2>From Gemfile to Cargo.toml</h2>
 <p>I knew my script needed to connect to Postgres and execute a SQL statement, so
 I added Diesel as a dependency to my Cargo.toml file:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/6/9/cargo-toml.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/6/9/cargo-toml.png"/>
 <p>Cargo is a dependency manager similar to Ruby’s <a href="https://bundler.io">Bundler</a>.
 The Cargo.toml file lists the Rust libraries, or “crates,” that my script will
 use. It plays the same role as the Gemfile does for Ruby projects.</p>
@@ -120,7 +120,7 @@ thing I need to do is open a connection to Postgres. After that, I can figure
 out how to execute my report.</p>
 <p>Here’s how I did it - again I show the Rust code in grey and the equivalent
 Ruby code below in pink:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/6/9/connect.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/6/9/connect.png"/>
 <p>The Rust code is fairly simple and easy to understand: It just passes a
 Postgres connection string to <span
 class="code">PgConnection::establish</span>. One interesting and important
@@ -128,7 +128,7 @@ detail here is the call to <span class="code">expect</span>. <span
 class="code">PgConnection::establish</span> returns a <span
 class="code">ConnectionResult<T></span> value, which is derived from the
 <a href="https://doc.rust-lang.org/std/result/enum.Result.html">Result enum</a>:</p>
-<p><img width="200" src="http://patshaughnessy.net/assets/2018/6/9/result.png"/></p>
+<img width="200" src="http://patshaughnessy.net/assets/2018/6/9/result.png"/>
 <p>As <em>The Rust Programming Language</em>
 <a href="https://doc.rust-lang.org/book/second-edition/ch09-00-error-handling.html">explains</a>,
 <span class="code">expect</span> checks whether the result value contains <span
@@ -174,7 +174,7 @@ Postgres table, and the names and types of each of the table’s columns. Notice
 that I provided two command line parameters: the Postgres connection string and
 my database table name.</p>
 <p>The Diesel macros resemble the original SQL definition of my Postgres table:</p>
-<p><img width="676" src="http://patshaughnessy.net/assets/2018/6/9/sql-to-macro.png"/></p>
+<img width="676" src="http://patshaughnessy.net/assets/2018/6/9/sql-to-macro.png"/>
 <p>Diesel used <span class="code">Int4</span> for the primary key column, and
 <span class="code">Nullable&lt;Varchar&gt;</span> for each of the Postgres varchar
 string columns. <span class="code">Nullable</span> must mean that my Postgres
@@ -186,7 +186,7 @@ specify <span class="code">NOT NULL</span> for these columns in my
 <p>Next, using these macros as a guide, I wrote a Rust struct to serve as my
 database model. An instance of this struct was going to represent each row in
 my Postgres table:</p>
-<p><img width="692" src="http://patshaughnessy.net/assets/2018/6/9/macro-to-model.png"/></p>
+<img width="692" src="http://patshaughnessy.net/assets/2018/6/9/macro-to-model.png"/>
 <p>Just as Diesel mapped each Postgres column type to a Rust macro with the
 corresponding type, I had to choose a Rust type for each Postgres column in my
 new struct. For the id column, I picked Rust’s <span class="code">i32</span>
@@ -194,7 +194,7 @@ integer type. This made sense because the <span class="code">Int4</span>
 implied a 4 byte or 32 bit integer value. And for each of the string columns, I
 chose the Rust <span class="code">String</span> type.</p>
 <p>Finally, I pasted all of this into my main.rs source code file, as follows:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/6/9/model.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/6/9/model.png"/>
 <p>Reading this over, the Ruby version is much more concise. In Rust I specified
 the name and type of each column, while in Ruby ActiveRecord figured all of
 that out for me. (Although as I mentioned above, I could have asked Diesel to
@@ -203,7 +203,7 @@ detect the column types automatically also.)</p>
 <p>Now after all of this setup, I’m finally ready to execute my report. Here’s the
 Rust code I wrote inside the <span class="code">main()</span> function, following the call to
 <span class="code">PgConnection::establish</span>:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/6/9/trying.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/6/9/trying.png"/>
 <p>It took me a while to figure out the proper syntax, especially the bits that
 use generic type notation, like <span class="code">Vec&lt;User&gt;</span> and <span
 class="code">Vec&lt;&amp;str&gt;</span>. Also the <span
@@ -277,18 +277,18 @@ that it shouldn’t make assumptions about what’s in the data set.</p>
 way of saving null values in my User struct. The problem, what the Rust
 compiler was trying to tell me, was that my User struct could not handle nulls
 as written. I needed to use an option type instead:</p>
-<p><img width="693" src="http://patshaughnessy.net/assets/2018/6/9/option-model.png"/></p>
+<img width="693" src="http://patshaughnessy.net/assets/2018/6/9/option-model.png"/>
 <p>Like the <span class="code">Result</span> enum we saw above, <span
 class="code">Option</span> is an enum that can contain either <span
 class="code">Some</span> or <span class="code">None</span>… i.e. a null value:</p>
-<p><img width="170" src="http://patshaughnessy.net/assets/2018/6/9/option.png"/></p>
+<img width="170" src="http://patshaughnessy.net/assets/2018/6/9/option.png"/>
 <p>To learn more about the <span class="code">Option</span> type, read <a href="https://doc.rust-lang.org/book/second-edition/ch06-01-defining-an-enum.html#the-option-enum-and-its-advantages-over-null-values">Chapter
 6</a>
 from <em>The Rust Programming Language</em>.</p>
 <p>After changing my <span class="code">User</span> struct, I then had to rework
 the closure inside of <span class="code">partition</span>. Here’s what I ended
 up with:</p>
-<p><img src="http://patshaughnessy.net/assets/2018/6/9/unwrap.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/6/9/unwrap.png"/>
 <p>I wrote <span class="code">if let Some(ref name)</span> to check whether or not
 the last name of each user struct was null. In other words, I “unwrapped” the
 last name. The <span class="code">ref</span> keyword satisfies Rust’s borrow
@@ -326,7 +326,7 @@ $ ruby main.rb
 Connected.
 main.rb:18:in `block in \<main\>': undefined method `split' for nil:NilClass (NoMethodError)
 </pre>
-<p><img src="http://patshaughnessy.net/assets/2018/6/9/fix-ruby.png"/></p>
+<img src="http://patshaughnessy.net/assets/2018/6/9/fix-ruby.png"/>
 <p>Rewriting my Ruby code in Rust revealed a bug I never knew I had. As shown
 above, I had to rework my Ruby code to check for a null last name inside the
 block, similar to what I wrote in Rust. Even though it required more typing and

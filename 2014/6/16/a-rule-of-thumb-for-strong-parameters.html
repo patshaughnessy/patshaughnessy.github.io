@@ -37,7 +37,7 @@ single array (internally Rails processes the arguments as an array). Each key/va
 right. You permit a hash by passing an array.</p>
 <h2>Strong Parameters Confusion</h2>
 <p>However, now suppose you add a second model to your app, <span
-class="code">Comment</span>. Let’s suppose a post has many comments, and each
+  class="code">Comment</span>. Let’s suppose a post has many comments, and each
 comment has a single text attribute.</p>
 <p><img src="http://patshaughnessy.net/assets/2014/6/16/has-many.png"><br/></p>
 <p>Because your app is a REST-ful JSON service (what else do people use Rails for
@@ -66,7 +66,7 @@ complaining that you haven’t whitelisted its attributes. Somehow each
 ActiveRecord model has knowledge about which attributes were whitelisted and
 which weren’t!</p>
 <p>If you happened to know that Rails 4 saves the parameters inside an <span
-class="code">ActionController::Parameters</span> object, you could try
+  class="code">ActionController::Parameters</span> object, you could try
 creating a separate instance of this class for each comment, and whitelist it's text attribute directly:</p>
 <p><img src="http://patshaughnessy.net/assets/2014/6/16/permit-comments2.png"><br/></p>
 <p>But you’ll still get the same “Unpermitted parameters” warning when you try to
@@ -118,7 +118,7 @@ the same.  <span class="code">ActionController::Parameters</span> is actually a
 subclass of <span class="code">Hash</span> (via <span
 class="code">ActiveSupport::HashWithIndifferentAccess</span>).</p>
 <p>But on the right notice that the <span
-class="code">ActionController::Parameters</span> object contains a <span class="code">permitted?</span>
+  class="code">ActionController::Parameters</span> object contains a <span class="code">permitted?</span>
 method. This tells ActiveRecord whether the attributes in that hash were
 whitelisted or not.</p>
 <p>When you create a new post or any <span class="code">ActiveRecord::Base</span>
@@ -128,7 +128,7 @@ object, code inside of Rails checks whether the attributes hash implements the
 <p>Because a normal hash doesn’t respond to <span class="code">permitted?</span>,
 ActiveRecord creates the new post without complaining.</p>
 <p>However, if you try to create a post from an <span
-class="code">ActionController::Parameters</span> object, Rails finds the
+  class="code">ActionController::Parameters</span> object, Rails finds the
 <span class="code">permitted?</span> method:</p>
 <p><img src="http://patshaughnessy.net/assets/2014/6/16/internals2.png"><br/></p>
 <p>If you didn’t whitelist this hash using a call to <span class="code">permit</span>, <span class="code">permitted?</span> will

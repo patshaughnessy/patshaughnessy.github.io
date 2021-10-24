@@ -56,10 +56,10 @@ to point back to <span class="code">n1</span>. Now our two nodes form a doubly
 linked list using a circular pattern of pointers. Also notice that the
 reference counts of both ABC and DEF have increased to two.  There are two
 pointers referring to each node: <span class="code">n1</span> and <span
-class="code">n2</span> as before, and now <span class="code">next</span> and
+  class="code">n2</span> as before, and now <span class="code">next</span> and
 <span class="code">prev</span> as well.</p>
 <p>Now let’s suppose our Python program stops using the nodes; we set both <span
-class="code">n1</span> and <span class="code">n2</span> to null. (In Python
+  class="code">n1</span> and <span class="code">n2</span> to null. (In Python
 null is known as <span class="code">None</span>.)</p>
 <p><img src="http://patshaughnessy.net/assets/2013/10/30/cycle3.png"><br/></p>
 <p>Now Python, as usual, decrements the reference count inside of each node down to 1.</p>
@@ -71,7 +71,7 @@ using either node object, therefore we expect Python’s garbage collector to be
 smart enough to free both objects and reclaim their memory for other purposes.
 But this doesn’t happen because both reference counts are one and not zero.
 Python’s reference counting algorithm can’t handle objects that refer to each
-other!</p>
+other! </p>
 <p>Of course, this is a contrived example, but your own programs might contain
 circular references like this in subtle ways that you may not be aware of. In
 fact, as your Python program runs over time it will build up a certain amount

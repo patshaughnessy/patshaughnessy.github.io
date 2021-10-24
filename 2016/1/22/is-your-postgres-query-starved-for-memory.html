@@ -15,7 +15,7 @@ file is an obscure, technical setting called <span
 class="code">work_mem</span>. This controls how much “working memory” your
 Postgres server allocates for each sort or join operation. The default value
 for this is only 4MB:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/1/22/work_mem.png"/></p>
+<img src="http://patshaughnessy.net/assets/2016/1/22/work_mem.png"/>
 <div style="clear: left"></div>
 <p>If your application ever tries to sort or join more than four megabytes worth
 of data, this working memory buffer will fill up. Instead of just returning the
@@ -32,7 +32,7 @@ algorithm</a>.
 I showed how Postgres scans over all the records in one of the tables from the
 join and saves them in a hash table.</p>
 <p>Here’s what a hash table might look like conceptually:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/1/22/table1.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2016/1/22/table1.svg"/>
 <p>On the left is an array of pointers called <em>buckets</em>. Each of these pointers is
 the head of a linked list, which I show on the right using blue rectangles. The
 rectangles represent values from one of the tables in the join. Postgres groups
@@ -43,7 +43,7 @@ as a <em>hash join</em>.</p>
 <p>Postgres’s hash join code gracefully scales up to process larger and larger
 data sets by increasing the number of buckets. If the target table had more
 records, Postgres would use 2048 buckets instead of 1024:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/1/22/table2.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2016/1/22/table2.svg"/>
 <p>Before starting to execute the hash join algorithm, Postgres estimates how many
 records it will need to add to the hash table, using the query plan. Then
 Postgres chooses a bucket count large enough to fit all of the records.</p>
@@ -70,7 +70,7 @@ called <span class="code">ExecChooseHashTableSize</span>.</p>
 <h2>How Large Can a Postgres Hash Table Grow?</h2>
 <p>If the table from your join query was even larger, then Postgres would use 4096
 buckets instead of 2048:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/1/22/table3.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2016/1/22/table3.svg"/>
 <p>In theory, this doubling of the bucket count could continue forever: 8192
 buckets, 16384 buckets, etc. With 10 records per linked list, this would
 accommodate 81,920 values, 163,840 values, etc.</p>
@@ -79,8 +79,8 @@ continues to increase Postgres will eventually run out of memory. But that
 doesn’t seem to be an immediate problem, does it? Modern server hardware
 contains tens or even hundreds of GBs - that is plenty of room to hold an
 extremely large hash table.</p>
-<p>But in fact, Postgres limits the size of each hash table to only 4MB!</p>
-<p><img src="http://patshaughnessy.net/assets/2016/1/22/table4.svg"/></p>
+<p>But in fact, Postgres limits the size of each hash table to only 4MB! </p>
+<img src="http://patshaughnessy.net/assets/2016/1/22/table4.svg"/>
 <p>The rectangle I drew around the hash table above is the working memory buffer
 assigned to that table. Regardless of how much memory my server hardware
 actually has, Postgres won’t allow the hash table to consume more than 4MB.
@@ -89,7 +89,7 @@ This value is the <span class="code">work_mem</span> setting found in the
 <p>At the same time Postgres calculates the number of buckets, it also calculates
 the total amount of memory it expects the hash table to consume. If this amount
 exceeds 4MB, Postgres divides the hash operation up into a series of <em>batches</em>:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/1/22/batches.svg"/></p>
+<img src="http://patshaughnessy.net/assets/2016/1/22/batches.svg"/>
 <p>In this example, Postgres calculated that it would need up to 8MB to hold the
 hash table. A larger join query might have many more batches, each holding 4MB
 of data. Like the bucket count, Postgres sets the batch count to a power of two
@@ -104,7 +104,7 @@ join</a>, Postgres first
 searches the hash table already in memory. Then it streams all of the data back
 from disk for the next batch, builds another hash table and searches it,
 repeating this process for each batch.</p>
-<p><br/></p>
+<br/>
 <blockquote>
 Note: Postgres actually holds a second hash table in memory, called the skew
 table. For simplicity I’m not showing this in the diagram. This special hash
@@ -157,7 +157,7 @@ $ launchctl unload homebrew.mxcl.postgresql.plist
 $ vim /usr/local/var/postgres/postgresql.conf
 </pre>
 <p>…uncommenting and changing the setting:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/1/22/work_mem2.png"/></p>
+<img src="http://patshaughnessy.net/assets/2016/1/22/work_mem2.png"/>
 <p>Finally I restart my server and repeat the test:</p>
 <pre>
 $ launchctl load homebrew.mxcl.postgresql.plist
@@ -183,9 +183,9 @@ Buckets: 8192  Batches: 1  Memory Usage: 5860kB
 </pre>
 <p>Postgres was able to use a working memory buffer size larger than 4MB. This
 allowed it to save the entire data set into a single, in memory hash table and
-avoid using temporary buffer files.</p>
+avoid using temporary buffer files. </p>
 <p>Because of this, the total execution time decreased from 960ms to 625ms:</p>
-<p><img src="http://patshaughnessy.net/assets/2016/1/22/chart.png"/></p>
+<img src="http://patshaughnessy.net/assets/2016/1/22/chart.png"/>
 <h2>Too Good To Be True</h2>
 <p>If memory intensive Postgres SQL statements could run so much faster, why does
 Postgres use only 4MB by default for the working memory buffer size? In this

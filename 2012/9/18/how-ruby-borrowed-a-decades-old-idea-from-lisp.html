@@ -16,10 +16,10 @@
 </div>
 <h2>What exactly is a block?</h2>
 <p>Internally Ruby represents each block using a C structure called <span class="code">rb_block_t</span>:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/9/18/empty-block.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/9/18/empty-block.png"/>
 <p>One way to define what a block is would be to take a look at the values Ruby stores inside this structure. Just as we did in Chapter 3 with the <span class="code">RClass</span> structure, let’s deduce what the contents of the <span class="code">rb_block_t</span> structure must be based on what we know blocks can do in our Ruby code.</p>
 <p>Starting with the most obvious attribute of blocks, we know each block must consist of a piece of Ruby code, or internally a set of compiled YARV byte code instructions. For example, if I call a method and pass a block as a parameter:</p>
-<p><br/></p>
+<br/>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">
 </span><span style="color:#d08770;">10</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
@@ -29,10 +29,10 @@
 </span></pre>
 
 <p>...it’s clear that when executing the <span class="code">10.times</span> call Ruby needs to know what code to iterate over. Therefore, we know the <span class="code">rb_block_t</span> structure must contain a pointer to that code:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/9/18/block-and-code.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/9/18/block-and-code.png"/>
 <p>In this diagram you can see a value called <span class="code">iseq</span> which is a pointer to the YARV instructions compiled from the Ruby code in my block.</p>
 <p>Another obvious but often overlooked behavior of blocks is that they can access variables in the surrounding or parent Ruby scope. For example:</p>
-<p><br/></p>
+<br/>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">
 </span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox</span><span style="color:#4f5b66;">&quot;
@@ -45,14 +45,14 @@
 <p>Here the <span class="code">puts</span> function call refers equally well to the <span class="code">str2</span> variable located inside the block and the <span class="code">str</span> variable from the surrounding code. We often take this for granted - obviously blocks can access values from the code surrounding them. This ability is one of the things that makes blocks useful. But if you think about this for a moment, you’ll realize blocks have in some sense a dual personality. On the one hand they behave like separate functions: you can call them and pass them arguments just as you would with any function. But on the other hand they are part of the surrounding function or method. As I wrote the sample code above I didn’t think of the block as a separate function - I thought of the block’s code as just part of the simple, top level script that printed a string 10 times.</p>
 <p>How does this work internally? Does Ruby internally implement blocks as separate functions? Or as part of the surrounding function? Let’s step through the example above, slowly, and see what happens inside of Ruby when you call a block.</p>
 <p>In this example when Ruby executes the first line of code, as I explained in Chapter 2, YARV will store the local variable <span class="code">str</span> on it’s internal stack, and save it’s location in the DFP pointer located in the current <span class="code">rb_control_frame_t</span> structure*. (*footnote: If the outer code was located inside a function or method then the DFP would point to the stack frame as shown, but if the outer code was located in the top level scope of your Ruby program, then Ruby would use dynamic access to save the variable in the TOPLEVEL_BINDING environment instead - more on this in section 4.3. Regardless the DFP will always indicate the location of the <span class="code">str</span> variable.)</p>
-<p><img src="http://patshaughnessy.net/assets/2012/9/18/save-local-variable.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/9/18/save-local-variable.png"/>
 <p>Next Ruby will come to the <span class="code">10.times do</span> call. Before executing the actual iteration - before calling the <span class="code">times</span> method - Ruby will first create and initialize a new <span class="code">rb_block_t</span> structure to represent the block. Ruby needs to create the block structure now, since the block is really just another argument to the <span class="code">times</span> method:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/9/18/new-block.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/9/18/new-block.png"/>
 <p>To do this, Ruby copies the current value of the DFP, the dynamic frame pointer, into the new block. In other words, Ruby saves away the location of the current stack frame in the new block.</p>
 <p>Next Ruby will proceed to call the <span class="code">times</span> method on the object <span class="code">10</span>, an instance of the <span class="code">Fixnum</span> class. While doing this, YARV will create a new frame on its internal stack. Now we have two stack frames: on the top is the new stack frame for the <span class="code">Fixnum.times</span> method, and below is the original stack frame used by the top level function:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/9/18/fixnum-stack.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/9/18/fixnum-stack.png"/>
 <p>Ruby implements the <span class="code">times</span> method internally using its own C code - it’s a built in method - but Ruby implements it the same way you probably would in Ruby. Ruby starts to iterate over the numbers 0, 1, 2, etc., up to 9, and calls <span class="code">yield</span> once for each of these integers. Finally, the code that implements <span class="code">yield</span> internally actually calls the block each time through the loop, pushing a third* frame onto the top of the stack for the code inside the block to use: (*footnote: Ruby actually pushes an extra, internal stack frame whenever you call yield before actually calling the block, so strictly speaking there should be four stack frames in this diagram. I only show three for the sake of clarity.)</p>
-<p><img src="http://patshaughnessy.net/assets/2012/9/18/executing-block.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/9/18/executing-block.png"/>
 <p>Here on the left we now have three stack frames:</p>
 <ul>
 <li>On the top is the new stack frame for the block, containing the <span class="code">str2</span> variable.</li>
@@ -63,10 +63,10 @@
 <p>To summarize, we have seen now that Ruby’s <span class="code">rb_block_t</span> structure contains two important values:
 a pointer to a snippet of YARV code instructions, and
 a pointer to a location on YARV’s internal stack, the location that was at the top of the stack when the block was created:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/>
 <p>At first glance this seems like a very technical, unimportant detail. This is obviously a behavior we expect Ruby blocks to exhibit, and the DFP seems to be just another minor, uninteresting part of Ruby’s internal implementation of blocks.</p>
 <p>Or is it? I believe the DFP is actually a profound, important part of Ruby internals. The DFP is the basis for Ruby’s implementation of “closures.” Here’s how Sussman and Steele defined the term “closure” in their 1975 paper <i><a href="http://en.wikisource.org/wiki/Scheme:_An_Interpreter_for_Extended_Lambda_Calculus">Scheme: An Interpreter for Extended Lambda Calculus</a></i>:</p>
-<p><br/></p>
+<br/>
 <blockquote>
 In order to solve this problem we introduce the notion of a closure [11, 14] which is a data structure containing a lambda expression, and an environment to be used when that lambda expression is applied to arguments.
 </blockquote>
@@ -76,7 +76,7 @@ In order to solve this problem we introduce the notion of a closure [11, 14] whi
 <li>An environment to be used when calling that lambda or function.</li>
 </ul>
 <p>I’ll have more context and information about “lambda expressions” and how Ruby’s borrowed the <span class="code">lambda</span> keyword from Lisp in section 4-2, but for now take another look at the internal <span class="code">rb_block_t</span> structure:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/></p>
+<img src="http://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/>
 <p>Notice that this structure meets the definition of a closure Sussman and Steele wrote back in 1975:</p>
 <ul>
 <li><span class="code">iseq</span> is a pointer to a lambda expression, i.e. a function or code snippet, and</li>
@@ -84,9 +84,9 @@ In order to solve this problem we introduce the notion of a closure [11, 14] whi
 </ul>
 <p>Following this train of thought, we can see that blocks are Ruby’s implementation of closures. Ironically blocks, one of the features that in my opinion makes Ruby so elegant and natural to read - so modern and innovative - is based on research and work done at least 20 years before Ruby was ever invented!</p>
 <div class="yellow">
-<p><b>
+<b>
 [ Note: In Ruby Under a Microscope I won't show or discuss any C code directly, except for optional sections that are called out with a different background color like this. ]
-</b></p>
+</b>
 <p>In Ruby 1.9 and later you can find the actual definition of the <span class="code">rb_block_t</span> structure in the vm_core.h file. Here it is:</p>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">

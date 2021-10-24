@@ -62,8 +62,8 @@ $ rails generate model user name:string email:string
 ==  CreateUsers: migrating ==============================
 -- create_table(:users)
 -&gt; 0.0013s
-==  CreateUsers: migrated (0.0014s) =====================</p>
-</pre></div>
+==  CreateUsers: migrated (0.0014s) =====================
+</pre></div></p>
 </div><br>
 <p>Next I&rsquo;ll write a simple rake task in a file called lib/tasks/users.rake to create a specified number of users, so we can time queries based on different numbers of records. Also, having a separate rake task for this avoids the possibility of including the record create time in the performance tests.</p>
 <div class="CodeRay">
@@ -172,7 +172,7 @@ require <span class="s"><span class="dl">'</span><span class="k">rake</span><spa
 <div class="CodeRay">
   <div class="code"><pre><span class="co">Rake</span>.application.remove_task <span class="s"><span class="dl">'</span><span class="k">db:test:prepare</span><span class="dl">'</span></span>
 <p>namespace <span class="sy">:db</span> <span class="r">do</span>
-<span class="er"> </span> namespace <span class="sy">:test</span> <span class="r">do</span>
+<span class="er"> </span> namespace <span class="sy">:test</span> <span class="r">do</span> 
 <span class="er"> </span> <span class="er"> </span> task <span class="sy">:prepare</span> <span class="r">do</span> |t|
 <span class="er"> </span> <span class="er"> </span> <span class="r">end</span>
 <span class="er"> </span> <span class="r">end</span>

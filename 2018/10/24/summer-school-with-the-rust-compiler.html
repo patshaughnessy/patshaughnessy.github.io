@@ -142,10 +142,10 @@ integers, but my code expected an actual integer, not a reference to an
 integer. But what are references, exactly?</p>
 <p>Running my code above, Ruby passed each integer from the array to my code as a
 simple value:</p>
-<p><img width="185" src="http://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png"/></p>
+<img width="185" src="http://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png"/>
 <p>But Rust passed each integer from the array as a reference, or in other words
 as a pointer to the value itself:</p>
-<p><img width="287" src="http://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png"/></p>
+<img width="287" src="http://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png"/>
 <p>In Ruby, of course, I didn’t have to worry about references, pointers or even
 types, so none of this came up. Or at least that’s what I thought at the time.</p>
 <h2>Lesson Two: Borrowed Values</h2>
@@ -188,7 +188,7 @@ by the <span class="code">main</span> function. When the <span
 class="code">main</span> function goes out of scope, Rust frees the memory for
 that array automatically. In this diagram, the red arrow shows where Rust
 allocates the array (at the top), and where Rust frees it (at the bottom):</p>
-<p><img width="339" src="http://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png"/></p>
+<img width="339" src="http://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png"/>
 <p>You can think of the red arrow as the “lifetime” of the array. When I pass a
 value from one spot to another, when I call a function or a closure, I can
 either “move” that value to the new function, or the function can ”borrow” it.
@@ -196,7 +196,7 @@ In this example, the call to <span class="code">iter()</span> borrowed the
 elements inside the array, passing a reference to each element into the
 closure. The blue array in this diagram indicates each element of the array,
 <span class="code">i</span>, is a borrowed value inside the closure:</p>
-<p><img width="334" src="http://patshaughnessy.net/assets/2018/10/24/rust-borrow.png"/></p>
+<img width="334" src="http://patshaughnessy.net/assets/2018/10/24/rust-borrow.png"/>
 <h2>Lesson Three: Immutable vs. Mutable Values</h2>
 <p>But using borrowed values isn’t the problem here. The problem is that my code
 tries to change them, or mutate them:</p>

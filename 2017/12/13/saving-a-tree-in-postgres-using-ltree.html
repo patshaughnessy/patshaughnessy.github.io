@@ -16,22 +16,22 @@ I possibly save a beautiful tree structure into an ugly, boring database table?<
 <p>Let’s return to the example tree from the <a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres">first
 post</a>
 in this series:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png"></p>
+<img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png">
 <p>The LTREE extension uses the <em>path enumeration</em> algorithm, which calls for each
 node in the tree to record the path from the root you would have to follow to
 reach that node.</p>
 <p>For example, to find <span class="code">G</span> starting from <span
 class="code">A</span>, the root, I would move down to <span
 class="code">B</span>, and then down again to <span class="code">G</span>:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/13/tree-path1.png"></p>
+<img src="http://patshaughnessy.net/assets/2017/12/13/tree-path1.png">
 <p>So the path to <span class="code">G</span> is:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/13/path1.png"></p>
+<img src="http://patshaughnessy.net/assets/2017/12/13/path1.png">
 <p>Here’s another example:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/13/tree-path2.png"></p>
+<img src="http://patshaughnessy.net/assets/2017/12/13/tree-path2.png">
 <p>This time I’ve traced a path from <span class="code">A</span> to <span
 class="code">D</span>, via <span class="code">C</span>. So the path of <span
 class="code">D</span> is:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/13/path2.png"></p>
+<img src="http://patshaughnessy.net/assets/2017/12/13/path2.png">
 <h2>Saving Tree Paths Using LTREE</h2>
 <p>To use LTREE, I need to create a column to hold these paths. For my example
 tree, I’ll use the same table I did before, but instead of the <span
@@ -55,9 +55,9 @@ more on this later!</p>
 column, encoded as a series of strings joined together by periods. For example
 to save the path of <span class="code">G</span> into my table I use this insert
 statement:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/13/insert1.png"></p>
+<img src="http://patshaughnessy.net/assets/2017/12/13/insert1.png">
 <p>And to save the path to node D I write:</p>
-<p><img src="http://patshaughnessy.net/assets/2017/12/13/insert2.png"></p>
+<img src="http://patshaughnessy.net/assets/2017/12/13/insert2.png">
 <p>Following this pattern, I can save my entire tree using these insert
 statements, one for each node in my tree:</p>
 <pre>
@@ -86,7 +86,7 @@ what if I needed to know how many children <span class="code">A</span> had,
 recursively? That is, what if I needed to count its children, grandchildren,
 great-grandchildren, etc.? Earlier we saw that using a <span
 class="code">parent_id</span> column this would require an ever increasing
-number of SQL statements:</p>
+number of SQL statements: </p>
 <pre>
 select count(*) from tree where parent_id = ID;
 select count(*) from tree where parent_id in (CHILD IDs);
