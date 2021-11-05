@@ -25,6 +25,12 @@ Reading Crystal’s internal implementation of Array or Hash is like reading
 a fairy tale in a children’s book. Anyone can understand it, even people
 without a Ph.D. in Computer Science or systems programming experience.
 
+<div style="clear: left"></div>
+
+<b>Update:</b> There was a [long discussion on Hacker
+News](https://news.ycombinator.com/item?id=28975453) about whether reading the
+standard library really is a good idea for various different languages.
+
 ## At First Glance, Crystal Is Ruby
 
 At first glance, when I read Crystal’s [Array
