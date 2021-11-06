@@ -346,6 +346,12 @@ span.code {
   font-size: 14px;
 }
 
+code {
+  font-family: Monaco;
+  padding: 2px;
+  font-size: 14px;
+}
+
 .reminder {
   background-color: #FFCCCC;
   padding: 2px;

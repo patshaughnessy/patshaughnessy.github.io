@@ -1,4 +1,275 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-10-24T00:23:55Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>To Learn a New Language, Read Its Standard Library</title><link href="http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></link><id href="http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></id><published>2021-10-23T00:00:00Z</published><updated>2021-10-23T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-06T18:03:45Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://localhost/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;Most modern, statically typed languages allow us to use generic types. We write
+a function once with generic type syntax, and then the c</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://localhost/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;Most modern, statically typed languages allow us to use generic types. We write
+a function once with generic type syntax, and then the compiler can apply the
+same code over and over again to different actual, concrete types. Hence the
+name &lt;em&gt;generic&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;This is a powerful language feature, but generic code is often confusing and
+hard to read. For me, generic code resembles something from my high school
+algebra textbook. I see small math puzzles sprinkled around my computer
+program. Why do this? Why add math problems to your code? Computer programming
+is already hard enough; why make it even more complicated?&lt;/p&gt;
+&lt;p&gt;Generic types allow us to get the best of both words: the safety and
+performance of static types, with the flexibility and simplicity of a dynamic,
+typeless language.&lt;/p&gt;
+&lt;p&gt;But this comes at a steep price: Using generic types force you to write two
+programs, in a sense. Your normal code for runtime, and a second, parallel
+type-specific program that runs at compile time. To see what I mean, let’s take
+an example from the &lt;a href=&quot;https://github.com/crystal-lang/crystal/tree/master/src&quot;&gt;Crystal standard
+library&lt;/a&gt; and explore
+how the Crystal team used generic type syntax to implement their array class.&lt;/p&gt;
+&lt;h2&gt;Array#uniq in Crystal&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library&quot;&gt;Last
+time&lt;/a&gt;
+I looked at the Crystal standard library, specifically at how Crystal removes
+duplicate elements from an array in
+&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr#L1843&quot;&gt;Array#uniq&lt;/a&gt;.
+I discussed a couple of optimizations the Crystal team used to implement &lt;code&gt;uniq&lt;/code&gt;
+for small or empty arrays.&lt;/p&gt;
+&lt;p&gt;But what about the general case? How does Crystal remove duplicate elements
+from large arrays? If I remove the small array optimizations, the Crystal
+implementation of &lt;code&gt;Array#uniq&lt;/code&gt; reads like this:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;class &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Array&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(T)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;uniq
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Convert the Array into a Hash and then ask for its values
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    to_lookup_hash.values
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;protected &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;to_lookup_hash
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    to_lookup_hash { &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem }
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;protected &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;to_lookup_hash&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: T &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;U) forall U
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    each_with_object(Hash(U, T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;o, h&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is &lt;em&gt;almost&lt;/em&gt; easy to read. Admittedly, I’m a Ruby developer, so the Ruby-like
+syntax makes perfect sense to me. However, most developers will be able to
+figure this out without much effort.&lt;/p&gt;
+&lt;p&gt;Crystal identifies the unique elements of the array by converting it into a
+“lookup hash:”&lt;/p&gt;
+&lt;p&gt;&lt;img width=&quot;650&quot; src=&quot;http://localhost/assets/2021/11/6/lookup-hash.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;As you know, hash keys are unique. By converting the array into a hash, Crystal
+has quickly identified the unique elements of that array.&lt;/p&gt;
+&lt;h2&gt;Converting An Array To A Hash At Runtime&lt;/h2&gt;
+&lt;p&gt;But if you read carefully, you’ll see that Crystal converts the array to a hash
+twice: once at compile time and then later again at runtime. Let’s look at the
+second, runtime program first, working our way from the inside out.&lt;/p&gt;
+&lt;p&gt;First, the &lt;code&gt;unless&lt;/code&gt; clause inside the loop checks whether the hash already
+contains a given element. If the element isn’t already in the hash, Crystal
+adds it:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is the crux of the unique algorithm. Crystal won’t insert a given key
+value twice. (Although the &lt;code&gt;unless&lt;/code&gt; clause is technically unnecessary; saving a
+repeated value would be harmless, overwriting the previous copy in the hash.)&lt;/p&gt;
+&lt;p&gt;Looking up one line, we can see the &lt;code&gt;to_lookup_hash&lt;/code&gt; function accepts a block,
+and calls it to calculate the a key value for each array element:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;And reading farther up, we can see another definition of &lt;code&gt;to_lookup_hash&lt;/code&gt; passes
+in such a block:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;protected &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;to_lookup_hash
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  to_lookup_hash { &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem }
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Since the block &lt;code&gt;{ |elem| elem }&lt;/code&gt; just returns whatever was passed into it, the
+keys and values of the lookup hash will be the same:&lt;/p&gt;
+&lt;p&gt;&lt;img width=&quot;275&quot; src=&quot;http://localhost/assets/2021/11/6/keys-and-values.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;This block adds a bit of flexibility to the code. The Crystal team might want
+to reuse this function someday with a different block and set of keys.&lt;/p&gt;
+&lt;p&gt;Finally, let’s look at how Crystal iterates over the array:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;each_with_object(Hash(U, T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;o, h&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Crystal calls &lt;code&gt;each_with_object&lt;/code&gt; on the array and provides a single argument:
+&lt;code&gt;Hash(U, T).new&lt;/code&gt;. Here’s our first example of generic type syntax. I’ll come
+back to that in a moment. For now, I can guess that &lt;code&gt;Hash(U, T).new&lt;/code&gt; creates a
+new, empty hash.&lt;/p&gt;
+&lt;p&gt;Next, &lt;code&gt;each_with_object&lt;/code&gt; loops over the receiver (the array), and calls the block
+&lt;code&gt;do |o, h| … end&lt;/code&gt; for each element. It sets &lt;code&gt;o&lt;/code&gt; to each element’s value as it
+iterates, and &lt;code&gt;h&lt;/code&gt; to the hash created with &lt;code&gt;Hash(U, T).new&lt;/code&gt;. As we saw above, the
+block inserts each value &lt;code&gt;o&lt;/code&gt; into the hash &lt;code&gt;h&lt;/code&gt;, skipping duplicates.&lt;/p&gt;
+&lt;p&gt;Finally, after the iteration completes, Crystal returns the values from the new
+hash, a new array containing only the unique elements from the original array:`&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;to_lookup_hash.values
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;h2&gt;Converting An Array To A Hash At Compile Time&lt;/h2&gt;
+&lt;p&gt;But there’s more to this program than meets the eye. Crystal actually runs part
+of this code, the generic type syntax, earlier at compile time. And, curiously,
+that code also converts the array into a hash but in a different way. When the
+Crystal team wrote &lt;code&gt;Array#uniq&lt;/code&gt;, they had to write two programs, not one!&lt;/p&gt;
+&lt;p&gt;But what exactly do I mean by “converting an array to a hash at compile time?”
+How and why does this happen? And what’s the second program here?&lt;/p&gt;
+&lt;p&gt;The answer has to do with the &lt;code&gt;Hash(U, T).new&lt;/code&gt; expression we read above. Crystal
+needs to convert the type &lt;code&gt;Array(T)&lt;/code&gt; into the type &lt;code&gt;Hash(U, T)&lt;/code&gt;. Let’s step through
+the second, type-level mirror program to find out how this works.&lt;/p&gt;
+&lt;p&gt;You can imagine the Crystal compiler processing the generic type code like
+this:&lt;/p&gt;
+&lt;p&gt;&lt;img width=&quot;550&quot; src=&quot;http://localhost/assets/2021/11/6/solved-puzzle.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;The first line is actually the most important:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;class &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Array&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(T)
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;This line means the Crystal team is not implementing a simple array of
+elements. Instead, they are implementing an array that must contain elements of
+the same type. And here on this line they name that type in a generic way: the
+type variable &lt;code&gt;T&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Specifying an array element type provides two important benefits: First, it is
+a nice safety net for us, the developers using Crystal arrays. Crystal’s
+compiler will prevent us from accidentally inserting elements from a different
+or unexpected type into the array. And the best part is that Crystal will tell
+us about our mistake at compile time, before our code ever runs and does any
+harm with real data. It’s annoying and difficult to write a second compile-time
+program using types, but the compiler might - and probably will - find some of
+our mistakes and tell us before the program even runs.&lt;/p&gt;
+&lt;p&gt;Second, because Crystal knows that all of the elements of the array have the
+same type, it can emit more efficient code that takes advantage of this
+knowledge. The machine language code the compiler produces can save and copy
+array elements faster because it knows how much memory each element occupies.&lt;/p&gt;
+&lt;p&gt;And by using generic type syntax to write &lt;code&gt;Array#uniq&lt;/code&gt;, the Crystal team gives us
+these benefits regardless of what kind of elements we add to our arrays. The
+Crystal compiler automatically maps the type we happen to choose in our code to
+the variable &lt;code&gt;T&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Next, take a look at the &lt;code&gt;to_lookup_hash&lt;/code&gt; function declaration:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;protected &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;to_lookup_hash&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: T &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;U) forall U
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;What in the world does this mean? What is &lt;code&gt;forall U&lt;/code&gt; referring to?&lt;/p&gt;
+&lt;p&gt;The first thing to note here is Crystal’s block parameter syntax: &lt;code&gt;&amp;amp; : T -&amp;gt; U&lt;/code&gt;.
+Crystal has borrowed the &lt;code&gt;&amp;amp;&lt;/code&gt; character from Ruby to indicate the following
+value is a block or closure, not a simple value. But in Crystal, the block
+parameters and the block’s return value all must have types. And here in this
+code those types are generic types: &lt;code&gt;T&lt;/code&gt; and &lt;code&gt;U&lt;/code&gt;. The arrow syntax tells us that the
+block takes a single parameter of type &lt;code&gt;T&lt;/code&gt;, and returns a single value of type &lt;code&gt;U&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;But what do &lt;code&gt;T&lt;/code&gt; and &lt;code&gt;U&lt;/code&gt; mean? Where are they defined?&lt;/p&gt;
+&lt;p&gt;This is our math puzzle for the day. Just like in a limit, integral or infinite
+series from Calculus, this formula contains bound and free variables:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp; : &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;T &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;U forall U
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Since the enclosing class statement above declared the class to be &lt;code&gt;Array(T)&lt;/code&gt;,
+Crystal binds the &lt;code&gt;T&lt;/code&gt; type variable here to be the same type as above. In order
+words, the type of values passed into this block must be the same as the type
+of the elements in the array.&lt;/p&gt;
+&lt;p&gt;But what about &lt;code&gt;U&lt;/code&gt;? What type is that?&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;forall U&lt;/code&gt; clause declares the U type to be a free variable. That means
+that &lt;code&gt;U&lt;/code&gt;, unlike the type &lt;code&gt;T&lt;/code&gt;, is not bound to any known type value. &lt;code&gt;forall&lt;/code&gt;
+tells the Crystal compiler that the following code should apply equally well to
+any type &lt;code&gt;U&lt;/code&gt;, “for all” possible types &lt;code&gt;U&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The Crystal compiler solves this math puzzle using the &lt;code&gt;yield&lt;/code&gt; statement we saw
+above:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here Crystal knows the value &lt;code&gt;o&lt;/code&gt; has a type of &lt;code&gt;T&lt;/code&gt;. How? Because Crystal knows
+that all of the elements of the array have a type &lt;code&gt;T&lt;/code&gt;, (this is the &lt;code&gt;Array(T)&lt;/code&gt;
+class) and Crystal knows the variable &lt;code&gt;o&lt;/code&gt; was set earlier to an array element
+by &lt;code&gt;each_with_object&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Next, the Crystal compiler can determine that &lt;code&gt;U == T&lt;/code&gt;, that both types are the
+same. How? When Crystal compiles the block’s code above:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;to_lookup_hash { &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem }
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;…Crystal notices that the return value of the block is the same as the value
+passed into the block, that &lt;code&gt;elem == elem&lt;/code&gt;. Then, the Crystal compiler maps
+this return value to the block declaration: &lt;code&gt;&amp;amp; : T -&amp;gt; U&lt;/code&gt;. Because Crystal knows
+&lt;code&gt;elem == elem&lt;/code&gt; in the block code, it deduces that the types of these values are
+also the same, that &lt;code&gt;U == T&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Finally, let’s return to the line above that iterates over the array:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;each_with_object(Hash(U, T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;o, h&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now the Crystal compiler can use the knowledge that types &lt;code&gt;U == T&lt;/code&gt; when it
+creates the lookup hash. In Crystal when you create a hash, just as when you
+create an array, you have to provide a type parameter for all the values. And
+for hashes you also need to provide a type for the keys. &lt;code&gt;Hash(U, T).new&lt;/code&gt;
+means: Create a new hash which has keys of type &lt;code&gt;U&lt;/code&gt; and values of type &lt;code&gt;T&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Armed with the knowledge that the keys of the lookup hash all have type &lt;code&gt;U&lt;/code&gt;, and
+that &lt;code&gt;U == T&lt;/code&gt;, the Crystal compiler can emit the correct, optimized code for
+finding and inserting hash values when it produces machine language
+instructions for this passage:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Crystal knows that both &lt;code&gt;o&lt;/code&gt; and &lt;code&gt;key&lt;/code&gt; have the same type &lt;code&gt;T&lt;/code&gt;, which allows the
+&lt;code&gt;has_key?&lt;/code&gt; and &lt;code&gt;[]=&lt;/code&gt; methods to run quickly and correctly.&lt;/p&gt;
+&lt;h2&gt;Are Generic Types Worth It?&lt;/h2&gt;
+&lt;p&gt;It’s a good thing the Crystal compiler is good at solving math puzzles!
+Crystal, like many other modern languages (Haskell, Swift, Rust, etc.) is able
+to determine the actual, concrete types for variables like &lt;code&gt;T&lt;/code&gt; and &lt;code&gt;U&lt;/code&gt;, and for
+all values in your code, using &lt;em&gt;type inference&lt;/em&gt;. The Crystal compiler can
+deduce what the type of each variable is based on the usage of that variable
+and the context of the surrounding code.&lt;/p&gt;
+&lt;p&gt;But the problem is that I, a user of the Crystal language, have to be good at
+math puzzles also. As we’ve just seen, in order to write code using Crystal or
+any language with a modern type system, I have to write my code twice: once to
+solve the problem I actually want to solve, and a second time to prove to the
+compiler that my code is consistent and mathematically correct at a type level.&lt;/p&gt;
+&lt;p&gt;Are the added performance and added safety worth it? That depends entirely on
+what code you are writing, how fast it needs to run, how many times and for how
+long that code will be used - and most importantly, how much time you have to
+solve math problems.&lt;/p&gt;
+</content></entry><entry><title>To Learn a New Language, Read Its Standard Library</title><link href="http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></link><id href="http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></id><published>2021-10-23T00:00:00Z</published><updated>2021-10-23T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;If I was learning to read English as a foreign language,&lt;br/&gt; I would need something simple to get started.&lt;br/&gt;
   &lt;small&gt;(from The Remarkable Story of Chicken Little, 1840)&lt;/small&gt;&lt;/i&gt; 
@@ -22,6 +293,10 @@ itself!&lt;/p&gt;
 Reading Crystal’s internal implementation of Array or Hash is like reading
 a fairy tale in a children’s book. Anyone can understand it, even people
 without a Ph.D. in Computer Science or systems programming experience.&lt;/p&gt;
+&lt;div style=&quot;clear: left&quot;&gt;&lt;/div&gt;
+&lt;p&gt;&lt;b&gt;Update:&lt;/b&gt; There was a &lt;a href=&quot;https://news.ycombinator.com/item?id=28975453&quot;&gt;long discussion on Hacker
+News&lt;/a&gt; about whether reading the
+standard library really is a good idea for various different languages.&lt;/p&gt;
 &lt;h2&gt;At First Glance, Crystal Is Ruby&lt;/h2&gt;
 &lt;p&gt;At first glance, when I read Crystal’s &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr&quot;&gt;Array
 implementation&lt;/a&gt;,
@@ -2543,363 +2818,4 @@ else clause.&lt;/p&gt;
 &lt;p&gt;Clearly the discriminant function is crucial - when I have time next, I’ll
 explore what discriminant means, where it’s implemented and how it works. Or if
 anyone from the Rust teams happens to read this, let us know.&lt;/p&gt;
-</content></entry><entry><title>Looking Inside Postgres at a GiST Index</title><link href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index" rel="alternate"></link><id href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index" rel="alternate"></id><published>2017-12-15T00:00:00Z</published><updated>2017-12-15T00:00:00Z</updated><category>the Postgres LTREE Extension</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/tree5.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt; What do Postgres GiST indexes look like? How are&lt;br/&gt;
-  they similar or different from standard Postgres indexes?&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;In the last few posts in this series 
-(&lt;a href=&quot;http://patshaughnessy.net/2017/12/11/trying-to-repres</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/tree5.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt; What do Postgres GiST indexes look like? How are&lt;br/&gt;
-  they similar or different from standard Postgres indexes?&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;In the last few posts in this series 
-(&lt;a href=&quot;http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres&quot;&gt;one&lt;/a&gt;,
-&lt;a href=&quot;http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension&quot;&gt;two&lt;/a&gt;,
-&lt;a href=&quot;http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree&quot;&gt;three&lt;/a&gt;
-and
-&lt;a href=&quot;http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension&quot;&gt;four&lt;/a&gt;)
-I showed you how to save hierarchical data in a flat database table using the
-Postgres &lt;a href=&quot;https://www.postgresql.org/docs/current/static/ltree.html&quot;&gt;LTREE
-extension&lt;/a&gt;. I
-explained that you represent tree nodes using path strings and how to search
-your tree data using special SQL operators LTREE provides.&lt;/p&gt;
-&lt;p&gt;But the real value of LTREE isn’t the operators and functions it gives you -
-internally these boil down to fairly simple string operations. Instead, what
-makes LTREE useful is that it integrates these new operators with Postgres’s
-indexing code, which allows you to search for and find matching tree paths
-&lt;em&gt;quickly&lt;/em&gt;. To achieve this, LTREE takes advantage of the &lt;a href=&quot;http://gist.cs.berkeley.edu&quot;&gt;Generalized Search Tree
-(GiST) project&lt;/a&gt;, an API that allows C developers
-to extend Postgres’s indexing system.&lt;/p&gt;
-&lt;p&gt;But what does the GiST API do? And what does it mean to extend Postgres’s
-indexing system, exactly? Read on to find out!&lt;/p&gt;
-&lt;h2&gt;Searching Without an Index&lt;/h2&gt;
-&lt;p&gt;Here again is the tree table I used as an example in the earlier posts in this
-series:&lt;/p&gt;
-&lt;pre&gt;
-create table tree(
-    id serial primary key,
-    letter char,
-    path ltree
-);
-&lt;/pre&gt;
-&lt;p&gt;Note the path column uses the custom &lt;span class=&quot;code&quot;&gt;ltree&lt;/span&gt; data type
-the LTREE extension provides. If you missed the previous posts, &lt;span
-class=&quot;code&quot;&gt;ltree&lt;/span&gt; columns represent hierarchical data by joining
-strings together with periods, e.g.  “A.B.C.D” or “Europe.Estonia.Tallinn.”&lt;/p&gt;
-&lt;p&gt;Earlier, I used a simple tree with only 7 nodes as an example. SQL operations
-on a small table like this will always be fast. Today I’d like to imagine a
-much larger tree to explore the benefits indexes can provide; suppose instead I
-have a tree containing hundreds or thousands of records in the &lt;span
-class=&quot;code&quot;&gt;path&lt;/span&gt; column:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/table.png&quot;/&gt;
-&lt;p&gt;Now suppose I search for a single tree node using a select statement:&lt;/p&gt;
-&lt;pre&gt;
-select letter from tree where path = 'A.B.T.V'
-&lt;/pre&gt;
-&lt;p&gt;Without an index on this table, Postgres has to resort to a &lt;em&gt;sequence scan&lt;/em&gt;,
-which is a technical way of saying that Postgres has to iterate over all of the
-records in the table:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/table2.png&quot;/&gt;
-&lt;p&gt;For each and every record in the table, Postgres executes a comparison &lt;span
-class=&quot;code&quot;&gt;p == q&lt;/span&gt; where &lt;span class=&quot;code&quot;&gt;p&lt;/span&gt; is the value of
-the path column for each record in the table, and &lt;span class=&quot;code&quot;&gt;q&lt;/span&gt;
-is the query, or the value I’m searching for, &lt;span class=&quot;code&quot;&gt;A.B.V.T&lt;/span&gt;
-in this example. This loop can be very slow if there are many records. Postgres
-has to check all of them, because they can appear in any order and there’s no
-way to know how many matches there might be in the data ahead of time.&lt;/p&gt;
-&lt;h2&gt;Searching With a B-Tree Index&lt;/h2&gt;
-&lt;p&gt;Of course, there’s a simple solution to this problem; I just need to create an
-index on the path column:&lt;/p&gt;
-&lt;pre&gt;
-create index tree_path_idx on tree (path);
-&lt;/pre&gt;
-&lt;p&gt;As you probably know, executing a search using an index is much faster. If you
-see a performance problem with a SQL statement in your application, the first
-thing you should check for is a missing index. But why? Why does creating an
-index speed up searches, exactly? The reason is that an index is a sorted copy
-of the target column’s data:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index1.png&quot;/&gt;
-&lt;p&gt;By sorting the values ahead of time, Postgres can search through them much more
-quickly. It uses a binary search algorithm:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index2.png&quot;/&gt;
-&lt;p&gt;Postgres starts by checking the value in the middle of the index. If the stored
-value (&lt;span class=&quot;code&quot;&gt;p&lt;/span&gt;) is too large and is greater than the query
-(&lt;span class=&quot;code&quot;&gt;q&lt;/span&gt;), if &lt;span class=&quot;code&quot;&gt;p &amp;gt; q&lt;/span&gt;, it moves up
-and checks the value at the 25% position. If the value is too small, if &lt;span
-class=&quot;code&quot;&gt;p &amp;lt; q&lt;/span&gt;, it moves down and checks the value at the 75%
-position. Repeatedly dividing the index into smaller and smaller pieces,
-Postgres only needs to search a few times before it finds the matching record
-or records.&lt;/p&gt;
-&lt;p&gt;However, for large tables with thousands or millions of rows Postgres can’t
-save all of the sorted data values in a single memory segment. Instead,
-Postgres indexes (and indexes inside of any relational database system) save
-values in a &lt;em&gt;binary or balanced tree&lt;/em&gt; (B-Tree):&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index3.png&quot;/&gt;
-&lt;p&gt;Now my values are saved in a series of different memory segments arranged in a
-tree structure. Dividing the index up into pieces allows Postgres to manage
-memory properly while saving possibly millions of values in the index. Note
-this isn’t the tree from my LTREE dataset; B-Trees are internal Postgres data
-structures I don’t have access to. To learn more about the Computer Science
-behind this read my 2014 article &lt;a href=&quot;http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes&quot;&gt;Discovering the Computer Science Behind
-Postgres
-Indexes&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Now Postgres uses repeated binary searches, one for each memory segment in the
-B-Tree, to find a value:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/index4.png&quot;/&gt;
-&lt;p&gt;Each value in the parent or root segment is really a pointer to a child
-segment. Postgres first searches the root segment using a binary search to find
-the right pointer, and then jumps down to the child segment to find the actual
-matching records using another binary search. The algorithm is recursive: The
-B-Tree could contain many levels in which case the child segments would contain
-pointers to grandchild segments, etc.&lt;/p&gt;
-&lt;h2&gt;What’s the Problem with Standard Postgres Indexes?&lt;/h2&gt;
-&lt;p&gt;But there’s a serious problem here I’ve overlooked so far. Postgres’s index
-search code only supports certain operators. Above I was searching using this
-select statement:&lt;/p&gt;
-&lt;pre&gt;
-select letter from tree where path = 'A.B.T.V'
-&lt;/pre&gt;
-&lt;p&gt;I was looking for records that were equal to my query: &lt;span class=&quot;code&quot;&gt;p ==
-q&lt;/span&gt;. Using a B-Tree index I could also have searched for records greater
-than or less than my query: &lt;span class=&quot;code&quot;&gt;p &amp;lt; q&lt;/span&gt; or &lt;span
-class=&quot;code&quot;&gt;p &amp;gt; q&lt;/span&gt;.&lt;/p&gt;
-&lt;p&gt;But what if I want to use the custom LTREE &lt;span class=&quot;code&quot;&gt;&amp;lt;@&lt;/span&gt;
-(ancestor) operator? What if I want to execute this select statement?&lt;/p&gt;
-&lt;pre&gt;
-select letter from tree where path &lt;@ 'A.B.V'
-&lt;/pre&gt;
-&lt;p&gt;As we saw in the previous posts in this series, this search will return all of
-the LTREE records that appear somewhere on the branch under &lt;span
-class=&quot;code&quot;&gt;A.B.V&lt;/span&gt;, that are descendants of the &lt;span
-class=&quot;code&quot;&gt;A.B.V&lt;/span&gt; tree node.&lt;/p&gt;
-&lt;p&gt;A standard Postgres index doesn’t work here. To execute this search efficiently
-using an index, Postgres needs to execute this comparison as it walks the
-B-Tree: &lt;span class=&quot;code&quot;&gt;p &amp;lt;@ q&lt;/span&gt;. But the standard Postgres index
-search code doesn’t support &lt;span class=&quot;code&quot;&gt;p &amp;lt;@ q&lt;/span&gt;. Instead, if I
-execute this search Postgres resorts to a slow sequence scan again, even if I
-create an index on the &lt;span class=&quot;code&quot;&gt;ltree&lt;/span&gt; column.&lt;/p&gt;
-&lt;p&gt;To search tree data efficiently, we need a Postgres index that will perform
-&lt;span class=&quot;code&quot;&gt;p &amp;lt;@ q&lt;/span&gt; comparisons equally well as &lt;span
-class=&quot;code&quot;&gt;p == q&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;p &amp;lt; q&lt;/span&gt; comparisons. We
-need a GiST index!&lt;/p&gt;
-&lt;h2&gt;The Generalized Search Tree (GiST) project&lt;/h2&gt;
-&lt;div style=&quot;float: right; padding: 8px 0px 0px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/berkeley.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;The Generalized Search Tree (GiST) project, like&lt;br/&gt;
-Postgres itself, started at UC Berkeley.&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Almost 20 years ago, an open source project at UC Berkeley solved this precise
-problem. The &lt;a href=&quot;http://gist.cs.berkeley.edu&quot;&gt;Generalized Search Tree (GiST)
-project&lt;/a&gt; added an API to Postgres allowing C
-developers to extend the set of data types that can be used in a Postgres
-index.&lt;/p&gt;
-&lt;p&gt;Quoting from the project’s web page:&lt;/p&gt;
-&lt;blockquote&gt;
-In the beginning there was the B-tree. All database search trees since the
-B-tree have been variations on its theme. Recognizing this, we have developed a
-new kind of index called a Generalized Search Tree (GiST), which provides the
-functionality of all these trees in a single package. The GiST is an extensible
-data structure, which allows users to develop indices over any kind of data,
-supporting any lookup over that data.
-&lt;/blockquote&gt;
-&lt;p&gt;GiST achieves this by adding an API to Postgres’s index system anyone can implement for their specific data type. GiST implements the general indexing and searching code, but calls out to custom code at four key moments in the indexing process. Quoting from the project’s web page again, here’s a quick explanation of the 4 methods in the GiST API:&lt;/p&gt;
-&lt;div style=&quot;padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist.png&quot;/&gt;
-&lt;/div&gt;
-&lt;p&gt;GiST indexes use a tree structure similar to the B-Tree we saw above. But
-Postgres doesn’t create the GiST index tree structure by itself; Postgres works
-with implementations of the GiST &lt;span class=&quot;code&quot;&gt;Union&lt;/span&gt;, &lt;span
-class=&quot;code&quot;&gt;Penalty&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;PickSplit&lt;/span&gt; API
-functions described above. And when you execute a SQL statement that searches
-for a value in a GiST index, Postgres uses the &lt;span
-class=&quot;code&quot;&gt;Consistent&lt;/span&gt; function to find the target values.&lt;/p&gt;
-&lt;p&gt;The key here is the implementor of the GiST API can decide what type of data to
-index and how to arrange those data values in the GiST tree. Postgres doesn’t
-care what the data values are or how the tree looks. Postgres simply calls
-&lt;span class=&quot;code&quot;&gt;Consistent&lt;/span&gt; any time it needs to search for a value
-and lets the GiST API implementor find the value.&lt;/p&gt;
-&lt;p&gt;An example would help understand this, and we have an example GiST API
-implementation: The LTREE extension!&lt;/p&gt;
-&lt;h2&gt;Implementing the GiST API for Tree Paths&lt;/h2&gt;
-&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/moscow-state.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;The LTREE Postgres extension was developed at Moscow State&lt;br/&gt;
-University by Oleg Bartunov and Teodor Sigaev.&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Starting in around 2001, two students at Moscow State University found the API
-from the GiST project and decided to use it to build indexing support for tree
-data. Oleg Bartunov and Teodor Sigaev, in effect, wrote a “Tree Paths
-Consistent” function, a “Tree Path Union” function, etc. The C code that
-implements this API is the LTREE extension. You can find these functions,
-&lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; and &lt;span
-class=&quot;code&quot;&gt;ltree_union&lt;/span&gt;, among other functions, in a file called
-ltree_gist.c, located in the contrib/ltree directory in the Postgres source
-code. They also implemented the &lt;span class=&quot;code&quot;&gt;Penalty&lt;/span&gt;, &lt;span
-class=&quot;code&quot;&gt;PickSplit&lt;/span&gt; and various other functions related to the GiST
-algorithm.&lt;/p&gt;
-&lt;p&gt;I can use these custom functions on my own data simply by creating a GiST
-index. Returning to my LTREE example, I’ll drop my B-Tree index and create a
-GiST index instead:&lt;/p&gt;
-&lt;pre&gt;
-drop index tree_path_idx;
-create index tree_path_idx on tree using gist (path);
-&lt;/pre&gt;
-&lt;p&gt;Notice the &lt;span class=&quot;code&quot;&gt;using gist&lt;/span&gt; keywords in the &lt;span
-class=&quot;code&quot;&gt;create index&lt;/span&gt; command. That’s all it takes; Postgres
-automatically finds, loads and uses the &lt;span class=&quot;code&quot;&gt;ltree_union&lt;/span&gt;,
-&lt;span class=&quot;code&quot;&gt;ltree_picksplit&lt;/span&gt; etc., functions whenever I insert a
-new value into the table. (It will also insert all existing records into the
-index immediately.) Of course, earlier I &lt;a href=&quot;http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension&quot;&gt;installed the LTREE
-extension&lt;/a&gt;
-also.&lt;/p&gt;
-&lt;p&gt;Let’s see how this works - suppose I add a few random tree records to my empty
-tree table after creating the index:&lt;/p&gt;
-&lt;pre&gt;
-insert into tree (letter, path) values ('A', 'A.B.G.A');
-insert into tree (letter, path) values ('E', 'A.B.T.E');
-insert into tree (letter, path) values ('M', 'A.B.R.M');
-insert into tree (letter, path) values ('F', 'A.B.E.F');
-insert into tree (letter, path) values ('P', 'A.B.R.P');
-&lt;/pre&gt;
-&lt;p&gt;To get things started, Postgres will allocate a new memory segment for the GiST
-index and insert my five records:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist1.png&quot;/&gt;
-&lt;p&gt;If I search now using the ancestor operator:&lt;/p&gt;
-&lt;pre&gt;
-select count(*) from tree where path &lt;@ 'A.B.T'
-&lt;/pre&gt;
-&lt;p&gt;…Postgres will simply iterate over the records in the same order I inserted
-then, and call the &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; function for each
-one. Here again is what the GiST API calls for the Consistent function to do:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/consistent.png&quot;/&gt;
-&lt;p&gt;In this case Postgres will compare &lt;span class=&quot;code&quot;&gt;p &amp;lt;@ A.B.T&lt;/span&gt; for
-each of these five records:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist2.png&quot;/&gt;
-&lt;p&gt;Because the values of &lt;span class=&quot;code&quot;&gt;p&lt;/span&gt;, the tree page keys, are
-simple path strings, &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; directly
-compares them with &lt;/span&gt;A.B.T&lt;/span&gt; and determines immediately whether each
-value is a descendent tree node of &lt;span class=&quot;code&quot;&gt;A.B.T&lt;/span&gt; or not.
-Right now the GiST index hasn’t provided much value; Postgres has to iterate
-over all the values, just like a sequence scan.&lt;/p&gt;
-&lt;p&gt;Now suppose I start to add more and more records to my table. Postgres can fit
-up to 136 LTREE records into the root GiST memory segment, and index scans
-function the same way as a sequence scan by checking all the values.&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist3.png&quot;/&gt;
-&lt;p&gt;But if I insert one more record, the 137th record doesn’t fit. At this point
-Postgres has to do something different:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist4.png&quot;/&gt;
-&lt;p&gt;Now Postgres “splits” the memory segment to make room for more values. It
-creates two new child memory segments and pointers to them from the parent or
-root segment.&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist5.png&quot;/&gt;
-&lt;p&gt;What does Postgres do next? What does it place into each child segment?
-Postgres leaves this decision to the GiST API, to the LTREE extension, by
-calling the the &lt;span class=&quot;code&quot;&gt;ltree_picksplit&lt;/span&gt; function. Here again
-is the API spec for &lt;span class=&quot;code&quot;&gt;PickSplit&lt;/span&gt;:&lt;/p&gt;
-&lt;div style=&quot;padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/pick-split.png&quot;/&gt;
-&lt;/div&gt;
-&lt;p&gt;The &lt;span class=&quot;code&quot;&gt;ltree_picksplit&lt;/span&gt; function - the LTREE
-implementation of the GiST API - sorts the tree paths alphabetically and copies
-each half into one of the two new child segments. Note that GiST indexes don’t
-normally sort their contents; however, GiST indexes created specifically by the
-LTREE extension do because of the way &lt;span class=&quot;code&quot;&gt;ltree_picksplit&lt;/span&gt;
-works. We’ll see why it sorts the data in a moment.&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist6.png&quot;/&gt;
-&lt;p&gt;Now Postgres has to decide what to leave in the root segment. To do this, it
-calls the Union GiST API:&lt;/p&gt;
-&lt;div style=&quot;padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/union.png&quot;/&gt;
-&lt;/div&gt;
-&lt;p&gt;In this example, each of the child segments is a set S. And the &lt;span
-class=&quot;code&quot;&gt;ltree_union&lt;/span&gt; function has to return a “union” value for each
-child segment that describes somehow what values are present in that segment:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist7.png&quot;/&gt;
-&lt;p&gt;Oleg and Teodor decided this union value should be a pair of left/right values
-indicating the minimum and maximum tree branches inside of which all of the
-values fit alphabetically. This is why the &lt;span
-class=&quot;code&quot;&gt;ltree_picksplit&lt;/span&gt; function sorted the values. For example,
-because the first child segment contains the sorted values from &lt;span
-class=&quot;code&quot;&gt;A.B.C.B&lt;/span&gt; through &lt;span class=&quot;code&quot;&gt;A.B.M.Z&lt;/span&gt;, the
-left/right union becomes &lt;span class=&quot;code&quot;&gt;A&lt;/span&gt; and &lt;span
-class=&quot;code&quot;&gt;A.B.M&lt;/span&gt;:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist8.png&quot;/&gt;
-&lt;p&gt;Note &lt;span class=&quot;code&quot;&gt;A.B.M&lt;/span&gt; is sufficient here to form a union value
-excluding &lt;span class=&quot;code&quot;&gt;A.B.N.X&lt;/span&gt; and all the following values; LTREE
-doesn’t need to save &lt;span class=&quot;code&quot;&gt;A.B.M.Z&lt;/span&gt;.&lt;/p&gt;
-&lt;p&gt;Similarly, the left/right union for the second child segment becomes &lt;span
-class=&quot;code&quot;&gt;A.B.N/A.B.X&lt;/span&gt;:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist9.png&quot;/&gt;
-&lt;p&gt;This is what a GiST index looks like. Or, what an LTREE GiST index looks like,
-specifically. The power of the GiST API is that anyone can use it to create a
-Postgres index for any type of data. Postgres will always use the same pattern:
-The parent index page contains a set of union values, each of which somehow
-describe the contents of each child index page.&lt;/p&gt;
-&lt;p&gt;For LTREE GiST indexes, Postgres saves left/right value pairs to describe the
-union of values that appear in each child index segment. For other types of
-GiST indexes, the union values could be anything. For example, a GiST index
-could store geographical information like latitude/longitude coordinates, or
-colors, or any sort of data at all. What’s important is that each union value
-describe the set of possible values that can appear under a certain branch of
-the index. And like B-Trees, this union value/child page pattern is recursive:
-A GiST index could hold millions of values in a tree with many pages saved in a
-large multi-level tree.&lt;/p&gt;
-&lt;h2&gt;Searching a GiST Index&lt;/h2&gt;
-&lt;p&gt;After creating this GiST index tree, searching for a value is straightforward.
-Postgres uses the &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; function. As an
-example, let’s repeat the same SQL query from above:&lt;/p&gt;
-&lt;pre&gt;
-select count(*) from tree where path &lt;@ 'A.B.T'
-&lt;/pre&gt;
-&lt;p&gt;To execute this using the GiST index, Postgres iterates over the union values
-in the root memory segment and calls the &lt;span
-class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; function for each one:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/consistent.png&quot;/&gt;
-&lt;p&gt;Now Postgres passes each union value to &lt;span
-class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; to calculate the &lt;span class=&quot;code&quot;&gt;p &amp;lt;@
-q&lt;/span&gt; formula. The code inside of &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt;
-then returns &amp;quot;MAYBE&amp;quot; if &lt;span class=&quot;code&quot;&gt;q &amp;gt;
-left&lt;/span&gt;, and &lt;span class=&quot;code&quot;&gt;q &amp;lt; right&lt;/span&gt;. Otherwise it returns
-&amp;quot;NO.&amp;quot;&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist10.png&quot;/&gt;
-&lt;p&gt;In this example you can see &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; finds
-that the query &lt;span class=&quot;code&quot;&gt;A.B.T&lt;/span&gt;, or &lt;span class=&quot;code&quot;&gt;q&lt;/span&gt;,
-&lt;em&gt;maybe&lt;/em&gt; is located inside the second child memory segment, but not the first one.&lt;/p&gt;
-&lt;p&gt;For the first child union structure, &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt;
-finds &lt;span class=&quot;code&quot;&gt;q &amp;gt; A&lt;/span&gt; true but &lt;span class=&quot;code&quot;&gt;q &amp;lt;
-A.B.M&lt;/span&gt; false. Therefore &lt;span
-class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; knows there can be no matches in the top
-child segment, so it skips down to the second union structure.&lt;/p&gt;
-&lt;p&gt;For the second child union structure, &lt;span class=&quot;code&quot;&gt;ltree_consistent&lt;/span&gt; finds both &lt;span class=&quot;code&quot;&gt;q &amp;gt; A.B.N&lt;/span&gt;
-true and &lt;span class=&quot;code&quot;&gt;q &amp;lt; A.B.X&lt;/span&gt; true. Therefore it returns &lt;span
-class=&quot;code&quot;&gt;MAYBE&lt;/span&gt;, meaning the search continues in the lower child
-segment:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/gist11.png&quot;/&gt;
-&lt;p&gt;Note Postgres never had to search the first child segment: The tree structure
-limits the comparisons necessary to just the values that might match &lt;span
-class=&quot;code&quot;&gt;p &amp;lt;@ A.B.T&lt;/span&gt;.&lt;/p&gt;
-&lt;p&gt;Imagine my table contained a million rows: Searches using the GiST index will
-still be fast because the GiST tree limits the scope of the search. Instead of
-executing &lt;span class=&quot;code&quot;&gt;p &amp;lt;@ q&lt;/span&gt; on every one of the million rows,
-Postgres only needs to run &lt;span class=&quot;code&quot;&gt;p &amp;lt;@ q&lt;/span&gt; a handful of times,
-on a few union records and on the child segments of the tree that contain
-values that might match.&lt;/p&gt;
-&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/sternberg.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;The Sternberg Astronomical Institute
-at Moscow State University&lt;/i&gt;
-&lt;/div&gt;
-&lt;h2&gt;Send Them a Postcard&lt;/h2&gt;
-&lt;p&gt;Oleg Bartunov and Teodor Sigaev, the authors of the LTREE extension, explain
-its usage and the algorithms I detailed above here on their &lt;a href=&quot;http://www.sai.msu.su/%7Emegera/postgres/gist/ltree/&quot;&gt;web
-page&lt;/a&gt;. They included more
-examples of SQL searches on tree data, including some which use the &lt;span
-class=&quot;code&quot;&gt;LTREE[]&lt;/span&gt; data type I didn’t have time to cover in these blog
-posts.&lt;/p&gt;
-&lt;p&gt;But most importantly, they included this note at the bottom:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2017/12/15/postcard.png&quot;/&gt;
-&lt;p&gt;Do you save tree data in Postgres? Does your app take advantage of the LTREE
-extension? If so, you should send Oleg and Teodor a postcard! I just did.&lt;/p&gt;
 </content></entry></feed>
