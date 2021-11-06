@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-06T18:20:41Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://localhost/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-06T18:28:33Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;Most modern, statically typed languages allow us to use generic types. We write
-a function once with generic type syntax, and then the c</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://localhost/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
+a function once with generic type syntax, and t</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;Most modern, statically typed languages allow us to use generic types. We write
@@ -66,7 +66,7 @@ syntax makes perfect sense to me. However, most developers will be able to
 figure this out without much effort.&lt;/p&gt;
 &lt;p&gt;Crystal identifies the unique elements of the array by converting it into a
 “lookup hash:”&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;650&quot; src=&quot;http://localhost/assets/2021/11/6/lookup-hash.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img width=&quot;650&quot; src=&quot;http://patshaughnessy.net/assets/2021/11/6/lookup-hash.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;As you know, hash keys are unique. By converting the array into a hash, Crystal
 has quickly identified the unique elements of that array.&lt;/p&gt;
 &lt;h2&gt;Converting An Array To A Hash At Runtime&lt;/h2&gt;
@@ -107,7 +107,7 @@ in such a block:&lt;/p&gt;
 
 &lt;p&gt;Since the block &lt;code&gt;{ |elem| elem }&lt;/code&gt; just returns whatever was passed into it, the
 keys and values of the lookup hash will be the same:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;275&quot; src=&quot;http://localhost/assets/2021/11/6/keys-and-values.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img width=&quot;275&quot; src=&quot;http://patshaughnessy.net/assets/2021/11/6/keys-and-values.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;This block adds a bit of flexibility to the code. The Crystal team might want
 to reuse this function someday with a different block and set of keys.&lt;/p&gt;
 &lt;p&gt;Finally, let’s look at how Crystal iterates over the array:&lt;/p&gt;
@@ -148,7 +148,7 @@ needs to convert the type &lt;code&gt;Array(T)&lt;/code&gt; into the type &lt;co
 the second, type-level mirror program to find out how this works.&lt;/p&gt;
 &lt;p&gt;You can imagine the Crystal compiler processing the generic type code like
 this:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;550&quot; src=&quot;http://localhost/assets/2021/11/6/solved-puzzle.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img width=&quot;550&quot; src=&quot;http://patshaughnessy.net/assets/2021/11/6/solved-puzzle.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;The first line is actually the most important:&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;

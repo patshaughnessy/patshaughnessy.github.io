@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Generic Types: Adding Math Puzzles To Your Code - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Generic Types: Adding Math Puzzles To Your Code</h1><div class="metadata"><span class="date">November 6th 2021</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Generic Types: Adding Math Puzzles To Your Code">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-  <img src="http://localhost/assets/2021/11/6/formula.png"><br/>
+  <img src="http://patshaughnessy.net/assets/2021/11/6/formula.png"><br/>
   <i>In this formula, x is the bound variable, a is<br/>the free variable and e is constant.</i>
 </div>
 <p>Most modern, statically typed languages allow us to use generic types. We write
@@ -61,7 +61,7 @@ syntax makes perfect sense to me. However, most developers will be able to
 figure this out without much effort.</p>
 <p>Crystal identifies the unique elements of the array by converting it into a
 “lookup hash:”</p>
-<p><img width="650" src="http://localhost/assets/2021/11/6/lookup-hash.svg"><br/></p>
+<p><img width="650" src="http://patshaughnessy.net/assets/2021/11/6/lookup-hash.svg"><br/></p>
 <p>As you know, hash keys are unique. By converting the array into a hash, Crystal
 has quickly identified the unique elements of that array.</p>
 <h2>Converting An Array To A Hash At Runtime</h2>
@@ -102,7 +102,7 @@ in such a block:</p>
 
 <p>Since the block <code>{ |elem| elem }</code> just returns whatever was passed into it, the
 keys and values of the lookup hash will be the same:</p>
-<p><img width="275" src="http://localhost/assets/2021/11/6/keys-and-values.svg"><br/></p>
+<p><img width="275" src="http://patshaughnessy.net/assets/2021/11/6/keys-and-values.svg"><br/></p>
 <p>This block adds a bit of flexibility to the code. The Crystal team might want
 to reuse this function someday with a different block and set of keys.</p>
 <p>Finally, let’s look at how Crystal iterates over the array:</p>
@@ -143,7 +143,7 @@ needs to convert the type <code>Array(T)</code> into the type <code>Hash(U, T)</
 the second, type-level mirror program to find out how this works.</p>
 <p>You can imagine the Crystal compiler processing the generic type code like
 this:</p>
-<p><img width="550" src="http://localhost/assets/2021/11/6/solved-puzzle.svg"><br/></p>
+<p><img width="550" src="http://patshaughnessy.net/assets/2021/11/6/solved-puzzle.svg"><br/></p>
 <p>The first line is actually the most important:</p>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">
