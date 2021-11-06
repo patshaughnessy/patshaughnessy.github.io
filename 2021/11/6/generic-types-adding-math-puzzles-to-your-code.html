@@ -136,7 +136,7 @@ hash, a new array containing only the unique elements from the original array:`<
 of this code, the generic type syntax, earlier at compile time. And, curiously,
 that code also converts the array into a hash but in a different way. When the
 Crystal team wrote <code>Array#uniq</code>, they had to write two programs, not one!</p>
-<p>But what exactly do I mean by “converting an array to a hash at compile time?”
+<p>What exactly do I mean by “converting an array to a hash at compile time?”
 How and why does this happen? And what’s the second program here?</p>
 <p>The answer has to do with the <code>Hash(U, T).new</code> expression we read above. Crystal
 needs to convert the type <code>Array(T)</code> into the type <code>Hash(U, T)</code>. Let’s step through
@@ -185,7 +185,7 @@ code those types are generic types: <code>T</code> and <code>U</code>. The arrow
 block takes a single parameter of type <code>T</code>, and returns a single value of type <code>U</code>.</p>
 <p>But what do <code>T</code> and <code>U</code> mean? Where are they defined?</p>
 <p>This is our math puzzle for the day. Just like in a limit, integral or infinite
-series from Calculus, this formula contains bound and free variables:</p>
+series from Calculus, this formula contains <em>bound and free variables</em>:</p>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">
 </span><span style="color:#4f5b66;">&amp; : </span><span style="color:#000000;">T </span><span style="color:#4f5b66;">-&gt; </span><span style="color:#000000;">U forall U
@@ -196,7 +196,7 @@ Crystal binds the <code>T</code> type variable here to be the same type as above
 words, the type of values passed into this block must be the same as the type
 of the elements in the array.</p>
 <p>But what about <code>U</code>? What type is that?</p>
-<p>The <code>forall U</code> clause declares the U type to be a free variable. That means
+<p>The <code>forall U</code> clause declares the U type to be a <em>free variable</em>. That means
 that <code>U</code>, unlike the type <code>T</code>, is not bound to any known type value. <code>forall</code>
 tells the Crystal compiler that the following code should apply equally well to
 any type <code>U</code>, “for all” possible types <code>U</code>.</p>

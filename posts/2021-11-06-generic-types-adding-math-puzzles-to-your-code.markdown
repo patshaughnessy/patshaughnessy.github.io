@@ -161,7 +161,7 @@ of this code, the generic type syntax, earlier at compile time. And, curiously,
 that code also converts the array into a hash but in a different way. When the
 Crystal team wrote `Array#uniq`, they had to write two programs, not one!
 
-But what exactly do I mean by “converting an array to a hash at compile time?”
+What exactly do I mean by “converting an array to a hash at compile time?”
 How and why does this happen? And what’s the second program here?
 
 The answer has to do with the `Hash(U, T).new` expression we read above. Crystal
@@ -221,7 +221,7 @@ block takes a single parameter of type `T`, and returns a single value of type `
 But what do `T` and `U` mean? Where are they defined?
 
 This is our math puzzle for the day. Just like in a limit, integral or infinite
-series from Calculus, this formula contains bound and free variables:
+series from Calculus, this formula contains _bound and free variables_:
 
 <pre type="ruby">
 & : T -> U forall U
@@ -234,7 +234,7 @@ of the elements in the array.
 
 But what about `U`? What type is that?
 
-The `forall U` clause declares the U type to be a free variable. That means
+The `forall U` clause declares the U type to be a _free variable_. That means
 that `U`, unlike the type `T`, is not bound to any known type value. `forall`
 tells the Crystal compiler that the following code should apply equally well to
 any type `U`, “for all” possible types `U`.

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-06T18:03:45Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-06T18:20:41Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://localhost/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
 &lt;/div&gt;
@@ -141,7 +141,7 @@ hash, a new array containing only the unique elements from the original array:`&
 of this code, the generic type syntax, earlier at compile time. And, curiously,
 that code also converts the array into a hash but in a different way. When the
 Crystal team wrote &lt;code&gt;Array#uniq&lt;/code&gt;, they had to write two programs, not one!&lt;/p&gt;
-&lt;p&gt;But what exactly do I mean by “converting an array to a hash at compile time?”
+&lt;p&gt;What exactly do I mean by “converting an array to a hash at compile time?”
 How and why does this happen? And what’s the second program here?&lt;/p&gt;
 &lt;p&gt;The answer has to do with the &lt;code&gt;Hash(U, T).new&lt;/code&gt; expression we read above. Crystal
 needs to convert the type &lt;code&gt;Array(T)&lt;/code&gt; into the type &lt;code&gt;Hash(U, T)&lt;/code&gt;. Let’s step through
@@ -190,7 +190,7 @@ code those types are generic types: &lt;code&gt;T&lt;/code&gt; and &lt;code&gt;U
 block takes a single parameter of type &lt;code&gt;T&lt;/code&gt;, and returns a single value of type &lt;code&gt;U&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;But what do &lt;code&gt;T&lt;/code&gt; and &lt;code&gt;U&lt;/code&gt; mean? Where are they defined?&lt;/p&gt;
 &lt;p&gt;This is our math puzzle for the day. Just like in a limit, integral or infinite
-series from Calculus, this formula contains bound and free variables:&lt;/p&gt;
+series from Calculus, this formula contains &lt;em&gt;bound and free variables&lt;/em&gt;:&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;
 &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp; : &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;T &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;U forall U
@@ -201,7 +201,7 @@ Crystal binds the &lt;code&gt;T&lt;/code&gt; type variable here to be the same t
 words, the type of values passed into this block must be the same as the type
 of the elements in the array.&lt;/p&gt;
 &lt;p&gt;But what about &lt;code&gt;U&lt;/code&gt;? What type is that?&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;forall U&lt;/code&gt; clause declares the U type to be a free variable. That means
+&lt;p&gt;The &lt;code&gt;forall U&lt;/code&gt; clause declares the U type to be a &lt;em&gt;free variable&lt;/em&gt;. That means
 that &lt;code&gt;U&lt;/code&gt;, unlike the type &lt;code&gt;T&lt;/code&gt;, is not bound to any known type value. &lt;code&gt;forall&lt;/code&gt;
 tells the Crystal compiler that the following code should apply equally well to
 any type &lt;code&gt;U&lt;/code&gt;, “for all” possible types &lt;code&gt;U&lt;/code&gt;.&lt;/p&gt;
