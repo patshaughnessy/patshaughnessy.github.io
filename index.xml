@@ -1,4 +1,371 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-06T18:28:33Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-29T19:09:56Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Find Your Language’s Primitives</title><link href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></id><published>2021-11-29T00:00:00Z</published><updated>2021-11-29T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;If you dig into your programming language's syntax, you might &lt;br/&gt;discover that it is capable of much more than you thought it was.
+  &lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;Wikipedia defines “Language Primitive” &lt;a href=&quot;https://en.wikipedia.org/wik</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;If you dig into your programming language's syntax, you might &lt;br/&gt;discover that it is capable of much more than you thought it was.
+  &lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;Wikipedia defines “Language Primitive” &lt;a href=&quot;https://en.wikipedia.org/wiki/Language_primitive&quot;&gt;this
+way&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+In computing, language primitives are the simplest elements available in a
+programming language. A primitive is the smallest 'unit of processing'
+available to a programmer of a given machine, or can be an atomic element of an
+expression in a language.
+&lt;/blockquote&gt;
+&lt;p&gt;By looking at a language’s primitives, we can learn what kind of code will be
+easy to write or impossible to express, and what types of problems the language
+was intended to solve.  Whether you’ve been using a language for years, or just
+now learning a new language for fun, take the time to find and learn about your
+language’s primitives. You might discover something you never knew, and will
+come away with a deeper understanding of how your programs work.&lt;/p&gt;
+&lt;p&gt;As an example today, I’m going to look at how arrays work in three languages:
+Ruby, Crystal and x86 Assembly Language.&lt;/p&gt;
+&lt;h2&gt;Retrieving an Array Element In Ruby&lt;/h2&gt;
+&lt;p&gt;In Ruby I can create an array and later access an element like this:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;This code would be the same or almost the same in many other programming
+languages. It just means: “find the second element of the array and print it to
+stdout.”&lt;/p&gt;
+&lt;p&gt;But how does this actually work? In Ruby, the &lt;span class=&quot;code&quot;&gt;Array&lt;/span&gt;
+class and all of its methods are language primitives. This means array methods
+like &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; or &lt;span class=&quot;code&quot;&gt;[]=&lt;/span&gt; cannot be
+broken down into smaller pieces of Ruby code. As Wikipedia says, these methods
+are the smallest unit of processing available to Ruby programmers working with
+arrays.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;Ruby hides the details of how arrays actually work from us. To learn how Ruby
+actually saves and retrieves values from an array, we would need to switch
+languages and drop down a level of abstraction, and read the C implementation
+in the Ruby source code:
+&lt;a href=&quot;https://github.com/ruby/ruby/blob/master/array.c&quot;&gt;array.c&lt;/a&gt;. There’s nothing
+wrong with this, of course. Ruby developers use arrays every day without any
+trouble. But switching from Ruby to C makes understanding internal details much
+more difficult.&lt;/p&gt;
+&lt;h2&gt;Retrieving an Array Element In Crystal&lt;/h2&gt;
+&lt;p&gt;This Fall I decided to learn more about &lt;a href=&quot;https://crystal-lang.org&quot;&gt;Crystal&lt;/a&gt;, a
+statically typed language with syntax that resembles Ruby. I expected to find a
+similar &lt;span class=&quot;code&quot;&gt;Array#[]&lt;/span&gt; primitive.  But surprisingly, I was
+wrong!&lt;/p&gt;
+&lt;p&gt;The same code from above also works in Crystal:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;In Crystal, arrays are not language primitives because the Crystal standard
+library implements arrays using Crystal itself. The &lt;span
+class=&quot;code&quot;&gt;Array#[]&lt;/span&gt; method is not the smallest unit of processing
+available to Crystal programmers. Let’s dig into the details and divide up the
+&lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; method into smaller and smaller pieces to see how
+the Crystal team implemented it.&lt;/p&gt;
+&lt;p&gt;Reading
+&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/indexable.cr#L56&quot;&gt;src/indexable.cr&lt;/a&gt;
+in the Crystal standard library, here’s the implementation of &lt;span class=&quot;code&quot;&gt;Indexable#[]&lt;/span&gt;
+which the array class uses when I call &lt;span class=&quot;code&quot;&gt;arr[1]&lt;/span&gt; above:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Returns the element at the given *index*.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Negative indices can be used to start counting from the end of the array.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Raises `IndexError` if trying to access an element outside the array&amp;#39;s range.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary = [&amp;#39;a&amp;#39;, &amp;#39;b&amp;#39;, &amp;#39;c&amp;#39;]
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[0]  # =&amp;gt; &amp;#39;a&amp;#39;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[2]  # =&amp;gt; &amp;#39;c&amp;#39;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[-1] # =&amp;gt; &amp;#39;c&amp;#39;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[-2] # =&amp;gt; &amp;#39;b&amp;#39;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[3]  # raises IndexError
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[-4] # raises IndexError
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;@[AlwaysInline]
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;[]&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  fetch(index) { &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;raise &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;IndexError&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;The Crystal team implemented &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; using another method
+called &lt;span class=&quot;code&quot;&gt;fetch&lt;/span&gt;:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Returns the element at the given *index*, if in bounds,
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# otherwise executes the given block with the index and returns its value.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# a = [:foo, :bar]
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# a.fetch(0) { :default_value }    # =&amp;gt; :foo
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# a.fetch(2) { :default_value }    # =&amp;gt; :default_value
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# a.fetch(2) { |index| index * 3 } # =&amp;gt; 6
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;fetch&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  index &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; check_index_out_of_bounds(index) &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return yield &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;index
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  unsafe_fetch(index)
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Neither the &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; operator nor the &lt;span
+class=&quot;code&quot;&gt;fetch&lt;/span&gt; method are language primitives. To find a language
+primitive, I need to keep dividing the code up into smaller and smaller pieces,
+until it can’t be divided any further. The same process a chemist would use to
+break up some material into smaller and smaller molecules until they are left
+with a set of atoms.&lt;/p&gt;
+&lt;p&gt;Let’s continue by reading &lt;span class=&quot;code&quot;&gt;unsafe_fetch&lt;/span&gt;:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Returns the element at the given *index*, without doing any bounds check.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# `Indexable` makes sure to invoke this method with *index* in `0...size`,
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# so converting negative indices to positive ones is not needed here.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Clients never invoke this method directly. Instead, they access
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# elements with `#[](index)` and `#[]?(index)`.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# This method should only be directly invoked if you are absolutely
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# sure the index is in bounds, to avoid a bounds check for a small boost
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# of performance.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;abstract &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unsafe_fetch&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int)
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Since &lt;span class=&quot;code&quot;&gt;Indexable#unsafe_fetch&lt;/span&gt; is an abstract method, I
+need to read how the &lt;span class=&quot;code&quot;&gt;Array&lt;/span&gt; class implements it back
+in
+&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr#L663&quot;&gt;src/array.cr&lt;/a&gt;:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;@[AlwaysInline]
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unsafe_fetch&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;T
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer[index]
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/dig2.jpg&quot;&gt;&lt;br/&gt;
+	&lt;i&gt;&lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Digging_in_permafrost.jpg&quot;&gt;Nick Bonzey via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;So far, I’ve drilled down through 3 levels of Crystal implementation:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;But I haven’t found a primitive function yet. Let’s keep digging!&lt;/p&gt;
+&lt;h2&gt;The Crystal Array Class&lt;/h2&gt;
+&lt;p&gt;To learn more, I need to scroll up and read the beginning of the Crystal &lt;span
+class=&quot;code&quot;&gt;Array&lt;/span&gt; class definition:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# An `Array` is an ordered, integer-indexed collection of objects of type T.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Array indexing starts at 0. A negative index is assumed to be
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# relative to the end of the array: -1 indicates the last element,
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# -2 is the next to last element, and so on.
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;etc...&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# An `Array` is implemented using an internal buffer of some capacity
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# and is reallocated when elements are pushed to it when more capacity
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# is needed. This is normally known as a [dynamic array](http://en.wikipedia.org/wiki/Dynamic_array).
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;class &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Array&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(T)
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;etc...&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The buffer where elements start.
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Pointer(T)
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;I’ve deleted some of the comments and code for clarity. You can read the full,
+original version in &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr&quot;&gt;src/array.cr.&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Now I get a sense of how the &lt;span class=&quot;code&quot;&gt;unsafe_fetch&lt;/span&gt; method
+above works. Let’s repeat that again:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unsafe_fetch&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;T
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer[index]
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Crystal saves all of the elements in each array into a memory buffer called
+&lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt;. And when I access an element of the array
+like this:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Crystal first checks that the array index (1 in this example) is valid, and
+then loads the array element I want from the buffer using: &lt;span
+class=&quot;code&quot;&gt;@buffer[1]&lt;/span&gt;.&lt;/p&gt;
+&lt;h2&gt;The Crystal Pointer Class&lt;/h2&gt;
+&lt;p&gt;But how does &lt;span class=&quot;code&quot;&gt;@buffer[index]&lt;/span&gt; actually work? I haven’t learned anything yet! I’m
+just going around in circles. So far all I’ve been able to find is that Crystal
+implements &lt;span class=&quot;code&quot;&gt;Array#[]&lt;/span&gt; with a different &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; operator, on a different class. What
+type of object is &lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt;? What does it do?&lt;/p&gt;
+&lt;p&gt;Reading the array class declaration again more carefully, I can see that
+&lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt; is an instance of the Pointer class:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The buffer where elements start.
+&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Pointer(T)
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let’s read how Crystal implements &lt;span class=&quot;code&quot;&gt;Pointer#[]&lt;/span&gt; in
+&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/pointer.cr#L107&quot;&gt;src/pointer.cr:&lt;/a&gt;&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Gets the value pointed at this pointer&amp;#39;s address plus `offset * sizeof(T)`.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr = Pointer.malloc(4) { |i| i + 10 }
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr[0] # =&amp;gt; 10
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr[1] # =&amp;gt; 11
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr[2] # =&amp;gt; 12
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr[3] # =&amp;gt; 13
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;[]&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(offset)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  (self &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; offset).value
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Reading this, I discovered the Crystal team has written a class that represents
+pointers! Just like using a pointer in C, Crystal code can refer to and access
+any memory location directly. Because the Pointer class is part of the
+language, Crystal allows us to implement our own data structures and algorithms
+in a very detailed manner, allocating and accessing memory just like the
+Crystal team has while implementing arrays, hashes and other classes.&lt;/p&gt;
+&lt;p&gt;Now I’ve dug down through 4 levels of Crystal function calls, but I still
+haven’t found a language primitive yet.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;A Crystal Language Primitive&lt;/h2&gt;
+&lt;p&gt;We still haven’t discovered how arrays actually work - how pointers actually
+work. That is, reading this line of code above:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(self &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; offset).value
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;…I understand the meaning and intent of pointer arithmetic, and how it’s used
+by Crystal arrays, but I still don’t see how or where Crystal actually obtains
+the array element referenced by a given pointer.&lt;/p&gt;
+&lt;p&gt;Digging deeper, let’s read the &lt;span class=&quot;code&quot;&gt;Pointer#value&lt;/span&gt; method
+to find out - this method’s implementation should tell me exactly how Crystal
+obtains the value:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Gets the value pointed by this pointer.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr = Pointer(Int32).malloc(4)
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr.value = 42
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr.value # =&amp;gt; 42
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;@[Primitive(&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;:pointer_get&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)]
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;value&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; : T
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;As you can see, this is a language primitive - it says “primitive” right there
+above the method definition!&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive4.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;Returning to Wikipedia’s definition of a language primitive, this is an atomic
+element of an expression. The Crystal compiler knows not to try to compile this
+code but to assume this behavior is part of the language. In fact, there is no
+implementation for &lt;span class=&quot;code&quot;&gt;Pointer#value&lt;/span&gt; here at all: the
+method is empty!&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;value&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; : T
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;The empty &lt;span class=&quot;code&quot;&gt;value&lt;/span&gt; method above doesn’t tell us where
+the value actually comes from, or how Crystal obtains it. To learn that, we
+need to step down one level of abstraction - we need to use a lower level
+language, not Crystal.&lt;/p&gt;
+&lt;h2&gt;Retrieving an Array Element In x86 Assembly Language&lt;/h2&gt;
+&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/cave.png&quot;&gt;&lt;br/&gt;
+&lt;/div&gt;
+&lt;p&gt;What lower level language should we use? Since the Crystal team used the &lt;a href=&quot;https://llvm.org&quot;&gt;Low
+Level Virtual Machine (LLVM)&lt;/a&gt; project to implement their
+compiler, I could look at LLVM’s low level instruction language. But since I’m
+not familiar with that, or with how the Crystal compiler works, I decided to
+jump down to the lowest level of abstraction available to me on my Intel Mac:
+x86 Assembly Language.&lt;/p&gt;
+&lt;p&gt;Here’s my Crystal program again:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;
+$ cat array_example.cr
+arr = [12345, 67890]
+puts arr[1]
+&lt;/pre&gt;
+&lt;p&gt;If I compile the program without running it, and then use the &lt;span
+class=&quot;code&quot;&gt;llvm-objdump&lt;/span&gt; command, LLVM will give me a version of my
+code converted into Intel x86 Assembly Language:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;
+$ crystal build array_example.cr
+$ llvm-objdump -D array_example &gt; array_example.a
+&lt;/pre&gt;
+&lt;p&gt;Now by reading the assembly produced by the Crystal compiler and LLVM, I can
+see how the &lt;span class=&quot;code&quot;&gt;Pointer#[]&lt;/span&gt; and &lt;span
+class=&quot;code&quot;&gt;Pointer#value&lt;/span&gt; methods actually work:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;
+0000000100089bb0 &lt;_*Pointer(Int32)@Pointer(T)#[]&lt;Int32&gt;:Int32&gt;:
+100089bb0: 50                           pushq %rax
+100089bb1: e8 0a 00 00 00               callq 0x100089bc0 &lt;_*Pointer(Int32)@Pointer(T)#+&lt;Int32&gt;:Pointer(Int32)&gt;
+100089bb6: 8b 00                        movl  (%rax), %eax
+100089bb8: 59                           popq  %rcx
+100089bb9: c3                           retq
+
+0000000100089bc0 &lt;_*Pointer(Int32)@Pointer(T)#+&lt;Int32&gt;:Pointer(Int32)&gt;:
+100089bc0: 48 63 c6                     movslq  %esi, %rax
+100089bc3: 48 c1 e0 02                  shlq  $2, %rax
+100089bc7: 48 01 c7                     addq  %rax, %rdi
+100089bca: 48 89 f8                     movq  %rdi, %rax
+100089bcd: c3                           retq
+&lt;/pre&gt;
+&lt;p&gt;Assembly language is just another programming language like any other, but with
+a different set of primitives. The primitives in this language are hardware
+instructions that my laptop’s CPU can understand and execute directly:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive5.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;I won’t pretend to understand all the details here, but if you’re curious what
+this code does - how my compiled Crystal program actually retrieves a value
+from an array - here are a few highlights you can look for:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/assembly-table.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;If you’re curious about x86 assembly language, I wrote an article a few years
+ago explaining some of the basics: &lt;a href=&quot;https://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language&quot;&gt;Learning to Read x86 Assembly
+Language&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Understand the Primitives of the Language You Are Using&lt;/h2&gt;
+&lt;p&gt;Why did I bother with this exercise? To make sure I deeply understand the
+programming languages I’m using. Ruby hides much of its implementation in C, so
+I didn’t learn much looking at the Ruby array primitives in this example. And
+the primitive functions of assembly language are by definition the instructions
+my CPU can execute directly. It’s always fun trying to identify and understand
+machine level instructions!&lt;/p&gt;
+&lt;p&gt;But Crystal surprised me - I expected to see a set of primitive array functions
+like we have in Ruby but I was wrong. Instead, I learned that Crystal supports
+pointers, just like C or other low level languages do. I discovered that
+Crystal, unlike Ruby, might be an appropriate choice for low level systems
+programming tasks. And I was able to learn all of this, along with the array
+implementation details, because the Crystal team implemented its standard
+library in the same, target language: Crystal. All I had to do was make an
+effort to read some code.&lt;/p&gt;
+&lt;p&gt;Dive into details and find out what the language primitives are in your
+favorite programming language. You might be surprised and discover that your
+language is capable of much more than you thought it was.&lt;/p&gt;
+</content></entry><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
 &lt;/div&gt;
@@ -2540,282 +2907,4 @@ let&lt;/span&gt; will never be executed unless the internal tag value matches th
 writing code in C and Rust is very different. C encourages me to write
 dangerous, crashing code, while Rust prevents me from writing dangerous code in
 the first place.&lt;/p&gt;
-</content></entry><entry><title>Learning Rust: If Let vs. Match</title><link href="http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match" rel="alternate"></link><id href="http://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match" rel="alternate"></id><published>2018-01-18T00:00:00Z</published><updated>2018-01-18T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/dictionary.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;Human languages have similar words with different&lt;br/&gt; shades of meaning. Some computer languages do too.&lt;br/&gt;
-  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG&quot;&gt;Wikimedia Commons</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/dictionary.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;Human languages have similar words with different&lt;br/&gt; shades of meaning. Some computer languages do too.&lt;br/&gt;
-  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
-&lt;/div&gt;
-&lt;p&gt;This year I’ve decided to try to learn &lt;a href=&quot;https://www.rust-lang.org&quot;&gt;Rust&lt;/a&gt;. I’m
-fascinated by its ownership model for memory management; I’m curious what the
-claims about safety are all about; and, I love how it incorporates ideas from
-the functional programming world. But I haven’t gotten to all of that yet - I’m
-just getting started learning the basic syntax.&lt;/p&gt;
-&lt;p&gt;Learning a computer language is just like learning a human language. You have
-to try to read and write it everyday, even if just for a few minutes. You need
-to get to know some native speakers. And there’s no way around it: You need to
-learn the basic vocabulary of the language, word by word. To make things worse,
-our human languages usually have several  words that mean the same thing. Which
-one should I use? Sometime only a native speaker will really know.&lt;/p&gt;
-&lt;p&gt;This week I was reading about &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; and &lt;span
-class=&quot;code&quot;&gt;match&lt;/span&gt; in &lt;a href=&quot;https://doc.rust-lang.org/book/second-edition/ch06-03-if-let.html&quot;&gt;The Rust Programming
-Book&lt;/a&gt;
-(TRPL). I read that &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; is really syntactic sugar
-for &lt;span class=&quot;code&quot;&gt;match&lt;/span&gt;:&lt;/p&gt;
-&lt;div style=&quot;padding: 8px 0px 40px 30px; text-align: center; line-height:18px&quot;&gt;
-&lt;img width=&quot;500&quot; src=&quot;http://patshaughnessy.net/assets/2018/1/18/trpl-quote.png&quot;/&gt;
-&lt;/div&gt;
-&lt;p&gt;This intrigued me. The phrase “syntactic sugar” implies the two code snippets
-don’t only produce the same results, it means the compiler generates exactly
-the same code in each case.&lt;/p&gt;
-&lt;p&gt;Does the Rust compiler really generate exactly the same code for &lt;span
-class=&quot;code&quot;&gt;if let&lt;/span&gt; as it does for &lt;span class=&quot;code&quot;&gt;match&lt;/span&gt;? Read
-on to find out. Today I’ll start with a quick review of the syntax and meaning
-of &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;match&lt;/span&gt;. Then
-I’ll take a look at how Rust compiles &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; and
-&lt;span class=&quot;code&quot;&gt;match&lt;/span&gt;, at what code it produces.&lt;/p&gt;
-&lt;h2&gt;If Let Compares a Pattern with a Value&lt;/h2&gt;
-&lt;p&gt;The idea behind &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; is that it compares a pattern
-with a value:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/pattern-value.png&quot;/&gt;
-&lt;p&gt;In this example &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; compares the pattern &lt;span
-class=&quot;code&quot;&gt;Some(3)&lt;/span&gt; with the value &lt;span
-class=&quot;code&quot;&gt;some_u8_value&lt;/span&gt;. If there’s a match, &lt;span class=&quot;code&quot;&gt;if
-let&lt;/span&gt; executes the &lt;span class=&quot;code&quot;&gt;println!&lt;/span&gt; code inside the
-block.&lt;/p&gt;
-&lt;h2&gt;If Let Also Assigns Values&lt;/h2&gt;
-&lt;p&gt;&lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; assigns a value at the same time, when the
-pattern matches the value. This is the idea behind including the &lt;span class=&quot;code&quot;&gt;let&lt;/span&gt; keyword
-after &lt;span class=&quot;code&quot;&gt;if&lt;/span&gt;. This is more apparent if I rewrite the example using a variable &lt;span class=&quot;code&quot;&gt;i&lt;/span&gt;
-instead of 3. I'll also add a main function so I can execute the code:&lt;/p&gt;
-&lt;pre&gt;
-fn main() {
-  let some_u8_value = Some(3u8);
-  if let Some(i) = some_u8_value {
-     println!(&quot;assigned {} to i&quot;, i);
-  }
-}
-&lt;/pre&gt;
-&lt;p&gt;When I saved this in a file called if-let.rs and ran it, I got:&lt;/p&gt;
-&lt;pre&gt;
-$ rustc if-let.rs
-$ ./main
-Assigned 3 to i
-&lt;/pre&gt;
-&lt;p&gt;&lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; “unwrapped” the option structure, and assigned
-the value 3 to the identifier &lt;span class=&quot;code&quot;&gt;i&lt;/span&gt;.&lt;/p&gt;
-&lt;h2&gt;Match: If Let’s Big Brother&lt;/h2&gt;
-&lt;p&gt;As TRPL explains, I could also have written this using the &lt;span
-class=&quot;code&quot;&gt;match&lt;/span&gt; keyword, as follows:&lt;/p&gt;
-&lt;pre&gt;
-fn main() {
-    let some_u8_value = Some(3u8);
-    match some_u8_value {
-        Some(i) =&gt; println!(&quot;Matched: {}&quot;, i),
-        None =&gt; (),
-    }
-}
-&lt;/pre&gt;
-&lt;p&gt;To write this all I had to do was move things around a bit in my &lt;span
-class=&quot;code&quot;&gt;if let&lt;/span&gt; code snippet from above:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/1/18/if-let-match.png&quot;/&gt;
-&lt;p&gt;Because there was no else clause for the &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt;
-statement, I used &lt;span class=&quot;code&quot;&gt;None =&amp;gt; ()&lt;/span&gt; in match.&lt;/p&gt;
-&lt;p&gt;Saving this code in match.rs and running it I got the same result:&lt;/p&gt;
-&lt;pre&gt;
-$ rustc match.rs
-$ ./main
-Matched: 3
-&lt;/pre&gt;
-&lt;h2&gt;Mid-Level IR (MIR)&lt;/h2&gt;
-&lt;p&gt;I was curious though: If these two code snippets are entirely equivalent, then
-the Rust compiler should generate &lt;em&gt;exactly the same executable program&lt;/em&gt; when I
-compile them. In theory, therefore, I should be able to compare the two
-executable binaries to test whether TRPL’s statement about syntactic sugar is
-accurate. But comparing binary executables might not work. Likely there are
-timestamps or other ephemeral values encoded in the executable that would break
-the comparison. I decided to look for an easier way to test the compiler’s
-output.&lt;/p&gt;
-&lt;p&gt;Then I came across mid-level intermediate representation (MIR), described &lt;a href=&quot;https://blog.rust-lang.org/2016/04/19/MIR.html&quot;&gt;here
-on the Rust blog&lt;/a&gt;. MIR is an
-internal text language the rust compiler produces when you include the
-&lt;span class=&quot;code&quot;&gt;—emit-mir&lt;/span&gt; flag, like this:&lt;/p&gt;
-&lt;pre&gt;
-$ rustc --emit mir if-let.rs
-&lt;/pre&gt;
-&lt;p&gt;With this option specified, rust generates a file called if-let.mir. Opening up
-this file, I see:&lt;/p&gt;
-&lt;pre&gt;
-// WARNING: This output format is intended for human consumers only
-// and is subject to change without notice. Knock yourself out.
-fn main() -&gt; () {
-    let mut _0: ();                      // return pointer
-    scope 1 {
-        let _1: std::option::Option&lt;u8&gt;; // &quot;some_u8_value&quot; in scope 1 at src/if-let.rs:16:9: 16:22
-
-etc…
-&lt;/pre&gt;
-&lt;p&gt;“Knock yourself out;” now I’m really intrigued!&lt;/p&gt;
-&lt;h2&gt;A First Look at MIR&lt;/h2&gt;
-&lt;p&gt;I decided to compare the MIR text file the Rust compiler produced for the &lt;span class=&quot;code&quot;&gt;if
-let&lt;/span&gt; snippet vs. the &lt;span class=&quot;code&quot;&gt;match&lt;/span&gt; snippet. If Rust
-considers &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; to be syntactic sugar for &lt;span
-class=&quot;code&quot;&gt;match&lt;/span&gt;, then the MIR representation of the two snippets
-should be the same.&lt;/p&gt;
-&lt;p&gt;But when I started reading the MIR code, I found the call to the &lt;span
-class=&quot;code&quot;&gt;println!&lt;/span&gt; macro generated a lot of verbose text:&lt;/p&gt;
-&lt;pre&gt;
-let mut _3: isize;
-let mut _4: ();
-let mut _5: std::fmt::Arguments;
-let mut _6: &amp;[&amp;str];
-let mut _7: &amp;[&amp;str; 2];
-let mut _8: &amp;[&amp;str; 2];
-let mut _9: &amp;[std::fmt::ArgumentV1];
-let mut _10: &amp;[std::fmt::ArgumentV1; 1];
-let mut _11: &amp;[std::fmt::ArgumentV1; 1];
-let mut _12: [std::fmt::ArgumentV1; 1];
-let mut _13: (&amp;u8,);
-let mut _14: &amp;u8;
-let mut _16: std::fmt::ArgumentV1;
-let mut _17: &amp;u8;
-let mut _18: fn(&amp;u8, &amp;mut std::fmt::Formatter&lt;'_&gt;) -&gt; std::result::Result&lt;(), std::fmt::Error&gt;;
-&lt;/pre&gt;
-&lt;p&gt;All of this MIR pseudocode might confuse my comparison unnecessarily, so I
-decided to simplify my &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; example by removing the
-&lt;span class=&quot;code&quot;&gt;println!&lt;/span&gt; call entirely. I rewrote the &lt;span
-class=&quot;code&quot;&gt;if let&lt;/span&gt; snippet like this (if-let.rs):&lt;/p&gt;
-&lt;pre&gt;
-fn main() {
-    let some_u8_value = Some(3u8);
-    if let Some(i) = some_u8_value {
-        let _ = i;
-    }
-}
-&lt;/pre&gt;
-&lt;p&gt;And the &lt;span class=&quot;code&quot;&gt;match&lt;/span&gt; snippet like this (match.rs):&lt;/p&gt;
-&lt;pre&gt;
-fn main() {
-    let some_u8_value = Some(3u8);
-    match some_u8_value {
-        Some(i) =&gt; { let _ = i; }
-        None =&gt; ()
-    }
-}
-&lt;/pre&gt;
-&lt;p&gt;I also noticed the MIR file contained many comments with line numbers:&lt;/p&gt;
-&lt;pre&gt;
-_2 = ((_1 as Some).0: u8);       // scope 3 at if-let.rs:3:17: 3:18
-StorageLive(_5);                 // scope 3 at &lt;print macros&gt;:2:27: 2:58
-StorageLive(_6);                 // scope 3 at &lt;println macros&gt;:3:18: 3:43
-&lt;/pre&gt;
-&lt;p&gt;I realized the line numbers would likely cause problems comparing one MIR file
-to another, so I removed all of the comments using sed:&lt;/p&gt;
-&lt;pre&gt;
-$ rustc if-let.rs --emit mir
-$ cat if-let.mir | sed -e 's/\/\/.*$//' &gt; if-let.mir.nocomments
-&lt;/pre&gt;
-&lt;p&gt;This generates a new text file called if-let.mir.nocomments, which contains the
-same content as if-let.mir, but with no comments. And this command processes
-the match.rs file in the same way:&lt;/p&gt;
-&lt;pre&gt;
-$ rustc match.rs --emit mir
-$ cat match.mir | sed -e 's/\/\/.*$//' &gt; match.mir.nocomments
-&lt;/pre&gt;
-&lt;h2&gt;Comparing MIR Files&lt;/h2&gt;
-&lt;p&gt;Now I ran a simple diff command on the simplified MIR text files. If the
-compiler considers &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; to be exactly the same as
-&lt;span class=&quot;code&quot;&gt;match&lt;/span&gt; then there should be no difference, then the
-output of diff should be empty.&lt;/p&gt;
-&lt;p&gt;But running diff I saw:&lt;/p&gt;
-&lt;pre&gt;
-$ diff if-let.mir.nocomments match.mir.nocomments
-19c19
-&lt;         switchInt(_3) -&gt; [1isize: bb2, otherwise: bb1];
----
-&gt;         switchInt(_3) -&gt; [0isize: bb1, otherwise: bb2];
-&lt;/pre&gt;
-&lt;p&gt;My two MIR files are &lt;em&gt;almost&lt;/em&gt; identical; the MIR text Rust generates for &lt;span
-class=&quot;code&quot;&gt;if let&lt;/span&gt; is exactly the same as the MIR text Rust generates
-for &lt;span class=&quot;code&quot;&gt;match&lt;/span&gt;, except for line 19. I’ve &lt;em&gt;almost&lt;/em&gt; proven
-the hypothesis that &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; is syntactic sugar for
-&lt;span class=&quot;code&quot;&gt;match&lt;/span&gt;, but not quite.&lt;/p&gt;
-&lt;p&gt;Let’s take a close look at the MIR code around line 19 and try to understand
-what it means. Here’s a portion of if-let.mir.nocomments, produced by the Rust
-compiler from my &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; code above:&lt;/p&gt;
-&lt;pre&gt;
-bb0: {
-    StorageLive(_1);
-    _1 = std::option::Option&lt;u8&gt;::Some(const 3u8,);
-    _3 = discriminant(_1);
-    switchInt(_3) -&gt; [1isize: bb2, otherwise: bb1];
-}
-
-bb1: {
-    _0 = ();
-    goto -&gt; bb3;
-}
-
-bb2: {
-    StorageLive(_2);
-    _2 = ((_1 as Some).0: u8);
-    _0 = ();
-    goto -&gt; bb3;
-}
-&lt;/pre&gt;
-&lt;p&gt;I don’t understand MIR syntax, but it’s not hard to guess what’s going on. Each
-of these “bb” blocks of code &lt;span class=&quot;code&quot;&gt;{ … }&lt;/span&gt; probably
-represents a logical piece of my program.&lt;/p&gt;
-&lt;p&gt;The first block, &lt;span class=&quot;code&quot;&gt;bb0&lt;/span&gt;, seems to assign the value &lt;span class=&quot;code&quot;&gt;Some(3)&lt;/span&gt; to _1, and then calls
-&lt;span class=&quot;code&quot;&gt;discriminant(_1)&lt;/span&gt; and saves the “discriminant,” whatever that is, in _3.
-Finally, it tests whether the discriminant is 1. If the discriminant is 1 it
-jumps to &lt;span class=&quot;code&quot;&gt;bb2&lt;/span&gt;, or otherwise to &lt;span
-class=&quot;code&quot;&gt;bb1&lt;/span&gt;. So &lt;span class=&quot;code&quot;&gt;bb0&lt;/span&gt; likely represents the
-&lt;span class=&quot;code&quot;&gt;if&lt;/span&gt; portion of my &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt;
-snippet, testing a condition:&lt;/p&gt;
-&lt;pre&gt;
-if let Some(i) = some_u8_value
-&lt;/pre&gt;
-&lt;p&gt;The &lt;span class=&quot;code&quot;&gt;bb1&lt;/span&gt; block saves &lt;span class=&quot;code&quot;&gt;()&lt;/span&gt; in &lt;span
-class=&quot;code&quot;&gt;_0&lt;/span&gt; and jumps to &lt;span class=&quot;code&quot;&gt;bb3&lt;/span&gt;. This likely represents the
-missing/default else clause of my &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; statement.&lt;/p&gt;
-&lt;p&gt;And the &lt;span class=&quot;code&quot;&gt;bb2&lt;/span&gt; block saves 3, the unwrapped value inside of &lt;span class=&quot;code&quot;&gt;Some(3)&lt;/span&gt;, in &lt;span class=&quot;code&quot;&gt;_2&lt;/span&gt; and
-jumps to &lt;span class=&quot;code&quot;&gt;bb3&lt;/span&gt;. Probably &lt;span class=&quot;code&quot;&gt;_2&lt;/span&gt; is the variable &lt;span class=&quot;code&quot;&gt;i&lt;/span&gt;, and this block of MIR text
-represents the &lt;span class=&quot;code&quot;&gt;let&lt;/span&gt; portion of my &lt;span
-class=&quot;code&quot;&gt;if let&lt;/span&gt; snippet:&lt;/p&gt;
-&lt;pre&gt;
-let Some(i) = some_u8_value
-let _ = i;
-&lt;/pre&gt;
-&lt;p&gt;Now let’s take a look at the &lt;span class=&quot;code&quot;&gt;match&lt;/span&gt; version, the contents of
-match.mir.nocomments. It’s entirely the same, except for the &lt;span class=&quot;code&quot;&gt;switchInt&lt;/span&gt; line:&lt;/p&gt;
-&lt;pre&gt;
-bb0: {
-    StorageLive(_1);
-    _1 = std::option::Option&lt;u8&gt;::Some(const 3u8,);
-    _3 = discriminant(_1);
-    &lt;b&gt;switchInt(_3) -&gt; [0isize: bb1, otherwise: bb2];&lt;/b&gt;
-}
-&lt;/pre&gt;
-&lt;p&gt;Reading this carefully, I saw that actually it does mean the same thing: If the
-discriminant is 0, Rust calls the &lt;span class=&quot;code&quot;&gt;bb1&lt;/span&gt; block, or
-otherwise the &lt;span class=&quot;code&quot;&gt;bb2&lt;/span&gt; block.&lt;/p&gt;
-&lt;p&gt;So, summarizing, the &lt;span class=&quot;code&quot;&gt;if let&lt;/span&gt; snippet ran this
-pseudo-code:&lt;/p&gt;
-&lt;blockquote&gt;
-If the discriminant is 1, call bb1, else bb2.
-&lt;/blockquote&gt;
-&lt;p&gt;…and the &lt;span class=&quot;code&quot;&gt;match&lt;/span&gt; snippet ran this pseudo-code:&lt;/p&gt;
-&lt;blockquote&gt;
-If the discriminant is 0, call bb2, else bb1.
-&lt;/blockquote&gt;
-&lt;p&gt;So, in fact, the two versions use the same logic, assuming the value of
-discriminant is either 0 or 1. If discriminant = 0, Rust assumes the comparison
-was true and executes the match clause; if discriminant = 1, Rust executes the
-else clause.&lt;/p&gt;
-&lt;p&gt;Clearly the discriminant function is crucial - when I have time next, I’ll
-explore what discriminant means, where it’s implemented and how it works. Or if
-anyone from the Rust teams happens to read this, let us know.&lt;/p&gt;
 </content></entry></feed>
