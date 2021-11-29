@@ -233,7 +233,7 @@ implements <span class="code">Array#[]</span> with a different <span class="code
 type of object is <span class="code">@buffer</span>? What does it do?
 
 Reading the array class declaration again more carefully, I can see that
-<span class="code">@buffer</span> is an instance of the Pointer class:
+<span class="code">@buffer</span> is an instance of the <span class="code">Pointer</span> class:
 
 <pre type="ruby">
 # The buffer where elements start.
@@ -260,10 +260,11 @@ end
 
 Reading this, I discovered the Crystal team has written a class that represents
 pointers! Just like using a pointer in C, Crystal code can refer to and access
-any memory location directly. Because the Pointer class is part of the
-language, Crystal allows us to implement our own data structures and algorithms
-in a very detailed manner, allocating and accessing memory just like the
-Crystal team has while implementing arrays, hashes and other classes.
+any memory location directly. Because the <span class="code">Pointer</span>
+class is part of the language, Crystal allows us to implement our own data
+structures and algorithms in a very detailed manner, allocating and accessing
+memory just like the Crystal team has while implementing arrays, hashes and
+other classes.
 
 Now I’ve dug down through 4 levels of Crystal function calls, but I still
 haven’t found a language primitive yet.
@@ -323,7 +324,7 @@ language, not Crystal.
 
 ## Retrieving an Array Element In x86 Assembly Language
 
-<div style="float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px">
+<div style="float: right; padding: 18px 0px 30px 30px; text-align: center; line-height:18px">
   <img src="http://patshaughnessy.net/assets/2021/11/29/cave.png"><br/>
 </div>
 
@@ -377,14 +378,14 @@ instructions that my laptop’s CPU can understand and execute directly:
 
 <img src="http://patshaughnessy.net/assets/2021/11/29/primitive5.png"><br/>
 
-I won’t pretend to understand all the details here, but if you’re curious what
-this code does - how my compiled Crystal program actually retrieves a value
-from an array - here are a few highlights you can look for:
+I won’t pretend to understand all the details here, but if you’re curious about
+what this code does - how my compiled Crystal program actually retrieves a
+value from an array - here are a few highlights you can look for:
 
 <img src="http://patshaughnessy.net/assets/2021/11/29/assembly-table.svg"><br/>
 
-If you’re curious about x86 assembly language, I wrote an article a few years
-ago explaining some of the basics: [Learning to Read x86 Assembly
+If you’d like to learn more about x86 assembly language, I wrote an article a
+few years ago explaining some of the basics: [Learning to Read x86 Assembly
 Language](https://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language).
 
 ## Understand the Primitives of the Language You Are Using
@@ -397,7 +398,7 @@ my CPU can execute directly. It’s always fun trying to identify and understand
 machine level instructions!
 
 But Crystal surprised me - I expected to see a set of primitive array functions
-like we have in Ruby but I was wrong. Instead, I learned that Crystal supports
+like we have in Ruby, but I was wrong. Instead, I learned that Crystal supports
 pointers, just like C or other low level languages do. I discovered that
 Crystal, unlike Ruby, might be an appropriate choice for low level systems
 programming tasks. And I was able to learn all of this, along with the array

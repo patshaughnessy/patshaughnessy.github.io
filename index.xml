@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-29T19:09:56Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Find Your Language’s Primitives</title><link href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></id><published>2021-11-29T00:00:00Z</published><updated>2021-11-29T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-29T19:25:48Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Find Your Language’s Primitives</title><link href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></id><published>2021-11-29T00:00:00Z</published><updated>2021-11-29T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;If you dig into your programming language's syntax, you might &lt;br/&gt;discover that it is capable of much more than you thought it was.
   &lt;/i&gt;
@@ -215,7 +215,7 @@ just going around in circles. So far all I’ve been able to find is that Crysta
 implements &lt;span class=&quot;code&quot;&gt;Array#[]&lt;/span&gt; with a different &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; operator, on a different class. What
 type of object is &lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt;? What does it do?&lt;/p&gt;
 &lt;p&gt;Reading the array class declaration again more carefully, I can see that
-&lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt; is an instance of the Pointer class:&lt;/p&gt;
+&lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt; is an instance of the &lt;span class=&quot;code&quot;&gt;Pointer&lt;/span&gt; class:&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;
 &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The buffer where elements start.
@@ -242,10 +242,11 @@ type of object is &lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt;? What 
 
 &lt;p&gt;Reading this, I discovered the Crystal team has written a class that represents
 pointers! Just like using a pointer in C, Crystal code can refer to and access
-any memory location directly. Because the Pointer class is part of the
-language, Crystal allows us to implement our own data structures and algorithms
-in a very detailed manner, allocating and accessing memory just like the
-Crystal team has while implementing arrays, hashes and other classes.&lt;/p&gt;
+any memory location directly. Because the &lt;span class=&quot;code&quot;&gt;Pointer&lt;/span&gt;
+class is part of the language, Crystal allows us to implement our own data
+structures and algorithms in a very detailed manner, allocating and accessing
+memory just like the Crystal team has while implementing arrays, hashes and
+other classes.&lt;/p&gt;
 &lt;p&gt;Now I’ve dug down through 4 levels of Crystal function calls, but I still
 haven’t found a language primitive yet.&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
@@ -296,7 +297,7 @@ the value actually comes from, or how Crystal obtains it. To learn that, we
 need to step down one level of abstraction - we need to use a lower level
 language, not Crystal.&lt;/p&gt;
 &lt;h2&gt;Retrieving an Array Element In x86 Assembly Language&lt;/h2&gt;
-&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
+&lt;div style=&quot;float: right; padding: 18px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/cave.png&quot;&gt;&lt;br/&gt;
 &lt;/div&gt;
 &lt;p&gt;What lower level language should we use? Since the Crystal team used the &lt;a href=&quot;https://llvm.org&quot;&gt;Low
@@ -340,12 +341,12 @@ class=&quot;code&quot;&gt;Pointer#value&lt;/span&gt; methods actually work:&lt;/
 a different set of primitives. The primitives in this language are hardware
 instructions that my laptop’s CPU can understand and execute directly:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive5.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;I won’t pretend to understand all the details here, but if you’re curious what
-this code does - how my compiled Crystal program actually retrieves a value
-from an array - here are a few highlights you can look for:&lt;/p&gt;
+&lt;p&gt;I won’t pretend to understand all the details here, but if you’re curious about
+what this code does - how my compiled Crystal program actually retrieves a
+value from an array - here are a few highlights you can look for:&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/assembly-table.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;If you’re curious about x86 assembly language, I wrote an article a few years
-ago explaining some of the basics: &lt;a href=&quot;https://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language&quot;&gt;Learning to Read x86 Assembly
+&lt;p&gt;If you’d like to learn more about x86 assembly language, I wrote an article a
+few years ago explaining some of the basics: &lt;a href=&quot;https://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language&quot;&gt;Learning to Read x86 Assembly
 Language&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Understand the Primitives of the Language You Are Using&lt;/h2&gt;
 &lt;p&gt;Why did I bother with this exercise? To make sure I deeply understand the
@@ -355,7 +356,7 @@ the primitive functions of assembly language are by definition the instructions
 my CPU can execute directly. It’s always fun trying to identify and understand
 machine level instructions!&lt;/p&gt;
 &lt;p&gt;But Crystal surprised me - I expected to see a set of primitive array functions
-like we have in Ruby but I was wrong. Instead, I learned that Crystal supports
+like we have in Ruby, but I was wrong. Instead, I learned that Crystal supports
 pointers, just like C or other low level languages do. I discovered that
 Crystal, unlike Ruby, might be an appropriate choice for low level systems
 programming tasks. And I was able to learn all of this, along with the array
