@@ -301,12 +301,10 @@ code. My debug logging indented each line to indicate the AST structure:
       &lt;Crystal::NumberLiteral number=1 kind=i32 >
 </pre>
 
-Each of these `&lt;Crystal::…>` values are subclasses the `Crystal::ASTNode`
-superclass. Crystal defines all of these in the
+Each of these values is a subclass of the `Crystal::ASTNode` superclass.
+Crystal defines all of these in the
 [ast.cr](https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/ast.cr)
-file.
-
-Some interesting details to note:
+file. Some interesting details to note:
 
 * The top level node is called `Expressions`, and more or less holds one
   expression per line of code.

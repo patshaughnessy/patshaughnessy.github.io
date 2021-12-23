@@ -235,11 +235,10 @@ code. My debug logging indented each line to indicate the AST structure:</p>
       &lt;Crystal::Var name=arr >
       &lt;Crystal::NumberLiteral number=1 kind=i32 >
 </pre>
-<p>Each of these <code>&amp;lt;Crystal::…&gt;</code> values are subclasses the <code>Crystal::ASTNode</code>
-superclass. Crystal defines all of these in the
+<p>Each of these values is a subclass of the <code>Crystal::ASTNode</code> superclass.
+Crystal defines all of these in the
 <a href="https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/ast.cr">ast.cr</a>
-file.</p>
-<p>Some interesting details to note:</p>
+file. Some interesting details to note:</p>
 <ul>
 <li>
 <p>The top level node is called <code>Expressions</code>, and more or less holds one

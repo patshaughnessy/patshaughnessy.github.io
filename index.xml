@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-12-23T01:17:41Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Reading Code Like a Compiler</title><link href="http://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="http://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-12-23T17:12:52Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Reading Code Like a Compiler</title><link href="http://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="http://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Imagine trying to read an entire book while &lt;br/&gt;
   focusing on only one or two words at a time
@@ -242,11 +242,10 @@ code. My debug logging indented each line to indicate the AST structure:&lt;/p&g
       &amp;lt;Crystal::Var name=arr &gt;
       &amp;lt;Crystal::NumberLiteral number=1 kind=i32 &gt;
 &lt;/pre&gt;
-&lt;p&gt;Each of these &lt;code&gt;&amp;amp;lt;Crystal::…&amp;gt;&lt;/code&gt; values are subclasses the &lt;code&gt;Crystal::ASTNode&lt;/code&gt;
-superclass. Crystal defines all of these in the
+&lt;p&gt;Each of these values is a subclass of the &lt;code&gt;Crystal::ASTNode&lt;/code&gt; superclass.
+Crystal defines all of these in the
 &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/ast.cr&quot;&gt;ast.cr&lt;/a&gt;
-file.&lt;/p&gt;
-&lt;p&gt;Some interesting details to note:&lt;/p&gt;
+file. Some interesting details to note:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;The top level node is called &lt;code&gt;Expressions&lt;/code&gt;, and more or less holds one
