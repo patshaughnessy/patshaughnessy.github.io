@@ -1,4 +1,287 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-11-29T19:25:48Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Find Your Language’s Primitives</title><link href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></id><published>2021-11-29T00:00:00Z</published><updated>2021-11-29T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-12-23T01:17:41Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Reading Code Like a Compiler</title><link href="http://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="http://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;Imagine trying to read an entire book while &lt;br/&gt;
+  focusing on only one or two words at a time
+  &lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;We use compilers every day to parse our code, find our programming mistakes and
+then help us fix them. But ho</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
+  &lt;i&gt;Imagine trying to read an entire book while &lt;br/&gt;
+  focusing on only one or two words at a time
+  &lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;We use compilers every day to parse our code, find our programming mistakes and
+then help us fix them. But how do compilers read and understand our code? What
+does our code look like to them?&lt;/p&gt;
+&lt;p&gt;We tend to read code like we would read a human language like English. We
+don’t see letters; we see words and phrases. And in a very natural way we use
+what we just read, the proceeding sentence or paragraph, to give us the context
+we need to understand the following text. And sometimes we just skim over text
+quickly to gleam a bit of the meaning without even reading every word.&lt;/p&gt;
+&lt;div style=&quot;clear: both&quot;&gt;&lt;/div&gt;
+&lt;p&gt;Compilers aren’t as smart as we are. They can’t read and understand entire
+phrases or sentences all at once. They read text one letter, one word at at
+time, meticulously building up a record of what they have read so far.&lt;/p&gt;
+&lt;p&gt;I was curious to learn more about how compilers parse text, but where should I
+look? Which compiler should I study? Once again, like in my last few posts,
+Crystal was the answer.&lt;/p&gt;
+&lt;h2&gt;Crystal: A Compiler Accessible to Everyone&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://crystal-lang.org&quot;&gt;Crystal&lt;/a&gt; is a unique combination of simple, human
+syntax inspired by Ruby, with the speed and robustness enabled by static types
+and the use of &lt;a href=&quot;https://llvm.org&quot;&gt;LLVM&lt;/a&gt;. But for me the most exciting thing
+about Crystal is how the Crystal team implemented both its standard library and
+compiler using the target language: Crystal. This makes Crystal’s internal
+implementation accessible to anyone familiar with Ruby. For once, you don’t
+have to be a hard core C or C++ developer to learn how a compiler works.
+Reading code not much more complex than a Ruby on Rails web site, I can take a
+peek under the hood of a real world compiler to see how it works internally.&lt;/p&gt;
+&lt;p&gt;Not only did the Crystal team implement their compiler using Crystal, they also
+wrote it by hand. Parsing is such a tedious task that often developers use a
+parser generator, such as &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;GNU Bison&lt;/a&gt;, to
+automatically generate the parse code given a set of rules. This is how Ruby
+works, for example. But the Crystal team wrote their parser directly in
+Crystal, which you can read in
+&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/parser.cr&quot;&gt;parser.cr&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Along with a readable compiler, I need a readable program to compile. I decided to
+reuse the same array snippet from my last post:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;This tiny Crystal program creates an array of two numbers and then prints out
+the second number. Simple enough: You and I can read and parse these two lines
+of code in one glance and in a fraction of a second understand what it does.
+Even if you’re not a Crystal or Ruby developer this syntax is so simple you can
+still understand it.&lt;/p&gt;
+&lt;p&gt;But the Crystal compiler can’t understand this code as easily as we can.
+Parsing even this simple program is a complex task for a compiler.&lt;/p&gt;
+&lt;h2&gt;How the Crystal Compiler Sees My Code&lt;/h2&gt;
+&lt;p&gt;Before parsing or running the code above, Crystal converts it into a series of
+tokens. To the Crystal compiler, my program looks like this:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/tokens.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;The first &lt;code&gt;IDENT&lt;/code&gt; token corresponds to the &lt;code&gt;arr&lt;/code&gt; variable at the beginning of the
+first line. You can also see two &lt;code&gt;NUMBER&lt;/code&gt; tokens: the &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/lexer.cr&quot;&gt;Crystal tokenizer
+code&lt;/a&gt;
+converted each series of numerical digits into single tokens, one for 12345 and
+the other for 67890. Along with these tokens you can also see other tokens for
+punctuation used in Crystal syntax, like the equals sign and left and right
+square brackets. There is also a new line token and one for the end of the
+entire file.&lt;/p&gt;
+&lt;h2&gt;Reading a Book One Word at a Time&lt;/h2&gt;
+&lt;p&gt;To understand my code, Crystal processes these tokens one at a time, stepping
+tediously through the entire program. What a slow, painful process!&lt;/p&gt;
+&lt;p&gt;How would we read if we could only see one word at a time? I imagine covering
+the book I’m trying to read with a piece of paper or plastic that had a small
+hole in it… and that through the hole I could only see one word at a time. How
+would I read one entire page? Well, I’d have to move the paper around, showing
+one word and then another and another. And how would I know where to move the
+paper next? Would I simply move the paper forward one word at at time? What if
+I forgot some word I had seen earlier? I’d have to backtrack - but how far back
+to go? What if the meaning of the word I was looking at depended on the words
+that followed it? This sounds like a nightmare.&lt;/p&gt;
+&lt;p&gt;To read like this, if it was even possible at all, I’d have to have a well
+thought out strategy. I’d have to know exactly how to move that plastic screen
+around. When you can only read one word at a time, deciding which word to read
+next becomes incredibly important. I would need an algorithm to follow.&lt;/p&gt;
+&lt;p&gt;This is what a parser algorithm is: Some set of rules the parse code can use to
+interpret each word, and, equally important, to decide which word to read next.
+Crystal’s parse code is over 6000 lines long, so I won’t attempt to completely
+explain it here. But there’s an underlying, high level algorithm the parse code
+uses:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/pattern-recurse-record.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;First, the parser compares the current token, and possibly the following or
+previous tokens as well, to a series of expected patterns. These patterns
+define the syntax the parser is reading.  Second, the parser recurses. It calls
+itself to parse the next token, or possibly multiple next tokens depending on
+which pattern the parser just matched. Finally, the parser records what it saw:
+which pattern matched the current token and the results of the recursive calls
+to itself, for future reference.&lt;/p&gt;
+&lt;h2&gt;Matching a Pattern&lt;/h2&gt;
+&lt;p&gt;The best way to understand how this works is to see it in action. Let’s follow
+along with the Crystal compiler as it parses the code I showed above:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Recall Crystal already converted this code into a token stream:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/token-line.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;(To be more accurate, Crystal actually converts my code into tokens as it goes.
+The parse code calls the tokenizer code each time it needs a new token. But
+this timing isn’t really important.)&lt;/p&gt;
+&lt;p&gt;As you might expect, Crystal starts with the first token, &lt;code&gt;IDENT&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;What does this mean? How does Crystal interpret &lt;code&gt;arr&lt;/code&gt;? &lt;code&gt;IDENT&lt;/code&gt; is short for
+identifier, but what role does this identifier play? What meaning does &lt;code&gt;arr&lt;/code&gt; have
+in my code?&lt;/p&gt;
+&lt;p&gt;To decide on the correct meaning, the Crystal parser compares the &lt;code&gt;IDENT&lt;/code&gt; token
+with a series of patterns. For example Crystal looks for patterns like:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;a ternary expression &lt;code&gt;a ? b : c&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;a range &lt;code&gt;a..b&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;an expression using a binary operator, such as: &lt;code&gt;a + b&lt;/code&gt;, etc.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;and many more…&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It turns out none of these patterns apply in this case, and Crystal ends up
+selecting a default pattern which handles the most common code pattern: a
+function call. Crystal decides that when I wrote &lt;code&gt;arr&lt;/code&gt; I intended to call a
+function called &lt;code&gt;arr&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;I often tell people I work with at my day job that I have really bad memory.
+And it’s true. I constantly have to google the syntax or return values of
+functions. I often forget what some code means even just a month after I wrote
+it. And the Crystal compiler is no better: As soon as it processes that &lt;code&gt;IDENT&lt;/code&gt;
+token above, it has to write down what it decided that token meant or else it
+would forget.&lt;/p&gt;
+&lt;p&gt;To record the function call, Crystal creates an object:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/ast1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;As we’ll see in a moment, Crystal builds up a tree of these objects, called an
+&lt;a href=&quot;https://en.wikipedia.org/wiki/Abstract_syntax_tree&quot;&gt;Abstract Syntax
+Tree&lt;/a&gt; (AST). The AST will
+later serve as a record of the syntactic structure of my code.&lt;/p&gt;
+&lt;h2&gt;Recursively Calling Itself&lt;/h2&gt;
+&lt;p&gt;Parsing is inherently a recursive process. Unlike English text, Crystal
+expressions can be nested one inside another to any depth. Although I suppose
+English grammar is somewhat recursive and can be nested to some degree. I
+wonder if the grammars for some other human languages are more recursive than
+English? Interesting question.&lt;/p&gt;
+&lt;p&gt;For parsing a programming language like Crystal, the simplest thing for the
+parser code to do is recursively call itself. And it does this based on the
+pattern it just matched. For example, if Crystal had parsed a plus sign, it
+would need to recursively call itself to parse the values that appeared before
+and after the plus.&lt;/p&gt;
+&lt;p&gt;In this example, Crystal has to decide what arguments to pass to this call to
+the &lt;code&gt;arr&lt;/code&gt; function. Did I write &lt;code&gt;arr(1, 2, 3)&lt;/code&gt; or just &lt;code&gt;arr&lt;/code&gt;? Or &lt;code&gt;arr()&lt;/code&gt;? What were
+the values 1, 2 and 3? Each of these could be a complex expression in their own
+right, maybe appearing inside of parentheses, a compound value like an array or
+maybe yet another function call.&lt;/p&gt;
+&lt;p&gt;To find the arguments of the function call, inside the recursive call to the
+parse code Crystal proceeds forward to process the next two tokens:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;Crystal skips over the space, and then encounters the equals sign. Suddenly
+Crystal realizes it was wrong! The &lt;code&gt;arr&lt;/code&gt; identifier wasn’t a reference to a
+function at all, it was a variable declaration. Yes, sometimes compilers change
+their minds while reading, just like we do!&lt;/p&gt;
+&lt;h2&gt;Recording an AST Node&lt;/h2&gt;
+&lt;p&gt;To record this new, revised syntax, Crystal changes the &lt;code&gt;Call&lt;/code&gt; AST node it
+created earlier to an &lt;code&gt;Assign&lt;/code&gt; AST node, and creates a new &lt;code&gt;Var&lt;/code&gt; AST node to
+record the variable being assigned to:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/ast2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;Now the AST is starting to resemble a tree. Because of the recursive nature of
+parse algorithm, this tree structure is an ideal way of record what the
+compiler has parsed so far. Trees are recursive too: Each branch is a tree in
+its own right.&lt;/p&gt;
+&lt;h2&gt;Rinse and Repeat&lt;/h2&gt;
+&lt;p&gt;But what value should Crystal assign to that variable? What should appear in
+the AST as the value attribute of the &lt;code&gt;Assign&lt;/code&gt; node?&lt;/p&gt;
+&lt;p&gt;To find out, the Crystal compiler recursively calls the same parsing algorithm
+again, but starting with the &lt;code&gt;[&lt;/code&gt; token:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;Following the pattern match, record and recurse process, the Crystal compiler
+once again matches the new token, &lt;code&gt;[&lt;/code&gt;, with a series of expected patterns. This
+time, Crystal decides that the left bracket is the start of literal array
+expression and records a new AST node:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/array-literal1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;But before inserting it into the syntax tree, Crystal recursively calls itself
+to parse each of the values that appear in the array. The array literal pattern
+expects a series of values to appear separated by spaces, so Crystal proceeds
+to process the following tokens, looking for values separated by commas:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token4.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;After encountering the comma, Crystal recursively calls the same parse code
+again on the previous token or tokens that appeared before the comma, because
+the array value before the comma could be another expression of arbitrary depth
+and complexity. In this example, Crystal finds a simple numeric array element,
+and creates a new AST node to represent the numeric value:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/number-literal1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;After reading the comma, Crystal calls its parser recursively again, and finds
+the second number:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/number-literal2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;Remember Crystal has a bad memory. With all these new AST nodes, Crystal will
+quickly forget what they mean. Fortunately, Crystal reads in the right square
+bracket and realizes I ended the array literal in my code:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token5.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;Now those recursive calls to the parse code return, and Crystal assembles these
+new AST nodes:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/array-literal2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;…and then places them inside the larger, surrounding AST:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/ast3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;After this, these recursive calls return and the Crystal compiler moves on to
+parse the second line of my program.&lt;/p&gt;
+&lt;h2&gt;A Complete Abstract Syntax Tree&lt;/h2&gt;
+&lt;p&gt;After following the Crystal parser for a while, I added some debug logging code
+to the compiler so I could see the result. Here’s my example code again:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;And here’s the complete AST the Crystal compiler generated after parsing my
+code. My debug logging indented each line to indicate the AST structure:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;
+&amp;lt;Crystal::Expressions exp_count=3 &gt;
+  &amp;lt;Crystal::Require string=prelude &gt;
+  &amp;lt;Crystal::Assign target=Crystal::Var value=Crystal::ArrayLiteral &gt;
+    &amp;lt;Crystal::Var name=arr &gt;
+    &amp;lt;Crystal::ArrayLiteral element_count=2 of=Nil name=Nil &gt;
+      &amp;lt;Crystal::NumberLiteral number=12345 kind=i32 &gt;
+      &amp;lt;Crystal::NumberLiteral number=67890 kind=i32 &gt;
+  &amp;lt;Crystal::Call obj= name=puts arg_count=1 &gt;
+    &amp;lt;Crystal::Call obj=arr name=[] arg_count=1 &gt;
+      &amp;lt;Crystal::Var name=arr &gt;
+      &amp;lt;Crystal::NumberLiteral number=1 kind=i32 &gt;
+&lt;/pre&gt;
+&lt;p&gt;Each of these &lt;code&gt;&amp;amp;lt;Crystal::…&amp;gt;&lt;/code&gt; values are subclasses the &lt;code&gt;Crystal::ASTNode&lt;/code&gt;
+superclass. Crystal defines all of these in the
+&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/ast.cr&quot;&gt;ast.cr&lt;/a&gt;
+file.&lt;/p&gt;
+&lt;p&gt;Some interesting details to note:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;The top level node is called &lt;code&gt;Expressions&lt;/code&gt;, and more or less holds one
+expression per line of code.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The second node, the first child node of &lt;code&gt;Expressions&lt;/code&gt;, is called &lt;code&gt;Require&lt;/code&gt;.
+The surprise here is that I didn’t even put a &lt;code&gt;require&lt;/code&gt; keyword in my
+program! Crystal silently inserts &lt;code&gt;require prelude&lt;/code&gt; to the beginning of
+all Crystal programs. The “prelude” is the Crystal standard library, the code
+that defines &lt;code&gt;Array&lt;/code&gt;, &lt;code&gt;String&lt;/code&gt; many other core classes. Reading the AST allows
+us to see how the Crystal compiler does this automatically.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The third node and its children are the nodes we saw Crystal create above for
+my first line of code, the array literal and the variable it is assigned to.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Finally, the last branch of the tree shows the call to &lt;code&gt;puts&lt;/code&gt;. This time
+Crystal’s default guess about identifiers being function calls was correct.
+Another interesting detail here is that the inner call to the &lt;code&gt;[]&lt;/code&gt; function
+was not generated by an identifier, but by the &lt;code&gt;[&lt;/code&gt; token. This was one of the
+patterns the Crystal parser checked for after one of the recursive parse
+calls.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Next TIme&lt;/h2&gt;
+&lt;p&gt;What’s the point of all of this? What does the Crystal compiler do next with
+the AST? This tree structure is a fantastic summary of how Crystal parsed my
+code, and, as we’ll see later, also provides a convenient way for Crystal later
+to process my code and transform it in different ways.&lt;/p&gt;
+&lt;p&gt;When I have time, I plan to write a few more posts about more of the inner
+workings of the Crystal compiler and the LLVM framework, which Crystal later
+uses to generate my x86 executable program.&lt;/p&gt;
+</content></entry><entry><title>Find Your Language’s Primitives</title><link href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></id><published>2021-11-29T00:00:00Z</published><updated>2021-11-29T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;If you dig into your programming language's syntax, you might &lt;br/&gt;discover that it is capable of much more than you thought it was.
   &lt;/i&gt;
@@ -2679,233 +2962,4 @@ something new. By taking 5 hours instead of 5 minutes to accomplish a simple
 task, I gained valuable insight and knowledge. I gave my mind the exercise it
 was so hungry for. And thankfully no one noticed it took me 5 hours to run a
 report that should have taken 5 minutes.&lt;/p&gt;
-</content></entry><entry><title>How Rust Implements Tagged Unions</title><link href="http://patshaughnessy.net/2018/3/15/how-rust-implements-tagged-unions" rel="alternate"></link><id href="http://patshaughnessy.net/2018/3/15/how-rust-implements-tagged-unions" rel="alternate"></id><published>2018-03-15T00:00:00Z</published><updated>2018-03-15T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/covers.png&quot;&gt;&lt;br/&gt;
-&lt;i&gt; &lt;small&gt;(&lt;a href=&quot;https://www.amazon.com/Programming-Language-Brian-W-Kernighan/dp/0131101633/ref=pd_lpo_sbs_14_img_1?_encoding=UTF8&amp;psc=1&amp;refRID=J7H21QEX2A2NN3Y6EG00&quot;&gt;The C Programming Language&lt;/a&gt; and &lt;a href=&quot;https://nostarch.com</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/covers.png&quot;&gt;&lt;br/&gt;
-&lt;i&gt; &lt;small&gt;(&lt;a href=&quot;https://www.amazon.com/Programming-Language-Brian-W-Kernighan/dp/0131101633/ref=pd_lpo_sbs_14_img_1?_encoding=UTF8&amp;psc=1&amp;refRID=J7H21QEX2A2NN3Y6EG00&quot;&gt;The C Programming Language&lt;/a&gt; and &lt;a href=&quot;https://nostarch.com/Rust&quot;&gt;The Rust Programming Language&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
-&lt;/div&gt;
-&lt;p&gt;Rust &lt;a href=&quot;https://www.rust-lang.org/en-US/&quot;&gt;describes itself&lt;/a&gt; as:&lt;/p&gt;
-&lt;blockquote&gt;
-…a systems programming language that runs blazingly fast, prevents segfaults, and guarantees thread safety.
-&lt;/blockquote&gt;
-&lt;p&gt;Of course, this is in contrast to C, a different systems programming language
-that encourages segfaults and makes no guarantees at all about thread safety.
-Rust improves on C in many ways, most famously with its innovative ownnership
-model for managing memory.&lt;/p&gt;
-&lt;p&gt;Another less obvious improvement Rust makes to C has to do with the &lt;span
-class=&quot;code&quot;&gt;union&lt;/span&gt; keyword. The Rust compiler implements &lt;em&gt;tagged
-unions&lt;/em&gt;, which prevent you from crashing your program by initializing a union
-with one variant and accessing it with another. &lt;del&gt;But the Rust doesn’t include
-the &lt;span class=&quot;code&quot;&gt;union&lt;/span&gt; keyword at all&lt;/del&gt;; instead, Rust
-uses &lt;span class=&quot;code&quot;&gt;enum&lt;/span&gt; to improve on both C enums and C unions at
-the same time.&lt;/p&gt;
-&lt;div style=&quot;clear: both&quot;&gt;&lt;/div&gt;
-&lt;p&gt;(Update: I heard &lt;a href=&quot;https://twitter.com/josh_triplett/status/974312496717742080&quot;&gt;on
-Twitter&lt;/a&gt; and in
-the comments that Rust does include untagged unions for use in FFI to
-interoperate with C, or for unsafe code building custom unions.)&lt;/p&gt;
-&lt;p&gt;Not sure what a tagged union is? Or why it’s an improvement over an old
-fashioned C union? Today I’ll explain. First I’ll start with a quick review of
-C unions, how they work and why they are dangerous. Then I’ll show you how Rust
-enums improve on them.&lt;/p&gt;
-&lt;h2&gt;C Unions&lt;/h2&gt;
-&lt;p&gt;Unions are one of the most dangerous features of C. Here’s an example:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/union1.png&quot;/&gt;
-&lt;p&gt;Here the union &lt;span class=&quot;code&quot;&gt;num_or_str&lt;/span&gt; saves either a number or
-a character pointer but not both. (A union can contain any number of members;
-for simplicity my example union has only two.) On the right I show how the C
-compiler would allocate memory for an instance of &lt;span
-class=&quot;code&quot;&gt;num_or_str&lt;/span&gt;. It allocates enough memory to hold the longest
-value in the union, but not both values at the same time. The integer is a
-short, meaning it occupies 16 bits or two bytes, and the string is a char
-pointer which takes 64 bits or 8 bytes using a modern 64-bit CPU. The two
-options for what might be stored in the union, &lt;span class=&quot;code&quot;&gt;num&lt;/span&gt;
-and &lt;span class=&quot;code&quot;&gt;str&lt;/span&gt; in this example, are known as &lt;em&gt;variants&lt;/em&gt;.&lt;/p&gt;
-&lt;h2&gt;Why C Unions Are Dangerous&lt;/h2&gt;
-&lt;p&gt;Unions are dangerous because you, the C programmer, need to remember which
-variant you set in the union. If you save one type of value but then access the
-other, your program will crash.&lt;/p&gt;
-&lt;p&gt;For example this code works fine:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code1.png&quot;/&gt;
-&lt;p&gt;But if you forget &lt;span class=&quot;code&quot;&gt;a_number&lt;/span&gt; contains a number, and use
-&lt;span class=&quot;code&quot;&gt;a_number&lt;/span&gt; as a string instead, your program will
-crash:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code2.png&quot;/&gt;
-&lt;p&gt;Notice the C compiler didn’t help me here at all. It didn’t display any sort of
-warning or error when I wrote &lt;span class=&quot;code&quot;&gt;a_number.str&lt;/span&gt;. It
-silently allowed me to write dangerous code; in fact, union syntax encouraged
-me to introduce a segmentation fault.&lt;/p&gt;
-&lt;p&gt;Writing C code with unions is like driving very fast down a highway full of
-potholes. You might be the best driver in the world, but eventually you’re
-going to hit one of the holes and crash.&lt;/p&gt;
-&lt;h2&gt;Tagged Unions&lt;/h2&gt;
-&lt;p&gt;C programmers have been writing code with unions for years - for decades in
-fact. How have they avoided this problem? There must be a safe way of writing C
-code with unions.&lt;/p&gt;
-&lt;p&gt;The most common and robust solution is to keep track of which union variant is
-valid using an integer value saved right next to the union in memory. This
-integer is known as a tag, and the combination of the tag and the union is a
-&lt;em&gt;tagged union&lt;/em&gt;.&lt;/p&gt;
-&lt;p&gt;Here’s an example:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/tagged_union.png&quot;/&gt;
-&lt;p&gt;On the right side I’ve allocated some memory right before the union for the tag
-using a struct. C structs, unlike unions, allocate enough memory to store all
-of their members at once. Note: Using two bytes to save a small integer value
-is unnecessary. C programs often use only one byte, or even represent the
-integer value using a bit mask inside the union’s values. But the principle
-remains the same.&lt;/p&gt;
-&lt;p&gt;Now when I save an integer in an instance of the union I can also set the tag
-to the value 1, for example, which I decide will mean that &lt;span
-class=&quot;code&quot;&gt;a_number&lt;/span&gt; contains a number:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code3.png&quot;/&gt;
-&lt;p&gt;And if I want to save a string instead, I set the tag to 2, for example:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code4.png&quot;/&gt;
-&lt;p&gt;Later when I access the tagged union, I first check the tag before deciding
-which variant I can access:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/c-code5.png&quot;/&gt;
-&lt;p&gt;Of course, tagged unions are not foolproof. I invented the tag values 1 and 2
-and wrote the code that checks for them. There’s nothing to prevent me from
-forgetting to save the tag value, saving the wrong tag value or misinterpreting
-the tag value when I later read it. And, if I ever add new variants to the
-union, I have to add a new branch to every &lt;span class=&quot;code&quot;&gt;if&lt;/span&gt;
-statement in my app that checks the tags, handling the new value. Needless to
-say, the C compiler won’t help me find those &lt;span class=&quot;code&quot;&gt;if&lt;/span&gt;
-statements or check whether I’ve covered all the possible tag values.&lt;/p&gt;
-&lt;p&gt;I’m a forgetful and  easily distracted person. I need a programming language
-that will keep me out of trouble. Even with tagged unions I’m sure I would
-write dangerous, crashing C code before long.&lt;/p&gt;
-&lt;h2&gt;Tagged Unions in Rust&lt;/h2&gt;
-&lt;p&gt;Rust implements tagged unions using the &lt;span class=&quot;code&quot;&gt;enum&lt;/span&gt; keyword.
-For example, to declare a Rust enum type equivalent to the C tagged union above
-I write:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/rust-enum1.png&quot;/&gt;
-&lt;p&gt;The questions for today are: Why are enums equivalent to tagged unions in C?
-And: What should I draw on the right side? What would I see if I could find and
-examine an enum in the memory space of a running Rust process?&lt;/p&gt;
-&lt;h2&gt;Saving a Rust Enum&lt;/h2&gt;
-&lt;p&gt;To find out, let’s create an instance of &lt;span class=&quot;code&quot;&gt;NumOrStr&lt;/span&gt;:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/rust-enum2.png&quot;/&gt;
-&lt;p&gt;Notice that instead of 4, I’ve saved a more recognizable value, 1234. Now, if I
-compile it with the &lt;span class=&quot;code&quot;&gt;-—emit asm&lt;/span&gt; flag:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/rust-emit-asm.png&quot;/&gt;
-&lt;p&gt;…Rust generates a file called union.s which contains the assembly language
-version of my program. If I open union.s and search for 1234, the integer value
-I saved above, I see:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm1.png&quot;/&gt;
-&lt;p&gt;I’ve found it; here are the x86 assembly language instructions that initialize
-&lt;span class=&quot;code&quot;&gt;a_number&lt;/span&gt;. These show me exactly how Rust represents
-enums in memory, how Rust implements tagged unions.&lt;/p&gt;
-&lt;p&gt;The only problem is… I have no idea what this means!&lt;/p&gt;
-&lt;h2&gt;The movw x86 Instruction&lt;/h2&gt;
-&lt;p&gt;What does &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt; mean? And what about &lt;span
-class=&quot;code&quot;&gt;-32(%rbp)&lt;/span&gt;?&lt;/p&gt;
-&lt;p&gt;It turns out x86 assembly language isn’t that hard to follow, once you learn
-the basic syntax. For a quick introduction, see my article from 2016: &lt;a href=&quot;http://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language&quot;&gt;Learning
-to Read x86 Assembly
-Language&lt;/a&gt;.
-Intel, the company that built the microprocessor inside my Mac, defines the
-&lt;span class=&quot;code&quot;&gt;mov&lt;/span&gt; instruction to mean “move.” (Note: the
-instructions I show here that &lt;span class=&quot;code&quot;&gt;rustc —emit asm&lt;/span&gt;
-generates aren’t written using Intel x86 syntax, but with GAS x86 syntax
-instead.)&lt;/p&gt;
-&lt;p&gt;Here’s a diagram showing what the first &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt;
-instruction moves:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm2.png&quot;/&gt;
-&lt;p&gt;It turns out that &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt; stands for “move a word.” A
-word is defined as 16 bits, or 2 bytes. There are a few different variations on
-move, &lt;span class=&quot;code&quot;&gt;movb&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt;, &lt;span
-class=&quot;code&quot;&gt;movl&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;movq&lt;/span&gt;, which move 1
-byte, 2 bytes, 4 bytes or 8 bytes respectively.&lt;/p&gt;
-&lt;p&gt;Next, the &lt;span class=&quot;code&quot;&gt;$&lt;/span&gt; notation indicates a literal value -  in
-this case zero: &lt;span class=&quot;code&quot;&gt;$0&lt;/span&gt;. Now we can see the first
-instruction above is moving 2 bytes containing the value zero. Similarly, the
-second instruction is moving 2 bytes containing the value 1234:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm3.png&quot;/&gt;
-&lt;h2&gt;The rbp Register&lt;/h2&gt;
-&lt;p&gt;But where are these &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt; instructions moving these
-values to? To understand that we need to understand the odd &lt;span
-class=&quot;code&quot;&gt;-32(%rbp)&lt;/span&gt; syntax on the right side of the instructions. The
-&lt;span class=&quot;code&quot;&gt;%&lt;/span&gt; sign indicates a register inside my Mac’s
-microprocessor, in this case the “base pointer” register. So &amp;quot;bp&amp;quot; means &amp;quot;base
-pointer.&amp;quot; And the “r” prefix in &amp;quot;rbp&amp;quot; means the move instruction is using all 8
-bytes (64 bits) of this register’s value.&lt;/p&gt;
-&lt;p&gt;The &lt;span class=&quot;code&quot;&gt;-32(%rbp)&lt;/span&gt; notation calculates a memory address
-for the instruction using the contents of the &lt;span class=&quot;code&quot;&gt;%rbp&lt;/span&gt;
-register - in this case the address of where to move the data to. The
-expression &lt;span class=&quot;code&quot;&gt;-32(%rbp)&lt;/span&gt; in English means: “Take the 64
-bit memory address value from the base pointer register, and subtract 32 from
-it.”&lt;/p&gt;
-&lt;p&gt;Compiled Rust programs - all programs really - that run on the x86 platform
-store values for local variables on the stack, using the base pointer register
-in this fashion. The base pointer, as it’s name indicates, stores the base
-address of my program's current stack frame. Each local variable in my code,
-for example &lt;span class=&quot;code&quot;&gt;a_number&lt;/span&gt;, is saved somewhere on the
-stack. If you’re not familiar with the concept of a stack, think of it as a
-convenient place for quickly saving and retrieving values while your program is
-running.&lt;/p&gt;
-&lt;h2&gt;How Rust Saves an Integer Enum Variant&lt;/h2&gt;
-&lt;p&gt;Taking a step back for a moment, here’s what we’ve learned so far. When I save
-an enum value containing an integer, Rust saves &lt;em&gt;two&lt;/em&gt; values, 0 and 1234:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save1.png&quot;/&gt;
-&lt;p&gt;What does the &lt;span class=&quot;code&quot;&gt;0&lt;/span&gt; mean? Rust records a zero to indicate
-that &lt;span class=&quot;code&quot;&gt;a_number&lt;/span&gt; uses the &lt;span
-class=&quot;code&quot;&gt;NumOrStr::Num&lt;/span&gt; variant. In other words, &lt;span
-class=&quot;code&quot;&gt;a_number&lt;/span&gt; is a tagged union, and the zero value is the tag.
-We know the tag occupies 2 bytes because of the &lt;span class=&quot;code&quot;&gt;movw&lt;/span&gt;
-instruction above. The integer value itself, &lt;span class=&quot;code&quot;&gt;1234&lt;/span&gt;,
-also takes 2 bytes because I declared it using &lt;span
-class=&quot;code&quot;&gt;Num(i16)&lt;/span&gt;, and we saw Rust used a movw to save that also.&lt;/p&gt;
-&lt;h2&gt;How Rust Saves an String Enum Variant&lt;/h2&gt;
-&lt;p&gt;But what about the other variant, the string? When I save a string in &lt;span
-class=&quot;code&quot;&gt;NumOrStr&lt;/span&gt;, what does Rust do? To find out, I’ll replace my
-main function from above with this line of code:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save2.png&quot;/&gt;
-&lt;p&gt;The I’ll compile it again using the &lt;span class=&quot;code&quot;&gt;--emit asm&lt;/span&gt;
-option. Now I find this assembly language code in the union.s file:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/asm4.png&quot;/&gt;
-&lt;p&gt;Unfortunately this code snippet is much more complex: It first calls &lt;span
-class=&quot;code&quot;&gt;String::from&lt;/span&gt; passing a string literal, and then saves the
-string into the enum via a method called &lt;span
-class=&quot;code&quot;&gt;drop_in_place&lt;/span&gt;. This is much harder to understand.&lt;/p&gt;
-&lt;p&gt;Rather than trying to figure this out, I decided to debug my Rust sample
-program using LLDB, and inspect the memory &lt;span class=&quot;code&quot;&gt;a_string&lt;/span&gt;
-occupies. I found that Rust used 26 bytes to represent the string variant,
-starting with a 16 bit word containing 1:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save3.png&quot;/&gt;
-&lt;p&gt;This is again the tag; in this case &lt;span class=&quot;code&quot;&gt;1&lt;/span&gt; means &lt;span
-class=&quot;code&quot;&gt;a_string&lt;/span&gt; uses the &lt;span class=&quot;code&quot;&gt;NumOrStr::Str&lt;/span&gt;
-variant. Following this I found a pointer to the string itself:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save4.png&quot;/&gt;
-&lt;p&gt;Pointers on a 64-bit microprocessor occupy 8 bytes and contain the memory
-address of something, in this case my string &amp;quot;This is a test.” After the
-pointer I found two 64 bit values, each containing 15:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save5.png&quot;/&gt;
-&lt;p&gt;These are two attributes of the string: its capacity and length. By inspecting
-my process's memory I’ve started to learn a bit about how Rust manages memory
-for strings.&lt;/p&gt;
-&lt;p&gt;But what’s important for me today is the first word, the value 1. Again, we see
-the same pattern. Rust saves an integer value, the tag, indicating which
-variant this instance of the enum uses. Then Rust saves the enum variant’s
-payload in the memory that follows:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/save6.png&quot;/&gt;
-&lt;h2&gt;Tagged Unions in Rust and C&lt;/h2&gt;
-&lt;p&gt;Let’s review by declaring a tagged union in C and Rust:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/review1.png&quot;/&gt;
-&lt;p&gt;On the left using C, I have to include the tag explicitly in a surrounding
-struct. Rust handles this for me automatically, saving the tag value inside the
-enum alongside the enum’s value. The code looks very different, but as we saw above
-the implementations are_ identical_.&lt;/p&gt;
-&lt;p&gt;Using a tagged union looks somewhat similar in C and Rust:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/3/15/review2.png&quot;/&gt;
-&lt;p&gt;But there are very important differences here! Using C, I need to remember to
-check the tag and to use the proper variant inside the union. The Rust
-compiler, on the other hand, checks the tag for me automatically and won’t
-allow me to access the wrong variant. The code inside of &lt;span class=&quot;code&quot;&gt;if
-let&lt;/span&gt; will never be executed unless the internal tag value matches the
-&lt;span class=&quot;code&quot;&gt;NumOrStr::Num&lt;/span&gt; variant.&lt;/p&gt;
-&lt;p&gt;Under the hood, the two languages implement tagged unions the same way. But
-writing code in C and Rust is very different. C encourages me to write
-dangerous, crashing code, while Rust prevents me from writing dangerous code in
-the first place.&lt;/p&gt;
 </content></entry></feed>
