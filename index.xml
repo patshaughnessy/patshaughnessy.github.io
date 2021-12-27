@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-12-23T17:12:52Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Reading Code Like a Compiler</title><link href="http://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="http://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-12-27T18:56:18Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Reading Code Like a Compiler</title><link href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Imagine trying to read an entire book while &lt;br/&gt;
   focusing on only one or two words at a time
@@ -280,7 +280,7 @@ to process my code and transform it in different ways.&lt;/p&gt;
 &lt;p&gt;When I have time, I plan to write a few more posts about more of the inner
 workings of the Crystal compiler and the LLVM framework, which Crystal later
 uses to generate my x86 executable program.&lt;/p&gt;
-</content></entry><entry><title>Find Your Language’s Primitives</title><link href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></id><published>2021-11-29T00:00:00Z</published><updated>2021-11-29T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Find Your Language’s Primitives</title><link href="https://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></link><id href="https://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></id><published>2021-11-29T00:00:00Z</published><updated>2021-11-29T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;If you dig into your programming language's syntax, you might &lt;br/&gt;discover that it is capable of much more than you thought it was.
   &lt;/i&gt;
@@ -648,7 +648,7 @@ effort to read some code.&lt;/p&gt;
 &lt;p&gt;Dive into details and find out what the language primitives are in your
 favorite programming language. You might be surprised and discover that your
 language is capable of much more than you thought it was.&lt;/p&gt;
-</content></entry><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="http://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="https://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="https://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
 &lt;/div&gt;
@@ -919,7 +919,7 @@ compiler that my code is consistent and mathematically correct at a type level.&
 what code you are writing, how fast it needs to run, how many times and for how
 long that code will be used - and most importantly, how much time you have to
 solve math problems.&lt;/p&gt;
-</content></entry><entry><title>To Learn a New Language, Read Its Standard Library</title><link href="http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></link><id href="http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></id><published>2021-10-23T00:00:00Z</published><updated>2021-10-23T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>To Learn a New Language, Read Its Standard Library</title><link href="https://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></link><id href="https://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></id><published>2021-10-23T00:00:00Z</published><updated>2021-10-23T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;If I was learning to read English as a foreign language,&lt;br/&gt; I would need something simple to get started.&lt;br/&gt;
   &lt;small&gt;(from The Remarkable Story of Chicken Little, 1840)&lt;/small&gt;&lt;/i&gt; 
@@ -1117,7 +1117,7 @@ also get to learn how Crystal works internally.&lt;/p&gt;
 &lt;p&gt;But what happens for longer arrays, with 100s or 1000s of elements? How does
 Crystal remove duplicates from longer arrays efficiently? I'll take a look at
 how that works in my next post.&lt;/p&gt;
-</content></entry><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-20T00:00:00Z</published><updated>2020-01-20T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="https://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="https://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-20T00:00:00Z</published><updated>2020-01-20T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
 easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
@@ -1411,7 +1411,7 @@ performance: With just a few lines of code I was able to write an asynchronous
 I/O program that can scale as much as I would like. The &lt;span
 class=&quot;code&quot;&gt;async&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; keywords make
 this code easy to write and easy to read.&lt;/p&gt;
-</content></entry><entry><title>Using Result Combinator Functions in Rust</title><link href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></link><id href="http://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Using Result Combinator Functions in Rust</title><link href="https://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></link><id href="https://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
   flow by checking for errors in a succinct, elegant way&lt;/i&gt;
@@ -1582,7 +1582,7 @@ any errors. While it’s harder to write, having the Rust compiler check my
 thought process as I piece together different code paths is a huge help.
 Learning to use and get along with the Rust compiler is worth it: You end up
 with code that is both readable and correct.&lt;/p&gt;
-</content></entry><entry><title>How Rust Makes Error Handling Part of the Language</title><link href="http://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></link><id href="http://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></id><published>2019-10-03T00:00:00Z</published><updated>2019-10-03T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>How Rust Makes Error Handling Part of the Language</title><link href="https://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></link><id href="https://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></id><published>2019-10-03T00:00:00Z</published><updated>2019-10-03T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/fingers-toes.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt;In Spanish these are all “dedos,” while in English&lt;br/&gt;we can distinguish between fingers and toes. &lt;/i&gt;
 &lt;/div&gt;
@@ -1919,7 +1919,7 @@ the nature of the task I’m trying to accomplish. Rust programmers think about
 errors and what might go wrong from the very beginning, from when they start
 writing code. To be honest, I've often thought about errors and what might go
 wrong as an afterthought, after I've written and deployed my code.&lt;/p&gt;
-</content></entry><entry><title>Using Rust to Build a Blog Site</title><link href="http://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></link><id href="http://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></id><published>2019-09-04T00:00:00Z</published><updated>2019-09-04T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Using Rust to Build a Blog Site</title><link href="https://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></link><id href="https://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></id><published>2019-09-04T00:00:00Z</published><updated>2019-09-04T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2019/9/4/batteries.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Rust comes with batteries included&lt;br/&gt;
     &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Color-w-batteries.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
@@ -2220,7 +2220,7 @@ without crates.io and Cargo. Using code from smarter, more seasoned Rust
 developers gave me a chance to build a useful app, even as a beginner. Cargo
 found, downloaded and compiled open source code from experts with just a few
 simple commands.&lt;/p&gt;
-</content></entry><entry><title>Summer School With The Rust Compiler</title><link href="http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="http://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>Summer School With The Rust Compiler</title><link href="https://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="https://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt; &lt;small&gt;(source: &lt;a href=&quot;https://twitter.com/steveklabnik/status/1022518806814617601&quot;&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
@@ -2598,7 +2598,7 @@ value, but strings by reference. Updating each string inside the loop also
 updated that string inside the array. Now my program will have bugs, unless the
 point of running that loop was to mutate the array, and not just to print it
 out.&lt;/p&gt;
-</content></entry><entry><title>From ActiveRecord to Diesel</title><link href="http://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel" rel="alternate"></link><id href="http://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel" rel="alternate"></id><published>2018-06-09T00:00:00Z</published><updated>2018-06-09T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+</content></entry><entry><title>From ActiveRecord to Diesel</title><link href="https://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel" rel="alternate"></link><id href="https://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel" rel="alternate"></id><published>2018-06-09T00:00:00Z</published><updated>2018-06-09T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/exercise.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Learning something new every day
 is exercise for your mind.&lt;/i&gt;&lt;br/&gt;
