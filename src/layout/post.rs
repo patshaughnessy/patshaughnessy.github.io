@@ -34,7 +34,7 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
               div class="metadata" {
                 span class="date" { (date_string) }
                 (PreEscaped("&nbsp;&mdash;&nbsp;"))
-                    a href="#disqus_thread" data-disqus-identifier={ "http://patshaughnessy.net/" (post.url) } class="date" {
+                    a href="#disqus_thread" data-disqus-identifier={ "https://patshaughnessy.net/" (post.url) } class="date" {
                         (PreEscaped("&nbsp; Comments and &nbsp; Reactions"))
                     }
                     (PreEscaped("<br>"))
@@ -50,7 +50,7 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
                 div id="disqus_thread" {
                   script type="text/javascript" {
                     (PreEscaped(r#"var disqus_identifier = '"#))
-                    "http://patshaughnessy.net/"
+                    "https://patshaughnessy.net/"
                     (post.url)
                     (PreEscaped(r#"'; var disqus_shortname = 'patshaughnessy'; var disqus_title = '"#))
                     (post.title)

@@ -24,7 +24,7 @@ pub fn render(all_posts: &Vec<Post>) -> String {
           name { "Pat Shaughnessy" }
         }
         @for post in all_posts.iter().take(10) {
-          @let absolute_url = format!("http://patshaughnessy.net/{}", post.url);
+          @let absolute_url = format!("https://patshaughnessy.net/{}", post.url);
           @let date = post.date.to_rfc3339_opts(SecondsFormat::Secs, true);
           entry {
             title {
