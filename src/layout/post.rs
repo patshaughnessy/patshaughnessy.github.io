@@ -57,9 +57,9 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
                     (PreEscaped(r#"';"#))
                   }
                 }
-                script type="text/javascript" src="http://disqus.com/forums/patshaughnessy/embed.js" { }
+                script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js" { }
                 noscript {
-                  a href="http://patshaughnessy.disqus.com/?url=ref" {
+                  a href="https://patshaughnessy.disqus.com/?url=ref" {
                     "View the discussion thread."
                   }
                 }
@@ -71,7 +71,7 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
               (PreEscaped(r#"(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
-        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
     }());"#))
             }
