@@ -1,9 +1,9 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Generational GC in Python and Ruby - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Generational GC in Python and Ruby</h1><div class="metadata"><span class="date">October 30th 2013</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2013/10/30/generational-gc-in-python-and-ruby" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Generational GC in Python and Ruby">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/10/30/generations.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/10/30/generations.jpg"><br/>
   <i>Both the Ruby and Python garbage collectors<br/>
   handle old and young objects differently.</i>
 </div>
-<p><a href="http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Last week I wrote up the my first half of my notes</a>
+<p><a href="https://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Last week I wrote up the my first half of my notes</a>
 from a presentation I did at <a href="http://13.rupy.eu">RuPy</a> called “Visualizing
 Garbage Collection in Ruby and Python.” I explained how standard Ruby (also
 known as Matz’s Ruby Interpreter or MRI) uses a garbage collection (GC)
@@ -39,14 +39,14 @@ with this algorithm: if one of your data structures refers to itself, if it is a
 <em>cyclic data structure</em>, some of the reference counts will never become zero. To
 better understand this problem let’s take an example. The code below shows the
 same <span class="code">Node</span> class we used last week:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/cycle1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/cycle1.png"><br/></p>
 <p>We have a constructor (these are called <span class="code">__init__</span> in Python) which saves a
 single attribute in an instance variable. Below the class definition we create
 two nodes, ABC and DEF, which I represent using the rectangles on the left. The
 reference count inside both of our nodes is initially one, since one pointer
 (<span class="code">n1</span> and <span class="code">n2</span>, respectively) refers to each node.</p>
 <p>Now let’s define two additional attributes in our nodes, <span class="code">next</span> and <span class="code">prev</span>:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/cycle2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/cycle2.png"><br/></p>
 <p>Unlike in Ruby, using Python you can define instance variables or object
 attributes on the fly like this. This seems like a bit of interesting magic
 missing from Ruby. (Disclaimer: I’m not a Python developer so I might have some
@@ -61,7 +61,7 @@ pointers referring to each node: <span class="code">n1</span> and <span
 <p>Now let’s suppose our Python program stops using the nodes; we set both <span
   class="code">n1</span> and <span class="code">n2</span> to null. (In Python
 null is known as <span class="code">None</span>.)</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/cycle3.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/cycle3.png"><br/></p>
 <p>Now Python, as usual, decrements the reference count inside of each node down to 1.</p>
 <h2>Generation Zero in Python</h2>
 <p>Notice in the diagram just above we’ve ended up with an unusual situation: We
@@ -83,12 +83,12 @@ different linked list to keep track of active objects. Instead of calling this
 the “active list,” Python’s internal C code refers to it as <em>Generation Zero</em>.
 Each time you create an object or some other value in your program, Python adds
 it to the Generation Zero linked list:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/python-gen1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/python-gen1.png"><br/></p>
 <p>Above you can see when we create the ABC node, Python adds it to Generation
 Zero. Note that this isn’t an actual list that you see and access in your
 program; this linked list is entirely internal to the Python runtime.</p>
 <p>Similarly, when we create the DEF node, Python adds it to the same linked list:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/python-gen2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/python-gen2.png"><br/></p>
 <p>Now Generation Zero contains two node objects. (It will also contain every
 other value our Python code creates, and many internal values used by Python
 itself.)</p>
@@ -98,7 +98,7 @@ which other objects each object in the list refers to, decrementing reference
 counts as it goes. In this way, Python accounts for internal references from
 one object to another that prevented Python from freeing the objects earlier.</p>
 <p>To make this a bit easier to understand, let’s take an example:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/python-gen3.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/python-gen3.png"><br/></p>
 <p>Above you can see the ABC and DEF nodes contain a reference count of 1. Three
 other objects are in the Generation Zero linked list also. The blue arrows
 indicate some of the objects are referred to by other objects that are located
@@ -108,7 +108,7 @@ Two.) These objects have higher reference counts because of the other pointers
 referring to them.</p>
 <p>Below you can see what happens after Python’s garbage collector processes
 Generation Zero.</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/python-gen4.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/python-gen4.png"><br/></p>
 <p>By identifying internal references, Python is able to reduce the reference
 count of many of the Generation Zero objects. Above in the top row you can see
 that ABC and DEF now have a reference count of zero. This means the collector
@@ -151,7 +151,7 @@ generational hypothesis</em>. The hypothesis actually consists of two ideas: tha
 most new objects die young, while older objects are likely to remain active for
 a long time.</p>
 <p>Suppose I create a new object using Python or Ruby:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/weak-gen1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/weak-gen1.png"><br/></p>
 <p>According to the hypothesis, my code is likely to use the new ABC node only for a
 short time.   The object is probably just an intermediate value used inside of
 one method and will become garbage as soon as the method returns. Most new
@@ -167,11 +167,11 @@ collector process the older objects.</p>
 <p>The upcoming release of Ruby, version 2.1, now uses a generational garbage
 collector algorithm for the first time! (Remember, other implementations of
 Ruby, such as JRuby and Rubinius, have been using this idea for years.) Let’s
-return to the free list diagrams from <a href="http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">my last post</a>
+return to the free list diagrams from <a href="https://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">my last post</a>
 to understand how this works.</p>
 <p>Recall that when the free list is used up, Ruby marks the objects your program
 is still using:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen1.png"><br/></p>
 <p>In this diagram, we see there are three active objects because the pointers <span class="code">n1</span>,
 <span class="code">n2</span> and <span class="code">n3</span> still refer to
 them. The remaining objects, the white squares, are garbage. (Of course, the
@@ -181,19 +181,19 @@ behind Ruby’s GC algorithm without getting bogged down in the details.)</p>
 <p>Also recall that Ruby moves the garbage objects back onto the free list,
 because now they can be recycled and reused by your program when it allocates new
 objects:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen2.png"><br/></p>
 <h2>Generational GC in Ruby 2.1</h2>
 <p>Starting with Ruby 2.1, the GC code takes an additional step: it promotes the
 remaining active objects to the <em>mature generation</em>. (The MRI C source code
 actually uses the word <em>old</em> and not <em>mature</em>.) This diagram shows a conceptual
 view of the two Ruby 2.1 object generations:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen3.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen3.png"><br/></p>
 <p>On the left is a different view of the free list. We see the garbage objects in
 white, and the remaining live, active objects in gray. The gray objects were
 just marked.</p>
 <p>Once the mark and sweep process is finished, Ruby 2.1 will consider the
 remaining marked objects to be mature:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen4.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen4.png"><br/></p>
 <p>Instead of using three generations like Python, Ruby 2.1’s garbage collector
 uses just two. On the left are new objects in the young generation, and on the
 right are old objects in the mature generation. Once Ruby 2.1 has marked an
@@ -208,7 +208,7 @@ objects in the mark and sweep process again. Once an object has been marked
 once it won’t be included in the next mark and sweep process.</p>
 <p>Now suppose your Ruby program continues to run, creating more new, young
 objects. These appear in the young generation again, on the left:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen5.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen5.png"><br/></p>
 <p>Just like Python, Ruby’s collector focuses its efforts on the young generation.
 It only includes the new, young objects created since the last GC process
 occurred in the mark and sweep algorithm. This is because many new objects are
@@ -228,7 +228,7 @@ the objects to be young again.</p>
 your code creates a new, young object and adds it as a child of an existing,
 mature object. For example, this would happen if you added a new value to an
 array that had existed for a long time.</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen6.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen6.png"><br/></p>
 <p>Here again on the left we see new, young objects and mature objects on the
 right. On the left side the marking process has identified that 5 new objects
 are still active (gray), while two new objects are garbage (white). But what

@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/29/fortran.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/29/fortran.png"></td></tr>
   <tr><td align="center"><small><i>Part of a Fortran IV program (source: <a href="http://en.wikibooks.org/wiki/Fortran/Fortran_examples">WikiBooks</a>)</i></small></td></tr>
 </table>
 </div>
@@ -29,7 +29,7 @@ puts "This line of code is never reached."
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/29/legacy-data.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/29/legacy-data.jpg"></td></tr>
 </table>
 </div>
 
@@ -168,7 +168,7 @@ The Ruby core team is playing a joke on us!
 
 While this might be worth a few laughs, I view it as a learning opportunity as well. The rest of this article will show you what happens inside Ruby when you set <span class="code">SUPPORT_JOKE=1</span>, and how the <span class="code">goto</span> statement actually works. Before we get to the C language details of the Ruby byte code compiler and the <span class="code">SUPPORT_JOKE</span> setting, let’s start with a brief overview of the Ruby 1.9 parse and compile process. Here’s a high level picture of what happens when you run a Ruby 1.9 program:
 
-![high level view](http://patshaughnessy.net/assets/2012/2/29/high-level.png)
+![high level view](https://patshaughnessy.net/assets/2012/2/29/high-level.png)
 
 Going from left to right, whenever you run a Ruby program it:
 <ul>
@@ -220,12 +220,12 @@ I first learned about Ripper watching Peter Cooper’s excellent [RubyTrickShots
 
 To make this easier to understand, here’s a graphical representation of the syntax tree for part of the joke.rb script:
 
-![Abstract Syntax Tree](http://patshaughnessy.net/assets/2012/2/29/ast.png)
+![Abstract Syntax Tree](https://patshaughnessy.net/assets/2012/2/29/ast.png)
 
 This is just part of the syntax tree for my joke.rb file. Notice that in the node on the left, representing the call to <span class="code">\_\_label\_\_(:loop)</span>, I’ve included the constant <span class="code">NODE_FCALL</span> used internally by the Ruby C source code to identify function calls in the syntax tree. We’ll see this used in a moment.
 ## Compiling
 
-After tokenizing and parsing your script, the next thing Ruby does is to compile the AST node tree into byte code that the YARV engine can later execute. As [Rohit Arondekar](http://www.rohitarondekar.com/) pointed out in a comment on [my last post](http://patshaughnessy.net/2012/2/15/is-ruby-interpreted-or-compiled) the easiest way to see the output of the Ruby 1.9 compiler is to use the <span class="code">RubyVM</span> object like this:
+After tokenizing and parsing your script, the next thing Ruby does is to compile the AST node tree into byte code that the YARV engine can later execute. As [Rohit Arondekar](http://www.rohitarondekar.com/) pointed out in a comment on [my last post](https://patshaughnessy.net/2012/2/15/is-ruby-interpreted-or-compiled) the easiest way to see the output of the Ruby 1.9 compiler is to use the <span class="code">RubyVM</span> object like this:
 
 <pre type="ruby">
 code = <<SRC

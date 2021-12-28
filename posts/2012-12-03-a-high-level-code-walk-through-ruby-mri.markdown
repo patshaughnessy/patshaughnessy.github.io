@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td align="center"><img src="http://patshaughnessy.net/assets/2012/12/3/screencast.png"></td></tr>
+    <tr><td align="center"><img src="https://patshaughnessy.net/assets/2012/12/3/screencast.png"></td></tr>
     <tr><td align="center"><i><a href="http://www.rubyinside.com/ruby-mri-code-walk-tour-6020.html">Watch it now on rubyinside.com!</a></i></td></tr>
   </table>
 </div>
@@ -20,7 +20,7 @@ tree and suggest places to get started reading the C source code yourself.
 
 Special thanks to Peter for taking time out of his busy schedule to record and
 edit the video, and for being such a big fan of my book, [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope)! I’m sure you
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope)! I’m sure you
 all know Peter as the editor of [Ruby Inside](http://www.rubyinside.com) and
 [Ruby Weekly](http://rubyweekly.com), but he’s also recorded a number of great
 screencasts. Just this June he produced the fantastic [Ruby 1.9

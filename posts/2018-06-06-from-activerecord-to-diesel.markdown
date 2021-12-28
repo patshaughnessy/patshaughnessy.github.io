@@ -3,7 +3,7 @@ date: 2018/6/9
 tag: Rust
 
 <div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2018/6/9/exercise.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2018/6/9/exercise.jpg"><br/>
 <i> Learning something new every day
 is exercise for your mind.</i><br/>
 	<small>(source: <a href="https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg">Jeremy Bowcock via Wikimedia Commons</a>)</small></i>
@@ -114,7 +114,7 @@ World” with just a few commands.
 Cargo placed the source code in a Rust file called src/main.rs, which looks
 like this:
 
-<img src="http://patshaughnessy.net/assets/2018/6/9/hello-world.png"/>
+<img src="https://patshaughnessy.net/assets/2018/6/9/hello-world.png"/>
 
 As a comparison, I show the equivalent Ruby code below in pink. Pretty simple.
 
@@ -123,7 +123,7 @@ As a comparison, I show the equivalent Ruby code below in pink. Pretty simple.
 I knew my script needed to connect to Postgres and execute a SQL statement, so
 I added Diesel as a dependency to my Cargo.toml file:
 
-<img src="http://patshaughnessy.net/assets/2018/6/9/cargo-toml.png"/>
+<img src="https://patshaughnessy.net/assets/2018/6/9/cargo-toml.png"/>
 
 Cargo is a dependency manager similar to Ruby’s [Bundler](https://bundler.io).
 The Cargo.toml file lists the Rust libraries, or “crates,” that my script will
@@ -154,7 +154,7 @@ out how to execute my report.
 Here’s how I did it - again I show the Rust code in grey and the equivalent
 Ruby code below in pink:
 
-<img src="http://patshaughnessy.net/assets/2018/6/9/connect.png"/>
+<img src="https://patshaughnessy.net/assets/2018/6/9/connect.png"/>
 
 The Rust code is fairly simple and easy to understand: It just passes a
 Postgres connection string to <span
@@ -164,7 +164,7 @@ class="code">PgConnection::establish</span> returns a <span
 class="code">ConnectionResult<T></span> value, which is derived from the
 [Result enum](https://doc.rust-lang.org/std/result/enum.Result.html):
 
-<img width="200" src="http://patshaughnessy.net/assets/2018/6/9/result.png"/>
+<img width="200" src="https://patshaughnessy.net/assets/2018/6/9/result.png"/>
 
 As _The Rust Programming Language_
 [explains](https://doc.rust-lang.org/book/second-edition/ch09-00-error-handling.html),
@@ -221,7 +221,7 @@ my database table name.
 
 The Diesel macros resemble the original SQL definition of my Postgres table:
 
-<img width="676" src="http://patshaughnessy.net/assets/2018/6/9/sql-to-macro.png"/>
+<img width="676" src="https://patshaughnessy.net/assets/2018/6/9/sql-to-macro.png"/>
 
 Diesel used <span class="code">Int4</span> for the primary key column, and
 <span class="code">Nullable\<Varchar></span> for each of the Postgres varchar
@@ -237,7 +237,7 @@ Next, using these macros as a guide, I wrote a Rust struct to serve as my
 database model. An instance of this struct was going to represent each row in
 my Postgres table:
 
-<img width="692" src="http://patshaughnessy.net/assets/2018/6/9/macro-to-model.png"/>
+<img width="692" src="https://patshaughnessy.net/assets/2018/6/9/macro-to-model.png"/>
 
 Just as Diesel mapped each Postgres column type to a Rust macro with the
 corresponding type, I had to choose a Rust type for each Postgres column in my
@@ -248,7 +248,7 @@ chose the Rust <span class="code">String</span> type.
 
 Finally, I pasted all of this into my main.rs source code file, as follows:
 
-<img src="http://patshaughnessy.net/assets/2018/6/9/model.png"/>
+<img src="https://patshaughnessy.net/assets/2018/6/9/model.png"/>
 
 Reading this over, the Ruby version is much more concise. In Rust I specified
 the name and type of each column, while in Ruby ActiveRecord figured all of
@@ -261,7 +261,7 @@ Now after all of this setup, I’m finally ready to execute my report. Here’s 
 Rust code I wrote inside the <span class="code">main()</span> function, following the call to
 <span class="code">PgConnection::establish</span>:
 
-<img src="http://patshaughnessy.net/assets/2018/6/9/trying.png"/>
+<img src="https://patshaughnessy.net/assets/2018/6/9/trying.png"/>
 
 It took me a while to figure out the proper syntax, especially the bits that
 use generic type notation, like <span class="code">Vec\<User></span> and <span
@@ -348,13 +348,13 @@ way of saving null values in my User struct. The problem, what the Rust
 compiler was trying to tell me, was that my User struct could not handle nulls
 as written. I needed to use an option type instead:
 
-<img width="693" src="http://patshaughnessy.net/assets/2018/6/9/option-model.png"/>
+<img width="693" src="https://patshaughnessy.net/assets/2018/6/9/option-model.png"/>
 
 Like the <span class="code">Result</span> enum we saw above, <span
 class="code">Option</span> is an enum that can contain either <span
 class="code">Some</span> or <span class="code">None</span>… i.e. a null value:
 
-<img width="170" src="http://patshaughnessy.net/assets/2018/6/9/option.png"/>
+<img width="170" src="https://patshaughnessy.net/assets/2018/6/9/option.png"/>
 
 To learn more about the <span class="code">Option</span> type, read [Chapter
 6](https://doc.rust-lang.org/book/second-edition/ch06-01-defining-an-enum.html#the-option-enum-and-its-advantages-over-null-values)
@@ -364,7 +364,7 @@ After changing my <span class="code">User</span> struct, I then had to rework
 the closure inside of <span class="code">partition</span>. Here’s what I ended
 up with:
 
-<img src="http://patshaughnessy.net/assets/2018/6/9/unwrap.png"/>
+<img src="https://patshaughnessy.net/assets/2018/6/9/unwrap.png"/>
 
 I wrote <span class="code">if let Some(ref name)</span> to check whether or not
 the last name of each user struct was null. In other words, I “unwrapped” the
@@ -410,7 +410,7 @@ Connected.
 main.rb:18:in `block in \<main\>': undefined method `split' for nil:NilClass (NoMethodError)
 </pre>
 
-<img src="http://patshaughnessy.net/assets/2018/6/9/fix-ruby.png"/>
+<img src="https://patshaughnessy.net/assets/2018/6/9/fix-ruby.png"/>
 
 Rewriting my Ruby code in Rust revealed a bug I never knew I had. As shown
 above, I had to rework my Ruby code to check for a null last name inside the

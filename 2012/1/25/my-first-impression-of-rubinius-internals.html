@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>My first impression of Rubinius internals - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>My first impression of Rubinius internals</h1><div class="metadata"><span class="date">January 25th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2012/1/25/my-first-impression-of-rubinius-internals" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="My first impression of Rubinius internals">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/1/25/garden.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/1/25/garden.png"></td></tr>
   <tr><td align="center"><small><i>Reading the Rubinius source code is like<br/>walking through a well-kept, manicured garden</i></small></td></tr>
 </table>
 </div>
@@ -17,7 +17,7 @@
 </ul>
 <p>The Rubinius team, including contributions from 100s of different developers, has done a great job at making Rubinius a simple drop in replacement for MRI ruby. Once you have it installed the “ruby” command will execute the Rubinius interpreter instead of the standard MRI C interpreter, and will work exactly the same way, most of the time. You can configure it to emulate Ruby 1.8 or 1.9, and there’s even a separate project called <a href="http://rubyspec.org/">Ruby Spec</a> that measures how much of the MRI implementation Rubinius supports.</p>
 <p>There are a couple of nice diagrams on the Rubinius home page you should look at to get the lay of the land. After using it for only a few days, here’s a diagram of my own mental model that I developed for Rubinius internals:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/1/25/mental_model.png" alt="mental model" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/1/25/mental_model.png" alt="mental model" /></p>
 <p>The way I think of Rubinius is: some of the Ruby standard library methods and classes are implemented with Ruby inside the “kernel” folder, while the rest of the standard library and the core behavior of the language is implemented with C++ code in the “vm/builtin” folder. So when your Ruby program makes a method call to one of the core methods sometimes it will be handled by Ruby code, and other times it will be handled by C++. Along with the C++ standard library method definitions, the Rubinius vm folder also contains code that actually executes your program and includes lots of other magic like a JIT (“just in time”) runtime compiler. </p>
 <p>However, just examining the Ruby and C++ implementation of commonly used Ruby classes and methods in the kernel and vm folders was very interesting and worthwhile. Someday I hope to understand more about the rest of the system.</p>
 <h2>How Rubinius implements String.upcase!</h2>
@@ -31,7 +31,7 @@
 </span></pre>
 
 <p>This is from the Rubinius home page, actually: “What started as a toy grew into a labour of love. We love building Rubinius and hope you'll love using it.” It’s not hard at all to find the implementation of <span class="code">String.upcase!</span> - a simple search and you’ll find it in the kernel/common/string.rb file. This diagram shows your Ruby program calling the <span class="code">upcase!</span> method:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/1/25/upcase.png" alt="upcase method calls" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/1/25/upcase.png" alt="upcase method calls" /></p>
 <p>Here’s the actual definition:</p>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">
@@ -156,7 +156,7 @@
 </span></pre>
 
 <p>Unlike the <span class="code">String.upcase!</span> function, the Rubinius team had to implement the actual string concatenation part using the <span class="code">append</span> method implemented in C++. So what we have is your Ruby method call handled first by a Ruby method, which in turn calls into the underlying C++ method:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/1/25/concat.png" alt="concat method calls" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/1/25/concat.png" alt="concat method calls" /></p>
 <p>And here’s the C++ code for append:</p>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">

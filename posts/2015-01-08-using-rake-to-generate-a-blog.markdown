@@ -3,7 +3,7 @@ date: 2015/1/8
 tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2015/1/8/power-rake.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2015/1/8/power-rake.png"><br/>
   <i>Jim Weirich showing a real power rake at <a href="http://www.confreaks.com/videos/988-goruco2012-power-rake">GORUCO 2012</a></i>
 </div>
 
@@ -52,7 +52,7 @@ What I really needed was an automated process for converting my markdown source
 files into a series of static HTML files that were navigable using URL patterns that
 readers expect. That is, I wanted a Rake task that would do this:
 
-<img src="http://patshaughnessy.net/assets/2015/1/8/convert-file.png"/>
+<img src="https://patshaughnessy.net/assets/2015/1/8/convert-file.png"/>
 
 On the top is one of my markdown files; on the bottom is the HTML version. I
 needed a way to generate the bottom file from the top one. I needed to write a Rake
@@ -61,7 +61,7 @@ and generate the corresponding HTML files in the proper target directory.  The
 markdown file name (“posts/2014-10-13-…”) was a naming convention I used to stay
 organized. However, the name and path of the HTML file was what readers would see
 in the post’s URL online - for example:
-[http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals](http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals).
+[https://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals](https://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals).
 This was a problem well suited to Rake file tasks, because they allow you to
 create a series of dependencies between source and target files.
 
@@ -88,7 +88,7 @@ A FileList is essentially an array with a few helper methods defined to make fil
 
 I like things that are easier. Here’s how I used <span class="code">FileList</span>:
 
-<img src="http://patshaughnessy.net/assets/2015/1/8/mapping-posts.png"/>
+<img src="https://patshaughnessy.net/assets/2015/1/8/mapping-posts.png"/>
 
 On the left are my markdown files with the corresponding post objects on the right. My
 code above first created a <span class="code">FileList</span>, using the <span class="code">posts/*.markdown</span> pattern. You
@@ -103,7 +103,7 @@ to the <span class="code">Post</span> class to make manipulating the markdown fi
 importantly, what I needed to know for each markdown file is where its HTML
 should go in the generated site. That is, I needed to know the URL of the post:
 
-<img src="http://patshaughnessy.net/assets/2015/1/8/post-url.png"/>
+<img src="https://patshaughnessy.net/assets/2015/1/8/post-url.png"/>
 
 This did the trick. The <span class="code">date</span> and <span class="code">title</span> methods parsed some metadata values I
 saved in the markdown file along with the text. The <span class="code">url</span> method returned a string using
@@ -122,7 +122,7 @@ you'll see in a minute, writing a file task requires two files: a source file
 and a target file. Somehow I needed to convert these two separate arrays into a
 single array of pairs, like this:
 
-<img src="http://patshaughnessy.net/assets/2015/1/8/zipping.png"/>
+<img src="https://patshaughnessy.net/assets/2015/1/8/zipping.png"/>
 
 As you can see, Ruby’s <span class="code">Enumerable#zip</span> method was
 perfect solution. It yielded object pairs, one object taken from the receiver
@@ -153,14 +153,14 @@ Now that I had pairs of HTML paths and <span class="code">Post</span> objects,
 it was easy for me to write a file task using one of these pairs. Here’s what I
 came up with:
 
-<img src="http://patshaughnessy.net/assets/2015/1/8/file-task.png"/>
+<img src="https://patshaughnessy.net/assets/2015/1/8/file-task.png"/>
 
 By calling <span class="code">file</span> inside of the <span class="code">zip</span> block, I created a file task for each one
 of the paths in <span class="code">html_files</span>. Now if I created a single, standard Rake task that
 depended on the array of html file paths, I could test whether any or all of the
 HTML files needed to be generated:
 
-<img src="http://patshaughnessy.net/assets/2015/1/8/rake-posts.png"/>
+<img src="https://patshaughnessy.net/assets/2015/1/8/rake-posts.png"/>
 
 Now I could generate all of my blog posts with one command: <span class="code">rake posts</span>!
 
@@ -170,7 +170,7 @@ What did the code inside the file task do? It generated the HTML file for a
 single post using <span class="code">ERB</span>, using a method I wrote called <span class="code">Layout#render</span>. If you’re
 interested, here’s the <span class="code">Layout</span> class ([github](https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/lib/layout.rb)):
 
-<img src="http://patshaughnessy.net/assets/2015/1/8/layout.png"/>
+<img src="https://patshaughnessy.net/assets/2015/1/8/layout.png"/>
 
 I won’t explain this line by line, but there were a couple of interesting tricks
 here also. First, the <span class="code">contents</span> method used nested calls to
@@ -186,7 +186,7 @@ in the context of the <span class="code">page</span> object and the current meth
 
 Let’s take a closer look at this:
 
-<img src="http://patshaughnessy.net/assets/2015/1/8/metaprogramming.png"/>
+<img src="https://patshaughnessy.net/assets/2015/1/8/metaprogramming.png"/>
 
 On the left I show the the <span class="code">page</span> object, an instance of the <span class="code">Post</span> class, in the
 center the code running the ERB transformation, and on the right the Ruby call
@@ -208,7 +208,7 @@ Of course, I’m glossing over some other important details here, such as
 generating the index or home page, the RSS feed and a few other things. For
 reference, here’s my entire Rakefile ([github](https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/Rakefile)):
 
-<img src="http://patshaughnessy.net/assets/2015/1/8/rakefile.png"/>
+<img src="https://patshaughnessy.net/assets/2015/1/8/rakefile.png"/>
 
 You can see the call to <span class="code">Layout#render</span> and the <span class="code">rake :posts</span> task I described
 above. Here are some other coding details, if you’re interested:

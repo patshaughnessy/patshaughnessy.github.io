@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Use An Ask, Don’t Tell Policy With Ruby - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Use An Ask, Don’t Tell Policy With Ruby</h1><div class="metadata"><span class="date">February 10th 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2014/2/10/use-an-ask-dont-tell-policy-with-ruby" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Use An Ask, Don’t Tell Policy With Ruby">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/2/10/innisfree.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/2/10/innisfree.jpg"><br/>
   <i>Innisfree is an actual island in Lough Gill, County Sligo, Ireland</i>
 </div>
 <p>The next time you need to develop a new algorithm, ask Ruby for what you want,
@@ -42,25 +42,25 @@ beautiful, <em>The Lake Isle Of Innisfree</em>:</p>
 </blockquote>
 <p>My task is to write a Ruby script to return the line that contains a given
 word, along with the following lines:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/console.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/console.png"><br/></p>
 <h2>Telling Ruby What To Do</h2>
 <p>When I first wrote this script, I put myself in the computer’s shoes: What do I
 need to do to find the target word? I started writing instructions for Ruby to
 follow.</p>
 <p>First I need to open the file and read in the poem:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/one.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/one.png"><br/></p>
 <p>Here <span class="code">File#readlines</span> saves all the lines of text into an array, which the <span class="code">parse</span>
 method will process, returning the result in another array. Later I join the
 result lines together and print them out.</p>
 <p>How do I implement <span class="code">parse</span>? Again, I imagine that I am the computer, that I am
 Ruby. How do I find the lines that follow <em>glimmer</em>? Well, obviously I need to
 loop through the array looking for the target word.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/two.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/two.png"><br/></p>
 <p>Once I find the word, I’ll start saving the lines into a new array called
 <span class="code">result</span>. Since I want to save all the following lines and not just the matching
 line, I’ll also use a boolean flag to keep track of whether I’ve already seen
 the target.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/three.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/three.png"><br/></p>
 <p>What’s wrong with this code? Nothing really. It works just fine, and it’s
 even somewhat idiomatic Ruby. In the past, I would have probably considered
 this done and moved on.</p>
@@ -81,7 +81,7 @@ think of writing an essay or story. You want your readers to understand what
 you are saying, and to be able to follow along. (You also want them to enjoy
 reading enough that they consider the code to be their own someday.)</p>
 <p>To get started I’ll write the new method to return an empty array.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/four.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/four.png"><br/></p>
 <p>Notice on the left I changed the label from “Instructions:” to “What do I
 want?” This reflects my new way of thinking about the problem.</p>
 <p>Now, what does “appear after the target word” mean exactly? It means the lines
@@ -90,7 +90,7 @@ Ah… in other words, the <span class="code">lines_after</span> method should re
 array. Rewriting the problem in a different way lead me towards a solution I
 hadn't thought of before.</p>
 <p>Now I can rewrite the “What do I want?” text like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/five.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/five.png"><br/></p>
 <p>I rewrote what I want from Ruby to be more specific: I want a “portion of the
 array” and I want the portion “including and following the line containing the
 target.” I haven’t written much code yet, but I’ve taken a big step forward in
@@ -100,7 +100,7 @@ how I think about the problem.</p>
 <span class="code">target_index</span> be?</p>
 <p>Thinking about this a bit, it’s easy to see how to find the line containing the
 target string: I can use <span class="code">detect</span> to find the line that includes the target word.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/six.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/six.png"><br/></p>
 <p>But I’m still not done. I need the index of the line containing the target, not
 the line itself. How can I find <span class="code">target_index</span>? Again, I shouldn’t tell Ruby what
 to do (maybe create a local variable and loop through the lines checking each
@@ -108,7 +108,7 @@ one). Instead, I should ask Ruby for what I need. What do I need? I need the
 index which corresponds to the line containing the target. In other words, I
 need to find (to detect) the target index, not the target line.</p>
 <p>Here’s how to do it:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/seven.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/seven.png"><br/></p>
 <p>Here I use Ruby’s <span class="code">detect</span> method to search a range of index values, not lines.
 Inside the block I check whether the line corresponding to each index
 (<span class="code">lines[i]</span>) contains the target. At the bottom I return the correct slice of the
@@ -116,7 +116,7 @@ array if I found the target, or an empty array if I didn’t.</p>
 <h2>Learning From Functional Languages</h2>
 <p>In my opinion this code is better than what I showed earlier. Why? They both
 work equally well. What’s the difference? Let's take a look at them side-by-side.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/compare.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/compare.png"><br/></p>
 <p>First of all, I have simpler, more terse code. Less code is better. The <span class="code">lines_after</span>
 method contains just 4 lines of code while the <span class="code">parse</span> method
 contains 9. Of course, I could find ways to rewrite <span class="code">parse</span> to use
@@ -142,7 +142,7 @@ computer what to do.</p>
 <p><b>Update:</b> Simon Kröger and Josh Cheek both suggested using <span
   class="code">drop_while</span>, which gives us an even more readable,
 functional solution:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/2/10/eight.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/2/10/eight.png"><br/></p>
 <p>I also decided to rename the <span class="code">after</span> method to <span
   class="code">lines_after</span>, based on the comments from TenderGlove and
 John Kary. I agree with them <span class="code">after</span> would make more sense if I

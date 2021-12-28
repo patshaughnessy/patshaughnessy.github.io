@@ -4,7 +4,7 @@ tag: Ruby
 
 <p>Today I want to demonstrate a JQuery slideshow tool that my friend <a href="http://www.flyingmachinestudios.com/">Daniel Higginbotham</a> wrote: <a href="http://github.com/flyingmachine/electric-slide">Electric Slide</a>. It&rsquo;s tremendously simple to use, while still providing ways to customize and adapt its behavior as you need to.</p>
 <p>Suppose you have a long series of slides containing text and/or images that you want to display as a slideshow on a web page; let&rsquo;s use these Mickey images as an example:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/4/27/mickey_row.png"/></p>
+<p><img src="https://patshaughnessy.net/assets/2010/4/27/mickey_row.png"/></p>
 <p>You might represent these slides using a Rails ActiveRecord model called &ldquo;Slide.&rdquo; If you had one image per slide you could attach it to the slide model with <a href="http://github.com/thoughtbot/paperclip">Paperclip</a>:</p>
 <div class="CodeRay">
   <div class="code"><pre><span class="r">class</span> <span class="cl">Slide</span> &lt; <span class="co">ActiveRecord</span>::<span class="co">Base</span>
@@ -22,13 +22,13 @@ tag: Ruby
 <span class="il"><span class="idl">&lt;%</span> <span class="r">end</span> <span class="idl">%&gt;</span></span></pre></div>
 </div><br>
 <p>However, scrolling can be annoying especially if there are many images or a lot of text. Also, this isn&rsquo;t a slideshow. I don&rsquo;t see each image in the same location as the previous one. It&rsquo;s harder to notice changes between the slides and also harder for me to surprise the user with something funny or unexpected in the following slide since they are all immediately visible.</p></td>
-    <td><img src="http://patshaughnessy.net/assets/2010/4/27/mickey_column.png"/></td>
+    <td><img src="https://patshaughnessy.net/assets/2010/4/27/mickey_column.png"/></td>
   </tr>
 </table>
 <p>Another simple solution would be to display each slide on a separate page and provide next/previous links, using code similar to this:</p>
 <table>
   <tr>
-    <td><img src="http://patshaughnessy.net/assets/2010/4/27/mickey_prev_next.png"></td>
+    <td><img src="https://patshaughnessy.net/assets/2010/4/27/mickey_prev_next.png"></td>
     <td>
 <div class="CodeRay">
   <div class="code"><pre><span class="il"><span class="idl">&lt;%=</span> image_tag <span class="iv">@slide</span>.image.url <span class="idl">%&gt;</span></span>
@@ -61,10 +61,10 @@ tag: Ruby
 </div>  
     </td>
     <td width="60">&nbsp;</td>
-    <td><img src="http://patshaughnessy.net/assets/2010/4/28/mickey_es1.png"></td>
+    <td><img src="https://patshaughnessy.net/assets/2010/4/28/mickey_es1.png"></td>
   </tr>
 </table>
-<p>With just a little bit of CSS love, the slideshow can look like this (click through the screen shot to see a <a href="http://patshaughnessy.net/assets/mickey_slides_example/index.html">working example</a>):</p>
+<p>With just a little bit of CSS love, the slideshow can look like this (click through the screen shot to see a <a href="https://patshaughnessy.net/assets/mickey_slides_example/index.html">working example</a>):</p>
 <table>
   <tr>
     <td><div class="CodeRay">
@@ -93,7 +93,7 @@ tag: Ruby
 </div>
     </td>
     <td width="60">&nbsp;</td>
-    <td><a href="http://patshaughnessy.net/assets/mickey_slides_example/index.html"><img src="http://patshaughnessy.net/assets/2010/4/28/mickey_es3.png"></a></td>
+    <td><a href="https://patshaughnessy.net/assets/mickey_slides_example/index.html"><img src="https://patshaughnessy.net/assets/2010/4/28/mickey_es3.png"></a></td>
   </tr>
 </table><br></p>
 <p>Now all the slides are displayed in a working slideshow inside my single web page! When I click on the previous or next links, I can watch Mickey move around without leaving the page. Let&rsquo;s take a look at how my ERB and CSS code works and what Electric Slide is doing:
@@ -111,7 +111,7 @@ $ cd mickey-slides</pre></div>
 </div><br>
 <p>Go ahead and download the Mickey images from my site; or feel free to use any images you have instead:</p>
 <div class="CodeRay">
-  <div class="code"><pre>$ curl -O http://patshaughnessy.net/assets/2010/4/28/mickey-images.tar.gz
+  <div class="code"><pre>$ curl -O https://patshaughnessy.net/assets/2010/4/28/mickey-images.tar.gz
 $ tar zxvf mickey-images.tar.gz 
 images/
 images/mickey1.jpg
@@ -121,7 +121,7 @@ images/mickey4.jpg
 images/mickey5.jpg
 images/mickey6.jpg</pre></div>
 </div><br>
-<p>Now let&rsquo;s use <a href="http://patshaughnessy.net/view_mapper">View Mapper</a> to create my slide model with an &ldquo;image&rdquo; attachment:</p>
+<p>Now let&rsquo;s use <a href="https://patshaughnessy.net/view_mapper">View Mapper</a> to create my slide model with an &ldquo;image&rdquo; attachment:</p>
 <div class="CodeRay">
   <div class="code"><pre>$ sudo gem install view_mapper
 $ ./script/generate scaffold_for_view slide --view paperclip:image

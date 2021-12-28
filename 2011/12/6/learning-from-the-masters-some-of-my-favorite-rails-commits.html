@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning from the masters: some of my favorite Rails commits - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning from the masters: some of my favorite Rails commits</h1><div class="metadata"><span class="date">December 6th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning from the masters: some of my favorite Rails commits">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/bach.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/6/bach.jpg"></td></tr>
   <tr><td align="center"><small><i>Reading the Rails source code is like looking<br/>at the score of a Bach sonata or partita</i></small></td></tr>
 </table>
 </div>
@@ -10,27 +10,27 @@
 <h2>Taking the time to make small improvements</h2>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/polishing.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/6/polishing.jpg"></td></tr>
   <tr><td align="center"><small><i>No, this is not DHH</i></small></td></tr>
 </table>
 </div>
 <p><a href="http://david.heinemeierhansson.com/">David Heinemeier Hansson (DHH)</a>, as we all know, created Rails back in 2004. It’s hard to believe, but that’s almost eight years ago now! But even after all these years, DHH is still making commits to Rails code. And looking at some of his recent commits DHH seems just as interested in and passionate about Rails as he must have been back in 2004 when he created it.</p>
 <p>One recent ActiveSupport commit from DHH that caught my eye, <a href="https://github.com/rails/rails/commit/9482554f31f3ac7f941e6239890c60fcc01975e1">9482554 - Added Array#prepend as an alias for Array#unshift and Array#append as an alias for Array</a>, might not seem interesting at all at first glance. Let’s take a look:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/12/6/9482554.png" alt="9482554" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/12/6/9482554.png" alt="9482554" /></p>
 <p>Here DHH has added a couple of new aliases - or alternative method names - for the commonly used Array operations of <span class="code">&lt;&lt;</span> and <span class="code">unshift</span>, which have somewhat confusing names in core Ruby. His code comments say it all: “The human way of thinking about...” He felt these aliases better reflected the way developers - humans - think about these Array operations and made the change in ActiveSupport to allow Rails apps, at least, to be more readable.</p>
 <p>Yes, all there is to this commit are a couple calls to <span class="code">alias_method</span> and nothing more. What real value is there here? It seems like a minor detail not worth mentioning at all - in fact, if you open the <a href="https://github.com/rails/rails/commit/9482554f31f3ac7f941e6239890c60fcc01975e1">git commit page</a> you’ll see a small debate about whether or not “append” and “prepend” are actually a good idea at all, since they probably belong in Rails core, and not just in ActiveSupport. Wow - DHH can’t even make a tiny change without sparking a minor debate! However, the point is: why in the world have I selected to highlight this small Rails commit among all the other thousands of commits DHH has made over the years?</p>
 <p>Well, to me it shows his passion: 8 years later DHH still cares enough about Rails to think of, write, test and commit a change this small. In my mind DHH invented the fastest race car on the block, and he seems to be the sort of guy you would see out there on a Summer weekend afternoon shining up the chrome on his front bumper or hubcap! I ask myself: “Do I treat my code with the same amount of love and care?” “Have I gone back to an app I wrote years ago to make a change this simple, just for the sake of readability?”</p>
 <p>The accompanying test code is also super simple - but at the same time very readable and explanatory:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/12/6/9482554_tests.png" alt="9482554 tests" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/12/6/9482554_tests.png" alt="9482554 tests" /></p>
 <p>Reading this I know exactly what “append” and “prepend” do, and how to use them. No documentation needed; end of story.</p>
 <h2>Code Gardening</h2>
 <div style="float: right; padding: 15px 0px 10px 15px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/weeding.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/6/weeding.jpg"></td></tr>
 </table>
 </div>
 <p>Another Rails commit that I came across this week is <a href="https://github.com/rails/rails/commit/fb6b80562041e8d2378cad1b51f8c234fe76fd5e">fb6b805 - code gardening: we have assert_(nil|blank|present), more concise, with better default failure messages - let's use them</a>, made by <a href="http://hashref.com/">Xavier Noria (@fxn)</a>, back in August of 2010. The commit message is certainly memorable: “code gardening...” what could Xavier be talking about? When I saw this commit message I just had to take a closer look. When I looked at the changes, at first glance they appeared to be nothing... just a few minor changes to a test file (I'm showing two here - there are more similar changes in the commit):</p>
-<p><img src="http://patshaughnessy.net/assets/2011/12/6/fb6b805.png" alt="fb6b805" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/12/6/fb6b805.png" alt="fb6b805" /></p>
 <p>What? Yes, I know; now you’re thinking: “Pat is completely nuts.” This is a trivial change that adds no value whatsoever to Rails at all! Just last week Xavier made the fantastic change to ActiveRecord that I mentioned above, git commit <a href="https://github.com/rails/rails/commit/0306f82e0c3cda3aad1b45eb0c3a359c254b62cc">0306f82</a>, that implements automatic explain plans for slow queries... doesn’t this creative, useful change from Xavier deserve more attention than a very minor refactor that no one even noticed from 2010? Commit <a href="https://github.com/rails/rails/commit/fb6b80562041e8d2378cad1b51f8c234fe76fd5e">fb6b805</a> does nothing more than change a few lines of test code - what’s the value in that? With this commit he hasn’t added even a single feature or bug fix to Rails. Not only that, the tests don’t run faster or work any better than they did before his change, except possibly they might display a more helpful error message.</p>
 <p>But I found Xavier’s commit message to be noteworthy - more than that - profound. I think it’s a fascinating analogy: he views his role as a Rails core committer to be similar to that of a gardener. He has something beautiful and alive that he’s been trusted to take care of. Like a real garden, the Rails source code would become full of weeds, grow out of control, or worse yet actually die, if it weren’t for the constant attention and care he and the rest of the core team give to the Rails code base. In addition to adding new features to Rails, Xavier also takes the time to keep a close eye on the small details that most people wouldn’t even notice. Seeing this commit, I asked myself: “When was the last time I went through my test code, looking for places where things weren’t quite right, or as clean as they could be?”</p>
 <p>Another example of Xavier serving as a “code gardener” is commit <a href="https://github.com/rails/rails/commit/d352e0dff2c88bc1519ee7040b8381231b2b2fac">d352e0d</a>. In this case, the commit message is again the most interesting part of the commit! Take a look:</p>
@@ -52,7 +52,7 @@ Date:   Sat Jul 23 14:41:30 2011 +0200
     Welcome $_.
 </pre>
 <p>If you <a href="https://github.com/rails/rails/commit/d352e0dff2c88bc1519ee7040b8381231b2b2fac">open the commit</a> in github, you’ll see:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/12/6/d352e0d.png" alt="d352e0d" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/12/6/d352e0d.png" alt="d352e0d" /></p>
 <p>In this example, there aren’t even any Ruby code changes at all!  What Xavier has done here is run a search through the Rails source tree to find Ruby code files that were  missing the UTF-8 encoding comment at the top. Whatever you think of this style and the need to include this comment in every file, what impresses me about this is that Xavier, in his code gardener role, took the time to write a shell script to search for this mistake. He showed interest, concern, initiative, and passion - like a gardener would have while removing weeds from a flower bed.</p>
 <p>If you’re interested, there’s another similar commit, <a href="https://github.com/rails/rails/commit/b451de0d6de4df6bc66b274cec73b919f823d5ae">b451de0</a>, made by <a href="https://github.com/spastorino">Santiago Pastorino</a> also in August 2010, that removed extra, trailing whitespace. Like Xavier, he also saved the shell script he used in the commit message:</p>
 <pre type="console">
@@ -65,7 +65,7 @@ Date:   Sat Aug 14 02:13:00 2010 -0300
 <h2>Code that teaches you something</h2>
 <div style="float: right; padding: 15px 0px 10px 15px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/chalkboard.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/6/chalkboard.jpg"></td></tr>
 </table>
 </div>
 <p>The last Rails code commit I’ll talk about today is also in ActiveSupport, and has to do with the ActiveSupport::Concern module. For some background on what it does refer to the <a href="http://api.rubyonrails.org/classes/ActiveSupport/Concern.html">Ruby on Rails API docs page</a>. In a nutshell, ActiveSupport::Concern makes it easier to write a module that extends the class methods and/or the instance methods of another module. This is used extensively in ActiveRecord, among many other places in Rails, and is a great tool for gem authors to use while overriding existing behavior.</p>
@@ -93,9 +93,9 @@ Date:   Sat Aug 14 02:13:00 2010 -0300
 
 <p>...ActiveSupport::Concern will add all the methods in MyModule::ClassMethods to Host as new class methods, and the methods in MyModule::InstanceMethods to Host as new instance methods.</p>
 <p>Now let's take a look at commit <a href="https://github.com/rails/rails/commit/401393b6561adc1ce7101945163c9601257c057a">401393b</a> made by José Valim just last month:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/12/6/401393b_message.png" alt="d352e0d" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/12/6/401393b_message.png" alt="d352e0d" /></p>
 <p>I love the commit message, but what I like more is that this commit helps me be a better Rails developer. It turns out the InstanceMethods module is unnecessary. Simply adding methods to MyModule is sufficient; any methods in MyModule will be included in Host because of the call to include (class methods, however, still work the same way as before). Let’s take a look at José’s code changes:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/12/6/401393b.png" alt="d352e0d" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/12/6/401393b.png" alt="d352e0d" /></p>
 <p>There are more changes I’m not showing here; <a href="https://github.com/rails/rails/commit/401393b6561adc1ce7101945163c9601257c057a">refer to github</a> for the complete commit. What’s interesting and helpful about this is that José deprecates the behavior related to the InstanceMethods module: that is, he leaves it in, but takes the time to add a line of code that displays this message whenever a developer uses InstanceMethods:</p>
 <pre type="console">
 The InstanceMethods module inside ActiveSupport::Concern will be no longer included automatically. Please

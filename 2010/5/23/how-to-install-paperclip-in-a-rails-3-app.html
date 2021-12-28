@@ -27,13 +27,13 @@ etc...
 <p>Right now it looks like Thoughtbot is finishing Rails 3 related changes in a &ldquo;rails3&rdquo; branch in their Paperclip github repository. The best thing to do if you have a Paperclip app you want to migrate to Rails 3 is simply to wait a bit longer for them to finish that work, test it and merge it back into the master branch.</p>
 <p>The rest of this article is really not about Paperclip at all, but about Rails 3. Here’s what I learned about Rails 3 while troubleshooting Paperclip:
 <ol>
-  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact1">The command line has changed</a></li>
-  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact2">Plugin generators have moved</a></li>
-  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact3">Rails 2.x generators don&rsquo;t work at all</a></li>
-  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact4">You use Bundler and a &ldquo;Gemfile&rdquo; to declare gems</a></li>
-  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact5">You can install a gem from a specific git repository branch</a></li>
-  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact6">Rails 3 frameworks are now based on Rails::Railtie</a></li>
-  <li><a href="http://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact7">Bundler does not call rails/init.rb in each gem</a></li>
+  <li><a href="https://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact1">The command line has changed</a></li>
+  <li><a href="https://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact2">Plugin generators have moved</a></li>
+  <li><a href="https://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact3">Rails 2.x generators don&rsquo;t work at all</a></li>
+  <li><a href="https://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact4">You use Bundler and a &ldquo;Gemfile&rdquo; to declare gems</a></li>
+  <li><a href="https://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact5">You can install a gem from a specific git repository branch</a></li>
+  <li><a href="https://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact6">Rails 3 frameworks are now based on Rails::Railtie</a></li>
+  <li><a href="https://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app#fact7">Bundler does not call rails/init.rb in each gem</a></li>
 </ol>
 Let&rsquo;s go ahead and troubleshoot Paperclip together in a new Rails 3 app. First I&rsquo;ll begin by verifying the versions of Ruby and Rails I&rsquo;m using now:</p>
 <p/>
@@ -199,7 +199,7 @@ from git://github.com/thoughtbot/paperclip.git (at rails3)
 <span class="r">end</span></pre></div>
 </div><br>
 <p>Before I start editing my views and adding the code to upload and display the avatar attachment, let&rsquo;s start the server and see if Paperclip is working. Opening the users index page I get&hellip;</p>
-<p><img src="http://patshaughnessy.net/assets/2010/5/22/paperclip_error.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/5/22/paperclip_error.png"></p>
 <p>&hellip; more trouble! I&rsquo;m definitely having a bad day&hellip; what now? Well it seems that Paperclip is just not being loaded at all, or is being initialized improperly for some reason. At this point I started to poke around the Paperclip source code a bit, and found that the code that includes the Paperclip module into ActiveRecord::Base was moved and is no longer being called. Since Paperclip is not included in my User/ActiveRecord class I get the error has_attached_file not defined, since that&rsquo;s defined by Paperclip.</p>
 <p>I found the include code in a file called &ldquo;lib/paperclip/railtie.rb:&rdquo;</p>
 <pre style="background-color:#ffffff;">
@@ -249,9 +249,9 @@ from git://github.com/thoughtbot/paperclip.git (at rails3)
 
 <p>Alternatively, you could just create a file called &ldquo;config/initializers/paperclip.rb&rdquo; and put the call to insert there.</p>
 <p>Now reloading the users index page we finally get Paperclip to work:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/5/22/index_view.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/5/22/index_view.png"></p>
 <p>Instead of proceeding with my sample app now, I&rsquo;m going to wait a few weeks while Thoughtbot finishes off the Rails 3 changes for Paperclip.</p>
-<p> I don&rsquo;t think troubleshooting these problems was a waste of time at all; in fact, it was a good excuse to get my hands dirty with Rails 3 and Bundler. Once Thoughtbot has finished their changes in the rails3 branch and merged them into the master I&rsquo;ll update <a href="http://patshaughnessy.net/2009/4/30/paperclip-sample-app">my tutorial from last year</a>, and also update <a href="http://github.com/patshaughnessy/paperclip">my Paperclip fork</a> to support database BLOB storage for Rails 3.</p>
+<p> I don&rsquo;t think troubleshooting these problems was a waste of time at all; in fact, it was a good excuse to get my hands dirty with Rails 3 and Bundler. Once Thoughtbot has finished their changes in the rails3 branch and merged them into the master I&rsquo;ll update <a href="https://patshaughnessy.net/2009/4/30/paperclip-sample-app">my tutorial from last year</a>, and also update <a href="http://github.com/patshaughnessy/paperclip">my Paperclip fork</a> to support database BLOB storage for Rails 3.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2010/5/23/how-to-install-paperclip-in-a-rails-3-app'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'How to install Paperclip in a Rails 3 app';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';

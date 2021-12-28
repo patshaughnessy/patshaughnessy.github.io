@@ -3,17 +3,17 @@ date: 2017/12/15
 tag: the Postgres LTREE Extension
 
 <div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/15/tree5.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2017/12/15/tree5.jpg"><br/>
   <i> What do Postgres GiST indexes look like? How are<br/>
   they similar or different from standard Postgres indexes?</i>
 </div>
 
 In the last few posts in this series 
-([one](http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres),
-[two](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
-[three](http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree)
+([one](https://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres),
+[two](https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
+[three](https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree)
 and
-[four](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension))
+[four](https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension))
 I showed you how to save hierarchical data in a flat database table using the
 Postgres [LTREE
 extension](https://www.postgresql.org/docs/current/static/ltree.html). I
@@ -55,7 +55,7 @@ much larger tree to explore the benefits indexes can provide; suppose instead I
 have a tree containing hundreds or thousands of records in the <span
 class="code">path</span> column:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/table.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/table.png"/>
 
 Now suppose I search for a single tree node using a select statement:
 
@@ -67,7 +67,7 @@ Without an index on this table, Postgres has to resort to a _sequence scan_,
 which is a technical way of saying that Postgres has to iterate over all of the
 records in the table:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/table2.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/table2.png"/>
 
 For each and every record in the table, Postgres executes a comparison <span
 class="code">p == q</span> where <span class="code">p</span> is the value of
@@ -92,12 +92,12 @@ thing you should check for is a missing index. But why? Why does creating an
 index speed up searches, exactly? The reason is that an index is a sorted copy
 of the target column’s data:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/index1.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/index1.png"/>
 
 By sorting the values ahead of time, Postgres can search through them much more
 quickly. It uses a binary search algorithm:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/index2.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/index2.png"/>
 
 Postgres starts by checking the value in the middle of the index. If the stored
 value (<span class="code">p</span>) is too large and is greater than the query
@@ -113,7 +113,7 @@ save all of the sorted data values in a single memory segment. Instead,
 Postgres indexes (and indexes inside of any relational database system) save
 values in a _binary or balanced tree_ (B-Tree):
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/index3.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/index3.png"/>
 
 Now my values are saved in a series of different memory segments arranged in a
 tree structure. Dividing the index up into pieces allows Postgres to manage
@@ -122,12 +122,12 @@ this isn’t the tree from my LTREE dataset; B-Trees are internal Postgres data
 structures I don’t have access to. To learn more about the Computer Science
 behind this read my 2014 article [Discovering the Computer Science Behind
 Postgres
-Indexes](http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes).
+Indexes](https://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes).
 
 Now Postgres uses repeated binary searches, one for each memory segment in the
 B-Tree, to find a value:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/index4.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/index4.png"/>
 
 Each value in the parent or root segment is really a pointer to a child
 segment. Postgres first searches the root segment using a binary search to find
@@ -178,7 +178,7 @@ need a GiST index!
 ## The Generalized Search Tree (GiST) project
 
 <div style="float: right; padding: 8px 0px 0px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/15/berkeley.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2017/12/15/berkeley.jpg"><br/>
   <i>The Generalized Search Tree (GiST) project, like<br/>
 Postgres itself, started at UC Berkeley.</i>
 </div>
@@ -203,7 +203,7 @@ supporting any lookup over that data.
 GiST achieves this by adding an API to Postgres’s index system anyone can implement for their specific data type. GiST implements the general indexing and searching code, but calls out to custom code at four key moments in the indexing process. Quoting from the project’s web page again, here’s a quick explanation of the 4 methods in the GiST API:
 
 <div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist.png"/>
 </div>
 
 GiST indexes use a tree structure similar to the B-Tree we saw above. But
@@ -226,7 +226,7 @@ implementation: The LTREE extension!
 ## Implementing the GiST API for Tree Paths
 
 <div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/15/moscow-state.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2017/12/15/moscow-state.jpg"><br/>
   <i>The LTREE Postgres extension was developed at Moscow State<br/>
 University by Oleg Bartunov and Teodor Sigaev.</i>
 </div>
@@ -258,7 +258,7 @@ automatically finds, loads and uses the <span class="code">ltree_union</span>,
 <span class="code">ltree_picksplit</span> etc., functions whenever I insert a
 new value into the table. (It will also insert all existing records into the
 index immediately.) Of course, earlier I [installed the LTREE
-extension](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension)
+extension](https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension)
 also.
 
 Let’s see how this works - suppose I add a few random tree records to my empty
@@ -275,7 +275,7 @@ insert into tree (letter, path) values ('P', 'A.B.R.P');
 To get things started, Postgres will allocate a new memory segment for the GiST
 index and insert my five records:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist1.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist1.png"/>
 
 If I search now using the ancestor operator:
 
@@ -287,12 +287,12 @@ select count(*) from tree where path <@ 'A.B.T'
 then, and call the <span class="code">ltree_consistent</span> function for each
 one. Here again is what the GiST API calls for the Consistent function to do:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/consistent.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/consistent.png"/>
 
 In this case Postgres will compare <span class="code">p <@ A.B.T</span> for
 each of these five records:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist2.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist2.png"/>
 
 Because the values of <span class="code">p</span>, the tree page keys, are
 simple path strings, <span class="code">ltree_consistent</span> directly
@@ -305,18 +305,18 @@ Now suppose I start to add more and more records to my table. Postgres can fit
 up to 136 LTREE records into the root GiST memory segment, and index scans
 function the same way as a sequence scan by checking all the values.
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist3.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist3.png"/>
 
 But if I insert one more record, the 137th record doesn’t fit. At this point
 Postgres has to do something different:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist4.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist4.png"/>
 
 Now Postgres “splits” the memory segment to make room for more values. It
 creates two new child memory segments and pointers to them from the parent or
 root segment.
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist5.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist5.png"/>
 
 What does Postgres do next? What does it place into each child segment?
 Postgres leaves this decision to the GiST API, to the LTREE extension, by
@@ -324,7 +324,7 @@ calling the the <span class="code">ltree_picksplit</span> function. Here again
 is the API spec for <span class="code">PickSplit</span>:
 
 <div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-<img src="http://patshaughnessy.net/assets/2017/12/15/pick-split.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/pick-split.png"/>
 </div>
 
 The <span class="code">ltree_picksplit</span> function - the LTREE
@@ -334,20 +334,20 @@ normally sort their contents; however, GiST indexes created specifically by the
 LTREE extension do because of the way <span class="code">ltree_picksplit</span>
 works. We’ll see why it sorts the data in a moment.
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist6.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist6.png"/>
 
 Now Postgres has to decide what to leave in the root segment. To do this, it
 calls the Union GiST API:
 
 <div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-<img src="http://patshaughnessy.net/assets/2017/12/15/union.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/union.png"/>
 </div>
 
 In this example, each of the child segments is a set S. And the <span
 class="code">ltree_union</span> function has to return a “union” value for each
 child segment that describes somehow what values are present in that segment:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist7.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist7.png"/>
 
 Oleg and Teodor decided this union value should be a pair of left/right values
 indicating the minimum and maximum tree branches inside of which all of the
@@ -358,7 +358,7 @@ class="code">A.B.C.B</span> through <span class="code">A.B.M.Z</span>, the
 left/right union becomes <span class="code">A</span> and <span
 class="code">A.B.M</span>:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist8.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist8.png"/>
 
 Note <span class="code">A.B.M</span> is sufficient here to form a union value
 excluding <span class="code">A.B.N.X</span> and all the following values; LTREE
@@ -367,7 +367,7 @@ doesn’t need to save <span class="code">A.B.M.Z</span>.
 Similarly, the left/right union for the second child segment becomes <span
 class="code">A.B.N/A.B.X</span>:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist9.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist9.png"/>
 
 This is what a GiST index looks like. Or, what an LTREE GiST index looks like,
 specifically. The power of the GiST API is that anyone can use it to create a
@@ -399,7 +399,7 @@ To execute this using the GiST index, Postgres iterates over the union values
 in the root memory segment and calls the <span
 class="code">ltree_consistent</span> function for each one:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/consistent.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/consistent.png"/>
 
 Now Postgres passes each union value to <span
 class="code">ltree_consistent</span> to calculate the <span class="code">p <@
@@ -408,7 +408,7 @@ then returns "MAYBE" if <span class="code">q >
 left</span>, and <span class="code">q < right</span>. Otherwise it returns
 "NO."
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist10.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist10.png"/>
 
 In this example you can see <span class="code">ltree_consistent</span> finds
 that the query <span class="code">A.B.T</span>, or <span class="code">q</span>,
@@ -425,7 +425,7 @@ true and <span class="code">q < A.B.X</span> true. Therefore it returns <span
 class="code">MAYBE</span>, meaning the search continues in the lower child
 segment:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/gist11.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/gist11.png"/>
 
 Note Postgres never had to search the first child segment: The tree structure
 limits the comparisons necessary to just the values that might match <span
@@ -439,7 +439,7 @@ on a few union records and on the child segments of the tree that contain
 values that might match.
 
 <div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/15/sternberg.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2017/12/15/sternberg.jpg"><br/>
   <i>The Sternberg Astronomical Institute
 at Moscow State University</i>
 </div>
@@ -455,7 +455,7 @@ posts.
 
 But most importantly, they included this note at the bottom:
 
-<img src="http://patshaughnessy.net/assets/2017/12/15/postcard.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/15/postcard.png"/>
 
 Do you save tree data in Postgres? Does your app take advantage of the LTREE
 extension? If so, you should send Oleg and Teodor a postcard! I just did.

@@ -4,7 +4,7 @@ tag: Interviews
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/1/rubygems.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/1/rubygems.png"></td></tr>
   <tr><td align="center"><small><i>RubyGems.org has made it much easier<br/>for all of us to contribute Ruby gems</i></small></td></tr>
 </table>
 </div>

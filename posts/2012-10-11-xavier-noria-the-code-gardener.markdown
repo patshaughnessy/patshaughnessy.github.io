@@ -4,7 +4,7 @@ tag: Interviews
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/10/11/xavier.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/10/11/xavier.jpg"></td></tr>
   <tr><td align="center"><small><i>Xavier won the <a href="http://www.youtube.com/watch?v=ffCxpBD-_Rs">Ruby Hero award</a> in 2010</i></small></td></tr>
 </table>
 </div>
@@ -19,7 +19,7 @@ he has presented at numerous Ruby conferences all across Europe this year.
 But I’m most impressed by Xavier’s role as the “Code Gardener” - a phrase I
 took from a [minor Rails commit](https://github.com/rails/rails/commit/fb6b80562041e8d2378cad1b51f8c234fe76fd5e)
 he made over two years ago. You can read more about this commit in an [article
-I wrote last year](http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits)
+I wrote last year](https://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits)
 about my favorite Rails commits. Last week Xavier and I had a chance to talk
 for over an hour - [read the interview on
 RubySource.com](http://rubysource.com/xavier-noria-the-code-gardener/) to learn

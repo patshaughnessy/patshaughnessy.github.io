@@ -3,7 +3,7 @@ date: 2014/12/17
 tag: Ruby
 
 <div class="epigraph">
-  <img src="http://patshaughnessy.net/assets/2014/12/17/microscope.png">
+  <img src="https://patshaughnessy.net/assets/2014/12/17/microscope.png">
   <div class="epigraph-text">Ruby処理系開発コミュニティは、<br/>あなたの挑戦を歓迎する。</div>
   <div class="epigraph-caption">
   The Ruby core community welcomes your challenge.
@@ -11,7 +11,7 @@ tag: Ruby
 </div>
 
 Today I’m happy to post an English translation of a new appendix to [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope) written by
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope) written by
 Koichi Sasada ([@_ko1](https://twitter.com/_ko1)), included in the Japanese
 edition last month. As you probably know, Koichi is the developer behind the
 virtual machine used by Ruby since Ruby 1.9 was released, known as “YARV.” He

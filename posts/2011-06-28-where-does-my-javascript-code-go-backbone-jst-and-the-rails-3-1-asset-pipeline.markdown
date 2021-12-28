@@ -4,7 +4,7 @@ tag: Ruby
 
 One of the best things about the Rails framework is that each project looks the same:
 
-![Rails server code](http://patshaughnessy.net/assets/2011/6/27/orig_server.gif)
+![Rails server code](https://patshaughnessy.net/assets/2011/6/27/orig_server.gif)
 
 ￼Every Rails developer knows to look in “app/models” for the model classes, “app/controllers” for the controller classes, etc. When you start a new project all of this is setup for you, and if you’re a new developer assigned to an existing Rails project you know where to look for things. The way you save and organizing your code files is not simply a convenience... I think it actually effects the way you think about code. Well organized code directories leads to well organized code!
 
@@ -16,7 +16,7 @@ Today I’m going to show off two interesting Rails projects and focus on how th
 
 Before the asset pipeline was introduced in the Rails 3.1 beta this year - as I write this the latest version of Rails is 3.1.0.rc4 - all of the javascript code in a Rails web site was typically stored under the “public” folder, along with other static content:
 
-![public folder](http://patshaughnessy.net/assets/2011/6/27/orig_public.gif)
+![public folder](https://patshaughnessy.net/assets/2011/6/27/orig_public.gif)
 
 Javascript code was considered just another type of static web asset file, like stylesheets and images, and was simply downloaded to the client browser by Apache or Nginx, without the Rails framework getting involved at all.
 
@@ -24,7 +24,7 @@ The biggest problem with this was that each static file, whether an image, CSS s
 
 However, in my opinion performance is not actually the biggest problem here. In most of my Rails projects the performance impact of having many small files was small. Instead, the biggest problem I faced using Rails 3.0 and earlier versions was how to organize my Javascript code. In a typical Rails 3.0 project, all of the vendor Javascript code (e.g. JQuery) is saved in a series of .js files in the public/javascripts folder, and any custom javascript is all combined together in one large “application.js” file:
 
-![original javascripts folder](http://patshaughnessy.net/assets/2011/6/27/orig_javascripts.gif)
+![original javascripts folder](https://patshaughnessy.net/assets/2011/6/27/orig_javascripts.gif)
 
 ## Enter Backbone
 
@@ -32,21 +32,21 @@ However, in my opinion performance is not actually the biggest problem here. In 
 
 Aside from the basic documentation, there’s [a great Backbone/Rails tutorial](http://www.jamesyu.org/2011/01/27/cloudedit-a-backbone-js-tutorial-by-example) out there by [James Yu](http://www.jamesyu.org); James walks you step by step through creating a simple Ajax/Backbone app that allows you to create and edit documents in a single page:
 
-![cloud edit](http://patshaughnessy.net/assets/2011/6/27/cloud_edit.png)
+![cloud edit](https://patshaughnessy.net/assets/2011/6/27/cloud_edit.png)
 
 James posted his [Rails 2.3.8 app on github](https://github.com/jamesyu/CloudEdit), so you can just download the code and try it out yourself. I won’t repeat everything from James’s tutorial here since he does a fantastic job of describing the code details.
 
 I also created a [scaffold for CloudEdit on ScaffoldHub](http://www.scaffoldhub.org/scaffolds/cloud_edit), which will setup the code from CloudEdit inside your own Rails 3 app with a single command:
 
-![public folder](http://patshaughnessy.net/assets/2011/6/27/cloud_edit_scaffold.png)
+![public folder](https://patshaughnessy.net/assets/2011/6/27/cloud_edit_scaffold.png)
 
 While working on this scaffold, I spent some time examining how James organized his Javascript code, so I could identify the files to include in the scaffold. I actually found this to be one of the most interesting and useful things from the CloudEdit sample. Here’s how James did it - first his server side Ruby code went into the usual locations:
 
-![public folder](http://patshaughnessy.net/assets/2011/6/27/cloud_edit_tree.gif)
+![public folder](https://patshaughnessy.net/assets/2011/6/27/cloud_edit_tree.gif)
 
 Aside from those two “JST” files, this is all standard Rails. The interesting part was how James setup his Backbone javascript files:
 
-![public folder](http://patshaughnessy.net/assets/2011/6/27/cloud_edit_tree_js.gif)
+![public folder](https://patshaughnessy.net/assets/2011/6/27/cloud_edit_tree_js.gif)
 
 ￼Note how James used MVC pattern in his code layout for both for the Rails server code: app/controllers, app/models, app/views and for the client side Javascript code: public/javascripts/controllers, public/javascripts/models, public/javascripts/views, plus public/javascript/collections which is new for Backbone.
 
@@ -93,7 +93,7 @@ The asset pipeline, based on the [Sprockets framework](http://getsprockets.org),
 
 With the asset pipeline, you can organize your client asset files like this (I'm leaving out the "lib/assets" folder, images and also gem folders):
 
-![public folder](http://patshaughnessy.net/assets/2011/6/27/asset_pipeline.gif)
+![public folder](https://patshaughnessy.net/assets/2011/6/27/asset_pipeline.gif)
 
 Now all of the javascript, stylesheets and other static files are compressed and combined together into a single request.
 
@@ -103,7 +103,7 @@ Another cool project I just came across recently while working on the CloudEdit 
 
 For their backbone-rails scaffold generator, Code Brew Studios have decided to use this directory structure:
 
-![public folder](http://patshaughnessy.net/assets/2011/6/27/backbone_rails_scaffold.gif)
+![public folder](https://patshaughnessy.net/assets/2011/6/27/backbone_rails_scaffold.gif)
 
 Here we can see they’ve created the usual “model,” “controllers” and “views” folders right under app/assets/javascripts. This works well with Rails 3.1 and Sprockets since all of these files will be compiled and combined together. You can also see a folder called “templates/posts”. This folder holds files similar to the JST files we saw above in the CloudEdit example, but instead CodeBrew is using the [EJS gem](https://github.com/sstephenson/ruby-ejs/) to preprocess their JST files on the server before later using them on the client side.
 

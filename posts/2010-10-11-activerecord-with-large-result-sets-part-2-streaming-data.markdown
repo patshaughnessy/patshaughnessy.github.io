@@ -2,16 +2,16 @@ title: "ActiveRecord with large result sets - part 2: streaming data"
 date: 2010/10/11
 tag: Ruby
 
-<p>In <a href="http://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">part 1 of this series</a> I showed how using select_all instead of find(:all) can often speed up slow ActiveRecord queries when you expect a large amount of data, by as much as 30 or 40% with Rails 3. However, often 30-40% faster just isn&rsquo;t enough. What difference does it make if I have to wait 3 minutes or 5 minutes for Rails to display a web page? Either way I&rsquo;m going to get frustrated and abandon the web site for something more interesting.</p>
+<p>In <a href="https://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">part 1 of this series</a> I showed how using select_all instead of find(:all) can often speed up slow ActiveRecord queries when you expect a large amount of data, by as much as 30 or 40% with Rails 3. However, often 30-40% faster just isn&rsquo;t enough. What difference does it make if I have to wait 3 minutes or 5 minutes for Rails to display a web page? Either way I&rsquo;m going to get frustrated and abandon the web site for something more interesting.</p>
 <p>But let&rsquo;s suppose a Rails web site sets my expectations a little differently. As an example, let&rsquo;s say that I need to download a report containing the entire list of user accounts from a database table. When I click the &ldquo;download user report&rdquo; link, suppose I see this in Firefox:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/10/11/open-users.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/10/11/open-users.png"></p>
 <p>Now instead of waiting to see a web page listing all of the users, I&rsquo;m waiting to download a large text or spreadsheet file containing the user list. Already, the web site has lowered my performance expectations, since I&rsquo;ve downloaded large files from the Internet many times before and I know it might take a few minutes to complete. Now when I click OK, Firefox displays this progress bar:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/10/11/progress-bar.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/10/11/progress-bar.png"></p>
 <p>Looking at this progress bar I&rsquo;m more willing to wait. Besides displaying the animation, Firefox is also telling me how fast the data is being downloaded, and also how much I&rsquo;ve downloaded in total. Even though it tells me there an &ldquo;Unknown time remaining&rdquo; I&rsquo;m less likely to get impatient since I know data is being steadily downloaded. Finally, when the request is finished I can double click to open the file:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/10/11/finished-download.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/10/11/finished-download.png"></p>
 <p>The point here is that web site performance is often more about perception than reality. If it takes 5 minutes for Rails to display a web page no one will wait regardless of how important the data is to them, since in this case the web site seems broken and there&rsquo;s no indication anything is happening. But if it takes 5 minutes to download a large file many users will happily wait, since they know their data is steadily arriving from the server and that it&rsquo;s just a matter of time.</p>
 <h2>How to implement this in your controller</h2>
-<p>Using the user/name/email example from <a href="http://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">part 1</a>, here&rsquo;s the controller code you&rsquo;ll need to implement this in a Rails 2.x application:
+<p>Using the user/name/email example from <a href="https://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">part 1</a>, here&rsquo;s the controller code you&rsquo;ll need to implement this in a Rails 2.x application:
 <div class="CodeRay">
   <div class="code"><pre><span class="r">def</span> <span class="fu">index</span>
   respond_to <span class="r">do</span> |format|
@@ -156,7 +156,7 @@ ruby-1.8.7-p302 ?>  end
   <span class="r">end</span>
 </pre></div>
 </div><br></p>
-<p>As I explained above, this will load all of the user records into memory at one time. By using a <a href="http://patshaughnessy.net/2010/9/28/ruby187gc-patch">GC patched version of the Ruby interpreter</a>, we can see how much memory this will take:</p>
+<p>As I explained above, this will load all of the user records into memory at one time. By using a <a href="https://patshaughnessy.net/2010/9/28/ruby187gc-patch">GC patched version of the Ruby interpreter</a>, we can see how much memory this will take:</p>
 <div class="CodeRay">
   <div class="code"><pre>$ rails console
 Loading development environment (Rails 3.0.0)

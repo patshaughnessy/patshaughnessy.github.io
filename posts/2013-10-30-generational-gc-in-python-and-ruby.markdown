@@ -3,12 +3,12 @@ date: 2013/10/30
 tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/10/30/generations.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/10/30/generations.jpg"><br/>
   <i>Both the Ruby and Python garbage collectors<br/>
   handle old and young objects differently.</i>
 </div>
 
-[Last week I wrote up the my first half of my notes](http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python)
+[Last week I wrote up the my first half of my notes](https://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python)
 from a presentation I did at [RuPy](http://13.rupy.eu) called “Visualizing
 Garbage Collection in Ruby and Python.” I explained how standard Ruby (also
 known as Matz’s Ruby Interpreter or MRI) uses a garbage collection (GC)
@@ -51,7 +51,7 @@ _cyclic data structure_, some of the reference counts will never become zero. To
 better understand this problem let’s take an example. The code below shows the
 same <span class="code">Node</span> class we used last week:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/cycle1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/cycle1.png"><br/>
 
 We have a constructor (these are called <span class="code">\_\_init\_\_</span> in Python) which saves a
 single attribute in an instance variable. Below the class definition we create
@@ -61,7 +61,7 @@ reference count inside both of our nodes is initially one, since one pointer
 
 Now let’s define two additional attributes in our nodes, <span class="code">next</span> and <span class="code">prev</span>:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/cycle2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/cycle2.png"><br/>
 
 Unlike in Ruby, using Python you can define instance variables or object
 attributes on the fly like this. This seems like a bit of interesting magic
@@ -79,7 +79,7 @@ Now let’s suppose our Python program stops using the nodes; we set both <span
   class="code">n1</span> and <span class="code">n2</span> to null. (In Python
 null is known as <span class="code">None</span>.)
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/cycle3.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/cycle3.png"><br/>
 
 Now Python, as usual, decrements the reference count inside of each node down to 1.
 
@@ -107,7 +107,7 @@ the “active list,” Python’s internal C code refers to it as _Generation Ze
 Each time you create an object or some other value in your program, Python adds
 it to the Generation Zero linked list:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/python-gen1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/python-gen1.png"><br/>
 
 Above you can see when we create the ABC node, Python adds it to Generation
 Zero. Note that this isn’t an actual list that you see and access in your
@@ -115,7 +115,7 @@ program; this linked list is entirely internal to the Python runtime.
 
 Similarly, when we create the DEF node, Python adds it to the same linked list:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/python-gen2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/python-gen2.png"><br/>
 
 Now Generation Zero contains two node objects. (It will also contain every
 other value our Python code creates, and many internal values used by Python
@@ -130,7 +130,7 @@ one object to another that prevented Python from freeing the objects earlier.
 
 To make this a bit easier to understand, let’s take an example:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/python-gen3.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/python-gen3.png"><br/>
 
 Above you can see the ABC and DEF nodes contain a reference count of 1. Three
 other objects are in the Generation Zero linked list also. The blue arrows
@@ -143,7 +143,7 @@ referring to them.
 Below you can see what happens after Python’s garbage collector processes
 Generation Zero.
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/python-gen4.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/python-gen4.png"><br/>
 
 By identifying internal references, Python is able to reduce the reference
 count of many of the Generation Zero objects. Above in the top row you can see
@@ -198,7 +198,7 @@ a long time.
 
 Suppose I create a new object using Python or Ruby:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/weak-gen1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/weak-gen1.png"><br/>
 
 According to the hypothesis, my code is likely to use the new ABC node only for a
 short time.   The object is probably just an intermediate value used inside of
@@ -218,13 +218,13 @@ collector process the older objects.
 The upcoming release of Ruby, version 2.1, now uses a generational garbage
 collector algorithm for the first time! (Remember, other implementations of
 Ruby, such as JRuby and Rubinius, have been using this idea for years.) Let’s
-return to the free list diagrams from [my last post](http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python)
+return to the free list diagrams from [my last post](https://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python)
 to understand how this works.
 
 Recall that when the free list is used up, Ruby marks the objects your program
 is still using:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen1.png"><br/>
 
 In this diagram, we see there are three active objects because the pointers <span class="code">n1</span>,
 <span class="code">n2</span> and <span class="code">n3</span> still refer to
@@ -237,7 +237,7 @@ Also recall that Ruby moves the garbage objects back onto the free list,
 because now they can be recycled and reused by your program when it allocates new
 objects:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen2.png"><br/>
 
 ## Generational GC in Ruby 2.1
 
@@ -246,7 +246,7 @@ remaining active objects to the _mature generation_. (The MRI C source code
 actually uses the word _old_ and not _mature_.) This diagram shows a conceptual
 view of the two Ruby 2.1 object generations:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen3.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen3.png"><br/>
 
 On the left is a different view of the free list. We see the garbage objects in
 white, and the remaining live, active objects in gray. The gray objects were
@@ -255,7 +255,7 @@ just marked.
 Once the mark and sweep process is finished, Ruby 2.1 will consider the
 remaining marked objects to be mature:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen4.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen4.png"><br/>
 
 Instead of using three generations like Python, Ruby 2.1’s garbage collector
 uses just two. On the left are new objects in the young generation, and on the
@@ -274,7 +274,7 @@ once it won’t be included in the next mark and sweep process.
 Now suppose your Ruby program continues to run, creating more new, young
 objects. These appear in the young generation again, on the left:
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen5.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen5.png"><br/>
 
 Just like Python, Ruby’s collector focuses its efforts on the young generation.
 It only includes the new, young objects created since the last GC process
@@ -299,7 +299,7 @@ your code creates a new, young object and adds it as a child of an existing,
 mature object. For example, this would happen if you added a new value to an
 array that had existed for a long time.
 
-<img src="http://patshaughnessy.net/assets/2013/10/30/ruby-gen6.png"><br/>
+<img src="https://patshaughnessy.net/assets/2013/10/30/ruby-gen6.png"><br/>
 
 Here again on the left we see new, young objects and mature objects on the
 right. On the left side the marking process has identified that 5 new objects

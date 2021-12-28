@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/10/1/libxml2.gif"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/10/1/libxml2.gif"></td></tr>
   <tr><td align="center"><small><i>Libxml2 powers your BDD/integration tests<br/>
 that use the default Capybara driver</i></small></td></tr>
 </table>
@@ -50,7 +50,7 @@ In a future blog post I may look at step 1 in more detail: how does Capybara sim
 
 It turns out that Capybara does this by parsing the HTML returned by the home page request using a gem called [Nokogiri](http://nokogiri.org/), which, in turn, uses the Libxml2 C library to perform the actual HTML parsing work. Here’s a diagram summarizing all of this:
 
-![capybara, nokogiri and libxml2](http://patshaughnessy.net/assets/2011/10/1/capybara-libxml.png)
+![capybara, nokogiri and libxml2](https://patshaughnessy.net/assets/2011/10/1/capybara-libxml.png)
 
 All of the code above the dashed line is Ruby, while the code below the line is C. I show Nokogiri straddling the dashed line, since it actually uses both C and Ruby code. Nokogiri contains “C extension code;” you can find this inside the gem’s “ext” folder. For Nokogiri you can [look here on github](https://github.com/tenderlove/nokogiri/tree/master/ext/nokogiri) to see its C extension code. C extension code allows a gem author to write functions in C that can be called by their Ruby code. C extension code, therefore, often plays the role of a bridge between Ruby and other C code in the application. When you install a Ruby gem containing C extension code, you’ll see the message “Compiling native extensions” appear - this means that Rubygems has called your C compiler to produce the native binaries needed to run the code on your platform.
 

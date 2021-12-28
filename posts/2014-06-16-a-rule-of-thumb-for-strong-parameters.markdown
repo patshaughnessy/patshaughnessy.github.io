@@ -3,7 +3,7 @@ date: 2014/6/16
 tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/6/16/security.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/6/16/security.jpg"><br/>
   <i>It can be hard to open the Strong Parameters<br/>door and let permitted values into your Rails 4 app.</i>
 </div>
 
@@ -38,14 +38,14 @@ Here’s how it works: Suppose you have a <span class="code">Post</span> model
 with title and body columns. Using Rails 4, you would write a create controller
 action like this:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/simple_controller.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/simple_controller.png"><br/>
 
 Here you first tell Rails which attributes are allowed for new post objects -
 title and body in this example - and then you create the new post. This is
 simple enough and quite readable. You are telling Rails: “data for a post is
 required and it’s attributes may only include title and body attributes.”
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/diagram1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/diagram1.png"><br/>
 
 In the diagram above you can see the post attribute hash on the left, and the
 arguments for <span class="code">permit</span> on the right. Notice the arguments are actually a
@@ -58,13 +58,13 @@ However, now suppose you add a second model to your app, <span
   class="code">Comment</span>. Let’s suppose a post has many comments, and each
 comment has a single text attribute.
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/has-many.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/has-many.png"><br/>
 
 Because your app is a REST-ful JSON service (what else do people use Rails for
 these days?) you have a requirement to create a post and its comments from a
 single JSON string:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/json.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/json.png"><br/>
 
 Because the comment array is named “comments” you assume ActiveRecord will
 create the associated comment models along with the new post. That is,
@@ -72,26 +72,26 @@ ActiveRecord should call <span class="code">comments=</span> on the new post
 and pass in the comment attributes. But it doesn’t work. Instead, using the
 code from earlier you get:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/warning.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/warning.png"><br/>
 
 Ah - you forgot to whitelist the comments attribute. You try adjusting the call
 to <span class="code">permit</span>:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/permit-comments.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/permit-comments.png"><br/>
 
 It still doesn’t work. You get the same warning:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/warning.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/warning.png"><br/>
 
 Clearly Rails isn’t listening! You just told it comments is permitted - why
 does Rails give you the same warning again? Maybe you need to create the
 comment objects yourself, as a separate step:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/create-comments.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/create-comments.png"><br/>
 
 Now things are even worse: Rails raises an exception!
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/exception.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/exception.png"><br/>
 
 The problem here is that the <span class="code">Comment</span> model is
 complaining that you haven’t whitelisted its attributes. Somehow each
@@ -102,7 +102,7 @@ If you happened to know that Rails 4 saves the parameters inside an <span
   class="code">ActionController::Parameters</span> object, you could try
 creating a separate instance of this class for each comment, and whitelist it's text attribute directly:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/permit-comments2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/permit-comments2.png"><br/>
 
 But you’ll still get the same “Unpermitted parameters” warning when you try to
 create the post next - not to mention that your code has become incredibly
@@ -115,7 +115,7 @@ The solution is to permit all the post and comment attributes with a single
 call to <span class="code">ActionController::Parameters#permit</span>, like
 this:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/nested-solution.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/nested-solution.png"><br/>
 
 What? What does the complex argument list to <span class="code">permit</span> mean? How in the world
 would anyone know to pass that in?
@@ -124,7 +124,7 @@ My rule of thumb can help. In this example, you are permitting an array of
 comments by passing a hash. Imagine if your app received a post with two
 comments, like this:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/diagram2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/diagram2.png"><br/>
 
 On the left you see the nested attributes for the post and its comments. Rails
 has parsed this for you from a JSON string. On the right are the arguments you
@@ -142,12 +142,12 @@ attributes feature with a complex HTML form. In this case, you would declare
 that posts accept nested attributes for comments, directing ActiveRecord to
 automatically create the comment objects for you:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/accepts-nested.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/accepts-nested.png"><br/>
 
 To make this work you will need to adjust your call to <span
 class="code">permit</span> slightly:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/nested-attribs-permit.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/nested-attribs-permit.png"><br/>
 
 With <span class="code">accepts_nested_attribute_for</span>, Rails expects the
 comments to be saved as <span class="code">comments_attributes</span>. Also,
@@ -163,7 +163,7 @@ array of comments you call <span class="code">permit</span> with a hash.
 Internally, Rails uses a trick to tell ActiveRecord which attributes were
 permitted and which weren’t. Here’s how it works:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/hashes.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/hashes.png"><br/>
 
 On the left is a normal hash - you can create an ActiveRecord model using this
 hash without worrying about whitelisting parameters. On the right is an <span
@@ -181,7 +181,7 @@ When you create a new post or any <span class="code">ActiveRecord::Base</span>
 object, code inside of Rails checks whether the attributes hash implements the
 <span class="code">permitted?</span> method or not:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/internals1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/internals1.png"><br/>
 
 Because a normal hash doesn’t respond to <span class="code">permitted?</span>,
 ActiveRecord creates the new post without complaining.
@@ -190,7 +190,7 @@ However, if you try to create a post from an <span
   class="code">ActionController::Parameters</span> object, Rails finds the
 <span class="code">permitted?</span> method:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/internals2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/internals2.png"><br/>
 
 If you didn’t whitelist this hash using a call to <span class="code">permit</span>, <span class="code">permitted?</span> will
 return <span class="code">false</span> and Rails will raise the <span class="code">ActiveModel::ForbiddenAttributesError</span>
@@ -205,7 +205,7 @@ objects.
 
 For example:
 
-<img src="http://patshaughnessy.net/assets/2014/6/16/normal-hashes.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/6/16/normal-hashes.png"><br/>
 
 Here you are whitelisting or permitting each attribute manually by copying them
 into normal hashes. Since <span class="code">Hash</span> doesn't implement <span

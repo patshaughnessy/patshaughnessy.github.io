@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-12-27T20:57:52Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Reading Code Like a Compiler</title><link href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-12-28T16:30:37Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Reading Code Like a Compiler</title><link href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Imagine trying to read an entire book while &lt;br/&gt;
   focusing on only one or two words at a time
   &lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;We use compilers every day to parse our code, find our programming mistakes and
-then help us fix them. But ho</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
+then help us fix them. But h</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Imagine trying to read an entire book while &lt;br/&gt;
   focusing on only one or two words at a time
   &lt;/i&gt;
@@ -61,7 +61,7 @@ Parsing even this simple program is a complex task for a compiler.&lt;/p&gt;
 &lt;h2&gt;How the Crystal Compiler Sees My Code&lt;/h2&gt;
 &lt;p&gt;Before parsing or running the code above, Crystal converts it into a series of
 tokens. To the Crystal compiler, my program looks like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/tokens.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/tokens.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;The first &lt;code&gt;IDENT&lt;/code&gt; token corresponds to the &lt;code&gt;arr&lt;/code&gt; variable at the beginning of the
 first line. You can also see two &lt;code&gt;NUMBER&lt;/code&gt; tokens: the &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/lexer.cr&quot;&gt;Crystal tokenizer
 code&lt;/a&gt;
@@ -91,7 +91,7 @@ interpret each word, and, equally important, to decide which word to read next.
 Crystal’s parse code is over 6000 lines long, so I won’t attempt to completely
 explain it here. But there’s an underlying, high level algorithm the parse code
 uses:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/pattern-recurse-record.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/pattern-recurse-record.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;First, the parser compares the current token, and possibly the following or
 previous tokens as well, to a series of expected patterns. These patterns
 define the syntax the parser is reading.  Second, the parser recurses. It calls
@@ -109,12 +109,12 @@ along with the Crystal compiler as it parses the code I showed above:&lt;/p&gt;
 &lt;/span&gt;&lt;/pre&gt;
 
 &lt;p&gt;Recall Crystal already converted this code into a token stream:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/token-line.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/token-line.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;(To be more accurate, Crystal actually converts my code into tokens as it goes.
 The parse code calls the tokenizer code each time it needs a new token. But
 this timing isn’t really important.)&lt;/p&gt;
 &lt;p&gt;As you might expect, Crystal starts with the first token, &lt;code&gt;IDENT&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;What does this mean? How does Crystal interpret &lt;code&gt;arr&lt;/code&gt;? &lt;code&gt;IDENT&lt;/code&gt; is short for
 identifier, but what role does this identifier play? What meaning does &lt;code&gt;arr&lt;/code&gt; have
 in my code?&lt;/p&gt;
@@ -145,7 +145,7 @@ it. And the Crystal compiler is no better: As soon as it processes that &lt;code
 token above, it has to write down what it decided that token meant or else it
 would forget.&lt;/p&gt;
 &lt;p&gt;To record the function call, Crystal creates an object:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/ast1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/ast1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;As we’ll see in a moment, Crystal builds up a tree of these objects, called an
 &lt;a href=&quot;https://en.wikipedia.org/wiki/Abstract_syntax_tree&quot;&gt;Abstract Syntax
 Tree&lt;/a&gt; (AST). The AST will
@@ -168,7 +168,7 @@ right, maybe appearing inside of parentheses, a compound value like an array or
 maybe yet another function call.&lt;/p&gt;
 &lt;p&gt;To find the arguments of the function call, inside the recursive call to the
 parse code Crystal proceeds forward to process the next two tokens:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;Crystal skips over the space, and then encounters the equals sign. Suddenly
 Crystal realizes it was wrong! The &lt;code&gt;arr&lt;/code&gt; identifier wasn’t a reference to a
 function at all, it was a variable declaration. Yes, sometimes compilers change
@@ -177,7 +177,7 @@ their minds while reading, just like we do!&lt;/p&gt;
 &lt;p&gt;To record this new, revised syntax, Crystal changes the &lt;code&gt;Call&lt;/code&gt; AST node it
 created earlier to an &lt;code&gt;Assign&lt;/code&gt; AST node, and creates a new &lt;code&gt;Var&lt;/code&gt; AST node to
 record the variable being assigned to:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/ast2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/ast2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;Now the AST is starting to resemble a tree. Because of the recursive nature of
 parse algorithm, this tree structure is an ideal way of record what the
 compiler has parsed so far. Trees are recursive too: Each branch is a tree in
@@ -187,35 +187,35 @@ its own right.&lt;/p&gt;
 the AST as the value attribute of the &lt;code&gt;Assign&lt;/code&gt; node?&lt;/p&gt;
 &lt;p&gt;To find out, the Crystal compiler recursively calls the same parsing algorithm
 again, but starting with the &lt;code&gt;[&lt;/code&gt; token:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;Following the pattern match, record and recurse process, the Crystal compiler
 once again matches the new token, &lt;code&gt;[&lt;/code&gt;, with a series of expected patterns. This
 time, Crystal decides that the left bracket is the start of literal array
 expression and records a new AST node:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/array-literal1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/array-literal1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;But before inserting it into the syntax tree, Crystal recursively calls itself
 to parse each of the values that appear in the array. The array literal pattern
 expects a series of values to appear separated by spaces, so Crystal proceeds
 to process the following tokens, looking for values separated by commas:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token4.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token4.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;After encountering the comma, Crystal recursively calls the same parse code
 again on the previous token or tokens that appeared before the comma, because
 the array value before the comma could be another expression of arbitrary depth
 and complexity. In this example, Crystal finds a simple numeric array element,
 and creates a new AST node to represent the numeric value:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/number-literal1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/number-literal1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;After reading the comma, Crystal calls its parser recursively again, and finds
 the second number:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/number-literal2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/number-literal2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;Remember Crystal has a bad memory. With all these new AST nodes, Crystal will
 quickly forget what they mean. Fortunately, Crystal reads in the right square
 bracket and realizes I ended the array literal in my code:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/process-token5.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token5.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;Now those recursive calls to the parse code return, and Crystal assembles these
 new AST nodes:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/array-literal2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/array-literal2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;…and then places them inside the larger, surrounding AST:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/12/22/ast3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/ast3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;After this, these recursive calls return and the Crystal compiler moves on to
 parse the second line of my program.&lt;/p&gt;
 &lt;h2&gt;A Complete Abstract Syntax Tree&lt;/h2&gt;
@@ -281,12 +281,12 @@ to process my code and transform it in different ways.&lt;/p&gt;
 workings of the Crystal compiler and the LLVM framework, which Crystal later
 uses to generate my x86 executable program.&lt;/p&gt;
 </content></entry><entry><title>Find Your Language’s Primitives</title><link href="https://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></link><id href="https://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></id><published>2021-11-29T00:00:00Z</published><updated>2021-11-29T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;If you dig into your programming language's syntax, you might &lt;br/&gt;discover that it is capable of much more than you thought it was.
   &lt;/i&gt;
 &lt;/div&gt;
-&lt;p&gt;Wikipedia defines “Language Primitive” &lt;a href=&quot;https://en.wikipedia.org/wik</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
+&lt;p&gt;Wikipedia defines “Language Primitive” &lt;a href=&quot;https://en.wikipedia.org/wi</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;If you dig into your programming language's syntax, you might &lt;br/&gt;discover that it is capable of much more than you thought it was.
   &lt;/i&gt;
 &lt;/div&gt;
@@ -323,7 +323,7 @@ like &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; or &lt;span class=&quot;
 broken down into smaller pieces of Ruby code. As Wikipedia says, these methods
 are the smallest unit of processing available to Ruby programmers working with
 arrays.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;Ruby hides the details of how arrays actually work from us. To learn how Ruby
 actually saves and retrieves values from an array, we would need to switch
 languages and drop down a level of abstraction, and read the C implementation
@@ -434,11 +434,11 @@ in
 &lt;/span&gt;&lt;/pre&gt;
 
 &lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/dig2.jpg&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/dig2.jpg&quot;&gt;&lt;br/&gt;
 	&lt;i&gt;&lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Digging_in_permafrost.jpg&quot;&gt;Nick Bonzey via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;So far, I’ve drilled down through 3 levels of Crystal implementation:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;But I haven’t found a primitive function yet. Let’s keep digging!&lt;/p&gt;
 &lt;h2&gt;The Crystal Array Class&lt;/h2&gt;
 &lt;p&gt;To learn more, I need to scroll up and read the beginning of the Crystal &lt;span
@@ -531,7 +531,7 @@ memory just like the Crystal team has while implementing arrays, hashes and
 other classes.&lt;/p&gt;
 &lt;p&gt;Now I’ve dug down through 4 levels of Crystal function calls, but I still
 haven’t found a language primitive yet.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h2&gt;A Crystal Language Primitive&lt;/h2&gt;
 &lt;p&gt;We still haven’t discovered how arrays actually work - how pointers actually
 work. That is, reading this line of code above:&lt;/p&gt;
@@ -562,7 +562,7 @@ obtains the value:&lt;/p&gt;
 
 &lt;p&gt;As you can see, this is a language primitive - it says “primitive” right there
 above the method definition!&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive4.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive4.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;Returning to Wikipedia’s definition of a language primitive, this is an atomic
 element of an expression. The Crystal compiler knows not to try to compile this
 code but to assume this behavior is part of the language. In fact, there is no
@@ -580,7 +580,7 @@ need to step down one level of abstraction - we need to use a lower level
 language, not Crystal.&lt;/p&gt;
 &lt;h2&gt;Retrieving an Array Element In x86 Assembly Language&lt;/h2&gt;
 &lt;div style=&quot;float: right; padding: 18px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/cave.png&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/cave.png&quot;&gt;&lt;br/&gt;
 &lt;/div&gt;
 &lt;p&gt;What lower level language should we use? Since the Crystal team used the &lt;a href=&quot;https://llvm.org&quot;&gt;Low
 Level Virtual Machine (LLVM)&lt;/a&gt; project to implement their
@@ -622,11 +622,11 @@ class=&quot;code&quot;&gt;Pointer#value&lt;/span&gt; methods actually work:&lt;/
 &lt;p&gt;Assembly language is just another programming language like any other, but with
 a different set of primitives. The primitives in this language are hardware
 instructions that my laptop’s CPU can understand and execute directly:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/primitive5.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive5.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;I won’t pretend to understand all the details here, but if you’re curious about
 what this code does - how my compiled Crystal program actually retrieves a
 value from an array - here are a few highlights you can look for:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/29/assembly-table.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/assembly-table.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;If you’d like to learn more about x86 assembly language, I wrote an article a
 few years ago explaining some of the basics: &lt;a href=&quot;https://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language&quot;&gt;Learning to Read x86 Assembly
 Language&lt;/a&gt;.&lt;/p&gt;
@@ -649,12 +649,12 @@ effort to read some code.&lt;/p&gt;
 favorite programming language. You might be surprised and discover that your
 language is capable of much more than you thought it was.&lt;/p&gt;
 </content></entry><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="https://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="https://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;Most modern, statically typed languages allow us to use generic types. We write
-a function once with generic type syntax, and t</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
+a function once with generic type syntax, and </summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;Most modern, statically typed languages allow us to use generic types. We write
@@ -676,7 +676,7 @@ an example from the &lt;a href=&quot;https://github.com/crystal-lang/crystal/tre
 library&lt;/a&gt; and explore
 how the Crystal team used generic type syntax to implement their array class.&lt;/p&gt;
 &lt;h2&gt;Array#uniq in Crystal&lt;/h2&gt;
-&lt;p&gt;&lt;a href=&quot;http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library&quot;&gt;Last
+&lt;p&gt;&lt;a href=&quot;https://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library&quot;&gt;Last
 time&lt;/a&gt;
 I looked at the Crystal standard library, specifically at how Crystal removes
 duplicate elements from an array in
@@ -716,7 +716,7 @@ syntax makes perfect sense to me. However, most developers will be able to
 figure this out without much effort.&lt;/p&gt;
 &lt;p&gt;Crystal identifies the unique elements of the array by converting it into a
 “lookup hash:”&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;650&quot; src=&quot;http://patshaughnessy.net/assets/2021/11/6/lookup-hash.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img width=&quot;650&quot; src=&quot;https://patshaughnessy.net/assets/2021/11/6/lookup-hash.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;As you know, hash keys are unique. By converting the array into a hash, Crystal
 has quickly identified the unique elements of that array.&lt;/p&gt;
 &lt;h2&gt;Converting An Array To A Hash At Runtime&lt;/h2&gt;
@@ -757,7 +757,7 @@ in such a block:&lt;/p&gt;
 
 &lt;p&gt;Since the block &lt;code&gt;{ |elem| elem }&lt;/code&gt; just returns whatever was passed into it, the
 keys and values of the lookup hash will be the same:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;275&quot; src=&quot;http://patshaughnessy.net/assets/2021/11/6/keys-and-values.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img width=&quot;275&quot; src=&quot;https://patshaughnessy.net/assets/2021/11/6/keys-and-values.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;This block adds a bit of flexibility to the code. The Crystal team might want
 to reuse this function someday with a different block and set of keys.&lt;/p&gt;
 &lt;p&gt;Finally, let’s look at how Crystal iterates over the array:&lt;/p&gt;
@@ -798,7 +798,7 @@ needs to convert the type &lt;code&gt;Array(T)&lt;/code&gt; into the type &lt;co
 the second, type-level mirror program to find out how this works.&lt;/p&gt;
 &lt;p&gt;You can imagine the Crystal compiler processing the generic type code like
 this:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;550&quot; src=&quot;http://patshaughnessy.net/assets/2021/11/6/solved-puzzle.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img width=&quot;550&quot; src=&quot;https://patshaughnessy.net/assets/2021/11/6/solved-puzzle.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;The first line is actually the most important:&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;
@@ -920,12 +920,12 @@ what code you are writing, how fast it needs to run, how many times and for how
 long that code will be used - and most importantly, how much time you have to
 solve math problems.&lt;/p&gt;
 </content></entry><entry><title>To Learn a New Language, Read Its Standard Library</title><link href="https://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></link><id href="https://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></id><published>2021-10-23T00:00:00Z</published><updated>2021-10-23T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;If I was learning to read English as a foreign language,&lt;br/&gt; I would need something simple to get started.&lt;br/&gt;
   &lt;small&gt;(from The Remarkable Story of Chicken Little, 1840)&lt;/small&gt;&lt;/i&gt; 
 &lt;/div&gt;
-&lt;p&gt;The best way to learn a </summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
+&lt;p&gt;The best way to learn a</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;If I was learning to read English as a foreign language,&lt;br/&gt; I would need something simple to get started.&lt;br/&gt;
   &lt;small&gt;(from The Remarkable Story of Chicken Little, 1840)&lt;/small&gt;&lt;/i&gt; 
 &lt;/div&gt;
@@ -1118,11 +1118,11 @@ also get to learn how Crystal works internally.&lt;/p&gt;
 Crystal remove duplicates from longer arrays efficiently? I'll take a look at
 how that works in my next post.&lt;/p&gt;
 </content></entry><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="https://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="https://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-20T00:00:00Z</published><updated>2020-01-20T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
 easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
-  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_201</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
+  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
 easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
   &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20111210.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
@@ -1218,7 +1218,7 @@ class=&quot;code&quot;&gt;Ok(())&lt;/span&gt; because that makes the code below 
 when I start downloading more than one page concurrently.&lt;/p&gt;
 &lt;p&gt;Visually, I can draw the &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and &lt;span
 class=&quot;code&quot;&gt;text&lt;/span&gt; calls like this:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/get-and-text.png&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/get-and-text.png&quot;&gt;
 &lt;p&gt;First I call &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and wait, then I call &lt;span
 class=&quot;code&quot;&gt;text&lt;/span&gt; and wait.&lt;/p&gt;
 &lt;p&gt;But what is asynchronous about this? This reads like normal, single threaded
@@ -1286,12 +1286,12 @@ some value and/or some error value instead.&lt;/p&gt;
 class=&quot;code&quot;&gt;join_all(tasks).await&lt;/span&gt; to wait for them all to finish.&lt;/p&gt;
 &lt;h2&gt;Asynchronous vs Multithreaded&lt;/h2&gt;
 &lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/traffic-light2.jpg&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/traffic-light2.jpg&quot;&gt;&lt;br/&gt;
   &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Traffic_lights,_Zl%C3%ADn.JPG&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
 &lt;/div&gt;
 &lt;p&gt;At first glance, it looks like this code is spawning three different threads. I
 even call a spawn function. A multithreaded download might look like this:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/multithreaded.png&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/multithreaded.png&quot;&gt;
 &lt;p&gt;We have 3 paths, so we have 3 threads. Each thread calls &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and waits, and
 then calls &lt;span class=&quot;code&quot;&gt;text&lt;/span&gt; and waits.&lt;/p&gt;
 &lt;p&gt;However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
@@ -1304,11 +1304,11 @@ threaded) and Threaded (thread pool) Scheduler; see &lt;a href=&quot;https://doc
 docs&lt;/a&gt;
 for more information.&lt;/p&gt;
 &lt;p&gt;I imagine three tasks running on one thread like this:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/one-thread.png&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/one-thread.png&quot;&gt;
 &lt;p&gt;Each time I call &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt;, Rust stops one task and
 starts another using the same thread. In fact, depending on how long it takes
 for each task to complete, they might be run in a different order:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/different-order.png&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/different-order.png&quot;&gt;
 &lt;p&gt;There’s no way to predict ahead of time what order the tasks will run it.
 That’s why I needed to copy each path string above; each task needs it own copy
 of the string with its own independent lifetime because it might be run at any
@@ -1346,7 +1346,7 @@ collector, this was going to be great!&lt;/p&gt;
 &lt;p&gt;What happened? The problem is the web server can't handle so many concurrent network
 connections. Using my thread/task diagram, launching all 100,000 tasks might
 look like this:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/simultaneous.png&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/simultaneous.png&quot;&gt;
 &lt;p&gt;I spawn 100,000 tasks all on to the same thread, and Tokio starts executing
 them all. Each time my code above calls &lt;span
 class=&quot;code&quot;&gt;get(&amp;amp;path).await&lt;/span&gt;, Tokio pauses that task and starts
@@ -1356,7 +1356,7 @@ these tasks start to fail.&lt;/p&gt;
 &lt;h2&gt;Sending a Buffered, Concurrent Stream of 100,000 Requests&lt;/h2&gt;
 &lt;p&gt;Instead, I need to limit the number of concurrent Tokio tasks - the number of
 concurrent HTTP requests. I need the diagram to look something like this:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2020/1/20/buffered.png&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/buffered.png&quot;&gt;
 &lt;p&gt;After the first 8 tasks are started, the first 8 blue boxes on the left, Tokio
 waits for at least one of them to complete before starting a 9th task. I
 indicate this with the “max concurrency” arrow.&lt;/p&gt;
@@ -1412,13 +1412,13 @@ I/O program that can scale as much as I would like. The &lt;span
 class=&quot;code&quot;&gt;async&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; keywords make
 this code easy to write and easy to read.&lt;/p&gt;
 </content></entry><entry><title>Using Result Combinator Functions in Rust</title><link href="https://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></link><id href="https://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
   flow by checking for errors in a succinct, elegant way&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;Using Rust for the first time, error handling was my biggest stumbling block.
-Was this v</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
+Was this </summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
   flow by checking for errors in a succinct, elegant way&lt;/i&gt;
 &lt;/div&gt;
@@ -1462,7 +1462,7 @@ to generate the static HTML pages for this blog site:&lt;/p&gt;
 Here’s a flowchart that illustrates this control flow:&lt;/p&gt;
 &lt;div style=&quot;margin-left: auto; margin-right: auto; width:235px&quot;&gt;
 &lt;br/&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2019/11/19/flowchart.png&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2019/11/19/flowchart.png&quot;&gt;
 &lt;/div&gt;
 &lt;p&gt;The happy path is from top to bottom, along the left side. If any of the
 compile methods fail, &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; short circuits the
@@ -1583,12 +1583,12 @@ thought process as I piece together different code paths is a huge help.
 Learning to use and get along with the Rust compiler is worth it: You end up
 with code that is both readable and correct.&lt;/p&gt;
 </content></entry><entry><title>How Rust Makes Error Handling Part of the Language</title><link href="https://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></link><id href="https://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></id><published>2019-10-03T00:00:00Z</published><updated>2019-10-03T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/fingers-toes.png&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/fingers-toes.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt;In Spanish these are all “dedos,” while in English&lt;br/&gt;we can distinguish between fingers and toes. &lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;Learning a foreign language can be an incredible experience, not only because
-you can talk to new people, v</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/fingers-toes.png&quot;&gt;&lt;br/&gt;
+you can talk to new people, </summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/fingers-toes.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt;In Spanish these are all “dedos,” while in English&lt;br/&gt;we can distinguish between fingers and toes. &lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;Learning a foreign language can be an incredible experience, not only because
@@ -1732,7 +1732,7 @@ of code means the &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; type is
 other types: &lt;span class=&quot;code&quot;&gt;a&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;b&lt;/span&gt;.
 Drawing that type equation, this is how I visualize Haskell &lt;span
 class=&quot;code&quot;&gt;Either&lt;/span&gt; values:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/left-or-right.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/left-or-right.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;A single &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; value can only encapsulate &lt;em&gt;either&lt;/em&gt;
 a value of type &lt;span class=&quot;code&quot;&gt;a&lt;/span&gt; or a value of type &lt;span
 class=&quot;code&quot;&gt;b&lt;/span&gt;:&lt;/p&gt;
@@ -1763,7 +1763,7 @@ vocabulary and grammar.&lt;/p&gt;
 &lt;p&gt;In Rust, the &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; type encapsulates two other types
 like &lt;span class=&quot;code&quot;&gt;Either.&lt;/span&gt; A single &lt;span
 class=&quot;code&quot;&gt;Result&lt;/span&gt; value has either one of those types or the other:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/ok-or-err.png&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/ok-or-err.png&quot;&gt;
 &lt;p&gt;Instead of &lt;span class=&quot;code&quot;&gt;Left a&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;Right
 b&lt;/span&gt; like in Haskell, Rust uses the words &lt;span class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;
 and &lt;span class=&quot;code&quot;&gt;Err(E)&lt;/span&gt;:&lt;/p&gt;
@@ -1838,7 +1838,7 @@ class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;:&lt;/p&gt;
 &lt;p&gt;Here, the use of &lt;span class=&quot;code&quot;&gt;?&lt;/span&gt; after &lt;span
 class=&quot;code&quot;&gt;File::open(&amp;quot;foo.txt&amp;quot;)&lt;/span&gt; tells the Rust compiler to check the
 return value of &lt;span class=&quot;code&quot;&gt;File::open&lt;/span&gt; for me automatically:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/success-or-failure.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/success-or-failure.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;p&gt;If the return value of &lt;span class=&quot;code&quot;&gt;File::open&lt;/span&gt; is &lt;span
 class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;, then Rust assigns the inner &lt;span
 class=&quot;code&quot;&gt;T&lt;/span&gt; value to &lt;span class=&quot;code&quot;&gt;file&lt;/span&gt;. If &lt;span
@@ -1902,7 +1902,7 @@ class=&quot;code&quot;&gt;read()&lt;/span&gt; will return &lt;span class=&quot;c
 &lt;span class=&quot;code&quot;&gt;e&lt;/span&gt; is a value of type &lt;span
 class=&quot;code&quot;&gt;std::io::Error&lt;/span&gt;. Note &lt;span class=&quot;code&quot;&gt;open&lt;/span&gt; returns
 the same error type that &lt;span class=&quot;code&quot;&gt;read&lt;/span&gt; does:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2019/10/3/error-types.png&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/error-types.png&quot;&gt;
 &lt;p&gt;This is where Rust shines. It allows for concise and readable error handling
 that is also thorough and correct. The Rust compiler checks for error handling
 completeness at &lt;em&gt;compile time&lt;/em&gt;, before I ever run my program.&lt;/p&gt;
@@ -1920,12 +1920,12 @@ errors and what might go wrong from the very beginning, from when they start
 writing code. To be honest, I've often thought about errors and what might go
 wrong as an afterthought, after I've written and deployed my code.&lt;/p&gt;
 </content></entry><entry><title>Using Rust to Build a Blog Site</title><link href="https://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></link><id href="https://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></id><published>2019-09-04T00:00:00Z</published><updated>2019-09-04T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2019/9/4/batteries.jpg&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/9/4/batteries.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Rust comes with batteries included&lt;br/&gt;
     &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Color-w-batteries.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
-&lt;p&gt;After “Hello World,” blog sites a</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2019/9/4/batteries.jpg&quot;&gt;&lt;br/&gt;
+&lt;p&gt;After “Hello World,” blog sites </summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/9/4/batteries.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Rust comes with batteries included&lt;br/&gt;
     &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Color-w-batteries.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
@@ -1951,7 +1951,7 @@ simple. And writing a blog site using Rust turned out to be simple too.&lt;/p&gt
 &lt;h2&gt;My Cargo.toml File&lt;/h2&gt;
 &lt;p&gt;I needed a few important features to generate this web site. I wanted my script
 to work like this for each blog post:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2019/9/4/flowchart.png&quot;/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2019/9/4/flowchart.png&quot;/&gt;
 &lt;p&gt;For each blog post, My new Rust script had to: parse the markdown source file
 and convert it to HTML markup, highlight the syntax of my code snippets using
 &amp;lt;style&amp;gt; tags and CSS, and use a template to insert the HTML for each post
@@ -2221,12 +2221,12 @@ developers gave me a chance to build a useful app, even as a beginner. Cargo
 found, downloaded and compiled open source code from experts with just a few
 simple commands.&lt;/p&gt;
 </content></entry><entry><title>Summer School With The Rust Compiler</title><link href="https://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="https://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt; &lt;small&gt;(source: &lt;a href=&quot;https://twitter.com/steveklabnik/status/1022518806814617601&quot;&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;A few months ago, I saw this tweet from Steve. I'm not even sure what
-&amp;quot;derridean</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
+&amp;quot;derridea</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
 &lt;i&gt; &lt;small&gt;(source: &lt;a href=&quot;https://twitter.com/steveklabnik/status/1022518806814617601&quot;&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;A few months ago, I saw this tweet from Steve. I'm not even sure what
@@ -2261,7 +2261,7 @@ $ ruby int-loop.rb
 3
 &lt;/pre&gt;
 &lt;div style=&quot;float: right; padding: 70px 0px 30px 30px; text-align: center;&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2018/10/24/garden-earthly-delights.png&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2018/10/24/garden-earthly-delights.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt;&lt;small&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/The_Garden_of_Earthly_Delights&quot;&gt;The Garden of Earthly Delights&lt;/a&gt; (detail), by Hieronymus Bosch&lt;/small&gt;&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;Ruby’s syntax and feature set are designed to make my life easier as a
@@ -2369,10 +2369,10 @@ integers, but my code expected an actual integer, not a reference to an
 integer. But what are references, exactly?&lt;/p&gt;
 &lt;p&gt;Running my code above, Ruby passed each integer from the array to my code as a
 simple value:&lt;/p&gt;
-&lt;img width=&quot;185&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png&quot;/&gt;
+&lt;img width=&quot;185&quot; src=&quot;https://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png&quot;/&gt;
 &lt;p&gt;But Rust passed each integer from the array as a reference, or in other words
 as a pointer to the value itself:&lt;/p&gt;
-&lt;img width=&quot;287&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png&quot;/&gt;
+&lt;img width=&quot;287&quot; src=&quot;https://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png&quot;/&gt;
 &lt;p&gt;In Ruby, of course, I didn’t have to worry about references, pointers or even
 types, so none of this came up. Or at least that’s what I thought at the time.&lt;/p&gt;
 &lt;h2&gt;Lesson Two: Borrowed Values&lt;/h2&gt;
@@ -2415,7 +2415,7 @@ by the &lt;span class=&quot;code&quot;&gt;main&lt;/span&gt; function. When the &
 class=&quot;code&quot;&gt;main&lt;/span&gt; function goes out of scope, Rust frees the memory for
 that array automatically. In this diagram, the red arrow shows where Rust
 allocates the array (at the top), and where Rust frees it (at the bottom):&lt;/p&gt;
-&lt;img width=&quot;339&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png&quot;/&gt;
+&lt;img width=&quot;339&quot; src=&quot;https://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png&quot;/&gt;
 &lt;p&gt;You can think of the red arrow as the “lifetime” of the array. When I pass a
 value from one spot to another, when I call a function or a closure, I can
 either “move” that value to the new function, or the function can ”borrow” it.
@@ -2423,7 +2423,7 @@ In this example, the call to &lt;span class=&quot;code&quot;&gt;iter()&lt;/span&
 elements inside the array, passing a reference to each element into the
 closure. The blue array in this diagram indicates each element of the array,
 &lt;span class=&quot;code&quot;&gt;i&lt;/span&gt;, is a borrowed value inside the closure:&lt;/p&gt;
-&lt;img width=&quot;334&quot; src=&quot;http://patshaughnessy.net/assets/2018/10/24/rust-borrow.png&quot;/&gt;
+&lt;img width=&quot;334&quot; src=&quot;https://patshaughnessy.net/assets/2018/10/24/rust-borrow.png&quot;/&gt;
 &lt;h2&gt;Lesson Three: Immutable vs. Mutable Values&lt;/h2&gt;
 &lt;p&gt;But using borrowed values isn’t the problem here. The problem is that my code
 tries to change them, or mutate them:&lt;/p&gt;
@@ -2599,11 +2599,11 @@ updated that string inside the array. Now my program will have bugs, unless the
 point of running that loop was to mutate the array, and not just to print it
 out.&lt;/p&gt;
 </content></entry><entry><title>From ActiveRecord to Diesel</title><link href="https://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel" rel="alternate"></link><id href="https://patshaughnessy.net/2018/6/9/from-activerecord-to-diesel" rel="alternate"></id><published>2018-06-09T00:00:00Z</published><updated>2018-06-09T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/exercise.jpg&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2018/6/9/exercise.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Learning something new every day
 is exercise for your mind.&lt;/i&gt;&lt;br/&gt;
-	&lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg&quot;&gt;Jeremy Bowcock via Wikimedia C</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/exercise.jpg&quot;&gt;&lt;br/&gt;
+	&lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg&quot;&gt;Jeremy Bowcock via Wikimedia </summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2018/6/9/exercise.jpg&quot;&gt;&lt;br/&gt;
 &lt;i&gt; Learning something new every day
 is exercise for your mind.&lt;/i&gt;&lt;br/&gt;
 	&lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Defender_builds_routine_to_achieve_goals_140716-F-FW757-073.jpg&quot;&gt;Jeremy Bowcock via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
@@ -2695,12 +2695,12 @@ Hello, world!
 World” with just a few commands.&lt;/p&gt;
 &lt;p&gt;Cargo placed the source code in a Rust file called src/main.rs, which looks
 like this:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/hello-world.png&quot;/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2018/6/9/hello-world.png&quot;/&gt;
 &lt;p&gt;As a comparison, I show the equivalent Ruby code below in pink. Pretty simple.&lt;/p&gt;
 &lt;h2&gt;From Gemfile to Cargo.toml&lt;/h2&gt;
 &lt;p&gt;I knew my script needed to connect to Postgres and execute a SQL statement, so
 I added Diesel as a dependency to my Cargo.toml file:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/cargo-toml.png&quot;/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2018/6/9/cargo-toml.png&quot;/&gt;
 &lt;p&gt;Cargo is a dependency manager similar to Ruby’s &lt;a href=&quot;https://bundler.io&quot;&gt;Bundler&lt;/a&gt;.
 The Cargo.toml file lists the Rust libraries, or “crates,” that my script will
 use. It plays the same role as the Gemfile does for Ruby projects.&lt;/p&gt;
@@ -2724,7 +2724,7 @@ thing I need to do is open a connection to Postgres. After that, I can figure
 out how to execute my report.&lt;/p&gt;
 &lt;p&gt;Here’s how I did it - again I show the Rust code in grey and the equivalent
 Ruby code below in pink:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/connect.png&quot;/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2018/6/9/connect.png&quot;/&gt;
 &lt;p&gt;The Rust code is fairly simple and easy to understand: It just passes a
 Postgres connection string to &lt;span
 class=&quot;code&quot;&gt;PgConnection::establish&lt;/span&gt;. One interesting and important
@@ -2732,7 +2732,7 @@ detail here is the call to &lt;span class=&quot;code&quot;&gt;expect&lt;/span&gt
 class=&quot;code&quot;&gt;PgConnection::establish&lt;/span&gt; returns a &lt;span
 class=&quot;code&quot;&gt;ConnectionResult&lt;T&gt;&lt;/span&gt; value, which is derived from the
 &lt;a href=&quot;https://doc.rust-lang.org/std/result/enum.Result.html&quot;&gt;Result enum&lt;/a&gt;:&lt;/p&gt;
-&lt;img width=&quot;200&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/result.png&quot;/&gt;
+&lt;img width=&quot;200&quot; src=&quot;https://patshaughnessy.net/assets/2018/6/9/result.png&quot;/&gt;
 &lt;p&gt;As &lt;em&gt;The Rust Programming Language&lt;/em&gt;
 &lt;a href=&quot;https://doc.rust-lang.org/book/second-edition/ch09-00-error-handling.html&quot;&gt;explains&lt;/a&gt;,
 &lt;span class=&quot;code&quot;&gt;expect&lt;/span&gt; checks whether the result value contains &lt;span
@@ -2778,7 +2778,7 @@ Postgres table, and the names and types of each of the table’s columns. Notice
 that I provided two command line parameters: the Postgres connection string and
 my database table name.&lt;/p&gt;
 &lt;p&gt;The Diesel macros resemble the original SQL definition of my Postgres table:&lt;/p&gt;
-&lt;img width=&quot;676&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/sql-to-macro.png&quot;/&gt;
+&lt;img width=&quot;676&quot; src=&quot;https://patshaughnessy.net/assets/2018/6/9/sql-to-macro.png&quot;/&gt;
 &lt;p&gt;Diesel used &lt;span class=&quot;code&quot;&gt;Int4&lt;/span&gt; for the primary key column, and
 &lt;span class=&quot;code&quot;&gt;Nullable&amp;lt;Varchar&amp;gt;&lt;/span&gt; for each of the Postgres varchar
 string columns. &lt;span class=&quot;code&quot;&gt;Nullable&lt;/span&gt; must mean that my Postgres
@@ -2790,7 +2790,7 @@ specify &lt;span class=&quot;code&quot;&gt;NOT NULL&lt;/span&gt; for these colum
 &lt;p&gt;Next, using these macros as a guide, I wrote a Rust struct to serve as my
 database model. An instance of this struct was going to represent each row in
 my Postgres table:&lt;/p&gt;
-&lt;img width=&quot;692&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/macro-to-model.png&quot;/&gt;
+&lt;img width=&quot;692&quot; src=&quot;https://patshaughnessy.net/assets/2018/6/9/macro-to-model.png&quot;/&gt;
 &lt;p&gt;Just as Diesel mapped each Postgres column type to a Rust macro with the
 corresponding type, I had to choose a Rust type for each Postgres column in my
 new struct. For the id column, I picked Rust’s &lt;span class=&quot;code&quot;&gt;i32&lt;/span&gt;
@@ -2798,7 +2798,7 @@ integer type. This made sense because the &lt;span class=&quot;code&quot;&gt;Int
 implied a 4 byte or 32 bit integer value. And for each of the string columns, I
 chose the Rust &lt;span class=&quot;code&quot;&gt;String&lt;/span&gt; type.&lt;/p&gt;
 &lt;p&gt;Finally, I pasted all of this into my main.rs source code file, as follows:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/model.png&quot;/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2018/6/9/model.png&quot;/&gt;
 &lt;p&gt;Reading this over, the Ruby version is much more concise. In Rust I specified
 the name and type of each column, while in Ruby ActiveRecord figured all of
 that out for me. (Although as I mentioned above, I could have asked Diesel to
@@ -2807,7 +2807,7 @@ detect the column types automatically also.)&lt;/p&gt;
 &lt;p&gt;Now after all of this setup, I’m finally ready to execute my report. Here’s the
 Rust code I wrote inside the &lt;span class=&quot;code&quot;&gt;main()&lt;/span&gt; function, following the call to
 &lt;span class=&quot;code&quot;&gt;PgConnection::establish&lt;/span&gt;:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/trying.png&quot;/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2018/6/9/trying.png&quot;/&gt;
 &lt;p&gt;It took me a while to figure out the proper syntax, especially the bits that
 use generic type notation, like &lt;span class=&quot;code&quot;&gt;Vec&amp;lt;User&amp;gt;&lt;/span&gt; and &lt;span
 class=&quot;code&quot;&gt;Vec&amp;lt;&amp;amp;str&amp;gt;&lt;/span&gt;. Also the &lt;span
@@ -2881,18 +2881,18 @@ that it shouldn’t make assumptions about what’s in the data set.&lt;/p&gt;
 way of saving null values in my User struct. The problem, what the Rust
 compiler was trying to tell me, was that my User struct could not handle nulls
 as written. I needed to use an option type instead:&lt;/p&gt;
-&lt;img width=&quot;693&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/option-model.png&quot;/&gt;
+&lt;img width=&quot;693&quot; src=&quot;https://patshaughnessy.net/assets/2018/6/9/option-model.png&quot;/&gt;
 &lt;p&gt;Like the &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; enum we saw above, &lt;span
 class=&quot;code&quot;&gt;Option&lt;/span&gt; is an enum that can contain either &lt;span
 class=&quot;code&quot;&gt;Some&lt;/span&gt; or &lt;span class=&quot;code&quot;&gt;None&lt;/span&gt;… i.e. a null value:&lt;/p&gt;
-&lt;img width=&quot;170&quot; src=&quot;http://patshaughnessy.net/assets/2018/6/9/option.png&quot;/&gt;
+&lt;img width=&quot;170&quot; src=&quot;https://patshaughnessy.net/assets/2018/6/9/option.png&quot;/&gt;
 &lt;p&gt;To learn more about the &lt;span class=&quot;code&quot;&gt;Option&lt;/span&gt; type, read &lt;a href=&quot;https://doc.rust-lang.org/book/second-edition/ch06-01-defining-an-enum.html#the-option-enum-and-its-advantages-over-null-values&quot;&gt;Chapter
 6&lt;/a&gt;
 from &lt;em&gt;The Rust Programming Language&lt;/em&gt;.&lt;/p&gt;
 &lt;p&gt;After changing my &lt;span class=&quot;code&quot;&gt;User&lt;/span&gt; struct, I then had to rework
 the closure inside of &lt;span class=&quot;code&quot;&gt;partition&lt;/span&gt;. Here’s what I ended
 up with:&lt;/p&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/unwrap.png&quot;/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2018/6/9/unwrap.png&quot;/&gt;
 &lt;p&gt;I wrote &lt;span class=&quot;code&quot;&gt;if let Some(ref name)&lt;/span&gt; to check whether or not
 the last name of each user struct was null. In other words, I “unwrapped” the
 last name. The &lt;span class=&quot;code&quot;&gt;ref&lt;/span&gt; keyword satisfies Rust’s borrow
@@ -2930,7 +2930,7 @@ $ ruby main.rb
 Connected.
 main.rb:18:in `block in \&lt;main\&gt;': undefined method `split' for nil:NilClass (NoMethodError)
 &lt;/pre&gt;
-&lt;img src=&quot;http://patshaughnessy.net/assets/2018/6/9/fix-ruby.png&quot;/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2018/6/9/fix-ruby.png&quot;/&gt;
 &lt;p&gt;Rewriting my Ruby code in Rust revealed a bug I never knew I had. As shown
 above, I had to rework my Ruby code to check for a null last name inside the
 block, similar to what I wrote in Rust. Even though it required more typing and

@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/1/18/fingers.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/1/18/fingers.jpg"></td></tr>
   <tr><td align="center"><small><i>How many Ruby string values can you see?</i></small></td></tr>
 </table>
 </div>
@@ -38,11 +38,11 @@ str = "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
 str2 = str[1..-1]
 </pre>
 
-The answers are not what you expect! Both the 1.9 and 1.8 MRI Ruby interpreters use an optimization called “copy on write” to avoid unnecessarily copying large string values. Like I did two weeks ago when [I discussed how Ruby 1.9 runs faster with strings containing 23 bytes or less](http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters), today I’m going to take a deep dive into Ruby internals to see how the copy on write optimization works. Read on to learn more... and to find out how many strings were allocated by the code snippets above!
+The answers are not what you expect! Both the 1.9 and 1.8 MRI Ruby interpreters use an optimization called “copy on write” to avoid unnecessarily copying large string values. Like I did two weeks ago when [I discussed how Ruby 1.9 runs faster with strings containing 23 bytes or less](https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters), today I’m going to take a deep dive into Ruby internals to see how the copy on write optimization works. Read on to learn more... and to find out how many strings were allocated by the code snippets above!
 
 ## Referring to one String object with two variables
 
-[Two weeks ago](http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters) I used this example to illustrate how Ruby shares string values:
+[Two weeks ago](https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters) I used this example to illustrate how Ruby shares string values:
 
 <pre type="ruby">
 str = "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
@@ -51,11 +51,11 @@ str2 = str
 
 Here’s a diagram showing how this string value is shared by <span class="code">str</span> and <span class="code">str2</span>:
 
-![One RString](http://patshaughnessy.net/assets/2012/1/18/one-rstring.png)
+![One RString](https://patshaughnessy.net/assets/2012/1/18/one-rstring.png)
 
 As Evan Phoenix pointed out in a comment on my last post, I was actually incorrect to use this as an example of a shared string. There really isn’t any sharing here at all: instead we just have two Ruby variables pointing to or referring to the same, single RString value.
 
-To find out exactly what is contained in any RString structure, and to prove this is actually what is happening inside the Ruby interpreter, I wrote a simple C extension that will display the hexadecimal address of a given RString value, along with the hexadecimal value of <span class="code">ptr</span>, which is the RString member that points to the actual string data. See [my last post](http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters) for more details on how RString works. I’ve included the C source code for this extension below in the “Appendix” if you’re interested in the details.
+To find out exactly what is contained in any RString structure, and to prove this is actually what is happening inside the Ruby interpreter, I wrote a simple C extension that will display the hexadecimal address of a given RString value, along with the hexadecimal value of <span class="code">ptr</span>, which is the RString member that points to the actual string data. See [my last post](https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters) for more details on how RString works. I’ve included the C source code for this extension below in the “Appendix” if you’re interested in the details.
 
 To use my C extension, I just need to require it and create an instance of the <span class="code">Debug</span> class and use it by calling <span class="code">display_string</span> as follows:
 
@@ -94,7 +94,7 @@ No surprise: You can see there’s a single RString structure at hexadecimal add
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/1/18/chalkboard.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/1/18/chalkboard.jpg"></td></tr>
   <tr><td align="center"><small><i>MRI Ruby will not copy string values unnecessarily</i></small></td></tr>
 </table>
 </div>
@@ -117,7 +117,7 @@ str2 = String.new(str)
 
 Here’s what we have now:
 
-![Shared String](http://patshaughnessy.net/assets/2012/1/18/shared-string.png)
+![Shared String](https://patshaughnessy.net/assets/2012/1/18/shared-string.png)
 
 This is a “Shared String:” two RString structures that share the same string data. You can see there’s a single copy of the actual string data, and that both RString structures have the same value for <span class="code">ptr</span> and <span class="code">len</span>. Also, the <span class="code">shared</span> value in <span class="code">str2</span> is a pointer back to the RString structure that it is sharing with. The same pattern could be used for 3, 4 or more RString structures that all share the same string value.
 
@@ -193,11 +193,11 @@ puts str2
 
 Obivously these two strings no longer share the same value. What happened? Well first at the moment that you call <span class="code">upcase!</span> the Ruby interpreter makes a new copy of the string heap data for <span class="code">str2</span> like this:
 
-![Copy On Write](http://patshaughnessy.net/assets/2012/1/18/copy-on-write.png)
+![Copy On Write](https://patshaughnessy.net/assets/2012/1/18/copy-on-write.png)
 
 And then it performs the <span class="code">upcase!</span> operation on that new copy:
 
-![Upcase Operation](http://patshaughnessy.net/assets/2012/1/18/upcase.png)
+![Upcase Operation](https://patshaughnessy.net/assets/2012/1/18/upcase.png)
 
 As Simon Russell explained in a comment on my last post, this algorithm is referred to as “copy on write,” meaning that the two string objects actually share the same string value until the very last moment when this is possible, while the two values are still the same. Then just before one of them changes, Ruby make a separate copy of the string and applies the write operation (<span class="code">upcase!</span> in this example) to the new copy.
 
@@ -244,7 +244,7 @@ str = "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
 str2 = str[1..25]
 </pre>
 
-![String.slice with a copy](http://patshaughnessy.net/assets/2012/1/18/slice-copy.png)
+![String.slice with a copy](https://patshaughnessy.net/assets/2012/1/18/slice-copy.png)
 
 However, often the substring is a single character or just a few characters from the target string:
 
@@ -255,7 +255,7 @@ str2 = str[1..4]
 
 In this case the new string is less than 24 characters long, so there’s no need to call malloc again to allocate more memory. The short substring is just saved into the new RString object:
 
-![String.slice with embedded copy](http://patshaughnessy.net/assets/2012/1/18/slice-embedded.png)
+![String.slice with embedded copy](https://patshaughnessy.net/assets/2012/1/18/slice-embedded.png)
 
 However, one interesting optimization I found in the MRI Ruby string implementation was that if you happen to take a substring that includes all of the remaining characters up to the end of the original string, like this:
 
@@ -266,7 +266,7 @@ str2 = str[1..-1]
 
 ... then Ruby will continue to share the same string data! What it does is set the <span class="code">ptr</span> value of <span class="code">str2</span> to point at the same string data, but advanced forward in memory by the proper number of bytes to return the desired substring:
 
-![String.slice shared string](http://patshaughnessy.net/assets/2012/1/18/slice-shared.png)
+![String.slice shared string](https://patshaughnessy.net/assets/2012/1/18/slice-shared.png)
 
 Let's test it out using the same debug code:
 

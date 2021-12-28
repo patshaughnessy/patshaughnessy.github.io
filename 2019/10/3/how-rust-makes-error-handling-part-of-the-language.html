@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>How Rust Makes Error Handling Part of the Language - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>How Rust Makes Error Handling Part of the Language</h1><div class="metadata"><span class="date">October 3rd 2019</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How Rust Makes Error Handling Part of the Language">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2019/10/3/fingers-toes.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2019/10/3/fingers-toes.png"><br/>
 <i>In Spanish these are all “dedos,” while in English<br/>we can distinguish between fingers and toes. </i>
 </div>
 <p>Learning a foreign language can be an incredible experience, not only because
@@ -143,7 +143,7 @@ of code means the <span class="code">Either</span> type is a combination of two
 other types: <span class="code">a</span> and <span class="code">b</span>.
 Drawing that type equation, this is how I visualize Haskell <span
 class="code">Either</span> values:</p>
-<p><img src="http://patshaughnessy.net/assets/2019/10/3/left-or-right.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2019/10/3/left-or-right.png"><br/></p>
 <p>A single <span class="code">Either</span> value can only encapsulate <em>either</em>
 a value of type <span class="code">a</span> or a value of type <span
 class="code">b</span>:</p>
@@ -174,7 +174,7 @@ vocabulary and grammar.</p>
 <p>In Rust, the <span class="code">Result</span> type encapsulates two other types
 like <span class="code">Either.</span> A single <span
 class="code">Result</span> value has either one of those types or the other:</p>
-<img src="http://patshaughnessy.net/assets/2019/10/3/ok-or-err.png">
+<img src="https://patshaughnessy.net/assets/2019/10/3/ok-or-err.png">
 <p>Instead of <span class="code">Left a</span> and <span class="code">Right
 b</span> like in Haskell, Rust uses the words <span class="code">Ok(T)</span>
 and <span class="code">Err(E)</span>:</p>
@@ -249,7 +249,7 @@ class="code">Ok(T)</span>:</p>
 <p>Here, the use of <span class="code">?</span> after <span
 class="code">File::open(&quot;foo.txt&quot;)</span> tells the Rust compiler to check the
 return value of <span class="code">File::open</span> for me automatically:</p>
-<p><img src="http://patshaughnessy.net/assets/2019/10/3/success-or-failure.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2019/10/3/success-or-failure.png"><br/></p>
 <p>If the return value of <span class="code">File::open</span> is <span
 class="code">Ok(T)</span>, then Rust assigns the inner <span
 class="code">T</span> value to <span class="code">file</span>. If <span
@@ -313,7 +313,7 @@ class="code">read()</span> will return <span class="code">Err(e)</span>, where
 <span class="code">e</span> is a value of type <span
 class="code">std::io::Error</span>. Note <span class="code">open</span> returns
 the same error type that <span class="code">read</span> does:</p>
-<img src="http://patshaughnessy.net/assets/2019/10/3/error-types.png">
+<img src="https://patshaughnessy.net/assets/2019/10/3/error-types.png">
 <p>This is where Rust shines. It allows for concise and readable error handling
 that is also thorough and correct. The Rust compiler checks for error handling
 completeness at <em>compile time</em>, before I ever run my program.</p>

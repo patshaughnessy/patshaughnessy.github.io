@@ -4,14 +4,14 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/mozart.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/20/mozart.jpg"></td></tr>
   <tr><td align="center"><small><i>Mozart’s Requiem Mass in D minor would be<br/>hard to understand without a translation from Latin</i></small></td></tr>
 </table>
 </div>
 
 Metaprogramming has always been one of the most intimidating features of the Ruby language - it’s considered very “advanced” and can often be very difficult to read and understand. However, I agree completely with what [Russ Olsen](http://jroller.com/rolsen/) said about metaprogramming on [this Thursday's Ruby Rogues podcast](http://rubyrogues.com/033-rr-book-club-eloquent-ruby/): that Ruby metaprogramming really isn’t all that hard to understand, that it is just another moderately difficult programming concept any Ruby developer can learn and use.
 
-[Like I did two weeks ago](http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits) I decided to take a look at the Rails source code, this time to see whether there were any good examples of metaprogramming that I could learn from.DELIM What techniques did the Rails core team use with metaprogramming that I could use in my own work? I found that I was impressed by how the Rails team <i>thought</i> about metaprogramming - the philosophy and coding practices they used - rather than by the actual metaprogramming techniques themselves.
+[Like I did two weeks ago](https://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits) I decided to take a look at the Rails source code, this time to see whether there were any good examples of metaprogramming that I could learn from.DELIM What techniques did the Rails core team use with metaprogramming that I could use in my own work? I found that I was impressed by how the Rails team <i>thought</i> about metaprogramming - the philosophy and coding practices they used - rather than by the actual metaprogramming techniques themselves.
 
 Today I’m going to discuss three of the metaprogramming practices I found in the Rails source code - read on to learn more about these best practices and how to use them in your code.
 
@@ -21,7 +21,7 @@ Today I’m going to discuss three of the metaprogramming practices I found in t
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/translate.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/20/translate.jpg"></td></tr>
 </table>
 </div>
 
@@ -95,7 +95,7 @@ But wait a minute... aren’t code comments frowned upon and largely unnecessary
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/accident.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/20/accident.jpg"></td></tr>
 </table>
 </div>
 
@@ -162,7 +162,7 @@ Here we can see that ActiveRecord implements <span class="code">respond_to?</spa
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/neighborhood.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/20/neighborhood.jpg"></td></tr>
 </table>
 </div>
 

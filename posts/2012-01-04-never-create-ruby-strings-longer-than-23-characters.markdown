@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/1/4/microscope.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/1/4/microscope.jpg"></td></tr>
   <tr><td align="center"><small><i>Looking at things through a microscope<br/>sometimes leads to surprising discoveries</i></small></td></tr>
 </table>
 </div>
@@ -64,7 +64,7 @@ str = "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
 
 ... the Ruby interpreter creates a structure called “RString” that conceptually looks like this:
 
-![heap strings](http://patshaughnessy.net/assets/2012/1/4/heap-string.png)
+![heap strings](https://patshaughnessy.net/assets/2012/1/4/heap-string.png)
 
 You can see here that the RString structure contains two values: <span class="code">ptr</span> and <span class="code">len</span>, but not the actual string data itself. Ruby actually saves the string character values themselves in some memory allocated from the heap, and then sets <span class="code">ptr</span> to the location of that heap memory, and <span class="code">len</span> to the length of the string.
 
@@ -92,7 +92,7 @@ str2 = str
 
 Here the Ruby interpreter has realized that you are assigning the same string value to two variables: str and str2. So in fact there’s no need to create two copies of the string data itself; instead Ruby creates two RString values that share the single copy of the string data. The way this works is that both RString structs contain the same ptr value to the shared data... meaning both strings contain the same value. There’s also a <span class="code">shared</span> value saved in the second RString struct that points to the first RString struct. There are some other details which I’m not showing here, such as some bit mask flags that Ruby uses to keep track of which RString’s are shared and which are not.
 
-![shared strings](http://patshaughnessy.net/assets/2012/1/4/shared-string.png)
+![shared strings](https://patshaughnessy.net/assets/2012/1/4/shared-string.png)
 
 Aside from saving memory, this also speeds up execution of your Ruby programs dramatically by avoiding the need to allocate more memory from the heap using another call to <span class="code">malloc</span>. <span class="code">Malloc</span> is actually a fairly expensive operation: it takes time to track down available memory of the proper size in the heap, and also to keep track of it for freeing later.
 
@@ -116,7 +116,7 @@ The third and last way that MRI Ruby 1.9 saves string data is by embedding the c
 str3 = "Lorem ipsum dolor"
 </pre>
 
-![embedded strings](http://patshaughnessy.net/assets/2012/1/4/embedded-string.png)
+![embedded strings](https://patshaughnessy.net/assets/2012/1/4/embedded-string.png)
 
 This RString structure contains a character array called <span class="code">ary</span> and not the <span class="code">ptr</span>, <span class="code">len</span> and <span class="code">shared</span> values we saw above. Here’s another simplified definition of the same RString structure, this time containing the <span class="code">ary</span> character array:
 
@@ -248,7 +248,7 @@ Note that when the string length is 23 or less, it takes about 250ms to create 1
 
 Here’s a graph showing some more data; the bars show how long it takes to allocate 1 million strings of the given length:
 
-![string allocation chart](http://patshaughnessy.net/assets/2012/1/4/string-allocations.png)
+![string allocation chart](https://patshaughnessy.net/assets/2012/1/4/string-allocations.png)
 
 ## Conclusion
 

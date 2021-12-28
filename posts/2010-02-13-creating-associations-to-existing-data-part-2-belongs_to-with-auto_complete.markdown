@@ -2,9 +2,9 @@ title: "Creating associations to existing data part 2: belongs_to with auto_comp
 date: 2010/02/13
 tag: View Mapper
 
-<p><a href="http://patshaughnessy.net/2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding">In my last post</a> I started a series on how to write Rails forms that associate a new record with existing data. This sort of requirement comes up for me over and over again at my day job, and so I decided to support scaffolding for these forms in <a href="http://patshaughnessy.net/view_mapper">View Mapper</a>.</p>
+<p><a href="https://patshaughnessy.net/2010/1/25/creating-associations-to-existing-data-part-1-belongs_to-scaffolding">In my last post</a> I started a series on how to write Rails forms that associate a new record with existing data. This sort of requirement comes up for me over and over again at my day job, and so I decided to support scaffolding for these forms in <a href="https://patshaughnessy.net/view_mapper">View Mapper</a>.</p>
 <p>Today I&rsquo;ll continue by showing how to use the auto_complete plugin to select an existing record &ndash; exactly what Ryan Bates discussed in his screen cast <a href="http://railscasts.com/episodes/102-auto-complete-association">Auto-Complete Association</a>. Using the same Category/Product example, this form would allow the user to create a new product record, and associate it with an existing category tag:<br/><br/>
-<img src="http://patshaughnessy.net/assets/2010/2/12/new_product.png"/>
+<img src="https://patshaughnessy.net/assets/2010/2/12/new_product.png"/>
 <p>To create scaffolding like this in your app with View Mapper, just run this command:</p>
 <div class="CodeRay">
   <div class="code"><pre>script/generate scaffold_for_view product name:string bar_code:integer
@@ -183,4 +183,4 @@ etc...</pre></div>
    -&gt; 0.0034s
 ==  CreateEmployees: migrated (0.0036s) =======================================</pre></div>
 </div><br/>
-<img src="http://patshaughnessy.net/assets/2010/2/12/new_employee.png"/>
+<img src="https://patshaughnessy.net/assets/2010/2/12/new_employee.png"/>

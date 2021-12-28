@@ -4,13 +4,13 @@ tag: Ruby
 
 <b>This is an excerpt from the beginning of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.
 
-If you’re interested in Ruby internals you can [sign up here](http://patshaughnessy.net/ruby-under-a-microscope) and I’ll send you an email when the eBook is finished. Next week I’m planning to publish part of the following chapter also, which will cover how Ruby’s YARV engine executes your code after it’s been compiled. You might also want to check out [an entire chapter from the book](http://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope) I posted last month. I’m having the time of my life researching and writing this - I hope you’ll find learning about what’s going on inside Ruby as fascinating and fun as I do!</b>
+If you’re interested in Ruby internals you can [sign up here](https://patshaughnessy.net/ruby-under-a-microscope) and I’ll send you an email when the eBook is finished. Next week I’m planning to publish part of the following chapter also, which will cover how Ruby’s YARV engine executes your code after it’s been compiled. You might also want to check out [an entire chapter from the book](https://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope) I posted last month. I’m having the time of my life researching and writing this - I hope you’ll find learning about what’s going on inside Ruby as fascinating and fun as I do!</b>
 
 <br/>
 
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td><img src="http://patshaughnessy.net/assets/2012/6/18/curved-road.jpg"></td></tr>
+    <tr><td><img src="https://patshaughnessy.net/assets/2012/6/18/curved-road.jpg"></td></tr>
   </table>
 </div>
 
@@ -21,7 +21,7 @@ Whenever you run a Ruby script - whether it’s a large Rails application, a sim
 <br/>
 At a high level, here’s what this journey looks like:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/process.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/process.png"/>
 
 First, Ruby tokenizes your code. During this first step, Ruby reads the text characters in your code file and converts them into tokens. Think of tokens as the words that are used in the Ruby language. In the next step, Ruby parses these tokens; “parsing” means to group the tokens into meaningful Ruby statements. This is analogous to grouping words into sentences. Finally, Ruby compiles these statements or sentences into low level instructions that later Ruby can execute using a virtual machine.
 
@@ -29,17 +29,17 @@ I’ll get to Ruby’s virtual machine called “Yet Another Ruby Virtual Machin
 
 ## Tokens: the words that make up the Ruby language
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Experiment 1-1: Using Ripper to tokenize different Ruby scripts
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Parsing: how Ruby understands the code you write
 
 <div style="float: right; padding: 15px 0px 10px 30px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td><img src="http://patshaughnessy.net/assets/2012/6/18/bison.jpg"></td></tr>
+    <tr><td><img src="https://patshaughnessy.net/assets/2012/6/18/bison.jpg"></td></tr>
     <tr><td align="center"><small><i>Ruby uses an LALR parser generator called Bison</i></small></td></tr>
   </table>
 </div>
@@ -54,7 +54,7 @@ Bison, Yacc and other parser generators require you to express your grammar rule
 
 Ruby doesn’t use Bison to actually process the tokens; instead, Ruby runs Bison ahead of time during Ruby’s build process to create the actual parser code. There are really two separate steps to the parsing process, then:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/process2.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/process2.png"/>
 
 Ahead of time, before you ever run your Ruby program, the Ruby build process uses Bison to generate the parser code (parse.c) from the grammar rules file (parse.y). Then later at run time this generated parser code actually parses the tokens returned by Ruby’s tokenizer code. You might have built Ruby yourself from source manually or automatically on your computer by using a tool like Homebrew. Or someone else may have built Ruby ahead of time for you if you installed Ruby with a prepared install kit.
 
@@ -80,7 +80,7 @@ This grammar rule means: if the token stream is equal to “me”, “gusta,” 
 
 How does this work? Here’s a conceptual picture of the parsing process in action:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing1.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing1.png"/>
 
 At the top I show the four input tokens, and the grammar rule right underneath it. It’s obvious in this case there’s a match since each input token corresponds directly to one of the terms on the right side of the grammar rule. In this example we have a match on the “SpanishPhrase” rule.
 
@@ -118,7 +118,7 @@ There’s a lot more going on here; you can see four grammar rules instead of ju
 
 Now things aren’t so obvious - the parser can’t immediately match any of the grammar rules like in the previous, trivial example:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing2.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing2.png"/>
 
 Here using the “SpanishPhrase” rule the “el” and “ruby” tokens match, but “le” and “gusta” do not. Ultimately we’ll see how the child rule “VerbAndObject” does match “le gusta” but for now there is no immediate match. And now that there are four grammar rules, how does the parser know which one to try to match against? ..and against which tokens?
 
@@ -131,53 +131,53 @@ This is where the real intelligence of the LALR parser comes into play. This acr
 
 Here’s how the algorithm works for this example. First, the parser takes the input token stream:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing3.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing3.png"/>
 
 … and shifts the tokens to the left, creating something I’ll call the “Grammar Rule Stack:”
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing4.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing4.png"/>
 
 Here since the parser has processed just one token, “le,” this is kept in the stack alone for the moment. “Grammar Rule Stack” is a simplification; in reality the parser does use a stack, but instead of grammar rules it pushes numbers onto its stack that indicate which grammar rule it just parsed. These numbers - or states from a state machine - help the parser keep track of where it is as it processes the tokens.
 
 Next, the parser shifts another token to the left:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing5.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing5.png"/>
 
 Now there are two tokens in the stack on the left. At this point the parser stops to examine all of the different grammar rules and looks for one that matches. In this case, it finds that the “SheLikes” rule matches:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing6.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing6.png"/>
 
 This operation is called “reduce,” since the parser is replacing the pair of tokens with a single, matching rule. This seems very straightforward… the parser just has to look through the available rules and reduce or apply the single, matching rule.
 
 Now the parser in our example can reduce again - now there is another matching rule: VerbAndObject! This rule matches because of the OR (vertical bar) operator: it matches either the “SheLikes” or the “ILike” child rule. The parser can next replace “SheLikes” with “VerbAndObject:”
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing7.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing7.png"/>
 
 But let’s stop for a moment and think about this a bit more carefully: how did the parser know to reduce and not continue to shift tokens? Also, in the real world there might actually be many matching rules the parser could reduce with - how does it know which rule to use? This is the crux of the algorithm that LALR parsers use... that Ruby uses… how does it decide whether to shift or reduce? And if it reduces, how does it decide which grammar rule to reduce with? 
 
 In other words, suppose at this point in the process…
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing8.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing8.png"/>
 
 … there were multiple matching rules that included “le gusta.” How would the parser know which rule to apply or whether to shift in the ‘el’ token first before looking for a match?
 
 Here’s where the “LA” (Look Ahead) portion of LALR comes in: in order to find proper matching rule it looks ahead at the next token:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing9.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing9.png"/>
 
 Additionally, the parser maintains a state table of possible outcomes depending on what the next token was and which grammar rule was just parsed. LALR parsers are complex state machines that match patterns in the token stream. When you use Bison to generate the LALR parser, Bison calculates what this state table should contain based on the grammar rules you provided. In this example, the state table would contain an entry indicating that if the next token was “el” the parser should first reduce using the SheLikes rule, before shifting a new token.
 
 I won’t show the details of what a state table looks like; if you’re interested, the actual LALR state table for Ruby can be found in the generated parse.c file. Instead let’s just continue the shift/reduce operations for my simple example. After matching the “VerbAndObject” rule, the parser would shift another token to the left:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing10.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing10.png"/>
 
 At this point no rules would match, and the state machine would shift another token to the left:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing11.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing11.png"/>
 
 And finally, the parent grammar rule “SpanishPhrase” would match after a final reduce operation:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/parsing12.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/parsing12.png"/>
 
 Why have I shown you this Spanish to English example? Because Ruby parses your program in exactly the same way! Inside the Ruby “parse.y” source code file, you’ll see hundreds of rules that define the structure and syntax of the Ruby language. There are parent and child rules, and the child rules return values the parent rules can refer to in exactly the same way, using the $$, $1, $2, etc. symbols. The only real difference is scale - my Spanish phrase grammar is extremely simple, trivial really. On the other hand, Ruby’s grammar is extremely complex, an intricate series of interrelated parent and child grammar rules, which sometimes even refer to each other in circular, recursive patterns. But this complexity just means that the generated state table in the parse.c file is larger. The basic LALR algorithm - how the parser processes tokens and uses the state table - is the same.
 
@@ -193,25 +193,25 @@ end
 
 This is a very simple Ruby script, right? Since this is so short, it should’t be too difficult to trace the Ruby parser’s path through its grammar rules. Let’s take a look at how it works:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/ruby-parse1.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/ruby-parse1.png"/>
 
 On the left I show the code that Ruby is trying to parse. On the right are the actual matching grammar rules from the Ruby parse.y file, shown in a simplified manner. The first rule, “program: top_compstmt” is the root grammar rule which matches every Ruby program in its entirety. As you follow the list down, you can see a complex series of child rules that also match my entire Ruby script: “top statements,” a single statement, an expression, an argument and finally a “primary” value.
 
 Once Ruby’s parse reaches the “primary” grammar rule, it encounters a rule that has two matching child rules: “method_call” and “brace_block.” Let’s take the method_call rule first:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/ruby-parse2.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/ruby-parse2.png"/>
 
 The method_call rule matches the “10.times” portion of my Ruby code - i.e. where I call the “times” method on the 10 Fixnum object. You can see the rule matches another primary value, followed by a period character, followed in turn by an “operation2”. The period is simple enough, and here’s how the primary_value and operation2 child rules work: first the “primary_value” rule matches the literal “10:”
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/ruby-parse3.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/ruby-parse3.png"/>
 
 And then the “operation2” rule matches the method name “times:”
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/ruby-parse4.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/ruby-parse4.png"/>
 
 What about the rest of my Ruby code? How does Ruby parse the contents of the “do … puts… end” block I passed to the times method? Ruby handles that using the “brace_block” rule from above:
 
-<img src="http://patshaughnessy.net/assets/2012/6/18/ruby-parse5.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/18/ruby-parse5.png"/>
 
 I won’t go through all the remaining child grammar rules here, but you can see how this rule in turn contains a series of other matching child rules:
 
@@ -222,24 +222,24 @@ I won’t go through all the remaining child grammar rules here, but you can see
   <li>“keyword_end” matches the “end” reserved keyword</li>
 </ul>
 
-… read the rest of this section in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read the rest of this section in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Experiment 1-2: Using Ripper to parse different Ruby scripts
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## How Ruby compiles your code into a new language!
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Experiment 1-3: Using the RubyVM class to display YARV instructions
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## How the JRuby team is implementing a new instruction set
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## An elegant dance: how Rubinius uses Ruby and C together to parse your code
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).

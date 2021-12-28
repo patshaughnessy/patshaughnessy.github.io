@@ -9,7 +9,7 @@ team effort, with commits both from the people on stage in Tokyo and hundreds
 of other open source developers located around the world.
 
 <div style="margin-left: auto; margin-right: auto; width:500px">
-  <img src="http://patshaughnessy.net/assets/2013/6/18/ruby-kaigi-stage2.jpeg">
+  <img src="https://patshaughnessy.net/assets/2013/6/18/ruby-kaigi-stage2.jpeg">
 </div>
 
 However, many of the most active developers behind the Ruby 2.0 release are

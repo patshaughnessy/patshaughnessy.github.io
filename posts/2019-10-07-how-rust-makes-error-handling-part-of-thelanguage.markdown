@@ -3,7 +3,7 @@ date: 2019/10/03
 tag: Rust
 
 <div style="float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2019/10/3/fingers-toes.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2019/10/3/fingers-toes.png"><br/>
 <i>In Spanish these are all “dedos,” while in English<br/>we can distinguish between fingers and toes. </i>
 </div>
 
@@ -176,7 +176,7 @@ other types: <span class="code">a</span> and <span class="code">b</span>.
 Drawing that type equation, this is how I visualize Haskell <span
 class="code">Either</span> values:
 
-<img src="http://patshaughnessy.net/assets/2019/10/3/left-or-right.png"><br/>
+<img src="https://patshaughnessy.net/assets/2019/10/3/left-or-right.png"><br/>
 
 A single <span class="code">Either</span> value can only encapsulate _either_
 a value of type <span class="code">a</span> or a value of type <span
@@ -209,7 +209,7 @@ In Rust, the <span class="code">Result</span> type encapsulates two other types
 like <span class="code">Either.</span> A single <span
 class="code">Result</span> value has either one of those types or the other:
 
-<img src="http://patshaughnessy.net/assets/2019/10/3/ok-or-err.png">
+<img src="https://patshaughnessy.net/assets/2019/10/3/ok-or-err.png">
 
 Instead of <span class="code">Left a</span> and <span class="code">Right
 b</span> like in Haskell, Rust uses the words <span class="code">Ok(T)</span>
@@ -285,7 +285,7 @@ Here, the use of <span class="code">?</span> after <span
 class="code">File::open("foo.txt")</span> tells the Rust compiler to check the
 return value of <span class="code">File::open</span> for me automatically:
 
-<img src="http://patshaughnessy.net/assets/2019/10/3/success-or-failure.png"><br/>
+<img src="https://patshaughnessy.net/assets/2019/10/3/success-or-failure.png"><br/>
 
 If the return value of <span class="code">File::open</span> is <span
 class="code">Ok(T)</span>, then Rust assigns the inner <span
@@ -357,7 +357,7 @@ class="code">read()</span> will return <span class="code">Err(e)</span>, where
 class="code">std::io::Error</span>. Note <span class="code">open</span> returns
 the same error type that <span class="code">read</span> does:
 
-<img src="http://patshaughnessy.net/assets/2019/10/3/error-types.png">
+<img src="https://patshaughnessy.net/assets/2019/10/3/error-types.png">
 
 This is where Rust shines. It allows for concise and readable error handling
 that is also thorough and correct. The Rust compiler checks for error handling

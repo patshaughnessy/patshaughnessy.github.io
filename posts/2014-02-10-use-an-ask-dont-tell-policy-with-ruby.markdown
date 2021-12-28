@@ -3,7 +3,7 @@ date: 2014/2/10
 tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/2/10/innisfree.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/2/10/innisfree.jpg"><br/>
   <i>Innisfree is an actual island in Lough Gill, County Sligo, Ireland</i>
 </div>
 
@@ -55,7 +55,7 @@ beautiful, _The Lake Isle Of Innisfree_:
 My task is to write a Ruby script to return the line that contains a given
 word, along with the following lines:
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/console.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/console.png"><br/>
 
 ## Telling Ruby What To Do
 
@@ -65,7 +65,7 @@ follow.
 
 First I need to open the file and read in the poem:
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/one.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/one.png"><br/>
 
 Here <span class="code">File#readlines</span> saves all the lines of text into an array, which the <span class="code">parse</span>
 method will process, returning the result in another array. Later I join the
@@ -75,14 +75,14 @@ How do I implement <span class="code">parse</span>? Again, I imagine that I am t
 Ruby. How do I find the lines that follow _glimmer_? Well, obviously I need to
 loop through the array looking for the target word.
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/two.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/two.png"><br/>
 
 Once I find the word, I’ll start saving the lines into a new array called
 <span class="code">result</span>. Since I want to save all the following lines and not just the matching
 line, I’ll also use a boolean flag to keep track of whether I’ve already seen
 the target.
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/three.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/three.png"><br/>
 
 What’s wrong with this code? Nothing really. It works just fine, and it’s
 even somewhat idiomatic Ruby. In the past, I would have probably considered
@@ -112,7 +112,7 @@ reading enough that they consider the code to be their own someday.)
 
 To get started I’ll write the new method to return an empty array.
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/four.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/four.png"><br/>
 
 Notice on the left I changed the label from “Instructions:” to “What do I
 want?” This reflects my new way of thinking about the problem.
@@ -125,7 +125,7 @@ hadn't thought of before.
 
 Now I can rewrite the “What do I want?” text like this:
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/five.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/five.png"><br/>
 
 I rewrote what I want from Ruby to be more specific: I want a “portion of the
 array” and I want the portion “including and following the line containing the
@@ -139,7 +139,7 @@ On the right, I’ve written code to return a subset of the array,
 Thinking about this a bit, it’s easy to see how to find the line containing the
 target string: I can use <span class="code">detect</span> to find the line that includes the target word.
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/six.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/six.png"><br/>
 
 But I’m still not done. I need the index of the line containing the target, not
 the line itself. How can I find <span class="code">target_index</span>? Again, I shouldn’t tell Ruby what
@@ -150,7 +150,7 @@ need to find (to detect) the target index, not the target line.
 
 Here’s how to do it:
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/seven.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/seven.png"><br/>
 
 Here I use Ruby’s <span class="code">detect</span> method to search a range of index values, not lines.
 Inside the block I check whether the line corresponding to each index
@@ -162,7 +162,7 @@ array if I found the target, or an empty array if I didn’t.
 In my opinion this code is better than what I showed earlier. Why? They both
 work equally well. What’s the difference? Let's take a look at them side-by-side.
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/compare.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/compare.png"><br/>
 
 First of all, I have simpler, more terse code. Less code is better. The <span class="code">lines_after</span>
 method contains just 4 lines of code while the <span class="code">parse</span> method
@@ -195,7 +195,7 @@ But, as we’ve seen, you don’t need to abandon Ruby to write functional code.
   class="code">drop_while</span>, which gives us an even more readable,
 functional solution:
 
-<img src="http://patshaughnessy.net/assets/2014/2/10/eight.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/2/10/eight.png"><br/>
 
 I also decided to rename the <span class="code">after</span> method to <span
   class="code">lines_after</span>, based on the comments from TenderGlove and

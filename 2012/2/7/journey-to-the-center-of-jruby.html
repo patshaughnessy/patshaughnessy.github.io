@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Journey to the center of JRuby - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Journey to the center of JRuby</h1><div class="metadata"><span class="date">February 7th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2012/2/7/journey-to-the-center-of-jruby" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Journey to the center of JRuby">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey1.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey1.jpg"></td></tr>
   <tr><td align="center"><small><i>Could Jules Verne have imagined something<br/>as complex as the Java Virtual Machine?</i></small></td></tr>
 </table>
 </div>
@@ -10,7 +10,7 @@
 <h2>Ruby</h2>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey2.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey2.jpg"></td></tr>
 </table>
 </div>
 <p>One of the nicest things about JRuby is its apparent simplicity: you use it more or less as a drop in replacement for MRI Ruby. That is, once you <a href="http://jruby.org/getting-started">install JRuby</a>, running a JRuby program works the same way as running a Ruby program. For example, here’s the trivial, one line Ruby program that I’ll look at today:</p>
@@ -35,10 +35,10 @@ JOURNEY TO THE CENTER OF JRUBY
 <p>Let’s get started by reviewing the basics of how JRuby works: JRuby is a Java program that interprets Ruby code. Here’s a simple diagram comparing the standard MRI setup with JRuby:</p>
 <div style="float: left; padding: 7px 30px 0px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey3.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey3.jpg"></td></tr>
 </table>
 </div>
-<p><img src="http://patshaughnessy.net/assets/2012/2/7/basics.png" alt="basics" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/2/7/basics.png" alt="basics" /></p>
 <p>On the left, you can see MRI executing a Ruby program, while on the right JRuby is doing the same thing. The difference is that JRuby is actually a Java program, which means it requires a Java Virtual Machine in order to run. MRI, on the other hand, is written in C and is compiled into native machine language and can run directly as a standalone program on your computer.</p>
 <p>Now let’s dive in a take a look at the Java code that implements the Ruby <span class="code">upcase</span> method. Since I installed JRuby using RVM, the JRuby source code is located at this location on my machine:</p>
 <pre type="console">
@@ -119,11 +119,11 @@ $ cd org/jruby
 <h2>Java byte code</h2>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey4.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey4.jpg"></td></tr>
 </table>
 </div>
 <p>In the diagram above, I showed how the JRuby interpreter is actually a Java program executed by the Java Virtual Machine (“JVM”). However, as you may know, Java is not interpreted the same way that Ruby is. Instead Java is a compiled, statically typed language. This means that the JRuby Java code, like the RubyString.java file we saw above, is compiled into something called “Java byte code” ahead of time. The byte code is what the JVM interprets and executes. Here’s a diagram showing how this process works:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/2/7/java-compiler.png" alt="Java compiler" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/2/7/java-compiler.png" alt="Java compiler" /></p>
 <p>To get a sense of what Java byte code looks like, let’s actually open up the RubyString.class file and see what’s contained inside. Since RubyString.class is a binary file, we need to use a Java utility called “javap” to be able to read and inspect its contents:</p>
 <pre type="console">
 $ cd .rvm/src/jruby-head/build/classes/jruby/org/jruby
@@ -201,7 +201,7 @@ public class org.jruby.RubyString extends org.jruby.RubyObject
 <h2>Assembly Language</h2>
 <div style="float: left; padding: 17px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey5.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey5.jpg"></td></tr>
 </table>
 </div>
 <p>Now we’re reaching the deepest, darkest depths of the JRuby system. It turns out that the modern JVMs are sophisticated enough to perform another compilation step internally and convert portions of your Java byte code - the interpreter running your Ruby program - directly into native machine language. This means that running the JRuby interpreter uses native machine language just like using the standard MRI interpreter does, at least for some portions of the code. This is one of the reasons why running a Ruby program with JRuby can often be faster than running it with MRI Ruby!</p>

@@ -3,7 +3,7 @@ date: 2014/1/9
 tag: Ruby
 
 <div style="float: left; padding: 7px 30px 20px 0px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2014/1/9/classes.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/1/9/classes.png"><br/>
   <i>Ruby represents small integers using Fixnum<br/>
     and large integers using Bignum.</i>
 </div>
@@ -35,7 +35,7 @@ Most computers these days represent numbers as 64 digit binary values
 internally. For example, the number ten thousand looks like this expressed as a
 binary value:
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/64-bits.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/64-bits.png"><br/>
 
 My rectangle here represents how a 64-bit computer would save an integer in a
 microprocessor register or a RAM memory location. The numbers 63 and 0 indicate
@@ -62,7 +62,7 @@ object.
 Here’s how Ruby represents ten thousand
 internally:
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/64-bits-ruby.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/64-bits-ruby.png"><br/>
 
 <span class="code">FIXNUM_FLAG</span>=1 indicates this integer represents an instance of the <span class="code">Fixnum</span>
 class. The flag is a performance optimization, removing the need for Ruby to
@@ -76,7 +76,7 @@ Like most other computer languages and also like your microprocessor’s actual 
 circuits, Ruby uses a binary format called [two’s complement](http://en.wikipedia.org/wiki/Two's_complement) to save negative
 integers. Here’s how the value -10,000 would be saved inside your Ruby program:
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/twos-complement-ruby.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/twos-complement-ruby.png"><br/>
 
 Note the first bit on the left, the sign bit, is set to 1. This indicates this
 is a negative integer. Ruby still sets the lowest bit, <span
@@ -100,7 +100,7 @@ works, however, for integer values that are small enough to fit into a single
   class="code">Fixnum</span> integer must be by setting all 62 of the middle
 bits to one, like this:
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/largest-value.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/largest-value.png"><br/>
 
 Here we have a zero on the left (indicating this is a positive integer) and a
 one on the right (for <span class="code">FIXNUM_FLAG</span>). The remaining 62 bits in the middle hold
@@ -116,19 +116,19 @@ course, the largest <span class="code">Fixnum</span> would be much smaller than 
 But what does Ruby do if we want to use larger numbers? For example, this Ruby
 program works just fine:
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/code.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/code.png"><br/>
 
 But now the sum doesn’t fit into a 64-bit <span class="code">Fixnum</span> value, since expressing
 4611686018427387904 as a binary value requires 63 digits, not 62:
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/doesnt-fit.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/doesnt-fit.png"><br/>
 
 This is where the <span class="code">Bignum</span> class comes in. While calculating
 4611686018427387903+1, Ruby has to create a new type of object to represent
 4611686018427387904 - an instance of the <span class="code">Bignum</span> class. Here’s how that looks
 inside of Ruby:
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/pointer.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/pointer.png"><br/>
 
 On the right you can see Ruby has reset the <span class="code">FIXNUM_FLAG</span> to zero, indicating
 this value is not a <span class="code">Fixnum</span> but instead a pointer to some other type of object.
@@ -141,7 +141,7 @@ zero, is actually also part of the pointer’s value.)
 Now let’s take a closer look at the <span class="code">RBignum</span> C structure and find out what’s
 inside it. Here’s how Ruby saves the value 4611686018427387904 internally: 
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/>
 
 On the left, you can see <span class="code">RBignum</span> contains an inner structure called <span class="code">RBasic</span>,
 which contains internal, technical values used by all Ruby objects. Below that
@@ -170,13 +170,13 @@ for the entire large integer. For example, for an extremely large number
 requiring 320 bits, Ruby could use 10 32-bit values by setting <span class="code">len</span> to 10 and
 allocating more memory:
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/ten-digits.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/ten-digits.png"><br/>
 
 In my example Ruby needs just two 32-bit values. This makes sense because, as
 we saw above, 4611686018427387903 is a 62-bit integer (all ones) and when I add one I get a 63-bit value. When I add
 one, Ruby first copies the 62 bits in the target value into a new <span class="code">Bignum</span> structure, like this:
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/copy-to-bignum.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/copy-to-bignum.png"><br/>
 
 Ruby copies the least significant 32 bits into the first digit
 value on the left, and the most significant 30 into the second digit value on
@@ -187,7 +187,7 @@ Once Ruby has copied 4611686018427387903 into a new <span
 implemented in bignum.c to perform an addition operation on the new Bignum. Now
 there is enough room to hold the 63-bit result, 4611686018427387904 (diagram copied from above):
 
-<img src="http://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/>
 
 A few other minor details to learn about this:
 
@@ -203,7 +203,7 @@ A few other minor details to learn about this:
   <li>For small <span class="code">Bignum</span>’s, Ruby saves memory and time
 by storing the digits values right inside the <span class="code">RBignum</span> structure itself, using a
 C <i>union</i> trick. I don’t have time to explain that here today, but you can see
-how the same optimization works for strings in my article <a href="http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a>.</li>
+how the same optimization works for strings in my article <a href="https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a>.</li>
 </ul>
 
 ## Next time

@@ -1,7 +1,7 @@
 <div style="float: left; padding: 17px 30px 10px 0px;
 line-height:16px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td align="center"><img src="http://patshaughnessy.net/assets/2012/12/17/bluebook-and-ruby.png"></td></tr>
+    <tr><td align="center"><img src="https://patshaughnessy.net/assets/2012/12/17/bluebook-and-ruby.png"></td></tr>
     <tr><td align="center"><i>Many of the ideas behind Ruby’s object model<br/>were developed for Smalltalk in the 1970s.</i></td></tr>
   </table>
 </div>
@@ -68,7 +68,7 @@ method of <span class="code">Polygon</span> can access. Here the <span class="co
 conceptual level, internally Ruby associates the <span class="code">@@sides</span> variable with the
 same memory structure used to represent the <span class="code">Polygon</span> class:</p>
 
-<p><img src="http://patshaughnessy.net/assets/2012/12/17/polygon.png"/></p>
+<p><img src="https://patshaughnessy.net/assets/2012/12/17/polygon.png"/></p>
 
 <p>The confusion comes in when you define a subclass; again here is another one of
 John Nunemaker’s examples:</p>
@@ -91,7 +91,7 @@ puts <span class="constant">Polygon</span>.sides
 <p>Notice both class variables, <span class="code">Triangle.sides</span> and <span class="code">Polygon.sides</span>, were changed to
 3. In fact, internally Ruby creates a single variable that both classes share:</p>
 
-<p><img src="http://patshaughnessy.net/assets/2012/12/17/polygon-and-triangle.png"/></p>
+<p><img src="https://patshaughnessy.net/assets/2012/12/17/polygon-and-triangle.png"/></p>
 
 <p>I may write in more detail about the details of Ruby’s internal implementation
 of class variables in an upcoming blog post, but for today I’ll just use these
@@ -117,7 +117,7 @@ should sound very familiar, of course.</p>
 <div style="float: left; padding: 17px 30px 10px 0px;
 line-height:16px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td align="center"><img src="http://patshaughnessy.net/assets/2012/12/17/children.png"></td></tr>
+    <tr><td align="center"><img src="https://patshaughnessy.net/assets/2012/12/17/children.png"></td></tr>
     <tr><td align="center"><i>
 
 In the 1970s, Alan Kay envisioned a laptop/tablet he called
@@ -415,7 +415,7 @@ puts <span class="constant">Polygon</span>.sides
 instance variable instead of a class variable:</p>
 
 <p><img
-src="http://patshaughnessy.net/assets/2012/12/17/polygon-instance.png"/></p>
+src="https://patshaughnessy.net/assets/2012/12/17/polygon-instance.png"/></p>
 
 <p>Conceptually there’s no difference, until I create the <span class="code">Triangle</span> subclass again:</p>
 
@@ -432,7 +432,7 @@ src="http://patshaughnessy.net/assets/2012/12/17/polygon-instance.png"/></p>
 <p>Now each class has its own copy of the value <span class="code">@sides</span>:</p>
 
 <p><img
-src="http://patshaughnessy.net/assets/2012/12/17/polygon-and-triangle-instance.png"/></p>
+src="https://patshaughnessy.net/assets/2012/12/17/polygon-and-triangle-instance.png"/></p>
 
 <p>Now let’s try the same thing in Smalltalk. In Smalltalk to declare an instance
 variable you call the <span class="code">instanceVariableNames</span> method on a class:</p>
@@ -519,7 +519,7 @@ To me Ruby seems to be a more succinct version of Smalltalk.</p>
 line-height:16px">
   <table cellpadding="0" cellspacing="0" border="0">
     <tr><td align="center"><img
-    src="http://patshaughnessy.net/assets/2012/12/17/metaphysics.png"></td></tr>
+    src="https://patshaughnessy.net/assets/2012/12/17/metaphysics.png"></td></tr>
     <tr><td align="center"><i>
 This diagram, taken from Alan Kay’s fascinating article <a
 href="http://www.smalltalk.org/downloads/papers/SmalltalkHistoryHOPL.pdf">The
@@ -601,13 +601,13 @@ using the <span class="code">Polygon</span> metaclass, an instance of the <span 
 <p>Here’s a diagram showing how these classes are all related in Smalltalk:</p>
 
 <p><img
-src="http://patshaughnessy.net/assets/2012/12/17/metaclasses-smalltalk.png"/></p>
+src="https://patshaughnessy.net/assets/2012/12/17/metaclasses-smalltalk.png"/></p>
 
 <p>By now, it should be no surprise if I tell you internally Ruby uses the same
 model. Here’s how classes work inside of Ruby:</p>
 
 <p><img
-src="http://patshaughnessy.net/assets/2012/12/17/metaclasses-ruby.png"/></p>
+src="https://patshaughnessy.net/assets/2012/12/17/metaclasses-ruby.png"/></p>
 
 <p>In Ruby whenever you create a class, Ruby internally creates a corresponding
 new class called the “metaclass.” Unlike Smalltalk, Ruby doesn’t use this for

@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/10/14/cheetah.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/10/14/cheetah.jpg"></td></tr>
   <tr><td align="center"><small><i>Bundler is about to get a lot faster...</i></small></td></tr>
 </table>
 </div>
@@ -132,7 +132,7 @@ This HTTP API call is very fast - less than a second - and provides all the info
 
 ## Visualizing Bundler 1.1’s algorithm for downloading dependencies
 
-Let’s use the same simple example Gemfile that I did three weeks ago in my article [How does Bundler bundle](http://patshaughnessy.net/2011/9/24/how-does-bundler-bundle):
+Let’s use the same simple example Gemfile that I did three weeks ago in my article [How does Bundler bundle](https://patshaughnessy.net/2011/9/24/how-does-bundler-bundle):
 
 <pre type="ruby">
 source 'http://rubygems.org'
@@ -141,7 +141,7 @@ gem 'uglifier’
 
 And I’ll draw a simple diagram that represents the contents of this Gemfile; in other words just a single gem:
 
-![single gem](http://patshaughnessy.net/assets/2011/10/14/one.png)
+![single gem](https://patshaughnessy.net/assets/2011/10/14/one.png)
 
 Next, I’ll run <span class="code">bundle update --verbose</span> in the folder containing this Gemfile and take a look at the output; but this time I’ll intersperse the output text with more diagrams showing what’s actually going on inside Bundler’s dependency-fetch algorithm:
 
@@ -150,7 +150,7 @@ $ bundle update --verbose
 Fetching gem metadata from http://rubygems.org/
 </pre>
 
-![first HTTP request](http://patshaughnessy.net/assets/2011/10/14/two.png)
+![first HTTP request](https://patshaughnessy.net/assets/2011/10/14/two.png)
 
 <pre type="console">
 Query List: ["uglifier"]
@@ -161,13 +161,13 @@ HTTP Success
 
 We can see here the first thing that happens is a HTTP request to determine the dependencies of the “uglifier” gem, the only gem in my Gemfile. You can see the results of this HTTP request above in the output of the parse_rubygems_api.rb script: that there are four gems that all of the different versions of uglifier depend on:
 
-![first HTTP request result](http://patshaughnessy.net/assets/2011/10/14/three.png)
+![first HTTP request result](https://patshaughnessy.net/assets/2011/10/14/three.png)
 
 The latest version of uglifier depends on json, execjs and multi_json, while some older versions of uglifier depend on “therubyracer” gem.
 
 The next thing Bundler will do is send a second HTTP request to RubyGems.org asking for the dependencies of these four gems:
 
-![second HTTP request](http://patshaughnessy.net/assets/2011/10/14/four.png)
+![second HTTP request](https://patshaughnessy.net/assets/2011/10/14/four.png)
 
 <pre type="console">
 Query List: ["multi_json", "execjs", "json", "therubyracer"]
@@ -178,11 +178,11 @@ HTTP Success
 
 If you’re interested you can run parse_rubygems_api.rb to see the results of this request. Here’s a diagram of what RubyGems returns:
 
-![second HTTP request result](http://patshaughnessy.net/assets/2011/10/14/five.png)
+![second HTTP request result](https://patshaughnessy.net/assets/2011/10/14/five.png)
 
 This time we can see that the “execjs” gem has some versions that depend on “multi_json” and that “therubyracer” depends on “libv8.” Finally, Bundler continues by sending a third HTTP request to RubyGems.org to get the dependencies of libv8 - multi_json is not included since we already have its info:
 
-![third HTTP request result](http://patshaughnessy.net/assets/2011/10/14/six.png)
+![third HTTP request result](https://patshaughnessy.net/assets/2011/10/14/six.png)
 
 <pre type="console">
 Query List: ["libv8"]
@@ -193,7 +193,7 @@ HTTP Success
 
 This time RubyGems.org returns an empty set, since libv8 has no dependencies at all:
 
-![third HTTP request result](http://patshaughnessy.net/assets/2011/10/14/seven.png)
+![third HTTP request result](https://patshaughnessy.net/assets/2011/10/14/seven.png)
 
 <pre type="console">
 Query List: []

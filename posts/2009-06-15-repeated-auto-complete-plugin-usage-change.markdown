@@ -2,7 +2,7 @@ title: "Repeated auto complete plugin usage change"
 date: 2009/06/15
 tag: the auto_complete plugin
 
-<p>I&rsquo;ve forked the auto_complete plugin to support repeated text fields in a complex form; see <a href="http://patshaughnessy.net/repeated_auto_complete">http://patshaughnessy.net/repeated_auto_complete</a> for more details.</p>
+<p>I&rsquo;ve forked the auto_complete plugin to support repeated text fields in a complex form; see <a href="https://patshaughnessy.net/repeated_auto_complete">https://patshaughnessy.net/repeated_auto_complete</a> for more details.</p>
 <p>If you had downloaded my plugin in the past, I&rsquo;ve just made a couple of changes that will require some simple code changes to your app:
   <ul>
     <li>You no longer need to or are able to use &ldquo;auto_complete_form_for&rdquo; or &ldquo;auto_complete_fields_for.&rdquo; I decided this was confusing and unnecessary. Now my plugin just mixes the text_field_with_auto_complete method right  into the standard FormBuilder class. Just use form_for or fields_for as usual.</li>

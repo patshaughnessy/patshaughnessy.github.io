@@ -4,21 +4,21 @@ tag: Redis
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/11/29/nosql.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/11/29/nosql.png"></td></tr>
   <tr><td align="center"><small><i>Consider a NoSQL solution such as Redis<br/> the next time you need to implement search...</i></small></td></tr>
 </table>
 </div>
 
-[Last week I demonstrated](http://patshaughnessy.net/2011/11/23/finding-your-soulmate-autocomplete-with-redis-in-rails-3-1) how to setup autocomplete in a new Rails 3.1 app using the [Soulmate](https://github.com/seatgeek/soulmate) gem, from [SeatGeek](http://seatgeek.com/). Soulmate uses Redis to cache all of the autocomplete phrases in memory, providing lightning fast query results. While autocomplete is a very useful feature and a common web site design element, what really interests me about Soulmate are the ideas and detailed techniques behind how it uses a NoSQL [Redis](http://redis.io/) database to implement autocomplete search.
+[Last week I demonstrated](https://patshaughnessy.net/2011/11/23/finding-your-soulmate-autocomplete-with-redis-in-rails-3-1) how to setup autocomplete in a new Rails 3.1 app using the [Soulmate](https://github.com/seatgeek/soulmate) gem, from [SeatGeek](http://seatgeek.com/). Soulmate uses Redis to cache all of the autocomplete phrases in memory, providing lightning fast query results. While autocomplete is a very useful feature and a common web site design element, what really interests me about Soulmate are the ideas and detailed techniques behind how it uses a NoSQL [Redis](http://redis.io/) database to implement autocomplete search.
 
 Today I’m going to take a look at two good examples of creating a search index using Redis: I’ll start with [Salvatore Sanfilippo’s original algorithm for autcomplete with Redis](http://antirez.com/post/autocomplete-with-redis.html), which uses a single sorted set to hold autocomplete prefixes. Then I’ll look at Soulmate’s solution, which also uses Redis but in addition supports matching multiple words in a phrase. I hope that these two examples will inspire you to consider using Redis the next time you need to implement any search related feature, not just autocomplete.
 
 ## How autocomplete is traditionally implemented with a SQL database
 
-Ruby on Rails has supported autocomplete for years; DHH himself wrote the [original autocomplete plugin](https://github.com/rails/auto_complete) years ago, and today’s there’s a newer, modern gem called [rails3-jquery-autocomplete](https://github.com/crowdint/rails3-jquery-autocomplete). Autocomplete uses Javascript to display a list of available options that match the first few letters a user types; for example, here’s the autocomplete field I implemented [last week](http://patshaughnessy.net/2011/11/23/finding-your-soulmate-autocomplete-with-redis-in-rails-3-1) in a sample Rails 3.1 app:
+Ruby on Rails has supported autocomplete for years; DHH himself wrote the [original autocomplete plugin](https://github.com/rails/auto_complete) years ago, and today’s there’s a newer, modern gem called [rails3-jquery-autocomplete](https://github.com/crowdint/rails3-jquery-autocomplete). Autocomplete uses Javascript to display a list of available options that match the first few letters a user types; for example, here’s the autocomplete field I implemented [last week](https://patshaughnessy.net/2011/11/23/finding-your-soulmate-autocomplete-with-redis-in-rails-3-1) in a sample Rails 3.1 app:
 
 <div class="diagram-frame">
-  <img src="http://patshaughnessy.net/assets/2011/11/23/working-autocomplete.png"/>
+  <img src="https://patshaughnessy.net/assets/2011/11/23/working-autocomplete.png"/>
 </div>
 
 Traditionally Rails gems and plugins have implemented this on the server using a SQL statement similar to this:
@@ -51,7 +51,7 @@ talk<br/>
 Then Antirez adds these prefixes to a sorted set using the Redis [ZADD command](http://redis.io/commands/zadd), like this:
 
 <div class="diagram-frame">
-  <img src="http://patshaughnessy.net/assets/2011/11/29/adding-to-a-sorted-set.png"/>
+  <img src="https://patshaughnessy.net/assets/2011/11/29/adding-to-a-sorted-set.png"/>
 </div>
 
 Along with the prefixes, you may have noticed that Antirez also inserted the two actual, complete words into the set as well, each with a trailing asterisk character. As we’ll see in a moment, this allows Antirez’s code to later find the complete words that need to be returned to the user in the autocomplete drop down.
@@ -89,7 +89,7 @@ The algorithm used by the Soulmate gem is similar, and was inspired by Antirez�
 First, Soulmate creates a Redis Hash object and saves all of the autocomplete phrases by repeatedly calling the [HSET command](http://redis.io/commands/hset), like this:
 
 <div class="diagram-frame">
-  <img src="http://patshaughnessy.net/assets/2011/11/29/adding-to-a-hash.png"/>
+  <img src="https://patshaughnessy.net/assets/2011/11/29/adding-to-a-hash.png"/>
 </div>
 
 HSET is very simple: it saves a value into a Redis Hash object, using the given key. This works almost the same way that a Ruby hash does, saving the data in memory. You’ll notice that the value for each hash element is encoded using JSON; this is a convenient way to serialize Ruby objects into a string and then to save them in Redis. Soulmate calls the hash “soulmate-data:tasks,” including the model name or data type in the Redis object key/name. Soulmate also uses the common Redis naming convention of using a colon character to separate various words concatenated together in Redis object names.
@@ -119,7 +119,7 @@ etc....
 Soulmate then generates a separate sorted set for each unique prefix, like this:
 
 <div class="diagram-frame">
-  <img src="http://patshaughnessy.net/assets/2011/11/29/multiple-sorted-sets.png"/>
+  <img src="https://patshaughnessy.net/assets/2011/11/29/multiple-sorted-sets.png"/>
 </div>
 
 Things to note here are:
@@ -138,7 +138,7 @@ For example, looking at the set for the prefix “tak,” we can see there’s a
 Creating all of these different sorted sets allows Soulmate to associate multiple phrases with a single prefix. Let’s see how that works: If the user starts to type “ta” then Soulmate will just need to find the “soulmate-index:task:ta” set:
 
 <div class="diagram-frame">
-  <img src="http://patshaughnessy.net/assets/2011/11/29/set-elements-are-hash-keys.png"/>
+  <img src="https://patshaughnessy.net/assets/2011/11/29/set-elements-are-hash-keys.png"/>
 </div>
 
 Now by calling the ZRANGE command to get all of the set’s elements (0 means start from the first element, and -1 means continue until the end)...
@@ -162,7 +162,7 @@ This all happens without a single SQL command, and all of the data values are fe
 But that’s not all; as I said above Soulmate also supports the ability to search for multiple prefixes at the same time. For example, suppose the user has typed in “ta bus” ... meaning she wants to match “Talk to the school bus driver” but not “Take out the trash.” How does this work? Well Soulmate will get two sorted sets, once for “ta” and one for “bus” like this:
 
 <div class="diagram-frame">
-  <img src="http://patshaughnessy.net/assets/2011/11/29/intersection.png"/>
+  <img src="https://patshaughnessy.net/assets/2011/11/29/intersection.png"/>
 </div>
 
 Here Soulmate uses Redis’s [ZINTERSTORE command](http://redis.io/commands/zinterstore) to calculate the intersection between two sets:
@@ -182,7 +182,7 @@ This creates a third set called “soulmate-cache:tasks:bus|ta” containing onl
 The last bit of magic in Soulmate’s algorithm that I’ll cover today is caching. To speed things up even further, Soulmate saves the result of the ZINTERSTORE call - the third set created with the common ID elements - for future lookups in case the same user or a different user types exactly the same letters again. Here’s how that works:
 
 <div class="diagram-frame">
-  <img src="http://patshaughnessy.net/assets/2011/11/29/cached-set.png"/>
+  <img src="https://patshaughnessy.net/assets/2011/11/29/cached-set.png"/>
 </div>
 
 The intersection set was actually saved above in the call to ZINTERSTORE, and now to indicate that it should expire after 10 minutes (600 seconds) we would use:

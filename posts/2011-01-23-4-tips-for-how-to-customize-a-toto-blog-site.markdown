@@ -188,4 +188,4 @@ _Once upon a time_...</pre></div>
 
 ## What next?
 
-Now that you've got Bundler setup with your version of Toto and the test suite working, you're ready to add something something new to Toto. Next week, I'll walk through how I added support for tagging/categories of articles, for example to get this page to work: [http://patshaughnessy.net/tags/view-mapper](http://patshaughnessy.net/tags/view-mapper)
+Now that you've got Bundler setup with your version of Toto and the test suite working, you're ready to add something something new to Toto. Next week, I'll walk through how I added support for tagging/categories of articles, for example to get this page to work: [https://patshaughnessy.net/tags/view-mapper](https://patshaughnessy.net/tags/view-mapper)

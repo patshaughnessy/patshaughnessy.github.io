@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Using a Ruby Class To Write Functional Code - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Using a Ruby Class To Write Functional Code</h1><div class="metadata"><span class="date">April 8th 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2014/4/8/using-a-ruby-class-to-write-functional-code" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Using a Ruby Class To Write Functional Code">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/4/8/timesheet.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/4/8/timesheet.jpg"><br/>
     <i>The time sheets I used at my first programming<br/>
     job in the Summer of 1986 looked just like this.</i>
 </div>
@@ -22,22 +22,22 @@ happened, how using a Ruby class helped me write more functional code.</p>
 developers, including me, is putting in enough hours on your project (instead
 of taking long lunches or writing blog posts). For example, suppose I report my
 hours like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/timesheet-data.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/timesheet-data.png"><br/></p>
 <p>You could parse my timesheet data using this simple Ruby program:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/parse1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/parse1.png"><br/></p>
 <p>This is simple enough to understand and works fine. <span
 class="code">parse1</span> is small function; if you remove the calls to <span class="code">puts</span>
 it only contains 3 lines of code, two simple calls to <span class="code">split</span>. How could this be
 any simpler?</p>
 <h2>A First Pass at a Functional Solution</h2>
-<p>Next you decide to look for a more functional solution by <a href="http://patshaughnessy.net/2014/2/10/use-an-ask-dont-tell-policy-with-ruby">asking Ruby for what
+<p>Next you decide to look for a more functional solution by <a href="https://patshaughnessy.net/2014/2/10/use-an-ask-dont-tell-policy-with-ruby">asking Ruby for what
 you want, instead of telling it what to
 do</a>.
 You try to break the problem up into small functions that return what you need.
 But what functions should you write? What values should they return? In this
 simple example, the answer is obvious: you can write a function to parse each
 value in the timesheet data.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/asking.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/asking.png"><br/></p>
 <p>You have divided the problem up into small pieces. Each function will return a
 predictable value based on some input and doesn’t have any side effects. These
 will be <em>pure</em> functions: They will always return the same result given the same
@@ -47,7 +47,7 @@ the problem around; you’ve phrased the problem as a series of questions rather
 than as a list of instructions.</p>
 <p>Refactoring <span class="code">parse1</span> above, you implement the
 functions, at least in a somewhat verbose and ugly fashion:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/refactoring.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/refactoring.png"><br/></p>
 <h2>Testing Pure Functions</h2>
 <p>As a Certified ScrumMaster™, you believe in TDD and other extreme
 programming practices. Originally, while writing <span
@@ -57,17 +57,17 @@ breaking the problem up into a series of functions, it seems natural to write
 tests for them.</p>
 <p>Next, you express your expectations for these functions using Minitest specs,
 for example:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/spec.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/spec.png"><br/></p>
 <p>Because the functions are small, the tests are small. Because the tests are
 small, you actually take the time to write them. Because the functions are
 decoupled from each other, it’s easy for you to decide which tests to write.</p>
 <p>To your surprise, you actually find a bug!</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/spec-fails.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/spec-fails.png"><br/></p>
 <p>Earlier in <span class="code">parse1</span>, the extra space was lost in the
 <span class="code">puts</span> output and you didn’t notice it. Separating this into a small function and
 carefully testing it revealed a minor problem. You adjust two of the functions
 to remove the extra space:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/fixing-bug.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/fixing-bug.png"><br/></p>
 <h2>Pushing Ruby Out Of Its Comfort Zone</h2>
 <p>You’re happy with your new tests. Ruby allowed you describe the behavior of the
 functions in a very natural, readable way. Ruby at its best. As an added bonus,
@@ -78,11 +78,11 @@ duplication: The <span class="code">office</span>, <span
 functions all call <span class="code">line.split(',')</span>. To fix this, you
 decide to extract <span class="code">line.split(',')</span> into a separate
 function, removing the duplication:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/extracting-method.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/extracting-method.png"><br/></p>
 <p>This doesn't look any better; in fact, there’s a deeper problem here. To see
 what I mean let’s refactor <span class="code">parse1</span> from earlier to use
 our new functions:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/parse2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/parse2.png"><br/></p>
 <p>This is clean and easy to follow, but now you have a performance bug: Each time
 around the loop, your code passes the same line to <span
 class="code">employee_id</span>, <span class="code">office</span> and <span
@@ -96,7 +96,7 @@ this example. This means theoretically you can avoid calling <span
 class="code">split</span> over and over again by caching the results.</p>
 <p>At first, you try to cache the return value of <span class="code">split</span>
 by using a hash table like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/hash1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/hash1.png"><br/></p>
 <p>This looks straightforward: The keys in <span class="code">split_lines</span>
 are the lines and the values are the corresponding split lines. You use Ruby’s
 elegant <span class="code">||=</span> operator either to return a cached value
@@ -113,11 +113,11 @@ verbose than it is now.  Or you could create the <span
 class="code">values</span> method using <span
 class="code">define_method</span>, instead of <span class="code">def</span>,
 like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/hash2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/hash2.png"><br/></p>
 <p>This confusing Ruby syntax allows the code inside of the new <span class="code">values</span> method to
 access the surrounding scope, including the hash table.</p>
 <p>However, taking a step back, something about your program now feels wrong.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/step-back.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/step-back.png"><br/></p>
 <p>Instead of making your code simpler and easier to understand, functional
 programming has started to make your Ruby code more confusing and harder to
 read. You’ve introduced a new data structure to cache results, and resorted to
@@ -129,9 +129,9 @@ functional programming.</p>
 <p>Next, you decide to forget all about functional programming and to try again by
 using a Ruby class. You write a <span class="code">Line</span> class,
 representing a single line of text from the timesheet text file:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/line1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/line1.png"><br/></p>
 <p>And you decide to move your functions into the new <span class="code">Line</span> class:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/line2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/line2.png"><br/></p>
 <p>Now you have a lot less noise. The biggest improvement is that now there’s no
 need to pass the line of text around as a parameter to each function. Instead,
 you hide it away in an instance variable, making the code much easier to read.
@@ -142,7 +142,7 @@ you organize your code using a class, which is really just a collection of
 functions.</p>
 <p>Continuing to simplify, you refactor the <span class="code">value</span> method at the bottom to remove
 the confusing <span class="code">define_method</span> syntax:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/refactor-values.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/refactor-values.png"><br/></p>
 <p>Now each instance of the <span class="code">Line</span> class, each line of text you program uses, will
 have its own copy of <span class="code">@values</span>. By using a Ruby class, you don’t need to
 resort to a hash table to map between lines (keys) and split lines (values).
@@ -153,7 +153,7 @@ method return values.</p>
 <h2>Breaking All the Rules</h2>
 <p>Now your code is much easier to read. Using an object oriented instead of a
 functional design turned out to be a good idea.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/line3.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/line3.png"><br/></p>
 <p>With your object oriented solution, you have broken some of the most important
 rules of functional programming: First, you created hidden state, the <span
 class="code">@line</span> instance variable, wrapping it up and hiding it
@@ -182,15 +182,15 @@ programming. Your code is just as easy to understand, maintain and test.</p>
 <h2>Creating an Object Pipeline</h2>
 <p>Wrapping up, you refactor your original program to use your new <span
 class="code">Line</span> class like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/parse3.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/parse3.png"><br/></p>
 <p>Of course, there’s not much difference here. You simply added a line of code to
 create new line objects, and then called its methods instead of your original
 functions.</p>
 <p>Finally, you decide to take one step further and refactor again by mapping the
 array of text lines to an array of line objects:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/object-pipeline.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/object-pipeline.png"><br/></p>
 <div style="float: right; padding: 80px 0px 25px 20px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/4/8/factory.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/4/8/factory.jpg"><br/>
 </div>
 <p>Again, not much difference in the code. However, the way you think about your
 program has changed dramatically. Now your code implements a pipeline of sorts,
@@ -209,7 +209,7 @@ would allow us to push the object pipeline idea even further. Thanks Oren! See
 Dave Thomas's article [Telling, Asking, and the Power of
 Jargon](http://pragdave.me/blog/2014/02/11/telling-asking-and-the-power-of-jargon/)
 for more background on "Tell, Don't Ask."
-<p><img src="http://patshaughnessy.net/assets/2014/4/8/parse5.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/4/8/parse5.png"><br/></p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2014/4/8/using-a-ruby-class-to-write-functional-code'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Using a Ruby Class To Write Functional Code';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';

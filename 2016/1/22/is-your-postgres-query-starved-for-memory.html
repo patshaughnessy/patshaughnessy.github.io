@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Is Your Postgres Query Starved for Memory? - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Is Your Postgres Query Starved for Memory?</h1><div class="metadata"><span class="date">January 22nd 2016</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2016/1/22/is-your-postgres-query-starved-for-memory" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Is Your Postgres Query Starved for Memory?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 20px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2016/1/22/sphygmomanometer.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/1/22/sphygmomanometer.png"><br/>
   <i>
 Like a patient with low blood pressure, a slow SQL<br/>
 query might not be getting the memory it needs.
@@ -15,7 +15,7 @@ file is an obscure, technical setting called <span
 class="code">work_mem</span>. This controls how much “working memory” your
 Postgres server allocates for each sort or join operation. The default value
 for this is only 4MB:</p>
-<img src="http://patshaughnessy.net/assets/2016/1/22/work_mem.png"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/work_mem.png"/>
 <div style="clear: left"></div>
 <p>If your application ever tries to sort or join more than four megabytes worth
 of data, this working memory buffer will fill up. Instead of just returning the
@@ -27,12 +27,12 @@ query is when the hash table doesn’t fit into the working memory buffer. You�
 learn how to use the EXPLAIN ANALYZE command to find out if your slow query is
 starved for memory.</p>
 <h2>Hash Tables Inside of Postgres</h2>
-<p>In my last article, I described <a href="http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join">how Postgres implements the hash join
+<p>In my last article, I described <a href="https://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join">how Postgres implements the hash join
 algorithm</a>.
 I showed how Postgres scans over all the records in one of the tables from the
 join and saves them in a hash table.</p>
 <p>Here’s what a hash table might look like conceptually:</p>
-<img src="http://patshaughnessy.net/assets/2016/1/22/table1.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/table1.svg"/>
 <p>On the left is an array of pointers called <em>buckets</em>. Each of these pointers is
 the head of a linked list, which I show on the right using blue rectangles. The
 rectangles represent values from one of the tables in the join. Postgres groups
@@ -43,7 +43,7 @@ as a <em>hash join</em>.</p>
 <p>Postgres’s hash join code gracefully scales up to process larger and larger
 data sets by increasing the number of buckets. If the target table had more
 records, Postgres would use 2048 buckets instead of 1024:</p>
-<img src="http://patshaughnessy.net/assets/2016/1/22/table2.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/table2.svg"/>
 <p>Before starting to execute the hash join algorithm, Postgres estimates how many
 records it will need to add to the hash table, using the query plan. Then
 Postgres chooses a bucket count large enough to fit all of the records.</p>
@@ -63,14 +63,14 @@ called <span class="code">ExecChooseHashTableSize</span>.</p>
     <div class="function-link"><a href="http://doxygen.postgresql.org/nodeHash_8c.html#a5b805ac64e22306b7307b4a07ae2b34e">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2016/1/22/ExecChooseHashTableSize.png"/>
+    <img src="https://patshaughnessy.net/assets/2016/1/22/ExecChooseHashTableSize.png"/>
   </div>
 </div>
 </p>
 <h2>How Large Can a Postgres Hash Table Grow?</h2>
 <p>If the table from your join query was even larger, then Postgres would use 4096
 buckets instead of 2048:</p>
-<img src="http://patshaughnessy.net/assets/2016/1/22/table3.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/table3.svg"/>
 <p>In theory, this doubling of the bucket count could continue forever: 8192
 buckets, 16384 buckets, etc. With 10 records per linked list, this would
 accommodate 81,920 values, 163,840 values, etc.</p>
@@ -80,7 +80,7 @@ doesn’t seem to be an immediate problem, does it? Modern server hardware
 contains tens or even hundreds of GBs - that is plenty of room to hold an
 extremely large hash table.</p>
 <p>But in fact, Postgres limits the size of each hash table to only 4MB! </p>
-<img src="http://patshaughnessy.net/assets/2016/1/22/table4.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/table4.svg"/>
 <p>The rectangle I drew around the hash table above is the working memory buffer
 assigned to that table. Regardless of how much memory my server hardware
 actually has, Postgres won’t allow the hash table to consume more than 4MB.
@@ -89,7 +89,7 @@ This value is the <span class="code">work_mem</span> setting found in the
 <p>At the same time Postgres calculates the number of buckets, it also calculates
 the total amount of memory it expects the hash table to consume. If this amount
 exceeds 4MB, Postgres divides the hash operation up into a series of <em>batches</em>:</p>
-<img src="http://patshaughnessy.net/assets/2016/1/22/batches.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/batches.svg"/>
 <p>In this example, Postgres calculated that it would need up to 8MB to hold the
 hash table. A larger join query might have many more batches, each holding 4MB
 of data. Like the bucket count, Postgres sets the batch count to a power of two
@@ -157,7 +157,7 @@ $ launchctl unload homebrew.mxcl.postgresql.plist
 $ vim /usr/local/var/postgres/postgresql.conf
 </pre>
 <p>…uncommenting and changing the setting:</p>
-<img src="http://patshaughnessy.net/assets/2016/1/22/work_mem2.png"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/work_mem2.png"/>
 <p>Finally I restart my server and repeat the test:</p>
 <pre>
 $ launchctl load homebrew.mxcl.postgresql.plist
@@ -185,7 +185,7 @@ Buckets: 8192  Batches: 1  Memory Usage: 5860kB
 allowed it to save the entire data set into a single, in memory hash table and
 avoid using temporary buffer files. </p>
 <p>Because of this, the total execution time decreased from 960ms to 625ms:</p>
-<img src="http://patshaughnessy.net/assets/2016/1/22/chart.png"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/chart.png"/>
 <h2>Too Good To Be True</h2>
 <p>If memory intensive Postgres SQL statements could run so much faster, why does
 Postgres use only 4MB by default for the working memory buffer size? In this
@@ -200,7 +200,7 @@ requests at the same time. Each request needs its own working memory buffer.
 Not only that, each SQL statement Postgres executes might require multiple
 memory buffers, one for each join or sort operation the query plan calls for.</p>
 <div style="float: right; padding: 0px 30px 50px 10px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2016/1/22/bp1.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/1/22/bp1.png"><br/>
 </div>
 <p>My Postgres server isn’t entirely dedicated to executing this one example SQL
 statement and nothing else. By increasing the value of <span

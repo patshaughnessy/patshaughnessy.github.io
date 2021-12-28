@@ -2,8 +2,8 @@ title: "Scaffolding for auto complete on a complex, nested form"
 date: 2009/11/25
 tag: View Mapper
 
-<p>I just updated <a href="http://patshaughnessy.net/view_mapper">View Mapper</a> to work with <a href="http://patshaughnessy.net/repeated_auto_complete">my fork of the Rails auto_complete plugin</a> that allows for repeated text fields on the same complex form. This means that View Mapper can now generate scaffolding code that uses both nested attributes and the auto_complete plugin at the same time, to display a form like this:<br/><br/>
-<img src="http://patshaughnessy.net/assets/2009/11/25/repeated_auto_complete.png"/> 
+<p>I just updated <a href="https://patshaughnessy.net/view_mapper">View Mapper</a> to work with <a href="https://patshaughnessy.net/repeated_auto_complete">my fork of the Rails auto_complete plugin</a> that allows for repeated text fields on the same complex form. This means that View Mapper can now generate scaffolding code that uses both nested attributes and the auto_complete plugin at the same time, to display a form like this:<br/><br/>
+<img src="https://patshaughnessy.net/assets/2009/11/25/repeated_auto_complete.png"/> 
 <p>To generate this sort of complex form for two of your models you&rsquo;ll first need to install my &ldquo;repeated_auto_complete&rdquo; gem from <a href="http://gemcutter.org/gems/repeated_auto_complete">gemcutter.org</a>:</p>
 <pre>$ gem sources -a http://gemcutter.org
 http://gemcutter.org added to sources
@@ -12,7 +12,7 @@ Successfully installed repeated_auto_complete-0.1.0
 1 gem installed
 Installing ri documentation for repeated_auto_complete-0.1.0...
 Installing RDoc documentation for repeated_auto_complete-0.1.0...</pre>
-<p>To learn more about repeated_auto_complete and what it does, see: <a href="http://patshaughnessy.net/repeated_auto_complete">http://patshaughnessy.net/repeated_auto_complete</a>. Now you can generate a complex form like the one shown above for two of your models in a has_many/belongs_to, has_and_belongs_to_many or has_many, :through association by installing View Mapper (version 0.3.1 or later):</p>
+<p>To learn more about repeated_auto_complete and what it does, see: <a href="https://patshaughnessy.net/repeated_auto_complete">https://patshaughnessy.net/repeated_auto_complete</a>. Now you can generate a complex form like the one shown above for two of your models in a has_many/belongs_to, has_and_belongs_to_many or has_many, :through association by installing View Mapper (version 0.3.1 or later):</p>
 <pre>$ sudo gem install view_mapper
 Successfully installed view_mapper-0.3.1
 1 gem installed
@@ -121,6 +121,6 @@ end</pre>
    -&gt; 0.0013s
 ==  CreateGroups: migrated (0.0014s) ==========================================</pre>
 <p><br/>Now running my server and creating a new group I see:<br/><br/>
-<img src="http://patshaughnessy.net/assets/2009/11/25/auto_complete_new_group.png"/> 
-<p>If you click &ldquo;Add a Person&rdquo; you&rsquo;ll see nested fields for new Person records appear. This all works exactly the same way as the standard nested attributes scaffolding that I described in <a href="http://patshaughnessy.net/2009/11/9/scaffolding-for-complex-forms-using-nested-attributes">my last post</a>. The only difference is that in this form, each of the text fields present in both the parent (&ldquo;Group&rdquo;) and child (&ldquo;Person&rdquo;) models are displayed using the &ldquo;text_field_with_auto_complete&rdquo; method.</p>
+<img src="https://patshaughnessy.net/assets/2009/11/25/auto_complete_new_group.png"/> 
+<p>If you click &ldquo;Add a Person&rdquo; you&rsquo;ll see nested fields for new Person records appear. This all works exactly the same way as the standard nested attributes scaffolding that I described in <a href="https://patshaughnessy.net/2009/11/9/scaffolding-for-complex-forms-using-nested-attributes">my last post</a>. The only difference is that in this form, each of the text fields present in both the parent (&ldquo;Group&rdquo;) and child (&ldquo;Person&rdquo;) models are displayed using the &ldquo;text_field_with_auto_complete&rdquo; method.</p>
 <p>I&rsquo;ll try to write up a detailed walk through of how this scaffolding actually works as soon as I can&hellip; there are a lot of interesting details in the code that will be fun to look at. In the meantime, hopefully this scaffolding will make it easier for you to learn how to use auto_complete and nested attributes together in your app.</p>

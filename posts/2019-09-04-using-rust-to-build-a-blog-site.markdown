@@ -3,7 +3,7 @@ date: 2019/09/04
 tag: Rust
 
 <div style="float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2019/9/4/batteries.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2019/9/4/batteries.jpg"><br/>
 <i> Rust comes with batteries included<br/>
     <small>(source: <a href="https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Color-w-batteries.jpg">Wikimedia Commons</a>)</small></i>
 </div>
@@ -35,7 +35,7 @@ simple. And writing a blog site using Rust turned out to be simple too.
 I needed a few important features to generate this web site. I wanted my script
 to work like this for each blog post:
 
-<img src="http://patshaughnessy.net/assets/2019/9/4/flowchart.png"/>
+<img src="https://patshaughnessy.net/assets/2019/9/4/flowchart.png"/>
 
 For each blog post, My new Rust script had to: parse the markdown source file
 and convert it to HTML markup, highlight the syntax of my code snippets using

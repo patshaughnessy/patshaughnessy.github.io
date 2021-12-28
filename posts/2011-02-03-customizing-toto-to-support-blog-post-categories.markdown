@@ -2,7 +2,7 @@ title: "Customizing Toto to support blog post categories"
 date: 2011/2/3
 tag: Toto
 
-On this blog I categorize my posts using a few tags, such as [http://patshaughnessy.net/tags/paperclip](http://patshaughnessy.net/tags/paperclip) or [http://patshaughnessy.net/tags/view-mapper](http://patshaughnessy.net/tags/view-mapper) for example. Today I’m going to walk through how I customized the Toto blog engine to display these category pages.
+On this blog I categorize my posts using a few tags, such as [https://patshaughnessy.net/tags/paperclip](https://patshaughnessy.net/tags/paperclip) or [https://patshaughnessy.net/tags/view-mapper](https://patshaughnessy.net/tags/view-mapper) for example. Today I’m going to walk through how I customized the Toto blog engine to display these category pages.
 
 Of course I could have gotten categories for free using a different blog engine such as [Jekyll](https://github.com/mojombo/jekyll) or [Nesta](https://github.com/gma/nesta), but to be honest when I saw Toto’s code for the first time I fell in love with it: concise, elegant and simple. I just couldn’t wait to try to understand how it works and modify it to do something new. I suppose it really is “the 10 second blog-engine for hackers!”
 
@@ -15,7 +15,7 @@ I’ll go about this in four steps... you can follow the same pattern if you’d
 
 ## <a id="step1"></a>Step 1: Writing new Riot tests
 
-Toto comes with a fast, effective test suite written using [Riot](https://github.com/thumblemonks/riot) and [RR](https://github.com/btakita/rr). If you plan to customize Toto, be sure to take advantage of Alexis Sellier’s existing tests to be sure you don’t break anything. Take a look at [my last post](http://patshaughnessy.net/2011/1/23/4-tips-for-how-to-customize-a-toto-blog-site) for some tips on how to get the tests working for Ruby 1.8.7.
+Toto comes with a fast, effective test suite written using [Riot](https://github.com/thumblemonks/riot) and [RR](https://github.com/btakita/rr). If you plan to customize Toto, be sure to take advantage of Alexis Sellier’s existing tests to be sure you don’t break anything. Take a look at [my last post](https://patshaughnessy.net/2011/1/23/4-tips-for-how-to-customize-a-toto-blog-site) for some tips on how to get the tests working for Ruby 1.8.7.
 
 I’ll start today by writing a few new Riot tests specifying exactly what behavior I mean by “blog post categories.”  I added this code to test/toto_test.rb in my local Toto gem folder:
 
@@ -163,7 +163,7 @@ else
 end
 </pre>
 
-Let’s take a few minutes to understand this method... this bit of code is really interesting. It plays the same role that routes.rb does in a Rails application. When Toto gets an HTTP request, it converts the path string into an array of strings and passes that into the “go” method as the first parameter: “route.” For example, if a user requests http://patshaughnessy.net/2011/1/23/4-tips-for-how-to-customize-a-toto-blog-site, then route will be set to:
+Let’s take a few minutes to understand this method... this bit of code is really interesting. It plays the same role that routes.rb does in a Rails application. When Toto gets an HTTP request, it converts the path string into an array of strings and passes that into the “go” method as the first parameter: “route.” For example, if a user requests https://patshaughnessy.net/2011/1/23/4-tips-for-how-to-customize-a-toto-blog-site, then route will be set to:
 
 <div class="CodeRay"> 
   <div class="code"><pre>[<span class="s"><span class="dl">&quot;</span><span class="k">2011</span><span class="dl">&quot;</span></span>, <span class="s"><span class="dl">&quot;</span><span class="k">1</span><span class="dl">&quot;</span></span>, <span class="s"><span class="dl">&quot;</span><span class="k">23</span><span class="dl">&quot;</span></span>, <span class="s"><span class="dl">&quot;</span><span class="k">4-tips-for-how-to-customize-a-toto-blog-site</span><span class="dl">&quot;</span></span>]</pre></div> 
@@ -306,7 +306,7 @@ Finally, we need to actually filter the list of articles on the given tag someho
 <span class="r">end</span></pre></div> 
 </div> 
 
-This code is called to generate the index page for a Toto blog (e.g. [http://patshaughnessy.net](http://patshaughnessy.net)), and also the year/month archives pages by providing a value for the filter parameter. It returns a single Archives object which contains an array of Article objects.
+This code is called to generate the index page for a Toto blog (e.g. [https://patshaughnessy.net](https://patshaughnessy.net)), and also the year/month archives pages by providing a value for the filter parameter. It returns a single Archives object which contains an array of Article objects.
 
 And here’s my version:
 

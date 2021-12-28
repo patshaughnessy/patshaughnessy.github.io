@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Never create Ruby strings longer than 23 characters - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Never create Ruby strings longer than 23 characters</h1><div class="metadata"><span class="date">January 4th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Never create Ruby strings longer than 23 characters">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/1/4/microscope.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/1/4/microscope.jpg"></td></tr>
   <tr><td align="center"><small><i>Looking at things through a microscope<br/>sometimes leads to surprising discoveries</i></small></td></tr>
 </table>
 </div>
@@ -49,7 +49,7 @@
 </span></pre>
 
 <p>... the Ruby interpreter creates a structure called “RString” that conceptually looks like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/1/4/heap-string.png" alt="heap strings" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/1/4/heap-string.png" alt="heap strings" /></p>
 <p>You can see here that the RString structure contains two values: <span class="code">ptr</span> and <span class="code">len</span>, but not the actual string data itself. Ruby actually saves the string character values themselves in some memory allocated from the heap, and then sets <span class="code">ptr</span> to the location of that heap memory, and <span class="code">len</span> to the length of the string.</p>
 <p>Here’s a simplified version of the C RString structure:</p>
 <pre style="background-color:#ffffff;">
@@ -71,7 +71,7 @@
 </span></pre>
 
 <p>Here the Ruby interpreter has realized that you are assigning the same string value to two variables: str and str2. So in fact there’s no need to create two copies of the string data itself; instead Ruby creates two RString values that share the single copy of the string data. The way this works is that both RString structs contain the same ptr value to the shared data... meaning both strings contain the same value. There’s also a <span class="code">shared</span> value saved in the second RString struct that points to the first RString struct. There are some other details which I’m not showing here, such as some bit mask flags that Ruby uses to keep track of which RString’s are shared and which are not.</p>
-<p><img src="http://patshaughnessy.net/assets/2012/1/4/shared-string.png" alt="shared strings" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/1/4/shared-string.png" alt="shared strings" /></p>
 <p>Aside from saving memory, this also speeds up execution of your Ruby programs dramatically by avoiding the need to allocate more memory from the heap using another call to <span class="code">malloc</span>. <span class="code">Malloc</span> is actually a fairly expensive operation: it takes time to track down available memory of the proper size in the heap, and also to keep track of it for freeing later.</p>
 <p>Here’s a somewhat more accurate version of the C RString structure, including the <span class="code">shared</span> value:</p>
 <pre type="console">
@@ -89,7 +89,7 @@ struct RString {
 </span><span style="color:#000000;">str3 </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor</span><span style="color:#4f5b66;">&quot;
 </span></pre>
 
-<p><img src="http://patshaughnessy.net/assets/2012/1/4/embedded-string.png" alt="embedded strings" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/1/4/embedded-string.png" alt="embedded strings" /></p>
 <p>This RString structure contains a character array called <span class="code">ary</span> and not the <span class="code">ptr</span>, <span class="code">len</span> and <span class="code">shared</span> values we saw above. Here’s another simplified definition of the same RString structure, this time containing the <span class="code">ary</span> character array:</p>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">
@@ -206,7 +206,7 @@ struct RString {
 </pre>
 <p>Note that when the string length is 23 or less, it takes about 250ms to create 1 million new strings. But when my string length is 24 or more, it takes around 480ms, almost twice as long!</p>
 <p>Here’s a graph showing some more data; the bars show how long it takes to allocate 1 million strings of the given length:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/1/4/string-allocations.png" alt="string allocation chart" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/1/4/string-allocations.png" alt="string allocation chart" /></p>
 <h2>Conclusion</h2>
 <p>Don’t worry! I don’t think you should refactor all your code to be sure you have strings of length 23 or less. That would obviously be ridiculous. The speed increase sounds impressive, but actually the time differences I measured were insignificant until I allocated 100,000s or millions of strings - how many Ruby applications will need to create this many string values? And even if you do need to create many string objects, the pain and confusion caused by using only short strings would overwhelm any performance benefit you might get.</p>
 <p>For me I really think understanding something about how the Ruby interpreter works is just fun! I enjoyed taking a look through a microscope at these sorts of tiny details. I do also suspect having some understanding of how Matz and his colleagues actually implemented the language will eventually help me to use Ruby in a wiser and more knowledgeable way. We’ll have to see... stay tuned for some more posts about Ruby internals!</p>

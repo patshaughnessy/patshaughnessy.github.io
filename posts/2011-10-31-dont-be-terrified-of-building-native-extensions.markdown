@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/10/31/halloween-terror.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/10/31/halloween-terror.png"></td></tr>
   <tr><td align="center"><small><i>It's time for all Ruby developers to<br/> confront their worst fear...</i></small></td></tr>
 </table>
 </div>
@@ -19,19 +19,19 @@ For years I’ve been nervous installing gems that contained native extensions b
 
 Before we get to what might go wrong building native extensions, let’s take a look at what native extensions are and why Ruby developers need them. “Native extensions” are the glue that connects a Ruby gem with some other non-Ruby software component or library present on your machine. Here’s a simple diagram that shows the relationship between a Ruby gem and some software it uses:
 
-![gem native extension](http://patshaughnessy.net/assets/2011/10/31/gem%20extension.png)
+![gem native extension](https://patshaughnessy.net/assets/2011/10/31/gem%20extension.png)
 
 The native extension is some C code that’s included inside the Ruby gem that calls the external component’s API, converting the parameters and return values between the format the external library needs and what the Ruby interpreter expects. Native extensions are one of the reasons for the success of the Ruby platform, since they allow Ruby gem authors to take advantage of non-Ruby libraries when appropriate in an organized, standard way. This means that Ruby gem authors can use Ruby to do what Ruby is best at, but switch to C or some other programming language or library when that makes sense.
 
 Here’s what the directory structure looks like for a Ruby gem that contains native extension code:
 
-![gem folders](http://patshaughnessy.net/assets/2011/10/31/gem%20folders.png)
+![gem folders](https://patshaughnessy.net/assets/2011/10/31/gem%20folders.png)
 
 ## What’s the process for building a native extension?
 
 The power of native extensions is also their biggest challenge. Since the extension code itself is written in C, it needs to be compiled into machine language for your specific platform and environment before you can use it. Rubygems provides a standard process for doing this; here’s what that looks like:
 
-![compile process](http://patshaughnessy.net/assets/2011/10/31/compile%20process.png)
+![compile process](https://patshaughnessy.net/assets/2011/10/31/compile%20process.png)
 
 This is what’s actually happening while you’re reading the message <span class="code">Building native extensions.  This could take a while...</span>.
 

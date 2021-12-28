@@ -1,14 +1,14 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Following a Select Statement Through Postgres Internals - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Following a Select Statement Through Postgres Internals</h1><div class="metadata"><span class="date">October 13th 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Following a Select Statement Through Postgres Internals">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/10/13/engine-room.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/10/13/engine-room.png"><br/>
   <i>Captain Nemo takes Professor Aronnax on a tour<br/>of the engine room, a fascinating description<br/>of future technology from an 1870 perspective.</i>
 </div>
 <b>
 This is the third of a series of four posts based on a presentation I did at the
 [Barcelona Ruby Conference](http://www.baruco.org) called “20,000 Leagues Under
 ActiveRecord.” (posts:
-[one](http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
-[two](http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements)
-[four](http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
+[one](https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
+[two](https://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements)
+[four](https://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
 and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).</b>
 <p>Preparing for this presentation over the Summer, I decided to read through
 parts of the PostgreSQL C source code. I executed a very simple select
@@ -25,12 +25,12 @@ documented and easy to follow. Find out for yourself how Postgres works
 internally by following me on a journey deep inside a tool you use everyday.</p>
 <div style="clear: left"></div>
 <h2>Finding Captain Nemo</h2>
-<p>Here’s the example query from <a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">the first half of my
+<p>Here’s the example query from <a href="https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">the first half of my
 presentation</a>;
 we’ll follow Postgres as it searches for Captain Nemo:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/23/sql.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/sql.png"/>
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/10/13/maps.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/10/13/maps.png"><br/>
   <i>Professor Aronnax and Captain Nemo<br/>plot the course of the Nautilus.</i>
 </div>
 <p>Finding a single name in string column like this should be straightforward,
@@ -41,7 +41,7 @@ the surface.</p>
 <p>What does Postgres do with this SQL string? How does it understand what we
 meant? How does it know what data we are looking for?</p>
 <p>Postgres processes each SQL command we send it using a four step process.</p>
-<img src="http://patshaughnessy.net/assets/2014/10/13/4-steps.png"/>
+<img src="https://patshaughnessy.net/assets/2014/10/13/4-steps.png"/>
 <p>In the first step, Postgres <em>parses</em> our SQL statement and converts it into a
 series of C memory structures, a <em>parse tree</em>. Next Postgres <em>analyzes and
 rewrites</em> our query, optimizing and simplifying it using a series of complex
@@ -62,10 +62,10 @@ backtrace which gives some context about exactly when and how Postgres calls
     <div class="function-link"><a href="http://doxygen.postgresql.org/postgres_8c.html#a7908e75bd9f9494fdb8c4b47f01a9de9">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/exec_simple_query.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/exec_simple_query.png"/>
   </div>
   <div class="function-bt">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/exec_simple_query_bt.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/exec_simple_query_bt.png"/>
   </div>
 </div>
 </p>
@@ -83,13 +83,13 @@ generated parser finds a corresponding pattern or syntax in the SQL string,
 and inserts a new C memory structure into the parse tree data structure.</p>
 <p>I won’t take the time today to explain how parsing algorithms work in detail.
 If you’re interested in that sort of thing, I’d suggest taking a look at my
-book <a href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
+book <a href="https://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
 Microscope</a>. In Chapter One
 I go through a detailed example of the LALR parse algorithm used by Bison and
 Ruby. Postgres parses SQL statements in exactly the same way.</p>
 <p>Using LLDB and enabling some C logging code, I observed the Postgres parser
 produce this parse tree for our Captain Nemo query:</p>
-<img src="http://patshaughnessy.net/assets/2014/10/13/parse-tree.png"/>
+<img src="https://patshaughnessy.net/assets/2014/10/13/parse-tree.png"/>
 <p>At the top is a node representing the entire SQL statement, and below that are
 child nodes or branches that represent the different portions of the SQL
 statement syntax: the target list (a list of columns), the from clause (a list
@@ -105,10 +105,10 @@ another C function called <span class="code">pg_parse_query</span>.</p>
     <div class="function-link"><a href="http://doxygen.postgresql.org/postgres_8c.html#a0449a974d1a66a2fcdee8896a0690521">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/pg_parse_query.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/pg_parse_query.png"/>
   </div>
   <div class="function-bt">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/pg_parse_query_bt.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/pg_parse_query_bt.png"/>
   </div>
 </div>
 </p>
@@ -118,14 +118,14 @@ design decisions.</p>
 <h2>All That Hard Work For Nothing</h2>
 <p>The parse tree above should look familiar - it’s almost precisely the same as
 the abstract syntax tree (AST) we saw ActiveRecord create earlier. Recall from
-the <a href="http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">first half of the
+the <a href="https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">first half of the
 presentation</a>
 ActiveRecord generated our Captain Nemo select statement when we executed this
 Ruby query:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/example1.png"/>
 <p>We saw that ActiveRecord internally created an AST when we called methods such
 as <span class="code">where</span> and <span class="code">first</span>. Later
-(see the <a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements">second
+(see the <a href="https://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements">second
 post</a>),
 we watched as the Arel gem converted the AST into our example select statement
 using an algorithm based on the visitor pattern.</p>
@@ -160,10 +160,10 @@ class="code">pg_analyze_and_rewrite</span>.</p>
     <div class="function-link"><a href="http://doxygen.postgresql.org/postgres_8c.html#a66930c41c305d22f3371cad134fd3dee">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/pg_analyze_and_rewrite.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/pg_analyze_and_rewrite.png"/>
   </div>
   <div class="function-bt">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/pg_analyze_and_rewrite_bt.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/pg_analyze_and_rewrite_bt.png"/>
   </div>
 </div>
 </p>
@@ -176,7 +176,7 @@ could reduce the number of sub-select clauses or joins to produce a simpler
 query that runs faster.</p>
 <p>For our simple select statement, here’s the query tree that <span
 class="code">pg_analyze_and_rewrite</span> produces:</p>
-<img src="http://patshaughnessy.net/assets/2014/10/13/query-tree.png"/>
+<img src="https://patshaughnessy.net/assets/2014/10/13/query-tree.png"/>
 <p>I don’t pretend to understand the detailed algorithms behind <span
 class="code">pg_analyze_and_rewrite</span>. I simply observed that for our
 example the query tree largely resembled the parse tree. This means the
@@ -186,7 +186,7 @@ select statement was so straightforward Postgres wasn’t able to simplify it fu
 a plan. This involves generating a third tree of nodes that form a list of
 instructions for Postgres to follow. Here’s the plan tree for our select
 statement.</p>
-<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/plan-tree.png"/>
+<img class="centered" src="https://patshaughnessy.net/assets/2014/10/13/plan-tree.png"/>
 <p>Imagine that each node in the plan tree is a machine or worker of some
 kind. The plan tree resembles a pipeline of data or a conveyor belt in a
 factory. In my simple example there is only one branch in the tree. Each node
@@ -203,10 +203,10 @@ class="code">pg_plan_queries</span>.</p>
     <div class="function-link"><a href="http://doxygen.postgresql.org/postgres_8c.html#a34e18d3874224b3b670ec0a3ae9c970c">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/pg_plan_queries.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/pg_plan_queries.png"/>
   </div>
   <div class="function-bt">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/pg_plan_queries_bt.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/pg_plan_queries_bt.png"/>
   </div>
 </div>
 </p>
@@ -215,7 +215,7 @@ class="code">total_cost</span> values in each plan node. Postgres uses these
 values to estimate how long the plan will take to complete. You don’t have
 to use a C debugger to see the execution plan for your query. Just prepend the
 SQL <span class="code">EXPLAIN</span> command to your query, like this:</p>
-<img src="http://patshaughnessy.net/assets/2014/10/13/explain.png"/>
+<img src="https://patshaughnessy.net/assets/2014/10/13/explain.png"/>
 <p>This is a powerful way to understand what Postgres is doing internally with one
 of your queries, and why it might be slow or inefficient - despite the
 sophisticated planning algorithms in <span class="code">pg_plan_queries</span>.</p>
@@ -232,20 +232,20 @@ class="code">LIMIT</span> SQL command, which limits the result set to the
 specified number of records. The same plan node also implements the <span
 class="code">OFFSET</span> command, which starts the result set window at the
 specified row.</p>
-<img src="http://patshaughnessy.net/assets/2014/10/13/limit1.png"/>
+<img src="https://patshaughnessy.net/assets/2014/10/13/limit1.png"/>
 <p>The first time Postgres calls the Limit node, it calculates what the limit and
 offset values should be, because they might be set to the result of some
 dynamic calculation. In our example, offset is 0 and limit is 1.</p>
 <p>Next, the Limit plan node repeatedly calls the subplan, in our case Sort,
 counting until it reaches the offset value:</p>
-<img src="http://patshaughnessy.net/assets/2014/10/13/limit2.png"/>
+<img src="https://patshaughnessy.net/assets/2014/10/13/limit2.png"/>
 <p>In our example the offset value is zero, so this loop will load the first data
 value and stop iterating. Then Postgres returns the last data value loaded from
 the subplan to the calling or upper plan. For us, this will be that first value
 from the subplan.</p>
 <p>Finally when Postgres continues to call the Limit node, it will pass the data
 values through from the subplan one at a time:</p>
-<img src="http://patshaughnessy.net/assets/2014/10/13/limit3.png"/>
+<img src="https://patshaughnessy.net/assets/2014/10/13/limit3.png"/>
 <p>In our example, because the limit value is 1 Limit will immediately return NULL
 indicating to the upper plan there is no more data available.</p>
 <p>Postgres implements the Limit node using code in a file called nodeLimit.c</p>
@@ -257,10 +257,10 @@ indicating to the upper plan there is no more data available.</p>
     <div class="function-link"><a href="http://doxygen.postgresql.org/nodeLimit_8c.html#a9fe32874f36f4a955f5b4b762d814631">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/exec_limit.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/exec_limit.png"/>
   </div>
   <div class="function-bt">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/exec_limit_bt.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/exec_limit_bt.png"/>
   </div>
 </div>
 </p>
@@ -272,7 +272,7 @@ Sort node, which appears below Limit in the plan.</p>
 that appears under Limit in the plan tree. Sort loads data values from its
 subplan and returns them to its calling plan, Limit. Here’s what Sort does when
 the Limit node calls it for the first time, to get the first data value:</p>
-<img src="http://patshaughnessy.net/assets/2014/10/13/sort1.png"/>
+<img src="https://patshaughnessy.net/assets/2014/10/13/sort1.png"/>
 <p>You can see that Sort functions very differently from Limit. It immediately
 loads all of the available data from the subplan into a buffer, before
 returning anything. Then it sorts the buffer using the
@@ -280,7 +280,7 @@ returning anything. Then it sorts the buffer using the
 returns the first sorted value.</p>
 <p>For the second and subsequent calls, Sort simply returns additional values from
 the sorted buffer, and never needs to call the subplan again:</p>
-<img src="http://patshaughnessy.net/assets/2014/10/13/sort2.png"/>
+<img src="https://patshaughnessy.net/assets/2014/10/13/sort2.png"/>
 <p>The Sort plan node is implemented by a C function called ExecSort:</p>
 <p>
 <div class="sign">
@@ -290,10 +290,10 @@ the sorted buffer, and never needs to call the subplan again:</p>
     <div class="function-link"><a href="http://doxygen.postgresql.org/nodeSort_8c.html#afe145ec8ff9b3d3a654022f73eab2810">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/exec_sort.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/exec_sort.png"/>
   </div>
   <div class="function-bt">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/exec_sort_bt.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/exec_sort_bt.png"/>
   </div>
 </div>
 </p>
@@ -304,16 +304,16 @@ means to look through the values in a table, returning values that match a
 given filter. To understand how the scan works with our filter, let’s step
 through an imaginary users table filled with fake names, looking for Captain
 Nemo.</p>
-<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan1.png"/>
+<img class="centered" src="https://patshaughnessy.net/assets/2014/10/13/seqscan1.png"/>
 <p>Postgres starts at the first record in a table (known as a <em>relation</em> in the
 Postgres source code) and executes the boolean expression from the plan tree.
 In simple terms, Postgres asks the question: “Is this Captain Nemo?” Because
 Laurianne Goodwin is not Captain Nemo, Postgres steps down to the next record.</p>
-<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan2.png"/>
+<img class="centered" src="https://patshaughnessy.net/assets/2014/10/13/seqscan2.png"/>
 <p>No, Candace is also not Captain Nemo. Postgres continues:</p>
-<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan3.png"/>
+<img class="centered" src="https://patshaughnessy.net/assets/2014/10/13/seqscan3.png"/>
 <p>… and eventually finds Captain Nemo!</p>
-<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/>
+<img class="centered" src="https://patshaughnessy.net/assets/2014/10/13/seqscan4.png"/>
 <p>Postgres implements the SeqScan node using a C function called ExecSeqScan.</p>
 <p>
 <div class="sign">
@@ -323,10 +323,10 @@ Laurianne Goodwin is not Captain Nemo, Postgres steps down to the next record.</
     <div class="function-link"><a href="http://doxygen.postgresql.org/nodeSeqscan_8c.html#af80d84501ff7621d2ef6249b148e7f44">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/exec_seq_scan.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/exec_seq_scan.png"/>
   </div>
   <div class="function-bt">
-    <img src="http://patshaughnessy.net/assets/2014/10/13/exec_seq_scan_bt.png"/>
+    <img src="https://patshaughnessy.net/assets/2014/10/13/exec_seq_scan_bt.png"/>
   </div>
 </div>
 </p>
@@ -339,9 +339,9 @@ string back to our Rails application and ActiveRecord can create a Ruby object.
 We can finally return to the surface of our application.</p>
 <p>But Postgres doesn’t stop! Instead of simply returning, Postgres continues to
 scan through the users table, even though we’ve already found Captain Nemo:</p>
-<img class="centered" src="http://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/>
+<img class="centered" src="https://patshaughnessy.net/assets/2014/10/13/seqscan5.png"/>
 <div style="float: right; padding: 117px 0px 70px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/10/13/suffocating.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/10/13/suffocating.png"><br/>
   <i>While returning from the South Pole, the air<br/> supply inside the Nautilus began to run out.</i>
 </div>
 <p>What’s going on here? Why is Postgres wasting its time, continuing to search

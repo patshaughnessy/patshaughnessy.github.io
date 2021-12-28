@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/9/8/thunder.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/9/8/thunder.jpg"></td></tr>
   <tr><td align="center"><small><i>“Kaminari” means thunder in Japanese</i></small></td></tr>
 </table>
 </div>
@@ -25,7 +25,7 @@ Here’s what a call to the Kaminari <span class="code">page</span> method looks
 
 One reason Kaminari became popular this year is that it cleanly leverages Rails 3 scopes to refine the result set to the specified page. Using ActiveRecord, for example, a call to <span class="code">Person.page(3).per(5)</span> will return an ActiveRecord::Relation scope object that looks something like this:
 
-![page scope](http://patshaughnessy.net/assets/2011/9/8/page_scope.png)
+![page scope](https://patshaughnessy.net/assets/2011/9/8/page_scope.png)
 
 An ActiveRecord::Relation object encapsulates some values, saved as instance variables, that will later be used to generate the SQL statement sent to your relational database server. This happens when your view code uses the ActiveRecord::Relation object as an array, for example when you call <span class="code">@people.each</span>. In this diagram I’ve shown just two values that are used by Kaminari for pagination:
 
@@ -45,11 +45,11 @@ The nice thing about scopes is that you can chain them together to create a more
 
 Here the <span class="code">where</span> method first returns a scope containing the age filter:
 
-![filter scope](http://patshaughnessy.net/assets/2011/9/8/filter_scope.png)
+![filter scope](https://patshaughnessy.net/assets/2011/9/8/filter_scope.png)
 
 It turns out that filter options set by using the <span class="code">where</span> method are saved as multiple values in an array. You can checkout the [ActiveRecord::Relation source code](https://github.com/rails/rails/blob/master/activerecord/lib/active_record/relation.rb) for more information. Next the call to the <span class="code">page</span> method combines the pagination options with that and a single, more complex scope is returned:
 
-![page scope 2](http://patshaughnessy.net/assets/2011/9/8/page_scope2.png)
+![page scope 2](https://patshaughnessy.net/assets/2011/9/8/page_scope2.png)
 
 ## Inspecting pagination SQL statements in the console
 

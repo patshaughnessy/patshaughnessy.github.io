@@ -15,20 +15,20 @@ using a dialect of Scheme called [Racket](http://racket-lang.org).
 Matthew starts by introducing the basics of Lambda Calculus notation like this:
 
 <div style="margin: 20px 0 0 100px">
-  <img src="http://patshaughnessy.net/assets/2014/1/30/basics.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/1/30/basics.png"><br/>
 </div>
 
 Matthew explains that all of Lambda Calculus is based on these two simple
 concepts, along with variable references. He then shows a couple of simple examples:
 
 <div style="margin: 20px 0 0 100px">
-  <img src="http://patshaughnessy.net/assets/2014/1/30/examples.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/1/30/examples.png"><br/>
 </div>
 
 ...and then asks the reader this simple question:
 
 <div style="margin: 20px 0 0 100px">
-  <img src="http://patshaughnessy.net/assets/2014/1/30/question.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/1/30/question.png"><br/>
 </div>
 
 In this post I’ll try to answer this question using a series of diagrams. I’m a
@@ -43,7 +43,7 @@ If I had a whiteboard, I’d rewrite the complex Lambda Calculus expression abov
 with circles instead of parentheses. This makes it much easier for me to see
 the nesting and order of operations. An even better visualization might be a tree structure, but I'll keep things inline with cirlces today.
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/one.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/one.png"><br/>
 
 For me, the biggest challenge to understanding Lisp or Scheme has always been
 all the nested parentheses. This picture is still cryptic and meaningless, but
@@ -54,7 +54,7 @@ now at least I can see the order of operations and nesting more easily.
 To understand what’s going on here, I started with the innermost lambda
 expression:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/two.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/two.png"><br/>
 
 Referring to Matthew’s explanation above, <span class="code">(f x)</span> means evaluate the function <span class="code">f</span>
 on the argument <span class="code">x</span>. Therefore, this expression represents an anonymous function
@@ -64,7 +64,7 @@ does.
 
 I usually visualize functions with inputs and outputs, like this:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/three.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/three.png"><br/>
 
 Here you can see the input <span class="code">x</span> comes from the left, and I’ve shown the anonymous
 function in the center using a half-oval. It applies a function <span class="code">f</span>, which is
@@ -75,13 +75,13 @@ right.
 
 Now let’s substitute this simple function back into the complex expression:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/four.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/four.png"><br/>
 
 You can see I’ve pasted the text “Apply f to my argument” into the center of
 the expression where the previous lambda was located. Working my way out, let’s
 take a look at what the next lambda expression means:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/five.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/five.png"><br/>
 
 Here you can see a definition for another anonymous function, another lambda
 expression, which takes <span class="code">f</span> as an argument. The body of the function is our
@@ -91,7 +91,7 @@ What this boils down to, therefore, is a function that takes a function as an
 argument and returns a second function as a result. Here’s what this might look
 like using my input/output diagram style:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/six.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/six.png"><br/>
 
 On the left you can see the function takes a function, <span class="code">f</span>, as input. On the
 right the dashed rectangle represents a single output value: another function.
@@ -114,24 +114,24 @@ the outer lambda is a closure around the free variable, <span class="code">f</sp
 
 Substituting again, here’s the entire expression simplified:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/seven.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/seven.png"><br/>
 
 The two lambdas on the right are easier to follow. These are examples of the
 identity function, a function that returns its argument. Matthew showed this
 syntax as one of his examples.
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/eight.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/eight.png"><br/>
 
 You can see here the identity function simply passes its input along as an
 output:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/nine.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/nine.png"><br/>
 
 ## Evaluating a Function
 
 Substituting again, here’s what we have now:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/ten.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/ten.png"><br/>
 
 Earlier we saw the higher order function on the left returns a function that
 will later operate on an argument, which I showed as <span class="code">x</span>. Now its time has come.
@@ -140,7 +140,7 @@ argument <span class="code">x</span>.”
 
 In other words, this expression:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/eleven.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/eleven.png"><br/>
 
 … means: “evaluate the higher order function on the left, providing the
 function on the right as an argument.”
@@ -148,13 +148,13 @@ function on the right as an argument.”
 The higher order function will take one function (the identity function) and
 return another:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/twelve.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/twelve.png"><br/>
 
 The output is a new function which will apply the identity function (the
 argument) to its own argument <span class="code">x</span>. Of course, this is equivalent to the identity
 function itself!
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/thirteen.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/thirteen.png"><br/>
 
 There must be some Lambda Calculus axiom (the “lambda identity axiom?”) behind
 this deduction, but I’m not sure. I’ll consider it obvious and just move on.
@@ -164,12 +164,12 @@ this deduction, but I’m not sure. I’ll consider it obvious and just move on.
 Substituting this result back into the original expression, we’re left with
 this:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/fourteen.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/fourteen.png"><br/>
 
 Reapplying the “lambda identity axiom” again it’s
 obvious this is equivalent to the identity function:
 
-<img src="http://patshaughnessy.net/assets/2014/1/30/fifteen.png"><br/>
+<img src="https://patshaughnessy.net/assets/2014/1/30/fifteen.png"><br/>
 
 That is, the identity function is also a higher order function. It returns the
 same functions you pass to it, unchanged.

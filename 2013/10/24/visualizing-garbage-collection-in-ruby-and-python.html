@@ -12,7 +12,7 @@ works inside of MRI vs.  JRuby and Rubinius.</p>
   generally, see my upcoming book, <a href="http://nostarch.com/rum">Ruby Under
   a Microscope</a>, due out very soon from No Starch Press.</p> </b>
 <div style="float: left; padding: 7px 30px 10px 0px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/10/24/circuitory-system-polish.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/10/24/circuitory-system-polish.png"><br/>
   <i>If your algorithms and business logic are the brain of your<br/>
   application, which organ would the garbage collector be?</i>
 </div>
@@ -42,7 +42,7 @@ three important tasks. They</p>
 <li>reclaim memory from garbage objects.</li>
 </ul>
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/10/24/heart-polish.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/10/24/heart-polish.png"><br/>
 </div>
 <p>Imagine if your application was a human body: All of the elegant code you
 write, your business logic, your algorithms, would be the brain or the
@@ -57,7 +57,7 @@ application would slow down and eventually die!</p>
 <h2>A Simple Example</h2>
 <p>It’s always helpful to work through theories using examples. Here’s a simple
 class, written in both Python and Ruby, that we can use as an example today:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/code.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/code.png"><br/></p>
 <p>By the way, it’s amazing to me how similar this code is in both languages: Ruby
 and Python are really just slightly different ways of saying the same thing.
 But are the languages also <em>implemented</em> in a similar way internally?</p>
@@ -68,11 +68,11 @@ exactly? How does Ruby go about creating a new object for us?</p>
 run, Ruby creates thousands of objects ahead of time and places them on a linked
 list, called the <em>free list</em>. Here’s what the free list might look like,
 conceptually:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/free-list1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/free-list1.png"><br/></p>
 <p>Imagine each of the white squares above is an unused, precreated Ruby object.
 When we call <span class="code">Node.new</span>, Ruby simply takes one of these objects and hands it to
 us:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/free-list2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/free-list2.png"><br/></p>
 <p>In the diagram above, the gray square on the left represents an active Ruby
 object we’re using in our code, while the remaining white squares are unused
 objects. [ Note: of course, my diagrams are a simplified version of reality. In
@@ -81,9 +81,9 @@ hold the class definition of Node, and still other objects to hold the parsed,
 abstract syntax tree (AST) representation of my code, etc. ]</p>
 <p>If we call <span class="code">Node.new</span> again, Ruby just hands
 us another object:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/free-list3.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/free-list3.png"><br/></p>
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/10/24/mccarthy.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/10/24/mccarthy.jpg"><br/>
   <i>John McCarthy’s 1960 implementation of Lisp contained<br/>the first garbage collector.</i>
   <i>(Courtesy MIT Museum)</i>
 </div>
@@ -106,15 +106,15 @@ list. What about Python?</p>
 certain objects such as lists), it normally allocates memory for new objects
 and values differently than Ruby does.</p>
 <p>Suppose we create a Node object using Python:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/python1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/python1.png"><br/></p>
 <p>Python, unlike Ruby, will ask the operating system for memory immediately when
 you create the object. (Python actually implements its own memory allocation
 system which provides an additional layer of abstraction on top of the OS heap.
 But I don’t have time to get into those details today.)</p>
 <p>When we create a second object, Python will again ask the OS for more memory:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/python2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/python2.png"><br/></p>
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/10/24/mess.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/10/24/mess.jpg"><br/>
   <i>Ruby leaves unused objects lying around in<br/>memory until the next GC process runs.</i>
 </div>
 <p>Seems simple enough; at the moment we create an object Python takes the time to
@@ -123,9 +123,9 @@ find and allocate memory for us.</p>
 <p>Back to Ruby. As we allocate more and more objects, Ruby will continue to hand
 us precreated objects from the free list. As it does this, the free list will
 become shorter:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/free-list4.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/free-list4.png"><br/></p>
 <p>...and shorter:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/free-list5.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/free-list5.png"><br/></p>
 <p>Notice as I continue to assign new values to <span class="code">n1</span>, Ruby
 leaves the old values behind. The ABC, JKL and MNO nodes remain in memory. Ruby
 doesn’t immediately clean up old objects my code is no longer using! Working as
@@ -135,27 +135,27 @@ with unused, garbage objects surrounding you.</p>
 <div style="clear: right"></div>
 <h2>Python Developers Live in a Tidy Household</h2>
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/10/24/clean.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/10/24/clean.jpg"><br/>
   <i>Python cleans up garbage objects immediately <br/>
     after your code is done using them.</i>
 </div>
 <p>Garbage collection works quite differently in Python than in Ruby. Let’s return
 to our three Python Node objects from earlier:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/python3b.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/python3b.png"><br/></p>
 <p>Internally, whenever we create an object Python saves an integer inside the
 object’s C structure, called the <em>reference count</em>. Initially, Python sets this
 value to 1:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/python4.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/python4.png"><br/></p>
 <p>The value of 1 indicates there is one pointer or reference to each of the three
 objects. Now suppose we create a new node, JKL:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/python5.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/python5.png"><br/></p>
 <p>Just as before, Python sets the reference count in JKL to be 1. However, also
 notice since we changed <span class="code">n1</span> to point to JKL, it no
 longer references ABC, and that Python decremented its reference count down to 0.</p>
 <p>At this point, the Python garbage collector immediately jumps into action! Whenever an
 object’s reference count reaches zero, Python immediately frees it, returning
 it’s memory to the operating system:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/python6.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/python6.png"><br/></p>
 <p>Above Python reclaims the memory used by the ABC node. Remember, Ruby simply
 leaves old objects lying around and doesn’t release their memory.</p>
 <p>This garbage collection algorithm is known as <em>reference counting</em>. It was
@@ -169,7 +169,7 @@ after you. As soon as you put down a dirty dish or glass, someone has already
 put it away in the dishwasher!</p>
 <p>Now for a second example. Suppose we set <span class="code">n2</span> to refer
 to the same node as <span class="code">n1</span>:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/python8.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/python8.png"><br/></p>
 <p>Above to the left you can see Python has decremented the reference count for
 DEF and will immediately garbage collect the DEF node. Also note that the JKL
 now has a reference count of 2, since both <span class="code">n1</span> and
@@ -178,7 +178,7 @@ now has a reference count of 2, since both <span class="code">n1</span> and
 <p>Eventually a messy house fills up with trash and life can’t continue as usual.
 After your Ruby program runs for some time, the free list will eventually be
 entirely used up:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/mark-and-sweep1.png"><br/></p>
 <p>Here all of the precreated Ruby objects have been used by our application
 (they are all gray) and no objects remain on the free list (no white squares
 are left).</p>
@@ -189,22 +189,22 @@ references our code makes to objects and other values. Ruby also iterates over
 internal pointers used by its virtual machine. It <em>marks</em> each object that
 it is able to reach using these pointers. I indicate these marks using the letter M
 here:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/mark-and-sweep2.png"><br/></p>
 <p>Above the three objects marked with “M” are live, active objects that our
 application is still using. Internally, Ruby actually uses a series of bits
 known as the <em>free bitmap</em> to keep track of which objects are marked or not:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep3.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/mark-and-sweep3.png"><br/></p>
 <p>Ruby saves the free bitmap in a separate memory location in order to take full
 advantage of Unix copy-on-write optimization. For more information on this, see
 my article <a
-  href="http://patshaughnessy.net/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why
+  href="https://patshaughnessy.net/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why
 You Should Be Excited About Garbage Collection in Ruby 2.0.</a></p>
 <p>If the marked objects are live, the remaining, unmarked objects must be garbage,
 meaning they are no longer being used by our code. I’ll show the garbage objects
 as white squares below:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep4.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/mark-and-sweep4.png"><br/></p>
 <p>Next Ruby <em>sweeps</em> the unused, garbage objects back onto the free list:</p>
-<p><img src="http://patshaughnessy.net/assets/2013/10/24/mark-and-sweep5.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/10/24/mark-and-sweep5.png"><br/></p>
 <p>Internally this happens quite quickly, since Ruby doesn’t actually copy objects
 around from one place to another. Instead, Ruby places the garbage objects back
 onto the free list by adjusting internal pointers to form a new linked list.</p>
@@ -241,7 +241,7 @@ notes from the rest of this presentation, reference counting can’t handle
 </li>
 </ul>
 <h2>Until Next Time...</h2>
-<p>Next week I’ll type up <a href="http://patshaughnessy.net/2013/10/30/generational-gc-in-python-and-ruby">the rest of the presentation</a>. I’ll discuss how Python
+<p>Next week I’ll type up <a href="https://patshaughnessy.net/2013/10/30/generational-gc-in-python-and-ruby">the rest of the presentation</a>. I’ll discuss how Python
 handles cyclic data structures, and how GC works in the upcoming Ruby 2.1 release.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Visualizing Garbage Collection in Ruby and Python';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;

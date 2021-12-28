@@ -3,7 +3,7 @@ date: 2012/4/6
 tag: Interviews
 
 <div style="float: left; padding: 7px 30px 10px 0px">
-  <img src="http://patshaughnessy.net/assets/2012/4/6/cucumber.png">
+  <img src="https://patshaughnessy.net/assets/2012/4/6/cucumber.png">
 </div>
 
 I’ve always considered [Cucumber](http://cukes.info/) to be just another tool in my developer’s toolkit of testing tools. Like RSpec, Test::Unit or MiniTest::Spec I thought of Cucumber as just another way to test my code: I would use RSpec for my unit tests, and Cucumber for my integration tests. While Cucumber’s business oriented scenario language seemed fun and innovative to me, I never really gave much thought to why Cucumber tests were written in such a verbose, elaborate way.

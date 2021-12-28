@@ -3,7 +3,7 @@ date: 2017/12/11
 tag: the Postgres LTREE Extension
 
 <div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/11/tree1.jpg">
+  <img src="https://patshaughnessy.net/assets/2017/12/11/tree1.jpg">
 </div>
 
 Suppose you had a hierarchical data structure in your application - how would
@@ -20,19 +20,19 @@ LTREE actually work? What Computer Science does it use behind the scenes to
 enable fast tree operations?
 
 This week I’ll publish a series
-([one](http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres),
-[two](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
-[three](http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
-[four](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension)
+([one](https://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres),
+[two](https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
+[three](https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
+[four](https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension)
 and
-[five](http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index))
+[five](https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index))
 of blog posts on the Postgres LTREE extension.  I'll get started today by
 trying to insert a tree structure into a Postgres table using standard SQL, and
 during the rest of the week I'll take a close look at LTREE: [how to install
-it](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
+it](https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
 [how to use
-it](http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
-and [how it works](http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index).
+it](https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
+and [how it works](https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index).
 
 <div style="clear: both"></div>
 
@@ -41,7 +41,7 @@ and [how it works](http://patshaughnessy.net/2017/12/15/looking-inside-postgres-
 My actual data set was more complicated, of course, but for the sake of example
 let’s suppose I needed to save this tree in a Postgres table:
 
-<img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png">
+<img src="https://patshaughnessy.net/assets/2017/12/11/example-tree.png">
 
 There are many different tree-like data structures in Computer Science, but
 this is probably the simplest: no cycles, no ordering of child nodes, and all
@@ -262,6 +262,6 @@ algorithms I mentioned above: path enumeration. Bundled inside of the Postgres
 source tree is an “extension,” an optional piece of C code you need compile,
 install and enable, that supports tree SQL operations using path enumeration.
 In my [next
-post](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
+post](https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
 I’ll show you how to install and use the [LTREE Postgres
 extension](https://www.postgresql.org/docs/current/static/ltree.html).

@@ -9,16 +9,16 @@ He later proceeds to write a Scheme interpreter in about 100 lines of code,
 using a dialect of Scheme called <a href="http://racket-lang.org">Racket</a>.</p>
 <p>Matthew starts by introducing the basics of Lambda Calculus notation like this:</p>
 <div style="margin: 20px 0 0 100px">
-  <img src="http://patshaughnessy.net/assets/2014/1/30/basics.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/1/30/basics.png"><br/>
 </div>
 <p>Matthew explains that all of Lambda Calculus is based on these two simple
 concepts, along with variable references. He then shows a couple of simple examples:</p>
 <div style="margin: 20px 0 0 100px">
-  <img src="http://patshaughnessy.net/assets/2014/1/30/examples.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/1/30/examples.png"><br/>
 </div>
 <p>...and then asks the reader this simple question:</p>
 <div style="margin: 20px 0 0 100px">
-  <img src="http://patshaughnessy.net/assets/2014/1/30/question.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/1/30/question.png"><br/>
 </div>
 <p>In this post I’ll try to answer this question using a series of diagrams. I’m a
 visual learner, and teacher. For me drawing something makes it much easier to
@@ -29,39 +29,39 @@ which I’m not aware of. I’ll just draw what comes naturally to me.</p>
 <p>If I had a whiteboard, I’d rewrite the complex Lambda Calculus expression above
 with circles instead of parentheses. This makes it much easier for me to see
 the nesting and order of operations. An even better visualization might be a tree structure, but I'll keep things inline with cirlces today.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/one.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/one.png"><br/></p>
 <p>For me, the biggest challenge to understanding Lisp or Scheme has always been
 all the nested parentheses. This picture is still cryptic and meaningless, but
 now at least I can see the order of operations and nesting more easily.</p>
 <h2>Start From the Inside and Work Your Way Out</h2>
 <p>To understand what’s going on here, I started with the innermost lambda
 expression:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/two.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/two.png"><br/></p>
 <p>Referring to Matthew’s explanation above, <span class="code">(f x)</span> means evaluate the function <span class="code">f</span>
 on the argument <span class="code">x</span>. Therefore, this expression represents an anonymous function
 that applies some function <span class="code">f</span> to its argument, <span class="code">x</span>. The oval on the left is the
 function and I’ve written this explanation on the right: what the function
 does.</p>
 <p>I usually visualize functions with inputs and outputs, like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/three.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/three.png"><br/></p>
 <p>Here you can see the input <span class="code">x</span> comes from the left, and I’ve shown the anonymous
 function in the center using a half-oval. It applies a function <span class="code">f</span>, which is
 almost like a second input value, to <span class="code">x</span> and returns an output value on the
 right.</p>
 <h2>Higher Order Functions</h2>
 <p>Now let’s substitute this simple function back into the complex expression:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/four.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/four.png"><br/></p>
 <p>You can see I’ve pasted the text “Apply f to my argument” into the center of
 the expression where the previous lambda was located. Working my way out, let’s
 take a look at what the next lambda expression means:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/five.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/five.png"><br/></p>
 <p>Here you can see a definition for another anonymous function, another lambda
 expression, which takes <span class="code">f</span> as an argument. The body of the function is our
 previous expression.</p>
 <p>What this boils down to, therefore, is a function that takes a function as an
 argument and returns a second function as a result. Here’s what this might look
 like using my input/output diagram style:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/six.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/six.png"><br/></p>
 <p>On the left you can see the function takes a function, <span class="code">f</span>, as input. On the
 right the dashed rectangle represents a single output value: another function.
 This is an example of a higher order function, a function that can use other
@@ -78,41 +78,41 @@ lambda. I’m not sure about this, but I suspect lambda mathematicians would say
 the outer lambda is a closure around the free variable, <span class="code">f</span>.</p>
 <h2>Identity Functions</h2>
 <p>Substituting again, here’s the entire expression simplified:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/seven.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/seven.png"><br/></p>
 <p>The two lambdas on the right are easier to follow. These are examples of the
 identity function, a function that returns its argument. Matthew showed this
 syntax as one of his examples.</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/eight.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/eight.png"><br/></p>
 <p>You can see here the identity function simply passes its input along as an
 output:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/nine.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/nine.png"><br/></p>
 <h2>Evaluating a Function</h2>
 <p>Substituting again, here’s what we have now:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/ten.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/ten.png"><br/></p>
 <p>Earlier we saw the higher order function on the left returns a function that
 will later operate on an argument, which I showed as <span class="code">x</span>. Now its time has come.
 Recall that <span class="code">(f x)</span> in Lambda Calculus means “evaluate the function <span class="code">f</span> on the
 argument <span class="code">x</span>.”</p>
 <p>In other words, this expression:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/eleven.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/eleven.png"><br/></p>
 <p>… means: “evaluate the higher order function on the left, providing the
 function on the right as an argument.”</p>
 <p>The higher order function will take one function (the identity function) and
 return another:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/twelve.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/twelve.png"><br/></p>
 <p>The output is a new function which will apply the identity function (the
 argument) to its own argument <span class="code">x</span>. Of course, this is equivalent to the identity
 function itself!</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/thirteen.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/thirteen.png"><br/></p>
 <p>There must be some Lambda Calculus axiom (the “lambda identity axiom?”) behind
 this deduction, but I’m not sure. I’ll consider it obvious and just move on.</p>
 <h2>The Result</h2>
 <p>Substituting this result back into the original expression, we’re left with
 this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/fourteen.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/fourteen.png"><br/></p>
 <p>Reapplying the “lambda identity axiom” again it’s
 obvious this is equivalent to the identity function:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/30/fifteen.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/30/fifteen.png"><br/></p>
 <p>That is, the identity function is also a higher order function. It returns the
 same functions you pass to it, unchanged.</p>
 <p>Stepping back and taking stock, we’ve deduced that:</p>

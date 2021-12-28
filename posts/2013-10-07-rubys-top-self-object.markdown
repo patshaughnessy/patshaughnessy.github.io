@@ -3,7 +3,7 @@ date: 2013/10/7
 tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/9/15/smalltalk-and-ruby.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/9/15/smalltalk-and-ruby.png"><br/>
   <i>Creating functions without a class is<br/>
   awkward in Smalltalk, but simple in Ruby.</i>
 </div>

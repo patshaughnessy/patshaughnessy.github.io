@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Find Your Language’s Primitives - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Find Your Language’s Primitives</h1><div class="metadata"><span class="date">November 29th 2021</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2021/11/29/find-your-languages-primitives" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Find Your Language’s Primitives">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2021/11/29/dig1.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2021/11/29/dig1.jpg"><br/>
   <i>If you dig into your programming language's syntax, you might <br/>discover that it is capable of much more than you thought it was.
   </i>
 </div>
@@ -36,7 +36,7 @@ like <span class="code">[]</span> or <span class="code">[]=</span> cannot be
 broken down into smaller pieces of Ruby code. As Wikipedia says, these methods
 are the smallest unit of processing available to Ruby programmers working with
 arrays.</p>
-<p><img src="http://patshaughnessy.net/assets/2021/11/29/primitive1.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2021/11/29/primitive1.png"><br/></p>
 <p>Ruby hides the details of how arrays actually work from us. To learn how Ruby
 actually saves and retrieves values from an array, we would need to switch
 languages and drop down a level of abstraction, and read the C implementation
@@ -147,11 +147,11 @@ in
 </span></pre>
 
 <div style="float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2021/11/29/dig2.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2021/11/29/dig2.jpg"><br/>
 	<i><small>(source: <a href="https://commons.wikimedia.org/wiki/File:Digging_in_permafrost.jpg">Nick Bonzey via Wikimedia Commons</a>)</small></i>
 </div>
 <p>So far, I’ve drilled down through 3 levels of Crystal implementation:</p>
-<p><img src="http://patshaughnessy.net/assets/2021/11/29/primitive2.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2021/11/29/primitive2.png"><br/></p>
 <p>But I haven’t found a primitive function yet. Let’s keep digging!</p>
 <h2>The Crystal Array Class</h2>
 <p>To learn more, I need to scroll up and read the beginning of the Crystal <span
@@ -244,7 +244,7 @@ memory just like the Crystal team has while implementing arrays, hashes and
 other classes.</p>
 <p>Now I’ve dug down through 4 levels of Crystal function calls, but I still
 haven’t found a language primitive yet.</p>
-<p><img src="http://patshaughnessy.net/assets/2021/11/29/primitive3.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2021/11/29/primitive3.png"><br/></p>
 <h2>A Crystal Language Primitive</h2>
 <p>We still haven’t discovered how arrays actually work - how pointers actually
 work. That is, reading this line of code above:</p>
@@ -275,7 +275,7 @@ obtains the value:</p>
 
 <p>As you can see, this is a language primitive - it says “primitive” right there
 above the method definition!</p>
-<p><img src="http://patshaughnessy.net/assets/2021/11/29/primitive4.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2021/11/29/primitive4.png"><br/></p>
 <p>Returning to Wikipedia’s definition of a language primitive, this is an atomic
 element of an expression. The Crystal compiler knows not to try to compile this
 code but to assume this behavior is part of the language. In fact, there is no
@@ -293,7 +293,7 @@ need to step down one level of abstraction - we need to use a lower level
 language, not Crystal.</p>
 <h2>Retrieving an Array Element In x86 Assembly Language</h2>
 <div style="float: right; padding: 18px 0px 30px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2021/11/29/cave.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2021/11/29/cave.png"><br/>
 </div>
 <p>What lower level language should we use? Since the Crystal team used the <a href="https://llvm.org">Low
 Level Virtual Machine (LLVM)</a> project to implement their
@@ -335,11 +335,11 @@ class="code">Pointer#value</span> methods actually work:</p>
 <p>Assembly language is just another programming language like any other, but with
 a different set of primitives. The primitives in this language are hardware
 instructions that my laptop’s CPU can understand and execute directly:</p>
-<p><img src="http://patshaughnessy.net/assets/2021/11/29/primitive5.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2021/11/29/primitive5.png"><br/></p>
 <p>I won’t pretend to understand all the details here, but if you’re curious about
 what this code does - how my compiled Crystal program actually retrieves a
 value from an array - here are a few highlights you can look for:</p>
-<p><img src="http://patshaughnessy.net/assets/2021/11/29/assembly-table.svg"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2021/11/29/assembly-table.svg"><br/></p>
 <p>If you’d like to learn more about x86 assembly language, I wrote an article a
 few years ago explaining some of the basics: <a href="https://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly
 Language</a>.</p>

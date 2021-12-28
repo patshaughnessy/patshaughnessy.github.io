@@ -3,7 +3,7 @@ date: 2021/12/22
 tag: Crystal
 
 <div style="float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg"><br/>
   <i>Imagine trying to read an entire book while <br/>
   focusing on only one or two words at a time
   </i>
@@ -71,7 +71,7 @@ Parsing even this simple program is a complex task for a compiler.
 Before parsing or running the code above, Crystal converts it into a series of
 tokens. To the Crystal compiler, my program looks like this:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/tokens.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/tokens.png"><br/>
 
 The first `IDENT` token corresponds to the `arr` variable at the beginning of the
 first line. You can also see two `NUMBER` tokens: the [Crystal tokenizer
@@ -108,7 +108,7 @@ Crystal’s parse code is over 6000 lines long, so I won’t attempt to complete
 explain it here. But there’s an underlying, high level algorithm the parse code
 uses:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/pattern-recurse-record.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/pattern-recurse-record.png"><br/>
 
 First, the parser compares the current token, and possibly the following or
 previous tokens as well, to a series of expected patterns. These patterns
@@ -130,7 +130,7 @@ puts arr[1]
 
 Recall Crystal already converted this code into a token stream:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/token-line.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/token-line.png"><br/>
 
 (To be more accurate, Crystal actually converts my code into tokens as it goes.
 The parse code calls the tokenizer code each time it needs a new token. But
@@ -138,7 +138,7 @@ this timing isn’t really important.)
 
 As you might expect, Crystal starts with the first token, `IDENT`.
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/process-token1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/process-token1.png"><br/>
 
 What does this mean? How does Crystal interpret `arr`? `IDENT` is short for
 identifier, but what role does this identifier play? What meaning does `arr` have
@@ -169,7 +169,7 @@ would forget.
 
 To record the function call, Crystal creates an object:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/ast1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/ast1.png"><br/>
 
 As we’ll see in a moment, Crystal builds up a tree of these objects, called an
 [Abstract Syntax
@@ -199,7 +199,7 @@ maybe yet another function call.
 To find the arguments of the function call, inside the recursive call to the
 parse code Crystal proceeds forward to process the next two tokens:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/process-token2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/process-token2.png"><br/>
 
 Crystal skips over the space, and then encounters the equals sign. Suddenly
 Crystal realizes it was wrong! The `arr` identifier wasn’t a reference to a
@@ -212,7 +212,7 @@ To record this new, revised syntax, Crystal changes the `Call` AST node it
 created earlier to an `Assign` AST node, and creates a new `Var` AST node to
 record the variable being assigned to:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/ast2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/ast2.png"><br/>
 
 Now the AST is starting to resemble a tree. Because of the recursive nature of
 parse algorithm, this tree structure is an ideal way of record what the
@@ -227,21 +227,21 @@ the AST as the value attribute of the `Assign` node?
 To find out, the Crystal compiler recursively calls the same parsing algorithm
 again, but starting with the `[` token:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/process-token3.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/process-token3.png"><br/>
 
 Following the pattern match, record and recurse process, the Crystal compiler
 once again matches the new token, `[`, with a series of expected patterns. This
 time, Crystal decides that the left bracket is the start of literal array
 expression and records a new AST node:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/array-literal1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/array-literal1.png"><br/>
 
 But before inserting it into the syntax tree, Crystal recursively calls itself
 to parse each of the values that appear in the array. The array literal pattern
 expects a series of values to appear separated by spaces, so Crystal proceeds
 to process the following tokens, looking for values separated by commas:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/process-token4.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/process-token4.png"><br/>
 
 After encountering the comma, Crystal recursively calls the same parse code
 again on the previous token or tokens that appeared before the comma, because
@@ -249,27 +249,27 @@ the array value before the comma could be another expression of arbitrary depth
 and complexity. In this example, Crystal finds a simple numeric array element,
 and creates a new AST node to represent the numeric value:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/number-literal1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/number-literal1.png"><br/>
 
 After reading the comma, Crystal calls its parser recursively again, and finds
 the second number:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/number-literal2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/number-literal2.png"><br/>
 
 Remember Crystal has a bad memory. With all these new AST nodes, Crystal will
 quickly forget what they mean. Fortunately, Crystal reads in the right square
 bracket and realizes I ended the array literal in my code:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/process-token5.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/process-token5.png"><br/>
 
 Now those recursive calls to the parse code return, and Crystal assembles these
 new AST nodes:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/array-literal2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/array-literal2.png"><br/>
 
 …and then places them inside the larger, surrounding AST:
 
-<img src="http://patshaughnessy.net/assets/2021/12/22/ast3.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/12/22/ast3.png"><br/>
 
 After this, these recursive calls return and the Crystal compiler moves on to
 parse the second line of my program.

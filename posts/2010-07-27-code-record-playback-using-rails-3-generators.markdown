@@ -73,7 +73,7 @@ etc...</pre></div>
 </pre></div>
 </div><br>
 <p>This is somewhat silly, but it&rsquo;s simple enough to use as an example here. Now if I run my app I&rsquo;ll get this fascinating page:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/7/27/Picture_1.png"/></p>
+<p><img src="https://patshaughnessy.net/assets/2010/7/27/Picture_1.png"/></p>
 <p>Next let&rsquo;s &ldquo;record&rdquo; this sample code by using generate_from_diff to create a new Rails generator for it. First, we need to install generate_from_diff:</p>
 <div class="CodeRay">
   <div class="code"><pre>$ gem install generate_from_diff
@@ -153,7 +153,7 @@ $ cp -r ../first_app/lib/generators/build_info lib/generators</pre></div>
   patching file test/unit/helpers/build_info_helper_test.rb</pre></div>
 </div><br>
 <p>That&rsquo;s it! Now I can run the second app and see the same build status page that we had before:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/7/27/Picture_1.png"/></p>
+<p><img src="https://patshaughnessy.net/assets/2010/7/27/Picture_1.png"/></p>
 <p><b>How does this actually work?</b></p>
 <p>Here&rsquo;s what is going on under the hood. First, when you record your code changes into the new generator like this:</p>
 <div class="CodeRay">

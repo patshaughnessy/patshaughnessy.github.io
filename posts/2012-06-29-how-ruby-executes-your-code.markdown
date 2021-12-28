@@ -4,13 +4,13 @@ tag: Ruby
 
 <b>This is an excerpt from the second chapter of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.
 
-If you’re interested in Ruby internals you can [sign up here](http://patshaughnessy.net/ruby-under-a-microscope) and I’ll send you an email when the eBook is finished.  I also posted [one entire chapter](http://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope) in May, and [an excerpt from the first chapter](http://patshaughnessy.net/2012/6/18/the-start-of-a-long-journey-how-ruby-parses-and-compiles-your-code) last week.</b>
+If you’re interested in Ruby internals you can [sign up here](https://patshaughnessy.net/ruby-under-a-microscope) and I’ll send you an email when the eBook is finished.  I also posted [one entire chapter](https://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope) in May, and [an excerpt from the first chapter](https://patshaughnessy.net/2012/6/18/the-start-of-a-long-journey-how-ruby-parses-and-compiles-your-code) last week.</b>
 
 <br/>
 
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td><img src="http://patshaughnessy.net/assets/2012/6/29/gears.jpg"></td></tr>
+    <tr><td><img src="https://patshaughnessy.net/assets/2012/6/29/gears.jpg"></td></tr>
   </table>
 </div>
 
@@ -20,24 +20,24 @@ Just like your computer’s actual microprocessor hardware, Koichi Sasada and th
 
 ## YARV’s internal stack and your Ruby stack
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Experiment 2-1: Benchmarking Ruby 1.9 vs. Ruby 1.8
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Local and dynamic access of Ruby variables
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Experiment 2-2: Exploring scope and variables using the binding object
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## How YARV controls your program’s execution flow
 
 <div style="float: left; padding: 17px 30px 10px 0px">
-  <img src="http://patshaughnessy.net/assets/2012/6/29/railroad.jpg">
+  <img src="https://patshaughnessy.net/assets/2012/6/29/railroad.jpg">
 </div>
 
 We’ve seen how YARV uses a stack while executing its instruction set and how it can access variables locally or dynamically, but what about control structures? Controlling the flow of execution is a fundamental requirement for any programming language, and Ruby has a rich set of control structures. How does YARV implement them?
@@ -46,7 +46,7 @@ Just like Ruby itself, YARV has it own control structures, albeit at a much lowe
 
 A good way to understand how YARV controls execution flow is to take a look at how the if/else statement works. Here’s a simple Ruby script that uses both <span class="code">if</span> and <span class="code">else</span>:
 
-<img src="http://patshaughnessy.net/assets/2012/6/29/if-statement.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/29/if-statement.png"/>
 
 On the right you can see the corresponding snippet of compiled YARV instructions. I’ve simplified the YARV instructions a bit by removing the <span class="code">trace</span> commands and a couple of other things. Reading the YARV instructions, you can see Ruby follows this pattern for implementing if/else statements:
 
@@ -59,7 +59,7 @@ On the right you can see the corresponding snippet of compiled YARV instructions
 
 This is a bit easier to follow if I paste the instructions into a flowchart:
 
-<img src="http://patshaughnessy.net/assets/2012/6/29/if-flowchart.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/29/if-flowchart.png"/>
 
 You can see how the <span class="code">branchunless</span> instruction is the key to how Ruby implements <span class="code">if</span> statements; here’s how it works:
 <ul>
@@ -107,29 +107,29 @@ To implement jumping from one place to another in the Ruby call stack - that is,
 
 Let’s take a look at how that works; here’s the compiled code for the block above containing the <span class="code">break</span> statement:
 
-<img src="http://patshaughnessy.net/assets/2012/6/29/break-code.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/29/break-code.png"/>
 
 You can see a <span class="code">throw 2</span> instruction appears in the compiled code for the block. <span class="code">Throw</span> implements throwing an exception at the YARV instruction level by using something called a “catch table.” A catch table is a table of pointers optionally attached to any YARV code snippet. Conceptually, a catch table might look like this:
 
-<img src="http://patshaughnessy.net/assets/2012/6/29/catch-table.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/29/catch-table.png"/>
 
 Here, the catch table from my example contains just a single pointer to the <span class="code">pop</span> statement, which is where execution would continue after an exception. Whenever you use a break statement in a block, Ruby not only compiles the <span class="code">throw</span> instruction into the block’s code, but it also adds the BREAK entry into the catch table of the parent scope. For a <span class="code">break</span> within a series of nested blocks, Ruby would add the BREAK entry to a catch table even farther down the rb_control_frame stack.
 
 Later, when YARV executes the <span class="code">throw</span> instruction it checks to see whether there’s a catch table containing a BREAK pointer for the current YARV instruction sequence:
 
-<img src="http://patshaughnessy.net/assets/2012/6/29/catch1.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/29/catch1.png"/>
 
 If there isn’t, Ruby will start to iterate down through the stack of rb_control_frame structures looking for a catch table containing a BREAK pointer...
 
-<img src="http://patshaughnessy.net/assets/2012/6/29/catch2.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/29/catch2.png"/>
 
 … and continue to iterate until it finds one:
 
-<img src="http://patshaughnessy.net/assets/2012/6/29/catch3.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/29/catch3.png"/>
 
 In my simple example, there is only one level of block nesting, so Ruby will find the catch table and BREAK pointer after just one iteration:
 
-<img src="http://patshaughnessy.net/assets/2012/6/29/caught.png"/>
+<img src="https://patshaughnessy.net/assets/2012/6/29/caught.png"/>
 
 Once Ruby finds the catch table pointer, it resets both the Ruby call stack (the CFP pointer) and the internal YARV stack to reflect the new program execution point. Then YARV continues to execute your code from there. That is, YARV resets the internal PC and SP pointers as needed.
 
@@ -141,12 +141,12 @@ Finally, besides BREAK there are other types of pointers that Ruby can use in th
 
 ## Experiment 2-3: How Ruby compiles different control structures into YARV instructions
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## High level vs. low level VM instructions - comparing how JRuby and Ruby 1.9 compile your code
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Comparing Rubinius high level instructions with LLVM's low level instructions
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).

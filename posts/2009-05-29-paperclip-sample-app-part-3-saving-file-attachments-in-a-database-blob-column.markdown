@@ -2,7 +2,7 @@ title: "Paperclip sample app part 3: saving file attachments in a database BLOB 
 date: 2009/05/29
 tag: Paperclip
 
-<p><a href="http://patshaughnessy.net/2009/4/30/paperclip-sample-app">In part 1 of this series</a>, I showed how to create a simple Rails web site that uses the Paperclip plugin from Thoughtbot to upload and display image files. <a href="http://patshaughnessy.net/2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">Then in part 2</a>, I went on to change the sample app to download the image files through a Rails controller and not just through a direct call to Apache. This would be useful if you wanted to implement security for file attachments or for a variety of other reasons.</p>
+<p><a href="https://patshaughnessy.net/2009/4/30/paperclip-sample-app">In part 1 of this series</a>, I showed how to create a simple Rails web site that uses the Paperclip plugin from Thoughtbot to upload and display image files. <a href="https://patshaughnessy.net/2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">Then in part 2</a>, I went on to change the sample app to download the image files through a Rails controller and not just through a direct call to Apache. This would be useful if you wanted to implement security for file attachments or for a variety of other reasons.</p>
 <p>This time I&rsquo;d like to show how to modify the same sample application to save the file attachments in a database BLOB column, instead of on your web server&rsquo;s file system. To jump ahead and just get the working code, look at the &ldquo;part3&rdquo; folder in the github repo: <a href="http://github.com/patshaughnessy/paperclip-sample-app">http://github.com/patshaughnessy/paperclip-sample-app</a>.</p>
 <p>But before we actually work on the sample app, a disclaimer: Don&rsquo;t try this at home! Serving file content directly from the file system via Apache or some other web server will always be faster and simpler than loading the file attachments from a database table&hellip; Apache and other web servers were designed to load and serve files quickly, and there&rsquo;s normally no need to issue an expensive SQL query or to make another network connection to a database server just to send files to a web browser.</p>
 <p>So why in the world would you ever want to pay the extra performance penalty and move the files into a database table? Here are a couple of reasons:
@@ -16,7 +16,7 @@ tag: Paperclip
 <pre>$ cd /path/to/paperclip-sample-app
 $ rm -rf vendor/plugins/paperclip
 $ ./script/plugin install git://github.com/patshaughnessy/paperclip.git</pre>
-<p>Now that we have the modified plugin installed, let&rsquo;s go ahead and create the BLOB columns that we will use to save the files. I tried to design the database storage module to be easy to use; one of the decisions I made was around what these BLOB columns should be called. I decided by default to use &ldquo;[attachment]_file&rdquo; as the name for the primary file attachment, and &ldquo;[attachment]_[style]_file&rdquo; for the other styles. If you want to use other column names, you just need to specify the names in the call to &ldquo;has_attached_file&rdquo; in the model. See <a href="http://patshaughnessy.net/2009/4/14/database-storage-for-paperclip-rewritten-to-use-a-single-table">my usage post</a> for more info.</p>
+<p>Now that we have the modified plugin installed, let&rsquo;s go ahead and create the BLOB columns that we will use to save the files. I tried to design the database storage module to be easy to use; one of the decisions I made was around what these BLOB columns should be called. I decided by default to use &ldquo;[attachment]_file&rdquo; as the name for the primary file attachment, and &ldquo;[attachment]_[style]_file&rdquo; for the other styles. If you want to use other column names, you just need to specify the names in the call to &ldquo;has_attached_file&rdquo; in the model. See <a href="https://patshaughnessy.net/2009/4/14/database-storage-for-paperclip-rewritten-to-use-a-single-table">my usage post</a> for more info.</p>
 <p>For this sample app I&rsquo;ll go ahead and use the default column names: &ldquo;avatar_file,&rdquo; &ldquo;avatar_small_file&rdquo; and &ldquo;avatar_thumb_file.&rdquo; Here&rsquo;s how to create those columns for a MySQL database. First create a new migration as usual:</p>
 <pre>$ ./script/generate migration add_attachments_blob_avatar_to_user
 exists  db/migrate
@@ -55,10 +55,10 @@ end</pre>
                     :url =&gt; &#x27;/:class/:id/:attachment?style=:style&#x27;
 end</pre>
 <p>Note that I also removed the &ldquo;:path&rdquo; parameter; this value would be ignored by the database storage module anyway since the files will be stored in the DB. Let&rsquo;s try it out! Start up the sample app, and re-edit a user record to upload a new image file:<br/>
-  <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-edit.png">
+  <img src="https://patshaughnessy.net/assets/2009/4/30/mickey-edit.png">
 </p>
 <p>Select a file, click &ldquo;Update&rdquo; to submit the form and the file will be processed by ImageMagick, and saved into our new BLOB columns by the database storage module in Paperclip&hellip;<br/>
-  <img src="http://patshaughnessy.net/assets/2009/5/29/mickey-missing.png">
+  <img src="https://patshaughnessy.net/assets/2009/5/29/mickey-missing.png">
 </p>
 <p>What? Where&rsquo;s the image? It turns out that we still need to make a code change to the UsersController to download the image file from the BLOB column instead of from the file system. I&rsquo;ll get to this in a moment. But first, let&rsquo;s look at the console and see if the new files were saved into the database properly:</p>
 <pre>$ ./script/console 
@@ -137,9 +137,9 @@ avatar_file_name: &quot;mickey-mouse.jpg&quot;, avatar_content_type: &quot;image
 avatar_file_size: 137233, avatar_updated_at: &quot;2009-05-28 17:37:42&quot;&gt;</pre>
 <p>Here we can see that ActiveRecord will load all of the User columns that are listed above in the hash we pass to named_scope&hellip; all of the columns except for the BLOB columns. This is different from what ActiveRecord does by default, which is a simple SELECT * FROM &hellip;. statement.</p>
 <p>Enough about ActiveRecord internals&hellip; let&rsquo;s get back to the sample app and finish it up:<br/>
-    <img src="http://patshaughnessy.net/assets/2009/5/29/mickey-missing.png">
+    <img src="https://patshaughnessy.net/assets/2009/5/29/mickey-missing.png">
   </p>
-<p>So why didn&rsquo;t the image appear here properly? The reason is that in UsersController I&rsquo;m still using the code that accesses the file on the file system and streams it to the client using send_file (see <a href="http://patshaughnessy.net/2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">my last post</a> for more info):</p>
+<p>So why didn&rsquo;t the image appear here properly? The reason is that in UsersController I&rsquo;m still using the code that accesses the file on the file system and streams it to the client using send_file (see <a href="https://patshaughnessy.net/2009/5/16/paperclip-sample-app-part-2-downloading-files-through-a-controller">my last post</a> for more info):</p>
 <pre>def avatars
     user = User.find(params[:id])
     style = params[:style] ? params[:style] : &#x27;original&#x27;
@@ -155,7 +155,7 @@ avatar_file_size: 137233, avatar_updated_at: &quot;2009-05-28 17:37:42&quot;&gt;
   end</pre>
 <p>  Only the line in bold has changed. We just call user.avatar.file_contents, pass in the specified style and then pass along the data to send_data.
   If you restart the app and refresh your browser, now you should see the image again:<br/>
-      <img src="http://patshaughnessy.net/assets/2009/5/29/mickey-small2.png">
+      <img src="https://patshaughnessy.net/assets/2009/5/29/mickey-small2.png">
     </p>
 <p>Now we are seeing the binary image file data loaded from the BLOB column by ActiveRecord and streamed down to the browser by send_data.</p>
 <p>One last detail about this: since usually everyone will use the same controller code to load the file contents for a given style from the BLOB, and then pass it along to send_data, I enabled Paperclip to add another utility method, this time to your controller, to make this even easier:</p>

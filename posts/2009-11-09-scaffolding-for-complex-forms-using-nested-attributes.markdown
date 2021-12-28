@@ -2,7 +2,7 @@ title: "Scaffolding for complex forms using nested attributes"
 date: 2009/11/09
 tag: View Mapper
 
-<p>While the new nested attributes feature in Rails 2.3 greatly simplifies writing forms that operate on two or more models at the same time, writing a complex form is still a confusing and daunting task even for experienced Rails developers. To make this easier, I just added nested attribute support to my <a href="http://patshaughnessy.net/view_mapper">View Mapper gem</a>. This means you can generate complex form scaffolding for two or more models in a has_many/belongs_to, has_and_belongs_to_many or has_many, through relationship.</p>
+<p>While the new nested attributes feature in Rails 2.3 greatly simplifies writing forms that operate on two or more models at the same time, writing a complex form is still a confusing and daunting task even for experienced Rails developers. To make this easier, I just added nested attribute support to my <a href="https://patshaughnessy.net/view_mapper">View Mapper gem</a>. This means you can generate complex form scaffolding for two or more models in a has_many/belongs_to, has_and_belongs_to_many or has_many, through relationship.</p>
 <p><b>Example:</b></p>
 <p>If I have a group model that has many people and accepts nested attributes for them like this:</p>
 <pre>class Group &lt; ActiveRecord::Base
@@ -23,11 +23,11 @@ end</pre>
       create  app/views/groups/_person.html.erb
       create  public/javascripts/nested_attributes.js</pre>
 <p>Now if I open my Rails app and create a new group, I will see:<br/>
- <img src="http://patshaughnessy.net/assets/2009/11/9/new_group.png"/></p>
+ <img src="https://patshaughnessy.net/assets/2009/11/9/new_group.png"/></p>
 <p>This looks just like the standard Rails scaffolding, but with one additional &ldquo;Add a Person&rdquo; link. If you click on it, you&rsquo;ll see the attributes of the person model appear along with a &ldquo;remove&rdquo; link, indented to the right:<br/>
- <img src="http://patshaughnessy.net/assets/2009/11/9/new_group_detail.png"/></p>
+ <img src="https://patshaughnessy.net/assets/2009/11/9/new_group_detail.png"/></p>
 <p>If I enter some values and submit, ActiveRecord will insert a new record into both the groups table and the people table, and set the group_id value in the new person record correctly:<br/>
- <img src="http://patshaughnessy.net/assets/2009/11/9/show_group.png"/><br/></p>
+ <img src="https://patshaughnessy.net/assets/2009/11/9/show_group.png"/><br/></p>
 <p>View Mapper has:
 <ul>
   <li>inspected your group and person models to find their attributes (columns).</li>

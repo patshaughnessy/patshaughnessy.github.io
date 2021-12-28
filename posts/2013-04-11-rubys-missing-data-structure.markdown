@@ -3,7 +3,7 @@ date: 2013/4/11
 tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
-  <img src="http://patshaughnessy.net/assets/2013/4/11/linked-list2.png">
+  <img src="https://patshaughnessy.net/assets/2013/4/11/linked-list2.png">
 </div>
 
 Have you ever noticed Ruby doesn’t include support for linked lists? Most

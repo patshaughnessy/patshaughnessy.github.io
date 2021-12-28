@@ -37,7 +37,7 @@
 
 <p>
   <p>You can find this code in the <a href="http://github.com/rails/auto_complete/blob/master/lib/auto_complete.rb">lib/auto_complete.rb</a> file inside the <a href="http://github.com/rails/auto_complete">rails/auto_complete</a> repository on github</a>. So what the heck does all of this mean? Let&rsquo;s take a step-by-step look at this code, and see if we can figure it out.</p>
-  <p>To get started, let&rsquo;s use the category/name example I used in <a href="http://patshaughnessy.net/2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">my last article</a>, and also that Ryan Bates used in his <a href="http://railscasts.com/episodes/102-auto-complete-association">Auto-Complete Association screencast</a> on the auto_complete plugin:</p>
+  <p>To get started, let&rsquo;s use the category/name example I used in <a href="https://patshaughnessy.net/2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">my last article</a>, and also that Ryan Bates used in his <a href="http://railscasts.com/episodes/102-auto-complete-association">Auto-Complete Association screencast</a> on the auto_complete plugin:</p>
     <div class="CodeRay">
       <div class="code"><pre>auto_complete_for <span class="sy">:category</span>, <span class="sy">:name</span></pre></div>
 
@@ -305,7 +305,7 @@
 <p>
   
   <p>Now we&rsquo;ve seen the real value of metaprogramming: the author of the auto_complete plugin was able to provide a simple helper method, auto_complete_for, which dynamically added this fairly complex method to your controller. The beauty and power of Ruby and Rails is just how easy this was to do: the generated function is tailored to use the Category model just as if you had written it yourself. When I first came across this code I was impressed not only by the power that this sort of metaprogramming provided, but also by how easy it was to do this using Ruby on Rails. Helper modules and methods, such as constantize in ActiveSupport, make it very, very easy to convert from symbols to strings to constants and back again&hellip; which is exactly what you need to do to write a general method that can be dynamically generated in this way.</p>
-  <p><a href="http://patshaughnessy.net/2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">Last week I asserted</a> that calling auto_complete_for in your controller like this was equivalent to this code from Ryan Bates&rsquo; <a href="http://railscasts.com/episodes/102-auto-complete-association">Auto-Complete Association screencast</a>:</p>
+  <p><a href="https://patshaughnessy.net/2010/2/13/creating-associations-to-existing-data-part-2-belongs_to-with-auto_complete">Last week I asserted</a> that calling auto_complete_for in your controller like this was equivalent to this code from Ryan Bates&rsquo; <a href="http://railscasts.com/episodes/102-auto-complete-association">Auto-Complete Association screencast</a>:</p>
 
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">

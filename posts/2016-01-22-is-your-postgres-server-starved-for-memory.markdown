@@ -3,7 +3,7 @@ date: 2016/1/22
 tag: Postgres
 
 <div style="float: left; padding: 7px 30px 20px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2016/1/22/sphygmomanometer.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/1/22/sphygmomanometer.png"><br/>
   <i>
 Like a patient with low blood pressure, a slow SQL<br/>
 query might not be getting the memory it needs.
@@ -22,7 +22,7 @@ class="code">work\_mem</span>. This controls how much “working memory” your
 Postgres server allocates for each sort or join operation. The default value
 for this is only 4MB:
 
-<img src="http://patshaughnessy.net/assets/2016/1/22/work_mem.png"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/work_mem.png"/>
 
 <div style="clear: left"></div>
 
@@ -40,13 +40,13 @@ starved for memory.
 ## Hash Tables Inside of Postgres
 
 In my last article, I described [how Postgres implements the hash join
-algorithm](http://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join).
+algorithm](https://patshaughnessy.net/2015/11/24/a-look-at-how-postgres-executes-a-tiny-join).
 I showed how Postgres scans over all the records in one of the tables from the
 join and saves them in a hash table.
 
 Here’s what a hash table might look like conceptually:
 
-<img src="http://patshaughnessy.net/assets/2016/1/22/table1.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/table1.svg"/>
 
 On the left is an array of pointers called _buckets_. Each of these pointers is
 the head of a linked list, which I show on the right using blue rectangles. The
@@ -60,7 +60,7 @@ Postgres’s hash join code gracefully scales up to process larger and larger
 data sets by increasing the number of buckets. If the target table had more
 records, Postgres would use 2048 buckets instead of 1024:
 
-<img src="http://patshaughnessy.net/assets/2016/1/22/table2.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/table2.svg"/>
 
 Before starting to execute the hash join algorithm, Postgres estimates how many
 records it will need to add to the hash table, using the query plan. Then
@@ -84,7 +84,7 @@ called <span class="code">ExecChooseHashTableSize</span>.
     <div class="function-link"><a href="http://doxygen.postgresql.org/nodeHash_8c.html#a5b805ac64e22306b7307b4a07ae2b34e">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2016/1/22/ExecChooseHashTableSize.png"/>
+    <img src="https://patshaughnessy.net/assets/2016/1/22/ExecChooseHashTableSize.png"/>
   </div>
 </div>
 </p>
@@ -94,7 +94,7 @@ called <span class="code">ExecChooseHashTableSize</span>.
 If the table from your join query was even larger, then Postgres would use 4096
 buckets instead of 2048:
 
-<img src="http://patshaughnessy.net/assets/2016/1/22/table3.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/table3.svg"/>
 
 In theory, this doubling of the bucket count could continue forever: 8192
 buckets, 16384 buckets, etc. With 10 records per linked list, this would
@@ -108,7 +108,7 @@ extremely large hash table.
 
 But in fact, Postgres limits the size of each hash table to only 4MB! 
 
-<img src="http://patshaughnessy.net/assets/2016/1/22/table4.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/table4.svg"/>
 
 The rectangle I drew around the hash table above is the working memory buffer
 assigned to that table. Regardless of how much memory my server hardware
@@ -120,7 +120,7 @@ At the same time Postgres calculates the number of buckets, it also calculates
 the total amount of memory it expects the hash table to consume. If this amount
 exceeds 4MB, Postgres divides the hash operation up into a series of _batches_:
 
-<img src="http://patshaughnessy.net/assets/2016/1/22/batches.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/batches.svg"/>
 
 In this example, Postgres calculated that it would need up to 8MB to hold the
 hash table. A larger join query might have many more batches, each holding 4MB
@@ -207,7 +207,7 @@ $ vim /usr/local/var/postgres/postgresql.conf
 
 …uncommenting and changing the setting:
 
-<img src="http://patshaughnessy.net/assets/2016/1/22/work_mem2.png"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/work_mem2.png"/>
 
 Finally I restart my server and repeat the test:
 
@@ -243,7 +243,7 @@ avoid using temporary buffer files.
 
 Because of this, the total execution time decreased from 960ms to 625ms:
 
-<img src="http://patshaughnessy.net/assets/2016/1/22/chart.png"/>
+<img src="https://patshaughnessy.net/assets/2016/1/22/chart.png"/>
 
 ## Too Good To Be True
 
@@ -263,7 +263,7 @@ Not only that, each SQL statement Postgres executes might require multiple
 memory buffers, one for each join or sort operation the query plan calls for.
 
 <div style="float: right; padding: 0px 30px 50px 10px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2016/1/22/bp1.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/1/22/bp1.png"><br/>
 </div>
 
 My Postgres server isn’t entirely dedicated to executing this one example SQL

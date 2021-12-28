@@ -3,8 +3,8 @@ date: 2008/10/31
 url: /2008/10/31/modifying-the-autocomplete-plugin-to-allow-repeated-fields
 tag: the auto_complete plugin
 
-<p>Update March 2009: I reimplemented the code from this article in a better way and posted it in a fork of auto_complete on github; see: <a href="http://patshaughnessy.net/repeated_auto_complete">http://patshaughnessy.net/repeated_auto_complete</a>.... however, the basic ideas below still apply.</p>
-<a href="http://patshaughnessy.net/2008/10/21/autocomplete-plugin-doesn-t-work-for-repeated-fields">Last week I ran into trouble</a> trying to use the auto_complete plugin like this for a form containing a single group name field, but a series of repeated people name fields:
+<p>Update March 2009: I reimplemented the code from this article in a better way and posted it in a fork of auto_complete on github; see: <a href="https://patshaughnessy.net/repeated_auto_complete">https://patshaughnessy.net/repeated_auto_complete</a>.... however, the basic ideas below still apply.</p>
+<a href="https://patshaughnessy.net/2008/10/21/autocomplete-plugin-doesn-t-work-for-repeated-fields">Last week I ran into trouble</a> trying to use the auto_complete plugin like this for a form containing a single group name field, but a series of repeated people name fields:
 <pre>&lt;p&gt;
   Group &lt;%= f.label :name %&gt;&lt;br /&gt;
   &lt;%= text_field_with_auto_complete :group, :name,

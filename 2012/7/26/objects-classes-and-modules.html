@@ -1,9 +1,9 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Objects, Classes and Modules - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Objects, Classes and Modules</h1><div class="metadata"><span class="date">July 26th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2012/7/26/objects-classes-and-modules" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Objects, Classes and Modules">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><p><b>This is an excerpt from the third chapter of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.</p>
-<p>If you’re interested in Ruby internals you can <a href="http://patshaughnessy.net/ruby-under-a-microscope">sign up here</a> and I’ll send you an email when the eBook is finished.  I also posted <a href="http://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope">one entire chapter</a> in May, and two other excerpts from <a href="http://patshaughnessy.net/2012/6/18/the-start-of-a-long-journey-how-ruby-parses-and-compiles-your-code">Chapter One</a> and <a href="http://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code">Chapter Two</a> last month.</b></p>
+<p>If you’re interested in Ruby internals you can <a href="https://patshaughnessy.net/ruby-under-a-microscope">sign up here</a> and I’ll send you an email when the eBook is finished.  I also posted <a href="https://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope">one entire chapter</a> in May, and two other excerpts from <a href="https://patshaughnessy.net/2012/6/18/the-start-of-a-long-journey-how-ruby-parses-and-compiles-your-code">Chapter One</a> and <a href="https://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code">Chapter Two</a> last month.</b></p>
 <p></p>
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td><img src="http://patshaughnessy.net/assets/2012/7/26/three_peppers.jpg"></td></tr>
+    <tr><td><img src="https://patshaughnessy.net/assets/2012/7/26/three_peppers.jpg"></td></tr>
   </table>
 </div>
 <p>We all learn very early on that Ruby is an object oriented language, descended from languages like Smalltalk and Simula. Everything is an object and all Ruby programs consist of a set of objects and the messages that are sent back and forth among them. Typically we learn about object oriented programming by looking at how to use objects and what they can do: how they can group together data values and behavior related to those values, how each class should have a single responsibility or purpose or how different objects can be related to each other through encapsulation or inheritance.</p>
@@ -11,11 +11,11 @@
 <p>In this chapter I’m going to answer these questions by exploring how Ruby works internally. Looking at exactly how Ruby implements objects, classes and modules can give you some insight into how they were intended to be used, and into how to write object oriented programs using Ruby.</p>
 <h2>What’s inside a Ruby object?</h2>
 <p>Ruby saves all of your custom objects inside a C memory structure called <span class="code">RObject</span>, which looks like this in Ruby 1.9 and 2.0:</p>
-<img src="http://patshaughnessy.net/assets/2012/7/26/ruby-object.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/ruby-object.png"/>
 <p>On the left is a pointer to the <span class="code">RObject</span> structure. Internally Ruby always refers to any value using these <span class="code">VALUE</span> pointers. On the right you can see the <span class="code">RObject</span> value is divided into two halves: <span class="code">RBasic</span> and <span class="code">RObject</span>. The <span class="code">RBasic</span> section contains information that all values use, not only objects: a set of boolean values called <span class="code">flags</span> which store a variety of internal, technical values and also a class pointer, called <span class="code">klass</span>. The class pointer indicates which class this object is an instance of. At the bottom in the <span class="code">RObject</span> specific portion Ruby saves an array of instance variables that this object instance contains using two values: <span class="code">numiv</span>, the instance variable count, and <span class="code">ivptr</span>, a pointer to an array of values.</p>
 <div style="float: right; padding: 0px 0px 0px 30px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td><img src="http://patshaughnessy.net/assets/2012/7/26/cut_pepper.jpg"></td></tr>
+    <tr><td><img src="https://patshaughnessy.net/assets/2012/7/26/cut_pepper.jpg"></td></tr>
     <tr><td align="center"><small><i>If I could slice open a Ruby object, what would I see?</i></small></td></tr>
   </table>
 </div>
@@ -56,18 +56,18 @@
  => #&lt;Mathematician:0x007fabdb850690 @first_name="Euclid">
 </pre>
 <p>Now let’s take a look at Ruby’s C memory structures in a bit more detail - when you run this simple script, Ruby will create one <span class="code">RClass</span> structure and two <span class="code">RObject</span> structures:</p>
-<img src="http://patshaughnessy.net/assets/2012/7/26/script-and-objects.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/script-and-objects.png"/>
 <p>I’ll cover how Ruby implements classes with the <span class="code">RClass</span> structure in the next section, but here is how Ruby saves the the mathematician information in the two <span class="code">RObject</span> structures in more detail:</p>
-<img src="http://patshaughnessy.net/assets/2012/7/26/more-detail.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/more-detail.png"/>
 <p>You can see each of the <span class="code">klass</span> values point to the <span class="code">Mathematician</span> <span class="code">RClass</span> structure, and each <span class="code">RObject</span> structure has a separate array of instance variables. Both arrays contain <span class="code">VALUE</span> pointers, the same pointer that Ruby uses to refer to the <span class="code">RObject</span> structure. One of the objects contains two instance variables, while the other contains only one.</p>
 <p>This is how Ruby saves custom classes, like my <span class="code">Mathematician</span> class, in <span class="code">RObject</span> structures. But we all know that every Ruby value, including basic data types such as integers, strings or symbols, are also objects. The Ruby source code internally refers to these built in types as “generic” types. How does Ruby store these generic objects? Do they also use the <span class="code">RObject</span> structure? The answer is no: internally Ruby uses a different C memory structure to save values for each of its generic data types, and not <span class="code">RObject</span>. For example, Ruby saves string values in <span class="code">RString</span> structures, arrays in <span class="code">RArray</span> structures and regular expressions in <span class="code">RRegexp</span> structures, etc. Ruby only uses <span class="code">RObject</span> to save instances of custom object classes that you create, and for a few custom object classes Ruby creates internally as well.</p>
 <p>However, all of these different structures share the same <span class="code">RBasic</span> information that we saw in <span class="code">RObject</span>:</p>
-<img src="http://patshaughnessy.net/assets/2012/7/26/three-structs.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/three-structs.png"/>
 <p>Since the <span class="code">RBasic</span> structure contains the class pointer, each of these generic data types is also an object - they are all instances of some Ruby class, indicated by the class pointer saved inside of <span class="code">RBasic</span>.</p>
 <p>As a performance optimization, Ruby saves small integers, symbols and a few other simple values without any structure at all. Ruby saves these values right inside the <span class="code">VALUE</span> pointer:</p>
-<img src="http://patshaughnessy.net/assets/2012/7/26/value-pointer.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/value-pointer.png"/>
 <p>That is, these <span class="code">VALUE</span>s are not pointers at all; instead they are the values themselves. For these simple data types, there is no class pointer. Instead Ruby remembers the class using a series of bit flags saved in the first few bits of the <span class="code">VALUE</span>. For example, all integers have the <span class="code">FIXNUM_FLAG</span> bit set, like this:</p>
-<img src="http://patshaughnessy.net/assets/2012/7/26/value-pointer-with-flag.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/value-pointer-with-flag.png"/>
 <p>Whenever the <span class="code">FIXNUM_FLAG</span> is set, Ruby knows this <span class="code">VALUE</span> is really a small integer, an instance of the <span class="code">Fixnum</span> class, and not a pointer to a value structure. There is also a similar bit flag to indicate if the <span class="code">VALUE</span> is a symbol, and values such as <span class="code">nil</span>, <span class="code">true</span> and <span class="code">false</span> also have special values.</p>
 <p>It’s easy to see that integers, strings and other generic values are all objects using IRB:</p>
 <pre type="console">
@@ -103,21 +103,21 @@ $ irb
 </pre>
 <p>You can repeat the same exercise using symbols, arrays, or any Ruby value whatsoever. Every Ruby value is an object, and every object contains a class pointer and an array of instance variables.</p>
 <p>Internally, Ruby uses a bit of a hack to save instance variables for generic objects - that is, for objects that don’t use an <span class="code">RObject</span> structure. When you save an instance variable in a generic object, Ruby saves it in a special hash called the <span class="code">generic_iv_table</span>. This hash maintains a map between generic objects and pointers to other hashes that contain each object’s instance variables. For my <span class="code">str</span> string example above, this would look like this:</p>
-<img src="http://patshaughnessy.net/assets/2012/7/26/generic-iv-table.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/generic-iv-table.png"/>
 <h2>Experiment 3-1: How long does it take to save a new instance variable?</h2>
-<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+<p>… read it in the <a href="https://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
 <h2>Deducing what’s inside the RClass structure</h2>
-<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+<p>… read it in the <a href="https://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
 <h2>Experiment 3-2: Where does Ruby save class methods?</h2>
-<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+<p>… read it in the <a href="https://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
 <h2>How Ruby implements modules and method lookup</h2>
-<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+<p>… read it in the <a href="https://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
 <h2>Experiment 3-3: Modifying a module after including it</h2>
-<p>This experiment was suggested by <a href="https://twitter.com/fxn/">Xavier Noria</a>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+<p>This experiment was suggested by <a href="https://twitter.com/fxn/">Xavier Noria</a>… read it in the <a href="https://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
 <h2>InvokeDynamic and method lookup in JRuby 1.7</h2>
-<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+<p>… read it in the <a href="https://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
 <h2>Modules and methods in Rubinius</h2>
-<p>… read it in the <a href="http://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
+<p>… read it in the <a href="https://patshaughnessy.net/ruby-under-a-microscope">finished eBook</a>.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2012/7/26/objects-classes-and-modules'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Objects, Classes and Modules';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';

@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning to Read x86 Assembly Language - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning to Read x86 Assembly Language</h1><div class="metadata"><span class="date">November 26th 2016</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning to Read x86 Assembly Language">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 0px 0px 30px 30px; text-align: center; line-height:16px">
-  <img src="http://patshaughnessy.net/assets/2016/11/26/8086.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/11/26/8086.jpg"><br/>
   <i>A 16-bit Intel 8086 microprocessor from 1978<br/>
 	<small>(source: <a href="https://commons.wikimedia.org/wiki/File:L_intel-c8086.jpg">RodolfoNeres via Wikimedia Commons</a>)</small></i>
 </div>
@@ -22,7 +22,7 @@ site</a>. </p>
 <h2>Usually Reading Assembly Language Is No Fun At All</h2>
 <p>Unfortunately, most of us only see assembly language after something has gone
 wrong, terribly wrong, when we encounter something like this:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/segfault.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/segfault.png"/>
 <p>This is what a segmentation fault looks like in a debugger. The debugger shows
 me assembly language because it doesn’t know what else to show me. A
 “segmentation fault” means one of the assembly language instructions, for
@@ -83,10 +83,10 @@ assembly language code. (Most of this was the compiled version of the Crystal
 runtime library.) I opened add_forty_two.s in a text editor and searched for
 “add_forty_two,” the name of my function. First I found the call site, the code
 that calls my add_forty_two function:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/call-site.png"/>
 <p>I’ll return to this a bit later. Searching again I found the x86 assembly
 language version of my function:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code1.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code1.png"/>
 <p>Next, I deleted all of the assembler directives, such as <span
 class="code">.globl</span> and <span class="code">.cfi_offset.</span> Someday
 it would be interesting to learn about these, but I wanted to focus on the
@@ -94,14 +94,14 @@ actual machine instructions. And finally I pasted the the remaining code inside
 of my Ruby function.</p>
 <p>Then I saw what my computer actually does when it executes <span
 class="code">add_forty_two</span>:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code2.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code2.png"/>
 <h2>x86 Assembly Language: Almost Easy to Read</h2>
 <p>This code is <em>almost</em> easy to follow. I can guess what each instruction means:
 push, add, move, etc., but I can’t quite follow what’s going on here. <span
 class="code">mov</span> probably means to move, but what is the computer
 moving? And from where to where? </p>
 <div style="float: right; padding: 20px 0px 0px 30px; text-align: center; line-height:16px">
-  <img src="http://patshaughnessy.net/assets/2016/11/26/budapest.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/11/26/budapest.jpg"><br/>
   <i>Was x86 assembly language designed in Hungary?</i>
 </div>
 <p>The problem is that x86 assembly language was designed by Hungarians. I don’t
@@ -125,13 +125,13 @@ instruction.</p>
 <p>It turns out x86 assembly is much simpler than Hungarian; there are only a few
 simple suffixes that refer to the size of the data you are operating on. Here
 are two examples:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/addl1.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/addl1.png"/>
 <p>The <span class="code">addl</span> instruction really means “add long,” where
 “long” refers to a 4 byte or 32 bit value. In Crystal, it corresponds to the
 <span class="code">Int32</span> type, which is the default integer type and the
 type my <span class="code">add_forty_two</span> method uses.</p>
 <p>Here’s another example:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/movq1.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/movq1.png"/>
 <p>The letter <em>q</em> refers to a “quad” word, or an 8 byte or 64 bit value. Most x86
 code these days works with 64 bit or 32 bit values, so you’ll most often see
 instructions that end with <em>q</em> or <em>l</em>. Other suffixes are <em>w</em> for word (16 bits
@@ -144,7 +144,7 @@ reading Perl code. Lots of punctuation symbols for no apparent reason.  Similar
 to Perl, x86 assembly language uses <em>sigils</em> or magical punctuation characters
 to indicate the type of each operand value.</p>
 <p>Here are my two example instructions again:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/addl2.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/addl2.png"/>
 <p>Here the &quot;$&quot; symbol means the 42 is a literal or “immediate” value. As you
 might guess, this is the line of code that adds 42 to something. But what does
 it add it to? From the &quot;%&quot; character we can see the x86 code is adding 42 to
@@ -155,7 +155,7 @@ above adds 42 to whatever value is contained in the <span
 class="code">edi</span> register, and saves it back into <span
 class="code">edi</span>.</p>
 <p>Here’s the second example again:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/movq2.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/movq2.png"/>
 <p>This instruction, <span class="code">movq</span>, refers to two registers:
 <span class="code">rsp</span> and <span class="code">rbp</span>. As you can
 guess, it moves whatever value is found in the <span class="code">rsp</span>
@@ -222,7 +222,7 @@ Manual</a>.
 Fortunately, my function’s assembly language code only uses a few registers. I
 don’t need to understand them all.</p>
 <div style="padding: 30px 0px 30px 0px; text-align: center; line-height:16px">
-<img src="http://patshaughnessy.net/assets/2016/11/26/registers.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/registers.svg"/>
 <i>Registers available in the x86 instruction set<br/>
 	<small>(source: <a href="https://commons.wikimedia.org/wiki/File:Table_of_x86_Registers_svg.svg">Immae via Wikimedia Commons</a>)</small></i>
 </div>
@@ -252,7 +252,7 @@ class="code">bx</span>, <span class="code">cx</span>, etc., registers to become
 class="code">ecx</span>, etc. These were later renamed again to <span
 class="code">rax</span>, <span class="code">rbx</span> etc. for 64-bit
 processors.</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/register.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/register.png"/>
 <p>As you can see here, even today x86 assembly code can refer to the same
 register using many different names, for example <span class="code">al</span>
 or <span class="code">ah</span> for 8-bits, <span class="code">ax</span> bit 16
@@ -261,7 +261,7 @@ class="code">rax</span> for 64 bits.</p>
 <h2>x86 Assembly Language: Reads Left to Right, Except When It Reads Right to Left</h2>
 <p>Returning to the move instruction from above, how do we know which way the move
 happens?</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/movq2.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/movq2.png"/>
 <p>That is, does this instruction move data from <span class="code">rsp</span> to
 <span class="code">rbp</span>? Or from <span class="code">rbp</span> to <span
 class="code">rsp</span>?  Does it read left to right, or right to left?</p>
@@ -269,12 +269,12 @@ class="code">rsp</span>?  Does it read left to right, or right to left?</p>
 syntax: &quot;AT&amp;T or GNU Assembler (GAS)&quot; syntax, which I’ve been using until now,
 and also &quot;Intel&quot; syntax. GAS reads left to right:</p>
 <div style="padding: 30px 0px 30px 0px; line-height:16px; width: 300px">
-<img src="http://patshaughnessy.net/assets/2016/11/26/movq3.png"/><br/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/movq3.png"/><br/>
 <center><i>AT&T/GAS syntax</i></center>
 </div>
 <p>But equally valid and common is the Intel syntax, which reads right to left:</p>
 <div style="padding: 30px 0px 30px 0px; line-height:16p; width: 300px">
-<img src="http://patshaughnessy.net/assets/2016/11/26/movq4.png"/><br/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/movq4.png"/><br/>
 <center><i>Intel syntax</i></center>
 </div>
 <p>If you see Perl-like sigils (<span class="code">%rsp</span> and <span
@@ -292,47 +292,47 @@ history behind each x86 assembly language instruction.</p>
 <p>Now that I understand the basics of x86 assembly language syntax, I’m ready to
 return to my <span class="code">add_forty_two</span> code and to try to
 understand how it works. Here it is again:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code2.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code2.png"/>
 <p>Reading the 6 instructions inside of <span class="code">add_forty_two</span>,
 there are three different operations going on. First, we setup a new stack
 frame for our function:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code3.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code3.png"/>
 <p>The stack frame is an area of memory that my code can use to save local
 variable and other information. I won’t spend time on this today because my
 code is so simple it doesn’t use any local variables. The last two instructions
 clean up this stack frame and return to the calling code:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code4.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code4.png"/>
 <p>I won’t cover this today either. In my next article, I’ll go through a slightly
 more complicated example containing local variables and explain how x86
 assembly code accesses them on the stack.</p>
 <p>For today, I want to focus on the two instructions in the middle which actually
 implement <span class="code">add_forty_two</span>:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code5.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code5.png"/>
 <p>We’re down to two assembly language instructions, but it’s still far from
 obvious what this code means! The key to understanding these two instructions
 is to realize that the argument to my function, <span class="code">n</span>, is
 passed in using a register:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code6.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code6.png"/>
 <p>We can see this is true by returning to the call site in the <span
 class="code">add_forty_two.s</span> file, to the code which calls my function:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/call-site.png"/>
 <p>Note how the first <span class="code">movl</span> instruction copies the value
 10 into the <span class="code">edi</span> register (the lower 32 bits of the
 <span class="code">rdi</span> register):</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code7.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code7.png"/>
 <p>Next the <span class="code">callq</span> instruction calls my function with 10
 in <span class="code">edi</span>:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code8.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code8.png"/>
 <p>So when the <span class="code">addl</span> instruction runs, it will add 42 to
 the argument 10.</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code9.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code9.png"/>
 <p>Next, the <span class="code">movl</span> instruction runs and copies the result
 52 from <span class="code">edi</span> to <span class="code">eax</span>:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code10.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code10.png"/>
 <p>This, in turn, becomes the return value from my function:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/code11.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/code11.png"/>
 <p>Again, we can see this is the case by reading the call site code again:</p>
-<img src="http://patshaughnessy.net/assets/2016/11/26/call-site.png"/>
+<img src="https://patshaughnessy.net/assets/2016/11/26/call-site.png"/>
 <p>What happens after <span class="code">add_forty_two</span> returns? It moves
 <span class="code">%eax</span>, the return value, to <span
 class="code">%edi</span> where it becomes the argument to a second function

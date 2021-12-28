@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning From the Masters: Sinatra Internals - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning From the Masters: Sinatra Internals</h1><div class="metadata"><span class="date">March 7th 2012</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2012/3/7/learning-from-the-masters-sinatra-internals" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning From the Masters: Sinatra Internals">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra1.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/3/7/sinatra1.jpg"></td></tr>
   <tr><td align="center"><small><i>More than a web framework, Sinatra is an elegant,<br/>stylish Ruby program we can all learn from<br/></i></small></td></tr>
 </table>
 </div>
@@ -19,7 +19,7 @@
 <p>Looking at Sinatra’s internals, the first thing I wanted to find out was how it called these code blocks. I expected to see some sort of loop, checking whether the current HTTP request path matched each route’s pattern, and indeed you can find this loop in the <a href="https://github.com/sinatra/sinatra/blob/master/lib/sinatra/base.rb#L796">Sinatra::Base.route! method</a>. But what I didn’t expect to see was how Sinatra implemented the actual call to the client’s route code block. This happens in a method called <span class="code">route_eval</span> in <span class="code">Sinatra::Base</span>:</p>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra3.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/3/7/sinatra3.jpg"></td></tr>
 </table>
 </div>
 <pre style="background-color:#ffffff;">
@@ -33,7 +33,7 @@
 <p>Huh? What’s going on here? The <span class="code">yield</span> statement makes sense: since the client provides the route code as a block, Sinatra needs to yield to it. But what is the <span class="code">throw</span> statement doing? And what does <span class="code">:halt</span> mean? Is my route block somehow returning an error or exception? And where is it thrown to?</p>
 <p>Before understanding what <span class="code">throw</span> is doing here, we need to review how <span class="code">throw</span> and <span class="code">catch</span> work in Ruby, and how they are different from <span class="code">raise</span> and <span class="code">rescue</span>. I won’t spend time here today explaining that since <a href="http://about.avdi.org/">Avdi Grimm</a> wrote a fantastic article about exactly this question last Summer: <a href="http://rubylearning.com/blog/2011/07/12/throw-catch-raise-rescue-im-so-confused/">Throw, Catch, Raise, Rescue… I’m so confused!</a> He even used Sinatra as one of his examples. In a nutshell, Avdi explained that despite the different names, <span class="code">raise</span>/<span class="code">rescue</span> should be used to handle exceptions, similar to <span class="code">try</span>/<span class="code">throw</span>/<span class="code">catch</span> in C++, Java and other languages. In Ruby, on the other hand, <span class="code">throw</span> and <span class="code">catch</span> are intended to be used as another program control structure.</p>
 <p>Let’s take a look at how Sinatra uses <span class="code">throw</span> and <span class="code">catch</span>:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/3/7/route-eval.png" alt="throw/catch used in Sinatra" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/3/7/route-eval.png" alt="throw/catch used in Sinatra" /></p>
 <p>Here you can see that after one of your route code blocks returns a value to <span class="code">route_eval</span>, Sinatra jumps back up the call stack to a method called <span class="code">invoke</span>, where it had actually started processing the current request earlier:</p>
 <pre style="background-color:#ffffff;">
 <span style="color:#000000;">
@@ -48,7 +48,7 @@
 
 <p>Ruby sets the catch block’s return value to the second argument passed to <span class="code">throw</span> - your route code block’s return value in this case, or <span class="code">res</span> in the diagram.</p>
 <p>This is just the simplest example of throw in Sinatra - it turns out that many of the helper methods like <span class="code">last_modified</span>, <span class="code">redirect</span>, <span class="code">error</span>, etc., all use <span class="code">throw</span> to jump back to the invoke in a similar way, providing the appropriate return value. Here’s another example showing how Sinatra’s <span class="code">redirect</span> helper method works:</p>
-<p><img src="http://patshaughnessy.net/assets/2012/3/7/redirect.png" alt="throw used by redirect" /></p>
+<p><img src="https://patshaughnessy.net/assets/2012/3/7/redirect.png" alt="throw used by redirect" /></p>
 <p>The big benefit here is that when the client code decides to call <span class="code">redirect</span>, Sinatra avoids the need to execute everything following the <span class="code">redirect</span> call (“... lots of code here...”) - or the need for the client code itself to have to use an if/else statement to avoid executing it. Sinatra has taken what should be a normal, mundane Ruby programming task - calling a code block - and done it in a stylish, elegant way. The result is faster, cleaner code, both for Sinatra’s internals and for you!</p>
 <h2>A readable and maintainable test suite</h2>
 <p>Something else in Sinatra’s internals that caught my eye was the way it used Test::Unit. Many Ruby developers today prefer to use <a href="http://rspec.info/">RSpec</a> or <a href="https://github.com/seattlerb/minitest">Minitest</a> instead of Test::Unit to get a more powerful and readable DSL for unit tests and BDD. But Sinatra, like the Rails core team, uses plain old Test::Unit for its test suite.</p>
@@ -83,7 +83,7 @@
 <p>This doesn’t look like Test::Unit at all! Instead, it seems like Sinatra is using RSpec - why do I see the <span class="code">describe</span> and <span class="code">it</span> keywords here? Well it turns out that Sinatra has employed a neat little library called <a href="https://github.com/citrusbyte/contest">contest</a>, which is adds support for <span class="code">describe</span>/<span class="code">context</span> blocks in Test::Unit, like you would see with RSpec or Shoulda. Sinatra has also defined the <span class="code">it</span> keyword as an alias for <span class="code">test</span> like this:</p>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra2.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/3/7/sinatra2.jpg"></td></tr>
 </table>
 </div>
 <pre style="background-color:#ffffff;">
@@ -213,7 +213,7 @@
 <p>This sounds fairly mundane and simple - I would have used much simpler code than this to do that same thing! What else is going on here?</p>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra4.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/3/7/sinatra4.jpg"></td></tr>
 </table>
 </div>
 <p>Like a lot of the code inside Sinatra, the <span class="code">register</span> method was not just implemented in a straightforward way - it was done with a real sense of style! Let’s take a closer look at some of the details here:</p>

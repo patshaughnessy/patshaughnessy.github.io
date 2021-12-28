@@ -3,7 +3,7 @@ date: 2016/10/7
 tag: Ruby
 
 <div style="float: left; padding: 0px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2016/10/7/x-ray1.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/10/7/x-ray1.jpg"><br/>
   <i>Running the Crystal compiler on your Ruby code<br/>is like asking a second doctor for their opinion.</i><br/>
 </div>
 
@@ -256,7 +256,7 @@ machine language.
 ## Think About Which Types to Use
 
 <div style="float: right; padding: 0px 0px 50px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2016/10/7/x-ray2.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/10/7/x-ray2.png"><br/>
   <i>Like an X-Ray, Crystal can find problems with<br/> your Ruby code hidden underneath the surface.</i>
 </div>
 

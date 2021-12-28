@@ -1,9 +1,9 @@
 title: "How to integrate Amazon Simple Pay into a Rails 3 app"
 date: 2010/11/20
 
-<p>Amazon Payments is a great alternative to PayPal or Active Merchant - users of your site can pay you via their Amazon account and like with PayPal you don&rsquo;t need to store credit card information in your own database. Another plus is they provide a special service tailored to non-profits, allowing users to make donations. We used this for ReliefHub, an online charity site <a href="http://patshaughnessy.net/2010/11/1/reliefhub-hackfest-helping-orphanages-in-haiti">I volunteered to work on last month</a>.</p>
+<p>Amazon Payments is a great alternative to PayPal or Active Merchant - users of your site can pay you via their Amazon account and like with PayPal you don&rsquo;t need to store credit card information in your own database. Another plus is they provide a special service tailored to non-profits, allowing users to make donations. We used this for ReliefHub, an online charity site <a href="https://patshaughnessy.net/2010/11/1/reliefhub-hackfest-helping-orphanages-in-haiti">I volunteered to work on last month</a>.</p>
 <p>Today I&rsquo;ll show you how to create a simple scaffolding Rails site with an Amazon Payments button that looks like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/11/20/listing_payments.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/11/20/listing_payments.png"></p>
 <p>It will actually accept payments: users will be able to enter an amount, click &ldquo;Pay Now&rdquo; and then confirm the transaction on the Amazon site. Later they will be redirected back to the Rails site, and their transaction will appear in the index scaffolding view.</p>
 <p>But first the hard part: dealing with the poor Amazon documentation, confusing admin web pages and numerous sign up forms. Bear with me! If you can suffer through the pain and confusion of the Amazon sign up process, it turns out to be quite easy to use Amazon Payments in a Rails 3 site.</p>
 <h2>Step 1: Sign up for Amazon Web Services</h2>
@@ -12,12 +12,12 @@ date: 2010/11/20
 <p>There are actually two different Amazon Payment Services sites: sandbox and production. The sandbox allows you to test transactions from your web site without using real money. You will have separate account IDs for Amazon Payments sandbox and production.</p>
 <p>For now, let&rsquo;s start with Amazon Payments Sandbox; open: <a href="https://payments-sandbox.amazon.com">https://payments-sandbox.amazon.com</a></p>
 <p>You should see the word &ldquo;sandbox&rdquo; in the Amazon Payments logo at the top left:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/11/20/payment_sandbox.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/11/20/payment_sandbox.png"></p>
 <p>Later when you are ready to deploy your Rails app and want to collect real money you&rsquo;ll need to repeat steps 2, 3 and 4 using the production Amazon site: <a href="https://payments.amazon.com">https://payments.amazon.com</a></p>
 <p>From the Amazon Payments home page, click &ldquo;Your Account&rdquo; and then login again using your Amazon email address and password. After you enter your Amazon credentials, you&rsquo;ll need to sign up and enter your contact information again, this time for Amazon Payments. Once you sign up, you should be redirected to your account page, which will display your account balance and recent transaction information.</p>
 <h2>Step 3: Sign up for the Amazon Flexible Payment Service (FPS)</h2>
 <p>Now for the confusing part: <i>you need to sign up for a third time</i>; this time for the &ldquo;Amazon Flexible Payments Service.&rdquo; To do this, click &ldquo;Developers&rdquo; and then click the &ldquo;Sign Up For Amazon FPS&rdquo; button on the right side of the page:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/11/20/amazon_fps_signup.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/11/20/amazon_fps_signup.png"></p>
 <p>Now that you&rsquo;ve signed up for Amazon FPS <b>you should promptly decide not to use it</b>. It&rsquo;s very confusing, complex and provides little additional value compared to Amazon Simple Pay. You might want to consider Amazon FPS if you need to make payments programmatically on a scheduled basis with no user interface or buttons. If that&rsquo;s the case, check out <a href="http://github.com/tylerhunt/remit">the Remit gem on github</a>, which will make Amazon FPS/Rails integration easier.</p>
 <p>Amazon Simple Pay, on the other hand, is a simple, straightforward way to add payment forms to your Rails site. That is, simple except for the sign up process and confusing documentation!</p>
 <h2>Step 4: Disable the &ldquo;Sign the buttons&rdquo; option</h2>
@@ -25,14 +25,14 @@ date: 2010/11/20
 <ul>
 <li>Return to the <a href="https://payments-sandbox.amazon.com">https://payments-sandbox.amazon.com</a> home page</li>
 <li>Go to: Your Account -&gt; Edit My Account Settings -&gt; Manage Developer and Seller Preferences</li>
-<li>Uncheck &ldquo;Sign the buttons&rdquo; if necessary<br><img src="http://patshaughnessy.net/assets/2010/11/20/sign_the_buttons.png"></li>
+<li>Uncheck &ldquo;Sign the buttons&rdquo; if necessary<br><img src="https://patshaughnessy.net/assets/2010/11/20/sign_the_buttons.png"></li>
 <li>Click &ldquo;Confirm&rdquo; at the bottom of the form if necessary.</li>
 </ul>
 <h2>Step 5: Create an Amazon Simple Pay button</h2>
 <p>Amazon Simple Pay is very easy to use since you can actually generate the HTML you need to create a payment form/button right on the Amazon Payments site. But it took me hours of clicking and searching to find the Amazon Payments admin page that allows you to generate the button.</p>
 <p>Here&rsquo;s a link to the create button form: <a href="https://payments-sandbox.amazon.com/sdui/sdui/standardbutton">https://payments-sandbox.amazon.com/sdui/sdui/standardbutton</a></p>
 <p>Bookmark this or you&rsquo;ll never find it again! There are other pages you can use to generate &ldquo;Donate&rdquo; buttons for non-profits, or other types of buttons. Now by filling out this form, you can create a payment form using one of the Amazon payment buttons, for example:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/11/20/pay_now.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/11/20/pay_now.png"></p>
 <p>Here&rsquo;s what to do:</p>
 <ul>
   <li>Click the link above</li>
@@ -212,12 +212,12 @@ end
 
 <p>The &ldquo;transaction amount&rdquo; parameter from Amazon may contain a prefix &ldquo;USD&rdquo; specifying the currency. However, sometimes this is not present. The code above parses the string as necessary in a virtual attribute &ldquo;transaction_amount&rdquo; and then saves the corresponding amount as the &ldquo;amount&rdquo; float value in the database. The Payment model also validates that both amount and transaction id are specified by Amazon in order to consider the payment valid.</p>
 <p>Now let&rsquo;s fire up the app and try it out!</p>
-<p><img src="http://patshaughnessy.net/assets/2010/11/20/listing_payments_empty.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/11/20/listing_payments_empty.png"></p>
 <p>If you click the &ldquo;Pay Now&rdquo; button you&rsquo;ll be redirected to Amazon:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/11/20/amazon_sign_in.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/11/20/amazon_sign_in.png"></p>
 <p>Your personal or business name should appear at the top left instead of my name. Next sign to Amazon with a different account and confirm the payment... you can&rsquo;t use the same account you used to setup Amazon Simple Pay, since Amazon doesn&rsquo;t allow someone to pay themselves. Also remember &ldquo;sandbox&rdquo; appeared in the form action URL, so there&rsquo;s no need to worry about spending real money yet!</p>
 <p>After you click &ldquo;Confirm&rdquo; you&rsquo;ll be redirected back to our Rails sample app, to the page we gave Amazon in the &ldquo;returnUrl&rdquo; form field. Now you should see:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/11/20/payment_successful.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/11/20/payment_successful.png"></p>
 <p>The transaction id and amount are now saved in the transactions table, which you can use for reporting or for other purposes in your user interface. This all worked as follows:
 <ul>
   <li>Amazon sent a GET request to the URL we provided in the &ldquo;returnUrl&rdquo; field in the payment form.</li>

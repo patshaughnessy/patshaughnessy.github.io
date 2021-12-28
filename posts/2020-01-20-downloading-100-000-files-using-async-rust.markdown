@@ -3,7 +3,7 @@ date: 2020/1/20
 tag: Rust
 
 <div style="float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg"><br/>
   <i>Rust's new async/await feature makes it <br/>
 easy to stop and start asynchronous tasks</i><br/>
   <small>(from: <a href="https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20111210.jpg">Wikimedia Commons</a>)</small></i> 
@@ -107,7 +107,7 @@ when I start downloading more than one page concurrently.
 Visually, I can draw the <span class="code">get</span> and <span
 class="code">text</span> calls like this:
 
-<img src="http://patshaughnessy.net/assets/2020/1/20/get-and-text.png">
+<img src="https://patshaughnessy.net/assets/2020/1/20/get-and-text.png">
 
 First I call <span class="code">get</span> and wait, then I call <span
 class="code">text</span> and wait.
@@ -183,14 +183,14 @@ class="code">join_all(tasks).await</span> to wait for them all to finish.
 ## Asynchronous vs Multithreaded
 
 <div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2020/1/20/traffic-light2.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2020/1/20/traffic-light2.jpg"><br/>
   <small>(from: <a href="https://commons.wikimedia.org/wiki/File:Traffic_lights,_Zl%C3%ADn.JPG">Wikimedia Commons</a>)</small></i> 
 </div>
 
 At first glance, it looks like this code is spawning three different threads. I
 even call a spawn function. A multithreaded download might look like this:
 
-<img src="http://patshaughnessy.net/assets/2020/1/20/multithreaded.png">
+<img src="https://patshaughnessy.net/assets/2020/1/20/multithreaded.png">
 
 We have 3 paths, so we have 3 threads. Each thread calls <span class="code">get</span> and waits, and
 then calls <span class="code">text</span> and waits.
@@ -208,13 +208,13 @@ for more information.
 
 I imagine three tasks running on one thread like this:
 
-<img src="http://patshaughnessy.net/assets/2020/1/20/one-thread.png">
+<img src="https://patshaughnessy.net/assets/2020/1/20/one-thread.png">
 
 Each time I call <span class="code">await</span>, Rust stops one task and
 starts another using the same thread. In fact, depending on how long it takes
 for each task to complete, they might be run in a different order:
 
-<img src="http://patshaughnessy.net/assets/2020/1/20/different-order.png">
+<img src="https://patshaughnessy.net/assets/2020/1/20/different-order.png">
 
 There’s no way to predict ahead of time what order the tasks will run it.
 That’s why I needed to copy each path string above; each task needs it own copy
@@ -259,7 +259,7 @@ What happened? The problem is the web server can't handle so many concurrent net
 connections. Using my thread/task diagram, launching all 100,000 tasks might
 look like this:
 
-<img src="http://patshaughnessy.net/assets/2020/1/20/simultaneous.png">
+<img src="https://patshaughnessy.net/assets/2020/1/20/simultaneous.png">
 
 I spawn 100,000 tasks all on to the same thread, and Tokio starts executing
 them all. Each time my code above calls <span
@@ -273,7 +273,7 @@ these tasks start to fail.
 Instead, I need to limit the number of concurrent Tokio tasks - the number of
 concurrent HTTP requests. I need the diagram to look something like this:
 
-<img src="http://patshaughnessy.net/assets/2020/1/20/buffered.png">
+<img src="https://patshaughnessy.net/assets/2020/1/20/buffered.png">
 
 After the first 8 tasks are started, the first 8 blue boxes on the left, Tokio
 waits for at least one of them to complete before starting a 9th task. I

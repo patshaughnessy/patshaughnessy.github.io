@@ -3,7 +3,7 @@ date: 2009/07/24
 tag: View Mapper
 
 <p>(Updated October 2009)</p>
-<p>I just rewrote and cleaned up the code I describe below here and published it as a new gem called <a href="http://gemcutter.org/gems/view_mapper">View Mapper on gemcutter.org</a>. See <a href="http://patshaughnessy.net/view_mapper">my usage article</a> for more details. I also rethought and redesigned the commands I describe below&hellip; the part about nested attributes will not work for now. I&rsquo;m planning to reimplement that soon.</p>
+<p>I just rewrote and cleaned up the code I describe below here and published it as a new gem called <a href="http://gemcutter.org/gems/view_mapper">View Mapper on gemcutter.org</a>. See <a href="https://patshaughnessy.net/view_mapper">my usage article</a> for more details. I also rethought and redesigned the commands I describe below&hellip; the part about nested attributes will not work for now. I&rsquo;m planning to reimplement that soon.</p>
 <p/>
 <p>I&rsquo;ve been thinking for a while that a generator that creates view scaffolding for an existing model or models would be really useful. For example, I want to be able to write this by hand:</p>
 <pre>class Group &lt; ActiveRecord::Base
@@ -48,7 +48,7 @@ end</pre>
       create  test/unit/helpers/people_helper_test.rb
        route  map.resources :people</pre>
 <p>If you run your Rails app you will see the usual scaffolding UI:</p>
-<img src="http://patshaughnessy.net/assets/2009/7/24/person_new.png">
+<img src="https://patshaughnessy.net/assets/2009/7/24/person_new.png">
 <p>This looks just like the scaffolding page you would have gotten from the Rails scaffolding generator. In fact, I&rsquo;ve based the &ldquo;view_for&rdquo; generator class (ViewForGenerator) on the existing Rails ScaffoldGenerator class, so it generates the same code.</p>
 <p>The difference here is that the scaffolding code was based on the properties of the existing Person model. Here&rsquo;s what the view_for generator did:
   <ul>
@@ -103,11 +103,11 @@ end</pre>
       create  test/unit/helpers/groups_helper_test.rb
        route  map.resources :groups</pre>
 <p>And now if we run our app, we get view scaffolding illustrating how to create and edit people and groups all at the same time:</p>
-<img src="http://patshaughnessy.net/assets/2009/7/24/group_new.png">
+<img src="https://patshaughnessy.net/assets/2009/7/24/group_new.png">
 <p>If I save the group&hellip;</p>
-<img src="http://patshaughnessy.net/assets/2009/7/24/group_show.png">
+<img src="https://patshaughnessy.net/assets/2009/7/24/group_show.png">
 <p>And re-editing the same group:</p>
-<img src="http://patshaughnessy.net/assets/2009/7/24/group_edit.png">
+<img src="https://patshaughnessy.net/assets/2009/7/24/group_edit.png">
 <p>More to come&hellip; as I said this is work-in-progress. As a next step I&rsquo;m planning to improve the scaffolding code for nested attributes by adding javascript to dynamically add/delete the child objects. But after that I'm thinking about:
   <ul>
     <li>Adding a &ldquo;paperclip_view_for&rdquo; generator that creates a file upload form for a model that contains a &ldquo;has_attached_file&rdquo; directive.</li>

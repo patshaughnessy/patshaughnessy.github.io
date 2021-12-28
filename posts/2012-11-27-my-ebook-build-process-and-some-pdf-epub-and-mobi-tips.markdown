@@ -3,14 +3,14 @@ date: 2012/11/27
 
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td align="center"><img src="http://patshaughnessy.net/assets/2012/11/27/cover-ana.png"></td></tr>
-    <tr><td align="center"><i><a href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a Microscope</a> is an illustrated guide to<br/> Ruby internals. No C programming required!</i></td></tr>
+    <tr><td align="center"><img src="https://patshaughnessy.net/assets/2012/11/27/cover-ana.png"></td></tr>
+    <tr><td align="center"><i><a href="https://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a Microscope</a> is an illustrated guide to<br/> Ruby internals. No C programming required!</i></td></tr>
   </table>
 </div>
 
 In case you missed it, last month I self-published an eBook about Ruby
 internals called [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope). To date I’ve
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope). To date I’ve
 sold over 600 copies - thanks everyone! I’ve never written anything so
 ambitious before, and I’m grateful for your support. I hope it’s been a fun
 read, and that you come away with a better appreciation for the amazing work
@@ -26,7 +26,7 @@ and Avdi Grimm (see [My authoring
 tools](http://devblog.avdi.org/2012/01/12/my-authoring-tools/)) who have been
 generous with their knowledge, I’d like to try to pass along whatever
 information I can about how to publish an eBook. This post contains a high
-level description of my build process for [Ruby Under a Microscope](http://patshaughnessy.net/ruby-under-a-microscope), and also a
+level description of my build process for [Ruby Under a Microscope](https://patshaughnessy.net/ruby-under-a-microscope), and also a
 few tips for dealing with the PDF, EPUB and MOBI file formats that I learned
 along the way. If anyone would like actual code or more technical detail about
 my build process, or if there’s any other way I can help you self-publish
@@ -35,7 +35,7 @@ something, please let me know!
 ## My authoring tools
 
 To write [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope) I used Apple
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope) I used Apple
 Pages on a Mac laptop. While I love VIM for writing code, I find it easier and
 more natural to use a traditional word processor to write English text. Also,
 Apple’s spelling autocorrect feature works nicely; I prefer to use the
@@ -43,7 +43,7 @@ Apple’s spelling autocorrect feature works nicely; I prefer to use the
 Auto-Correction.
 
 As you might know, [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope) contains a large
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope) contains a large
 number of diagrams - a picture is worth 1000 words, and often I find visual
 aids are the only way to communicate the complex ideas, algorithms and data
 structures Ruby uses internally. To draw these I used the
@@ -65,7 +65,7 @@ process of creating the PDF, EPUB and MOBI target files from them. Bookshop, in
 turn, uses a tool called [PrinceXML](http://www.princexml.com) to create the
 PDF file:
 
-<img src="http://patshaughnessy.net/assets/2012/11/27/pdf-build.png"/>
+<img src="https://patshaughnessy.net/assets/2012/11/27/pdf-build.png"/>
 
 As you can see, Bookshop is essentially a Ruby static site generator like
 [Jekyll](http://jekyllrb.com) or [Middleman](http://middlemanapp.com): you use
@@ -99,7 +99,7 @@ styles I could use for page numbers, the table of contents and more.
 
 Next, here’s how Bookshop creates the EPUB file:
 
-<img src="http://patshaughnessy.net/assets/2012/11/27/epub-build.png"/>
+<img src="https://patshaughnessy.net/assets/2012/11/27/epub-build.png"/>
 
 You can see here that the EPUB is essentially a ZIP file containing the static
 HTML/CSS source code, along with a few mysterious XML files (content.opf,
@@ -117,7 +117,7 @@ Finally, Bookshop launches Amazon’s [KindleGen
 utility](http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000765211) to
 generate the MOBI file from the EPUB file:
 
-<img src="http://patshaughnessy.net/assets/2012/11/27/mobi-build.png"/>
+<img src="https://patshaughnessy.net/assets/2012/11/27/mobi-build.png"/>
 
 ## Customizing Bookshop
 
@@ -154,12 +154,12 @@ But since the Adobe’s PDF file format is more or less a black box, this doesn�
 normally matter: who cares how the PDF file format works internally?
 
 I certainly didn’t, until I tried to render some of the many diagrams in [Ruby
-Under a Microscope](http://patshaughnessy.net/ruby-under-a-microscope) in a PDF
+Under a Microscope](https://patshaughnessy.net/ruby-under-a-microscope) in a PDF
 file. For my first attempt, I rendered my diagrams as PNG images and then
 included them in my HTML using &lt;img&gt; tags, as I normally do for blog posts.
 PrinceXML then produced a PDF file that looked like this:
 
-<img src="http://patshaughnessy.net/assets/2012/11/27/blurry-text.png"/>
+<img src="https://patshaughnessy.net/assets/2012/11/27/blurry-text.png"/>
 
 While this isn’t horrible, you can see the “YARV internal stack,”
 “rb_control_frame_t” and other text in my diagram at the bottom is blurry and
@@ -178,12 +178,12 @@ solution: since PDF is internally a vector based format, why not render my
 diagrams using a vector based image file format? After paying some extra money
 to upgrade to Omnigraffle Pro, I was able to use the “File -&gt; Export” command:
 
-<img src="http://patshaughnessy.net/assets/2012/11/27/file-export.png"/>
+<img src="https://patshaughnessy.net/assets/2012/11/27/file-export.png"/>
 
 … and then select the “SVG vector drawing” file type (the standard version of
 Omnigraffle doesn’t support this):
 
-<img src="http://patshaughnessy.net/assets/2012/11/27/file-type.png"/>
+<img src="https://patshaughnessy.net/assets/2012/11/27/file-type.png"/>
 
 Now the real magic happens: when I include an SVG image in my HTML using a
 standard &lt;img&gt; tag, PrinceXML generates a PDF file that includes the vector
@@ -197,9 +197,9 @@ prince: used font: Menlo, Regular
 </pre>
 
 Here’s what same diagram looks like in the final version of [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope):
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope):
 
-<img src="http://patshaughnessy.net/assets/2012/11/27/correct-text.png"/>
+<img src="https://patshaughnessy.net/assets/2012/11/27/correct-text.png"/>
 
 The reason this looks better is that the end user PDF viewer app, Apple Preview,
 Adobe Reader, iBooks or whatever software your reader has, draws the diagram
@@ -209,7 +209,7 @@ that PrinceXML embedded into the PDF file.
 ## EPUB tip: package many small HTML files, not one large one
 
 While writing [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope) I also became
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope) I also became
 familiar with the EPUB file format. It’s a useful file format because it’s
 become an open standard shared by a large number of eBook reader devices. You
 can read EPUBs on a high end device like an iPad, on a variety of Android
@@ -303,7 +303,7 @@ version of the Kindle and without this app there’s no way to know what will
 happen.
 
 Using the Kindle Previewer with [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope) I ran into
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope) I ran into
 trouble rendering fonts on some versions of the Kindle. Newer versions of
 Kindle, like the Kindle Fire, worked well, while older Kindles had trouble when
 I used certain fonts. More trial and error revealed that I could use only

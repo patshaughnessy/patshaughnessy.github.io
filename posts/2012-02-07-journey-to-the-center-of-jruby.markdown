@@ -4,7 +4,7 @@ tag: JRuby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey1.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey1.jpg"></td></tr>
   <tr><td align="center"><small><i>Could Jules Verne have imagined something<br/>as complex as the Java Virtual Machine?</i></small></td></tr>
 </table>
 </div>
@@ -19,7 +19,7 @@ Read on to join me on a journey through all of these layers; we’ll see how a s
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey2.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey2.jpg"></td></tr>
 </table>
 </div>
 
@@ -52,11 +52,11 @@ Let’s get started by reviewing the basics of how JRuby works: JRuby is a Java 
 
 <div style="float: left; padding: 7px 30px 0px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey3.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey3.jpg"></td></tr>
 </table>
 </div>
 
-![basics](http://patshaughnessy.net/assets/2012/2/7/basics.png)
+![basics](https://patshaughnessy.net/assets/2012/2/7/basics.png)
 
 On the left, you can see MRI executing a Ruby program, while on the right JRuby is doing the same thing. The difference is that JRuby is actually a Java program, which means it requires a Java Virtual Machine in order to run. MRI, on the other hand, is written in C and is compiled into native machine language and can run directly as a standalone program on your computer.
 
@@ -148,13 +148,13 @@ That’s enough Java for one day! Let’s move on to see how this Java code is a
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey4.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey4.jpg"></td></tr>
 </table>
 </div>
 
 In the diagram above, I showed how the JRuby interpreter is actually a Java program executed by the Java Virtual Machine (“JVM”). However, as you may know, Java is not interpreted the same way that Ruby is. Instead Java is a compiled, statically typed language. This means that the JRuby Java code, like the RubyString.java file we saw above, is compiled into something called “Java byte code” ahead of time. The byte code is what the JVM interprets and executes. Here’s a diagram showing how this process works:
 
-![Java compiler](http://patshaughnessy.net/assets/2012/2/7/java-compiler.png)
+![Java compiler](https://patshaughnessy.net/assets/2012/2/7/java-compiler.png)
 
 To get a sense of what Java byte code looks like, let’s actually open up the RubyString.class file and see what’s contained inside. Since RubyString.class is a binary file, we need to use a Java utility called “javap” to be able to read and inspect its contents:
 
@@ -244,7 +244,7 @@ However, I’m not sure. I feel like a 19th Century egyptologist trying to under
 
 <div style="float: left; padding: 17px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/7/journey5.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/7/journey5.jpg"></td></tr>
 </table>
 </div>
 

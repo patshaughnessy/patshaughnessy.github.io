@@ -158,7 +158,7 @@ WHERE (authors.name IS NULL)
 </div><br>
 <p>It works now since the :joins option simply adds LEFT OUTER JOIN to the query without rewriting the entire SELECT statement. Then ActiveRecord combines the join with the select scope, inserting the DISTINCT keyword into the query.</p>
 <p><b>Customizing SearchLogic to use LEFT OUTER JOIN</b></p>
-<p>Ok &ndash; now using the same techniques from <a href="http://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic">my last post</a>, let&rsquo;s see if we can customize SearchLogic to support this sort of named scope. First let&rsquo;s install SearchLogic into our sample app:</p>
+<p>Ok &ndash; now using the same techniques from <a href="https://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic">my last post</a>, let&rsquo;s see if we can customize SearchLogic to support this sort of named scope. First let&rsquo;s install SearchLogic into our sample app:</p>
 <div class="CodeRay">
   <div class="code"><pre>$ script/plugin install http://github.com/binarylogic/searchlogic.git</pre></div>
 </div><br>
@@ -300,7 +300,7 @@ end
 =&gt; [&quot;Four&quot;, &quot;Five&quot;]</pre></div>
 </div><br>
 <p>Phew &ndash; it does! Ideally I would have some RSpec examples setup to test this, instead of using the console.</p>
-<p>Just like in <a href="http://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic">my last article</a>, the last thing I&rsquo;ll do today is move these class methods out of the Book model and into a new module called SearchLogicExtensions, which in my application I saved into a file called config/initializers/search_logic_extensions.rb. This causes the method missing code to be loaded when my app starts up. At the bottom I extend ActiveRecord::Base with the new module, so the named scope can be used by every model in my application:</p>
+<p>Just like in <a href="https://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic">my last article</a>, the last thing I&rsquo;ll do today is move these class methods out of the Book model and into a new module called SearchLogicExtensions, which in my application I saved into a file called config/initializers/search_logic_extensions.rb. This causes the method missing code to be loaded when my app starts up. At the bottom I extend ActiveRecord::Base with the new module, so the named scope can be used by every model in my application:</p>
 
 <pre type="ruby">
 module SearchLogicExtensions

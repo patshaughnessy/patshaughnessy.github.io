@@ -2,11 +2,11 @@ title: "How Ruby Borrowed a Decades Old Idea From Lisp"
 date: 2012/9/18
 tag: Ruby
 
-<b>This is the last of a series of free excerpts from an eBook I’m writing called [Ruby Under a Microscope](http://patshaughnessy.net/ruby-under-a-microscope). I plan to finish the book and make it available for purchase and download from this web site before [RubyConf 2012](http://rubyconf.org) on Nov. 1. You can still [sign up here](http://patshaughnessy.net/ruby-under-a-microscope), if you haven’t already, to receive an email when the book is finished. I plan send that one, single email message out to everyone before November!</b>
+<b>This is the last of a series of free excerpts from an eBook I’m writing called [Ruby Under a Microscope](https://patshaughnessy.net/ruby-under-a-microscope). I plan to finish the book and make it available for purchase and download from this web site before [RubyConf 2012](http://rubyconf.org) on Nov. 1. You can still [sign up here](https://patshaughnessy.net/ruby-under-a-microscope), if you haven’t already, to receive an email when the book is finished. I plan send that one, single email message out to everyone before November!</b>
 
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td><img src="http://patshaughnessy.net/assets/2012/9/18/ibm-704.jpg"></td></tr>
+    <tr><td><img src="https://patshaughnessy.net/assets/2012/9/18/ibm-704.jpg"></td></tr>
     <tr><td align="center"><i>The IBM 704, above, was the first computer<br/>to run Lisp in the early 1960s.</i></td></tr>
   </table>
 </div>
@@ -19,7 +19,7 @@ But what does “closure” actually mean? In other words, exactly what are Ruby
 
 <div style="float: right; padding: 25px 0px 20px 40px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/9/18/sussman-steele-paper.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/9/18/sussman-steele-paper.jpg"></td></tr>
   <tr><td align="center"><i>Sussman and Steele gave a useful definition of the term “closure”<br/>in <a href="http://en.wikisource.org/wiki/Scheme:_An_Interpreter_for_Extended_Lambda_Calculus">this 1975 academic paper</a>, one of the so-called “<a href="http://en.wikipedia.org/wiki/Lambda_Papers#The_Lambda_Papers">Lambda Papers</a>.”</i></td></tr>
 </table>
 </div>
@@ -28,7 +28,7 @@ But what does “closure” actually mean? In other words, exactly what are Ruby
 
 Internally Ruby represents each block using a C structure called <span class="code">rb_block_t</span>:
 
-<img src="http://patshaughnessy.net/assets/2012/9/18/empty-block.png"/>
+<img src="https://patshaughnessy.net/assets/2012/9/18/empty-block.png"/>
 
 One way to define what a block is would be to take a look at the values Ruby stores inside this structure. Just as we did in Chapter 3 with the <span class="code">RClass</span> structure, let’s deduce what the contents of the <span class="code">rb_block_t</span> structure must be based on what we know blocks can do in our Ruby code.
 
@@ -44,7 +44,7 @@ end
 
 ...it’s clear that when executing the <span class="code">10.times</span> call Ruby needs to know what code to iterate over. Therefore, we know the <span class="code">rb_block_t</span> structure must contain a pointer to that code:
 
-<img src="http://patshaughnessy.net/assets/2012/9/18/block-and-code.png"/>
+<img src="https://patshaughnessy.net/assets/2012/9/18/block-and-code.png"/>
 
 In this diagram you can see a value called <span class="code">iseq</span> which is a pointer to the YARV instructions compiled from the Ruby code in my block.
 
@@ -65,21 +65,21 @@ How does this work internally? Does Ruby internally implement blocks as separate
 
 In this example when Ruby executes the first line of code, as I explained in Chapter 2, YARV will store the local variable <span class="code">str</span> on it’s internal stack, and save it’s location in the DFP pointer located in the current <span class="code">rb_control_frame_t</span> structure\*. (\*footnote: If the outer code was located inside a function or method then the DFP would point to the stack frame as shown, but if the outer code was located in the top level scope of your Ruby program, then Ruby would use dynamic access to save the variable in the TOPLEVEL_BINDING environment instead - more on this in section 4.3. Regardless the DFP will always indicate the location of the <span class="code">str</span> variable.)
 
-<img src="http://patshaughnessy.net/assets/2012/9/18/save-local-variable.png"/>
+<img src="https://patshaughnessy.net/assets/2012/9/18/save-local-variable.png"/>
 
 Next Ruby will come to the <span class="code">10.times do</span> call. Before executing the actual iteration - before calling the <span class="code">times</span> method - Ruby will first create and initialize a new <span class="code">rb_block_t</span> structure to represent the block. Ruby needs to create the block structure now, since the block is really just another argument to the <span class="code">times</span> method:
 
-<img src="http://patshaughnessy.net/assets/2012/9/18/new-block.png"/>
+<img src="https://patshaughnessy.net/assets/2012/9/18/new-block.png"/>
 
 To do this, Ruby copies the current value of the DFP, the dynamic frame pointer, into the new block. In other words, Ruby saves away the location of the current stack frame in the new block.
 
 Next Ruby will proceed to call the <span class="code">times</span> method on the object <span class="code">10</span>, an instance of the <span class="code">Fixnum</span> class. While doing this, YARV will create a new frame on its internal stack. Now we have two stack frames: on the top is the new stack frame for the <span class="code">Fixnum.times</span> method, and below is the original stack frame used by the top level function:
 
-<img src="http://patshaughnessy.net/assets/2012/9/18/fixnum-stack.png"/>
+<img src="https://patshaughnessy.net/assets/2012/9/18/fixnum-stack.png"/>
 
 Ruby implements the <span class="code">times</span> method internally using its own C code - it’s a built in method - but Ruby implements it the same way you probably would in Ruby. Ruby starts to iterate over the numbers 0, 1, 2, etc., up to 9, and calls <span class="code">yield</span> once for each of these integers. Finally, the code that implements <span class="code">yield</span> internally actually calls the block each time through the loop, pushing a third\* frame onto the top of the stack for the code inside the block to use: (*footnote: Ruby actually pushes an extra, internal stack frame whenever you call yield before actually calling the block, so strictly speaking there should be four stack frames in this diagram. I only show three for the sake of clarity.)
 
-<img src="http://patshaughnessy.net/assets/2012/9/18/executing-block.png"/>
+<img src="https://patshaughnessy.net/assets/2012/9/18/executing-block.png"/>
 
 Here on the left we now have three stack frames:
 
@@ -95,7 +95,7 @@ To summarize, we have seen now that Ruby’s <span class="code">rb_block_t</span
 a pointer to a snippet of YARV code instructions, and
 a pointer to a location on YARV’s internal stack, the location that was at the top of the stack when the block was created:
 
-<img src="http://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/>
+<img src="https://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/>
 
 At first glance this seems like a very technical, unimportant detail. This is obviously a behavior we expect Ruby blocks to exhibit, and the DFP seems to be just another minor, uninteresting part of Ruby’s internal implementation of blocks.
 
@@ -115,7 +115,7 @@ Reading this again carefully, a closure is defined to be the combination of:
 
 I’ll have more context and information about “lambda expressions” and how Ruby’s borrowed the <span class="code">lambda</span> keyword from Lisp in section 4-2, but for now take another look at the internal <span class="code">rb_block_t</span> structure:
 
-<img src="http://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/>
+<img src="https://patshaughnessy.net/assets/2012/9/18/code-and-stack.png"/>
 
 Notice that this structure meets the definition of a closure Sussman and Steele wrote back in 1975:
 
@@ -174,29 +174,29 @@ Notice that this C structure also contains all of the same values the <span clas
 
 ## Experiment 4-1: Which is faster: a while-loop or passing a block to each?
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Lambdas and Procs: treating code as a first class citizen
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Experiment 4-2: Lambda/Proc performance - how long does it take Ruby to copy a stack frame to the heap?
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Bindings: A closure environment without a function
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Experiment 4-3: Exploring the TOPLEVEL_BINDING object.
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Closures in JRuby
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Closures in Rubinius
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 

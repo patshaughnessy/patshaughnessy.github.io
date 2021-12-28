@@ -2,7 +2,7 @@ title: "Paperclip scaffolding"
 date: 2009/10/16
 tag: View Mapper
 
-<p>I just updated the <a href="http://patshaughnessy.net/view_mapper">View Mapper gem</a> to support Paperclip. You can use it to generate scaffolding code that supports uploading and downloading Paperclip file attachments.</p>
+<p>I just updated the <a href="https://patshaughnessy.net/view_mapper">View Mapper gem</a> to support Paperclip. You can use it to generate scaffolding code that supports uploading and downloading Paperclip file attachments.</p>
 <p><b>Creating a view for an existing model</b></p>
 <p>If you have a model like this:</p>
 <pre>class Song &lt; ActiveRecord::Base
@@ -11,7 +11,7 @@ end</pre>
 <p>&hellip; you can generate a &ldquo;Paperclip view&rdquo; for this model like this:</p>
 <pre>script/generate view_for song --view paperclip</pre>
 <p>This will generate a controller, view and other code files that support uploading and downloading files. If you run your app you&rsquo;ll see the typical scaffolding user interface but with a file field for the &ldquo;mp3&rdquo; Paperclip attachment:</p>
-<p><img src="http://patshaughnessy.net/assets/2009/10/16/new_song.png"/></p>
+<p><img src="https://patshaughnessy.net/assets/2009/10/16/new_song.png"/></p>
 <p>View Mapper has:
 <ul>
   <li>inspected your model (&ldquo;Song&rdquo; in this example) and found its Paperclip attachments and other standard ActiveRecord attributes</li>

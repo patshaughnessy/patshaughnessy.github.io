@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>How Big is a Bignum? - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>How Big is a Bignum?</h1><div class="metadata"><span class="date">January 9th 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2014/1/9/how-big-is-a-bignum" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How Big is a Bignum?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 20px 0px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2014/1/9/classes.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/1/9/classes.png"><br/>
   <i>Ruby represents small integers using Fixnum<br/>
     and large integers using Bignum.</i>
 </div>
@@ -25,7 +25,7 @@ with GMP. But for now, let’s start with the basics.</p>
 <p>Most computers these days represent numbers as 64 digit binary values
 internally. For example, the number ten thousand looks like this expressed as a
 binary value:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/64-bits.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/64-bits.png"><br/></p>
 <p>My rectangle here represents how a 64-bit computer would save an integer in a
 microprocessor register or a RAM memory location. The numbers 63 and 0 indicate
 that there are spaces for 64 binary digits, each of which can contain a zero or
@@ -46,7 +46,7 @@ zero Ruby would instead consider the integer to be a pointer to some Ruby
 object.</p>
 <p>Here’s how Ruby represents ten thousand
 internally:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/64-bits-ruby.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/64-bits-ruby.png"><br/></p>
 <p><span class="code">FIXNUM_FLAG</span>=1 indicates this integer represents an instance of the <span class="code">Fixnum</span>
 class. The flag is a performance optimization, removing the need for Ruby to
 create a separate C structure the way it normally would for other types of
@@ -56,7 +56,7 @@ objects. (Ruby uses a similar trick for symbols and special values such as
 <p>Like most other computer languages and also like your microprocessor’s actual hardware
 circuits, Ruby uses a binary format called <a href="http://en.wikipedia.org/wiki/Two&#x27;s_complement">two’s complement</a> to save negative
 integers. Here’s how the value -10,000 would be saved inside your Ruby program:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/twos-complement-ruby.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/twos-complement-ruby.png"><br/></p>
 <p>Note the first bit on the left, the sign bit, is set to 1. This indicates this
 is a negative integer. Ruby still sets the lowest bit, <span
   class="code">FIXNUM_FLAG</span>, to 1. The other bits contain the value
@@ -76,7 +76,7 @@ works, however, for integer values that are small enough to fit into a single
 64-bit word. We can see what the largest positive <span
   class="code">Fixnum</span> integer must be by setting all 62 of the middle
 bits to one, like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/largest-value.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/largest-value.png"><br/></p>
 <p>Here we have a zero on the left (indicating this is a positive integer) and a
 one on the right (for <span class="code">FIXNUM_FLAG</span>). The remaining 62 bits in the middle hold
 this binary number:<br/>
@@ -87,15 +87,15 @@ course, the largest <span class="code">Fixnum</span> would be much smaller than 
 <h2>The Smallest Bignum: 4611686018427387904</h2>
 <p>But what does Ruby do if we want to use larger numbers? For example, this Ruby
 program works just fine:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/code.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/code.png"><br/></p>
 <p>But now the sum doesn’t fit into a 64-bit <span class="code">Fixnum</span> value, since expressing
 4611686018427387904 as a binary value requires 63 digits, not 62:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/doesnt-fit.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/doesnt-fit.png"><br/></p>
 <p>This is where the <span class="code">Bignum</span> class comes in. While calculating
 4611686018427387903+1, Ruby has to create a new type of object to represent
 4611686018427387904 - an instance of the <span class="code">Bignum</span> class. Here’s how that looks
 inside of Ruby:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/pointer.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/pointer.png"><br/></p>
 <p>On the right you can see Ruby has reset the <span class="code">FIXNUM_FLAG</span> to zero, indicating
 this value is not a <span class="code">Fixnum</span> but instead a pointer to some other type of object.
 (C programs like MRI Ruby that use <span class="code">malloc</span> to allocate memory always get
@@ -104,7 +104,7 @@ zero, is actually also part of the pointer’s value.)</p>
 <h2>The RBignum Structure</h2>
 <p>Now let’s take a closer look at the <span class="code">RBignum</span> C structure and find out what’s
 inside it. Here’s how Ruby saves the value 4611686018427387904 internally: </p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/></p>
 <p>On the left, you can see <span class="code">RBignum</span> contains an inner structure called <span class="code">RBasic</span>,
 which contains internal, technical values used by all Ruby objects. Below that
 I show values specific to <span class="code">Bignum</span> objects: <span class="code">digits</span> and <span class="code">len</span>. <span class="code">digits</span> is a pointer
@@ -128,11 +128,11 @@ until the entire big integer has been processed.</p>
 for the entire large integer. For example, for an extremely large number
 requiring 320 bits, Ruby could use 10 32-bit values by setting <span class="code">len</span> to 10 and
 allocating more memory:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/ten-digits.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/ten-digits.png"><br/></p>
 <p>In my example Ruby needs just two 32-bit values. This makes sense because, as
 we saw above, 4611686018427387903 is a 62-bit integer (all ones) and when I add one I get a 63-bit value. When I add
 one, Ruby first copies the 62 bits in the target value into a new <span class="code">Bignum</span> structure, like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/copy-to-bignum.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/copy-to-bignum.png"><br/></p>
 <p>Ruby copies the least significant 32 bits into the first digit
 value on the left, and the most significant 30 into the second digit value on
 the right (there is space for two leading zeroes in the second digit value).</p>
@@ -140,7 +140,7 @@ the right (there is space for two leading zeroes in the second digit value).</p>
   class="code">RBignum</span> structure, it can then use a special algorithm
 implemented in bignum.c to perform an addition operation on the new Bignum. Now
 there is enough room to hold the 63-bit result, 4611686018427387904 (diagram copied from above):</p>
-<p><img src="http://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/></p>
+<p><img src="https://patshaughnessy.net/assets/2014/1/9/closer-look.png"><br/></p>
 <p>A few other minor details to learn about this:</p>
 <ul>
   <li>Ruby saves the sign bit inside the <span class="code">RBasic</span>
@@ -152,7 +152,7 @@ there is enough room to hold the 63-bit result, 4611686018427387904 (diagram cop
 <li>For small <span class="code">Bignum</span>’s, Ruby saves memory and time
 by storing the digits values right inside the <span class="code">RBignum</span> structure itself, using a
 C <i>union</i> trick. I don’t have time to explain that here today, but you can see
-how the same optimization works for strings in my article <a href="http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a>.</li>
+how the same optimization works for strings in my article <a href="https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a>.</li>
 </ul>
 <h2>Next time</h2>
 <p>In my next post I’ll look at how Ruby performs an actual mathematical operation

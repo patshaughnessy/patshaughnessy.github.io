@@ -3,7 +3,7 @@ date: 2019/11/19
 tag: Rust
 
 <div style="float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg"><br/>
+  <img src="https://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg"><br/>
   <i>Rust’s Result type can help you control your program’s<br/>
   flow by checking for errors in a succinct, elegant way</i>
 </div>
@@ -50,7 +50,7 @@ Here’s a flowchart that illustrates this control flow:
 
 <div style="margin-left: auto; margin-right: auto; width:235px">
 <br/>
-<img src="http://patshaughnessy.net/assets/2019/11/19/flowchart.png">
+<img src="https://patshaughnessy.net/assets/2019/11/19/flowchart.png">
 </div>
 
 The happy path is from top to bottom, along the left side. If any of the

@@ -4,7 +4,7 @@ tag: Interviews
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2013/2/12/laurent3.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2013/2/12/laurent3.png"></td></tr>
   <tr><td align="center"><i>Laurent Sansonetti created <a href="http://www.rubymotion.com/">RubyMotion</a></i></td></tr>
 </table>
 </div>

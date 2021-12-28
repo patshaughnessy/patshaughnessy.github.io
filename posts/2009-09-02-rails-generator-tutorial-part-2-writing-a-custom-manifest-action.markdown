@@ -2,7 +2,7 @@ title: "Rails generator tutorial part 2: writing a custom manifest action"
 date: 2009/09/02
 tag: Ruby
 
-<p>In <a href="http://patshaughnessy.net/2009/8/23/tutorial-how-to-write-a-rails-generator">part one of this tutorial</a> I wrote a simple rails generator that creates a controller code file in app/controllers. This time I want to finish up my simple &ldquo;VersionGenerator&rdquo; example by enabling it to add a line to the routes.rb file. In other words, I want to be able to use a manifest action called &ldquo;route&rdquo; like this:</p>
+<p>In <a href="https://patshaughnessy.net/2009/8/23/tutorial-how-to-write-a-rails-generator">part one of this tutorial</a> I wrote a simple rails generator that creates a controller code file in app/controllers. This time I want to finish up my simple &ldquo;VersionGenerator&rdquo; example by enabling it to add a line to the routes.rb file. In other words, I want to be able to use a manifest action called &ldquo;route&rdquo; like this:</p>
 <pre>def manifest
     record do |m|
       m.template(&#x27;controller.rb&#x27;, &#x27;app/controllers/version_controller.rb&#x27;)

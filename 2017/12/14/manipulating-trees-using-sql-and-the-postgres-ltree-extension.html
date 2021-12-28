@@ -1,7 +1,7 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Manipulating Trees Using SQL and the Postgres LTREE Extension - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Manipulating Trees Using SQL and the Postgres LTREE Extension</h1><div class="metadata"><span class="date">December 14th 2017</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Manipulating Trees Using SQL and the Postgres LTREE Extension">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/14/tree4.jpg">
+  <img src="https://patshaughnessy.net/assets/2017/12/14/tree4.jpg">
 </div>
-<p><a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">Yesterday</a>,
+<p><a href="https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">Yesterday</a>,
 I used the <a href="https://www.postgresql.org/docs/current/static/ltree.html">LTREE</a>
 extension to save a tree data structure in a Postgres table. After saving the
 tree, I used the <span class="code">@&gt;</span> or ancestor operator to count the
@@ -9,14 +9,14 @@ number of descendant nodes on a given branch.</p>
 <p>But that’s not all LTREE can do. Today I’ll show you how to delete, move and
 copy branches from one place to another in your tree, using <span
 class="code">@&gt;</span> in combination with other LTREE functions. After that,
-in <a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">my last post in this
+in <a href="https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">my last post in this
 series</a>,
 I’ll look at how LTREE works under the hood, at the Computer Science that makes
 all of this possible.</p>
 <h2>My Example Tree Again</h2>
 <p>Here’s the tree I’ve been working with during the last few blog posts:</p>
-<img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png">
-<p><a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">In my last
+<img src="https://patshaughnessy.net/assets/2017/12/11/example-tree.png">
+<p><a href="https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">In my last
 post</a>,
 I saved this tree in my database using a series of insert statements:</p>
 <pre>
@@ -36,7 +36,7 @@ select count(*) from tree where 'A.C' @> path;
 <h2>Cutting Off a Branch</h2>
 <p>But suppose I wanted to remove these nodes from the tree entirely; that is,
 suppose I wanted to “cut off this branch” of the tree, so to speak:</p>
-<img src="http://patshaughnessy.net/assets/2017/12/14/cut-branch.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/14/cut-branch.png"/>
 <p>How can I do this? Simple! I just use a SQL delete statement:</p>
 <pre>
 delete from tree where 'A.C' @> path;
@@ -48,7 +48,7 @@ statements as in select statements.</p>
 table. That is, I want two trees: the original <span class="code">A</span> tree
 and a new tree consisting of the <span class="code">C</span> branch “replanted”
 as a new root:</p>
-<img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
 <p>Thinking about this for a moment, moving some nodes from one location to
 another in my tree means I’ll need to update their path values somehow in my
 table. That is, I’ll need to use an update statement and not a select or delete
@@ -149,7 +149,7 @@ made the SQL language I already know how to use even more powerful.</p>
 <p>Now let’s return to the question of moving a branch into a new tree. As this
 diagram shows, I want to delete <span class="code">C</span> and its children
 from the <span class="code">A</span> tree, and move them to a new location:</p>
-<img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
 <p>Earlier I considered moving the nodes using a single update statement for each:</p>
 <pre>
 update tree set path = 'C' where path = 'A.C';
@@ -187,7 +187,7 @@ the branch we want to replant isn’t already a root.</p>
 location in my tree to some other location, not necessary to the root? This is
 a more general problem. For example, suppose I want to move the <span
 class="code">C</span> branch under <span class="code">G</span>, like this:</p>
-<img src="http://patshaughnessy.net/assets/2017/12/14/moving.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/14/moving.png"/>
 <p>To write a formula for this transformation using SQL, we need to use one more
 important LTREE operator: the <span class="code">||</span> or concatenation
 operator. Let’s try it out with an example first:</p>
@@ -286,7 +286,7 @@ fairly simple string operations.</p>
 <p>The special sauce that makes LTREE such a powerful tool is that it integrates
 with Postgres GiST indexes. By using an index, Postgres can execute any of the
 SQL expressions I wrote above equally fast on 7000 records as it would on 7!
-How? The only way to find out is by <a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">Looking Inside Postgres at a GiST
+How? The only way to find out is by <a href="https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">Looking Inside Postgres at a GiST
 Index</a>.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Manipulating Trees Using SQL and the Postgres LTREE Extension';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;

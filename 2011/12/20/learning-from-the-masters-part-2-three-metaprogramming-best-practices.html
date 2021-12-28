@@ -1,17 +1,17 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning from the masters part 2: three metaprogramming best practices - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning from the masters part 2: three metaprogramming best practices</h1><div class="metadata"><span class="date">December 20th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2011/12/20/learning-from-the-masters-part-2-three-metaprogramming-best-practices" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning from the masters part 2: three metaprogramming best practices">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/mozart.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/20/mozart.jpg"></td></tr>
   <tr><td align="center"><small><i>Mozart’s Requiem Mass in D minor would be<br/>hard to understand without a translation from Latin</i></small></td></tr>
 </table>
 </div>
 <p>Metaprogramming has always been one of the most intimidating features of the Ruby language - it’s considered very “advanced” and can often be very difficult to read and understand. However, I agree completely with what <a href="http://jroller.com/rolsen/">Russ Olsen</a> said about metaprogramming on <a href="http://rubyrogues.com/033-rr-book-club-eloquent-ruby/">this Thursday's Ruby Rogues podcast</a>: that Ruby metaprogramming really isn’t all that hard to understand, that it is just another moderately difficult programming concept any Ruby developer can learn and use.</p>
-<p><a href="http://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits">Like I did two weeks ago</a> I decided to take a look at the Rails source code, this time to see whether there were any good examples of metaprogramming that I could learn from. What techniques did the Rails core team use with metaprogramming that I could use in my own work? I found that I was impressed by how the Rails team <i>thought</i> about metaprogramming - the philosophy and coding practices they used - rather than by the actual metaprogramming techniques themselves.</p>
+<p><a href="https://patshaughnessy.net/2011/12/6/learning-from-the-masters-some-of-my-favorite-rails-commits">Like I did two weeks ago</a> I decided to take a look at the Rails source code, this time to see whether there were any good examples of metaprogramming that I could learn from. What techniques did the Rails core team use with metaprogramming that I could use in my own work? I found that I was impressed by how the Rails team <i>thought</i> about metaprogramming - the philosophy and coding practices they used - rather than by the actual metaprogramming techniques themselves.</p>
 <p>Today I’m going to discuss three of the metaprogramming practices I found in the Rails source code - read on to learn more about these best practices and how to use them in your code.</p>
 <p><strong>TL;DR:</strong> Be sure to provide a translated, annotated version of your metaprogramming in comments and to raise exceptions with accurate method name, file and line number information. Also when using <span class="code">method_missing</span> be sure to call <span class="code">super</span> and to implement <span class="code">respond_to?</span>.</p>
 <h2>Provide a translation</h2>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/translate.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/20/translate.jpg"></td></tr>
 </table>
 </div>
 <p>One of the most commonly used and well known examples of metaprogramming in Rails is the way ActiveRecord implements dynamic finder and scope methods. For example, suppose I have an ActiveRecord model called “Shirt” with a color field. I can get all the red shirt records just by calling <span class="code">Shirt.find_all_by_color('red')</span>. ActiveRecord also supports dynamic scope methods that return a scope object; for example calling <span class="code">Shirt.scoped_by_color('red')</span> will return a scope that you can then chain with other methods.</p>
@@ -74,7 +74,7 @@
 <h2>Plan ahead for accidents</h2>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/accident.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/20/accident.jpg"></td></tr>
 </table>
 </div>
 <p>Using the same <span class="code">Shirt.scoped_by_color</span> example, let’s suppose I forget to pass in the color parameter (note: if you try this yourself you won’t get this error unless you’re using edge Rails. In Rails 3.1 and earlier a warning is put into the log file instead.):</p>
@@ -132,7 +132,7 @@ ArgumentError: wrong number of arguments (0 for 1)
 <p>Here we can see that ActiveRecord implements <span class="code">respond_to?</span> to indicate which dynamic finder and scope methods <span class="code">method_missing</span> will handle. It returns true if the method_id matches one or more of the model’s attributes, and false if not. This is important since other code in your application that uses the Shirt model, for example, might call <span class="code">respond_to?</span> to determine whether or not Shirt has a color attribute.</p>
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/20/neighborhood.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/20/neighborhood.jpg"></td></tr>
 </table>
 </div>
 <p>It might seem that there’s not a tremendous amount of value here - after all, I know that my Shirt model handles find_by_color and find_all_by_color, etc., and I’ll probably never call <span class="code">Shirt.respond_to?</span> myself directly. However, keep in mind that other developers might work with the same application in the future, and also there may be gems or other 3rd party code that use my Shirt model from a more generalized perspective and that might call <span class="code">respond_to?</span> on it.</p>

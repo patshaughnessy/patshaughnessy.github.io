@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Trying to Represent a Tree Structure Using Postgres - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Trying to Represent a Tree Structure Using Postgres</h1><div class="metadata"><span class="date">December 11th 2017</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Trying to Represent a Tree Structure Using Postgres">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/11/tree1.jpg">
+  <img src="https://patshaughnessy.net/assets/2017/12/11/tree1.jpg">
 </div>
 <p>Suppose you had a hierarchical data structure in your application - how would
 you save it in a database? How would you represent a complex tree structure
@@ -12,24 +12,24 @@ operators and functions that support tree operations.</p>
 LTREE actually work? What Computer Science does it use behind the scenes to
 enable fast tree operations?</p>
 <p>This week I’ll publish a series
-(<a href="http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres">one</a>,
-<a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension">two</a>,
-<a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">three</a>,
-<a href="http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension">four</a>
+(<a href="https://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres">one</a>,
+<a href="https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension">two</a>,
+<a href="https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">three</a>,
+<a href="https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension">four</a>
 and
-<a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">five</a>)
+<a href="https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">five</a>)
 of blog posts on the Postgres LTREE extension.  I'll get started today by
 trying to insert a tree structure into a Postgres table using standard SQL, and
-during the rest of the week I'll take a close look at LTREE: <a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension">how to install
+during the rest of the week I'll take a close look at LTREE: <a href="https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension">how to install
 it</a>,
-<a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">how to use
+<a href="https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">how to use
 it</a>,
-and <a href="http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">how it works</a>.</p>
+and <a href="https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">how it works</a>.</p>
 <div style="clear: both"></div>
 <h2>An Example Tree</h2>
 <p>My actual data set was more complicated, of course, but for the sake of example
 let’s suppose I needed to save this tree in a Postgres table:</p>
-<img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png">
+<img src="https://patshaughnessy.net/assets/2017/12/11/example-tree.png">
 <p>There are many different tree-like data structures in Computer Science, but
 this is probably the simplest: no cycles, no ordering of child nodes, and all
 the child nodes are accessible moving down from a single root. Should be easy,
@@ -213,7 +213,7 @@ overall system to support a single new data structure?</p>
 algorithms I mentioned above: path enumeration. Bundled inside of the Postgres
 source tree is an “extension,” an optional piece of C code you need compile,
 install and enable, that supports tree SQL operations using path enumeration.
-In my <a href="http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension">next
+In my <a href="https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension">next
 post</a>,
 I’ll show you how to install and use the <a href="https://www.postgresql.org/docs/current/static/ltree.html">LTREE Postgres
 extension</a>.</p>

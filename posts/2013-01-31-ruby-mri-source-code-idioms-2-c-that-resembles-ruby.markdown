@@ -5,13 +5,13 @@ tag: MRI Idioms
 <div style="float: right; margin: 8px 5px 20px 25px; line-height:16px;">
   <table cellpadding="0" cellspacing="0" border="0">
     <tr><td align="center" style="background-color: rgb(248, 248, 255);padding: 5px;"><img
-    src="http://patshaughnessy.net/assets/2013/1/31/c-ruby.png"></td></tr>
+    src="https://patshaughnessy.net/assets/2013/1/31/c-ruby.png"></td></tr>
     <tr><td align="center"><i>Reading Ruby’s C source code can be<br/>as easy as reading your own Ruby code</i></td></tr>
   </table>
 </div>
 
 [Last
-week](http://patshaughnessy.net/2013/1/23/ruby-mri-source-code-idioms-1-accessing-data-via-macros)
+week](https://patshaughnessy.net/2013/1/23/ruby-mri-source-code-idioms-1-accessing-data-via-macros)
 I discussed how Ruby’s C source code uses macros to access data values. I
 explained that this “MRI Idiom” can make Ruby’s source a bit confusing for C
 programmers to read, but at the same time can make it easier to follow for Ruby
@@ -23,7 +23,7 @@ Sounds hard to believe, doesn’t it? At first glance MRI’s C source code look
 nothing like Ruby. For example, take a look at the implementation of
 <span class="code">Array#collect</span>:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/rb_ary_collect1.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/rb_ary_collect1.png"/>
 
 This is typical C code: verbose, confusing and hard to understand. Ruby is
 supposed to be elegant and concise! However, I honestly believe this C code
@@ -35,13 +35,13 @@ Of course, we don’t need to imagine how we would implement this in Ruby - ther
 already is a Ruby version of <span class="code">Array#collect</span> (actually
 <span class="code">Enumerable#collect</span>) in [Rubinius](http://rubini.us):
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/rubinius1.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/rubinius1.png"/>
 
 Now let’s take a second look at MRI’s C implementation - if you have a vivid
 imagination you can see how the MRI C code corresponds to the Ruby used by
 Rubinius:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/rb_ary_collect2.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/rb_ary_collect2.png"/>
 
 My point is that by learning a few of MRI’s idioms and coding patterns, you can
 begin to read Ruby’s C source code just as easily as you can read Rubinius’s
@@ -70,7 +70,7 @@ much of Ruby’s internal source code without being an expert C developer.
 Let’s start by reviewing how the <span class="code">collect</span> method works in Ruby. Here’s the
 example from the Ruby documentation:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/ruby-example1.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/ruby-example1.png"/>
 
 Most of the time we use <span class="code">collect</span> to iterate over an array (or some other
 Enumerable) and call a block for each element. Later <span class="code">collect</span> pushes the
@@ -80,7 +80,7 @@ it.
 However, if you call <span class="code">collect</span> without a block it returns an enumerator object
 you can use later:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/ruby-example2.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/ruby-example2.png"/>
 
 Now let’s see how Ruby implements <span class="code">Array#collect</span> internally. I’ll do this by
 replacing bits of the confusing C code with Ruby, step by step. As you’ll see,
@@ -100,14 +100,14 @@ the function name to distinguish it from other functions that also create
 arrays in slightly different ways, for example without the internal capacity
 setting. Let’s take a look what <span class="code">rb_ary_new2</span> does:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/rb_ary_new2.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/rb_ary_new2.png"/>
 
 You can see it just calls <span class="code">ary_new</span> with the given
 capacity value, and by passing in <span class="code">rb_cArray</span> indicates
 we want to create a new instance of the Array class (sometimes Ruby uses the
 <span class="code">RArray</span> struct for instances of other classes):
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/ary_new.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/ary_new.png"/>
 
 I won’t explain this in detail, but you can see at the top Ruby checks the
 capacity parameter is valid, and gets a new <span class="code">RArray</span>
@@ -119,13 +119,13 @@ Now let’s return to <span class="code">rb_ary_collect</span> and substitute th
 Ruby <span class="code">Array.new</span> call into our C code - just as a
 thought experiment, of course!
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/substitute1.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/substitute1.png"/>
 
 ## for-loop = Array#each
 
 Next, let’s look at how Ruby internally iterates over the array’s elements:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/for-loop.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/for-loop.png"/>
 
 Of course, in Ruby I would never use a for-loop like this; instead I would
 call <span class="code">Array.each</span> and pass each element to a block. But remember in the C
@@ -136,7 +136,7 @@ a loop and assigns the values 0, 1, 2… to the variable <span
   class="code">i</span>. Next, Ruby accesses each value of the array using this
 syntax:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/c-array.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/c-array.png"/>
 
 As I explained last week, the <span class="code">RARRAY_PTR</span> returns a
 pointer to the array’s actual data, and <span class="code">[i]</span> uses C’s
@@ -145,7 +145,7 @@ array syntax to obtain the proper element of the array.
 Now in our thought experiment if we substitute the for-loop with a call to
 <span class="code">Array#each</span>, passing a block parameter we get:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/substitute2.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/substitute2.png"/>
 
 Now this C code is starting to make more sense!
 
@@ -160,14 +160,14 @@ works in detail here - it calls into the internal guts of the YARV virtual
 machine that runs your Ruby program. For a good explanation of how YARV works
 and of what Ruby does internally when you call a block, check out chapters 2
 and 5 from [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope), my eBook on
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope), my eBook on
 Ruby internals.
 
 Let’s continue the thought experiment and substitute <span
   class="code">rb_yield</span> with a simple Ruby <span
   class="code">yield</span> keyword:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/substitute3.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/substitute3.png"/>
 
 ## rb_ary_push = Array#&lt;&lt;
 
@@ -176,7 +176,7 @@ this simply calls <span class="code">Array#&lt;&lt;</span>. It adds a new value 
 array. Let’s take a quick look at the implementation of this, much farther
 above in the same array.c MRI source code file:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/rb_ary_push.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/rb_ary_push.png"/>
 
 I won’t explain this code carefully, but in a nutshell Ruby uses another C
 function called <span class="code">rb_ary_push_1</span> as a optimization when
@@ -194,7 +194,7 @@ Following the same pattern, I’ll substitute a call to <span
   class="code">Array#&lt;&lt;</span> into my original C function - now the C
 code is looking more and more like the Rubinius implementation:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/substitute4.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/substitute4.png"/>
 
 ## RETURN_ENUMERATOR = Kernel.to_enum
 
@@ -203,7 +203,7 @@ original version of <span class="code">rb_ary_collect</span> - the <span
   class="code">RETURN_ENUMERATOR</span> macro. Let’s take a look at how this
 macro is written, from include/ruby/intern.h:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/return_enumerator.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/return_enumerator.png"/>
 
 Ah yes… typical C verbosity! We have a multiline macro with backslashes, and a
 needless do...while loop inserted around the actual macro to provide a safe
@@ -227,7 +227,7 @@ object that is initialized with the values in the current array.
 Replacing this macro with the equivalent call to <span
   class="code">Kernel.to_enum</span>, I get:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/substitute5.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/substitute5.png"/>
 
 ## Conclusion
 
@@ -238,7 +238,7 @@ that I was familiar with. This allowed me - in my own head at least - to read
 the C source code the same way I would read a Ruby function. Notice how similar
 the code above is to Rubinius’s implementation:
 
-<img src="http://patshaughnessy.net/assets/2013/1/31/rubinius2.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/31/rubinius2.png"/>
 
 My point today is that by learning a few of the C coding patterns the Ruby core
 team uses, you can start to read Ruby’s source code just as easily as you can

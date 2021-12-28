@@ -4,12 +4,12 @@ url: /2014/12/15/matzs-forward-to-ruby-under-a-microscope
 tag: Ruby
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/12/15/rumja_cover.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/12/15/rumja_cover.png"><br/>
   <i><a href="http://shop.ohmsha.co.jp/shopdetail/000000004065/">A Japanese translation</a> of Ruby Under a<br/>Microscope was published last month.</i>
 </div>
 
 Matz wrote a new foreword to [Ruby Under a
-Microscope](http://patshaughnessy.net/ruby-under-a-microscope), which was
+Microscope](https://patshaughnessy.net/ruby-under-a-microscope), which was
 included in the Japanese version of the book published just last month. Today
 I’d like to share a translation so everyone has a chance to read it. The
 Japanese edition also includes a new appendix written by Koichi Sasada about

@@ -1,14 +1,14 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>20,000 Leagues Under ActiveRecord - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>20,000 Leagues Under ActiveRecord</h1><div class="metadata"><span class="date">September 17th 2014</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="20,000 Leagues Under ActiveRecord">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/17/title.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/9/17/title.jpg"><br/>
   <i>First published in 1870, <a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea">20,000 Leagues Under the Sea</a><br/>describes an underwater adventure that takes place<br/>onboard a submarine called the “Nautilus.”</i>
 </div>
 <b>
 This is the first of a series of four posts based on a presentation I did at the
 [Barcelona Ruby Conference](http://www.baruco.org) called “20,000 Leagues Under
 ActiveRecord.” (posts:
-[two](http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements)
-[three](http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals)
-[four](http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
+[two](https://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements)
+[three](https://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals)
+[four](https://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
 and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).</b>
 </b>
 <p>Let me start with a question: How many of you have actually read 20,000 Leagues
@@ -24,7 +24,7 @@ novel itself as we go.</p>
 how ActiveRecord works internally; how it finds the information we ask for and
 returns it to us as a Ruby object.</p>
 <div style="clear: left"/></div>
-<img src="http://patshaughnessy.net/assets/2014/9/17/example1.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/example1.png"/>
 <p>But why talk about ActiveRecord? We all know how to use ActiveRecord; most of
 you understand exactly what this line of code does. You didn’t need to come to
 Barcelona to learn how to use ActiveRecord.</p>
@@ -35,9 +35,9 @@ line of code similar to this one into the Rails console or into a Rails app
 somewhere. It was amazing!  Before that I was using PHP or Java - I’ve since
 blocked out all memory of that so I’m not quite sure which it was :) - and when
 I saw how easy it was to use Rails to query a database I was very impressed.</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/irb.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/irb.png"/>
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/17/underwater-walk.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/9/17/underwater-walk.png"><br/>
   <i>Captain Nemo takes Professor Aronnax, Conseil and Ned Land<br/>on a hike through an underwater “forest.” Verne’s novel has<br/>many beautiful, detailed descriptions of underwater worlds<br/>he had never actually seen, and could only imagine.</i>
 </div>
 <p>Somehow Rails could take a simple, beautiful and readable line of Ruby code and
@@ -58,7 +58,7 @@ us? Let’s find out!</p>
 class='code'>ActiveRecord::Relation</span>, the top, public API for
 ActiveRecord many of you use everyday. Then, we’ll look deeper inside of
 ActiveRecord to find out how it converts our Ruby queries into SQL statements.</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/agenda.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/agenda.png"/>
 <p>Later, in the second half of the presentation we’ll dive even deeper and
 directly into an actual relational database server (RDBMS); today I’ll use
 PostgreSQL as an example. How does Postgres understand the SQL statement that
@@ -70,18 +70,18 @@ allows database servers to work.</p>
 for Captain Nemo together. Therefore, we’ll start with a <span
 class='code'>User</span> class, a subclass of <span
 class='code'>ActiveRecord::Base</span>.</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-base.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/activerecord-base.png"/>
 <p>When I call <span class='code'>where</span> what happens? It turns out the
 <span class='code'>where</span> method is defined in the <span
 class='code'>ActiveRecord::Querying</span> module:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-querying.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/activerecord-querying.png"/>
 <p>But as you can see, ActiveRecord delegates the <span class='code'>where</span>
 method over to another method called <span class='code'>all</span>, which
 returns a new instance of a different class called <span
 class='code'>ActiveRecord::Relation</span>. In fact, my call to <span
 class='code'>User.where</span> is entirely equivalent to calling <span
 class='code'>User.all.where</span>:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/user-all.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/user-all.png"/>
 <p>ActiveRecord actually implements the <span class='code'>where</span> method
 using the new instance of <span class='code'>ActiveRecord::Relation</span>.
 Internally, <span class='code'>where</span> is implemented by the <span
@@ -89,7 +89,7 @@ class='code'>ActiveRecord::QueryMethods</span> module, included into <span
 class='code'>ActiveRecord::Relation</span>.  Next, <span
 class='code'>ActiveRecord::QueryMethods#where</span> returns, in turn, a second
 new instance of <span class='code'>ActiveRecord::Relation</span>:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation1.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/activerecord-relation1.png"/>
 <p>If you look at the right, you can see the second <span
 class='code'>ActiveRecord::Relation</span> object contains information about
 what record we’re looking for, that we want the records where the name is
@@ -97,7 +97,7 @@ what record we’re looking for, that we want the records where the name is
 <p>Of course, we don’t want all of the Captain Nemo users; we just
 want the first one. Next, we call the <span class='code'>first</span> method on
 the new <span class='code'>ActiveRecord::Relation</span>:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/activerecord-relation2.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/activerecord-relation2.png"/>
 <h2>The Internal Implementation of ActiveRecord::FinderMethods#first</h2>
 <p>Now you can see ActiveRecord creates a third instance of <span
 class='code'>ActiveRecord::Relation</span> - this time with even more information
@@ -108,7 +108,7 @@ come from? We can find out by taking a look at the implementation of <span
   class='code'>first</span>. The <span
   class='code'>ActiveRecord::FinderMethods</span> module implements this, which
 ActiveRecord includes into the <span class='code'>ActiveRecord::Relation</span> class.</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/first1.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/first1.png"/>
 <p>Here you can see because we didn’t pass in a value for <span class='code'>limit</span>, ActiveRecord
 calls <span class='code'>find_nth</span> and passes in a value of 0,
 indicating we want the first record from the query result set. The second
@@ -117,27 +117,27 @@ zero, meaning we want to count into a window of records at the beginning of the
 result set, not a window located somewhere farther along the result set.</p>
 <p>ActiveRecord implements a series of similar methods that will return the
 second, third, fourth or even fifth record:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/second-fifth.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/second-fifth.png"/>
 <p>You can see the pattern here; the first argument is a zero-based index
 indicating which record we want. And just in case we want the forty second
 record from the result set, ActiveRecord implements this useful method... :)</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/forty-second.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/forty-second.png"/>
 <p>It’s no joke! <span class='code'>forty_two</span> is actually in the
 ActiveRecord source code; you can try it for yourself. Replacing <span
 class='code'>first</span> with the equivalent call to <span
 class='code'>find_nth</span>, here’s our example again:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/find-nth.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/find-nth.png"/>
 <p>Following the code path through the <span
 class='code'>ActiveRecord::FinderMethods</span> module, we can see <span
 class='code'>find_nth</span> calls, in turn, <span
 class='code'>find_nth_with_limit</span>:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/find-nth-with-limit.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/find-nth-with-limit.png"/>
 <p>Now the arguments have been reversed; the first argument, 0, is now the offset
 and the second, 1, is the number of records we want, or the limit value.</p>
 <p>Substituting one more time, let’s replace <span
 class='code'>find_nth_with_limit</span> with more detailed calls it makes to
 <span class='code'>order</span> and <span class='code'>limit</span>:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/detailed-calls.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/detailed-calls.png"/>
 <p>Now you can see where all of the values in the final <span
 class='code'>ActiveRecord::Relation</span> object come from. Each call to a
 scoping method saves a new piece of information about our query, and returns a
@@ -147,9 +147,9 @@ new instance of the <span class='code'>ActiveRecord::Relation</span> class.
 <p>Taking a step back, we can see that our simple line of code, <span
 class='code'>User.where(name: &quot;Captain Nemo&quot;).first</span>, is creating a
 series of <span class='code'>ActiveRecord::Relation</span> objects like this:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/method-chain.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/method-chain.png"/>
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/17/south-pacific.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/9/17/south-pacific.png"><br/>
   <i>Captain Nemo allowed Canadian harpoonist Ned Land<br/>to leave the submarine for a short time and explore a<br/>tropical island off the coast of Papua New Guinea.</i>
 </div>
 <p>There are two interesting and beautiful things about this, I think. First,
@@ -172,7 +172,7 @@ worry about executing it until we’re ready.</p>
 <p>It’s not until we call the <span class='code'>to_a</span> method, in other to convert the
 <span class='code'>ActiveRecord::Relation</span> object into an array and access the result set, that
 ActiveRecord executes the query:</p>
-<img src="http://patshaughnessy.net/assets/2014/9/17/to-a.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/17/to-a.png"/>
 <p>You can see here that <span class='code'>to_a</span> calls <span class='code'>load</span> internally,
 which later calls the <span class='code'>DatabaseStatements#select_all</span>
 method. Note the <span class="code">find_nth_with_limit</span> method calls
@@ -183,7 +183,7 @@ known as “terminating methods.” To prevent the query from executing immediat
 to keep it lazy - just use <span class="code">order</span> and <span
 class="code">limit</span> instead.</p>
 <h2>Next time</h2>
-<p>In the next few days I’ll post <a href="http://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements">the second part of my presentation from
+<p>In the next few days I’ll post <a href="https://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements">the second part of my presentation from
 Barcelona</a>.
 We’ll look at what “Relational Algebra” means and how the Arel gem converts our
 <span class='code'>ActiveRecord::Relation</span> object into a string

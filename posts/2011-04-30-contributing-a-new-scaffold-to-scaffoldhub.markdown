@@ -12,11 +12,11 @@ To lower the bar for contributing, I looked for a design that hopefully makes it
 
 You can create a new account on ScaffoldHub by clicking the “sign up” link on the top left:
 
-![sign up](http://patshaughnessy.net/assets/2011/4/30/sign_up.png)
+![sign up](https://patshaughnessy.net/assets/2011/4/30/sign_up.png)
 
 The site will take a username and password, and optionally an email address and home page URL:
 
-![sign up form](http://patshaughnessy.net/assets/2011/4/30/sign_up_form.png)
+![sign up form](https://patshaughnessy.net/assets/2011/4/30/sign_up_form.png)
 
 If you provide an email address, ScaffoldHub will display your gravatar next to all the scaffolds that you create. And if you have a blog or home page, enter that URL and ScaffoldHub will display your username as a link to that site.
 
@@ -52,7 +52,7 @@ Scaffoldhub::Specification.new do
     parameter_example 'FIELD_NAME'
 
     # Optionally post a link to an article you write explaining how the scaffold works.
-    blog_post 'http://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub'
+    blog_post 'https://patshaughnessy.net/2011/3/13/view-mapper-for-rails-3-scaffoldhub'
   end
 
   # Define a model template - this ERB file will be used to generate a new
@@ -112,7 +112,7 @@ $ rails generate new_scaffold example
 
 This example screenshot image is also generated:
 
-![example screenshot](http://patshaughnessy.net/assets/2011/4/30/example_screenshot.png)
+![example screenshot](https://patshaughnessy.net/assets/2011/4/30/example_screenshot.png)
 
 ## Step 3: Test your new scaffold locally
 

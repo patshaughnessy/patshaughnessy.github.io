@@ -3,7 +3,7 @@ date: 2018/1/18
 tag: Rust
 
 <div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2018/1/18/dictionary.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2018/1/18/dictionary.jpg"><br/>
   <i>Human languages have similar words with different<br/> shades of meaning. Some computer languages do too.<br/>
   <small>(from: <a href="https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG">Wikimedia Commons</a>)</small></i> 
 </div>
@@ -28,7 +28,7 @@ Book](https://doc.rust-lang.org/book/second-edition/ch06-03-if-let.html)
 for <span class="code">match</span>:
 
 <div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-<img width="500" src="http://patshaughnessy.net/assets/2018/1/18/trpl-quote.png"/>
+<img width="500" src="https://patshaughnessy.net/assets/2018/1/18/trpl-quote.png"/>
 </div>
 
 This intrigued me. The phrase “syntactic sugar” implies the two code snippets
@@ -47,7 +47,7 @@ I’ll take a look at how Rust compiles <span class="code">if let</span> and
 The idea behind <span class="code">if let</span> is that it compares a pattern
 with a value:
 
-<img src="http://patshaughnessy.net/assets/2018/1/18/pattern-value.png"/>
+<img src="https://patshaughnessy.net/assets/2018/1/18/pattern-value.png"/>
 
 In this example <span class="code">if let</span> compares the pattern <span
 class="code">Some(3)</span> with the value <span
@@ -100,7 +100,7 @@ fn main() {
 To write this all I had to do was move things around a bit in my <span
 class="code">if let</span> code snippet from above:
 
-<img src="http://patshaughnessy.net/assets/2018/1/18/if-let-match.png"/>
+<img src="https://patshaughnessy.net/assets/2018/1/18/if-let-match.png"/>
 
 Because there was no else clause for the <span class="code">if let</span>
 statement, I used <span class="code">None => ()</span> in match.

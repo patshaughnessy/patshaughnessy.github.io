@@ -4,12 +4,12 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/9/17/gem_graph_cropped.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/9/17/gem_graph_cropped.png"></td></tr>
   <tr><td align="center"><small><i>Part of a gem dependency network graph</i></small></td></tr>
 </table>
 </div>
 
-This week I just discovered Bundler’s best kept secret: the <span class="code">bundle viz</span> command will generate a network graph showing the dependencies among all the different gems used by your Ruby app. For example, the image on the left is a portion of the gem dependency graph for a vanilla Rails 3.1 app. [Click here](http://patshaughnessy.net/assets/2011/9/17/gem_graph.png) to see the entire, uncropped dependency graph. The gems actually called out in your Gemfile are displayed in grey, while other gems included through dependencies only are shown in white. Finally gem groups are shown as rectangles along the top.
+This week I just discovered Bundler’s best kept secret: the <span class="code">bundle viz</span> command will generate a network graph showing the dependencies among all the different gems used by your Ruby app. For example, the image on the left is a portion of the gem dependency graph for a vanilla Rails 3.1 app. [Click here](https://patshaughnessy.net/assets/2011/9/17/gem_graph.png) to see the entire, uncropped dependency graph. The gems actually called out in your Gemfile are displayed in grey, while other gems included through dependencies only are shown in white. Finally gem groups are shown as rectangles along the top.
 
 To try this on your own app, you’ll first need to install the [GraphViz](http://www.graphviz.org/) library, which is what Bundler uses to generate the graph. On my Mac Lion laptop, I used Homebrew:
 
@@ -34,14 +34,14 @@ $ bundle viz
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/9/17/gem_graph_version.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/9/17/gem_graph_version.png"></td></tr>
   <tr><td align="center"><small>bundle viz --version</small></td></tr>
 </table>
 </div>
 
 <div style="float: right; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/9/17/gem_graph_requirements.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/9/17/gem_graph_requirements.png"></td></tr>
   <tr><td align="center"><small>bundle viz --requirements</small></td></tr>
 </table>
 </div>
@@ -124,8 +124,8 @@ end
 
 ...you’ll get a network graph that looks like this:
 
-![page scope](http://patshaughnessy.net/assets/2011/9/17/activerecord_associations.png)
+![page scope](https://patshaughnessy.net/assets/2011/9/17/activerecord_associations.png)
 
 Here’s a more real world example - this is the network graph I get for the ActiveRecord associations in the BostonRB web site [http://bostonrb.org](http://bostonrb.org):
 
-![page scope](http://patshaughnessy.net/assets/2011/9/17/bostonrb_models.png)
+![page scope](https://patshaughnessy.net/assets/2011/9/17/bostonrb_models.png)

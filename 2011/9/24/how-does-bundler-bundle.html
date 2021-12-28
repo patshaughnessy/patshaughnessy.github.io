@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>How does Bundler bundle? - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>How does Bundler bundle?</h1><div class="metadata"><span class="date">September 24th 2011</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2011/9/24/how-does-bundler-bundle" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="How does Bundler bundle?">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/9/24/bundle.jpeg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/9/24/bundle.jpeg"></td></tr>
 </table>
 </div>
 <p>Every time you start a new Ruby project, probably one of the first things you do is write a Gemfile and then run <span class="code">bundle install</span>. Bundler has truly made all of our lives much easier... we know it will install the proper version of all the gems we need. But how does it actually work? This week I decided to take a closer look at the Bundler code itself to find out. How does it know which gems to install? How does it guarantee each gem’s dependencies will be satisfied? How do I get just the right “bundle” my app needs?</p>
@@ -28,21 +28,21 @@ Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem 
 </pre>
 <p>If you run this you should now have a text file called “output.txt” which will contain some information about how Bundler resolved the gem dependencies.</p>
 <h2>Visualizing Bundler’s resolver algorithm using GraphViz</h2>
-<p>To make this debug text file easier to understand, I decided to write some Ruby code to parse it and then use <a href="http://www.graphviz.org/">GraphViz</a> to output a graphical representation of the information there. <a href="http://patshaughnessy.net/2011/9/17/bundlers-best-kept-secret">As I discussed last week</a>, GraphViz is the library that Bundler uses to implement the <span class="code">bundle viz</span> command, which displays a graphical chart showing your gem dependencies.</p>
+<p>To make this debug text file easier to understand, I decided to write some Ruby code to parse it and then use <a href="http://www.graphviz.org/">GraphViz</a> to output a graphical representation of the information there. <a href="https://patshaughnessy.net/2011/9/17/bundlers-best-kept-secret">As I discussed last week</a>, GraphViz is the library that Bundler uses to implement the <span class="code">bundle viz</span> command, which displays a graphical chart showing your gem dependencies.</p>
 <p>Now let’s take a look at how Bundler’s resolver code actually works. We’ll start the process with two lists:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/simple1.png" alt="step 1" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/simple1.png" alt="step 1" /></p>
 <p>On the left are the gems activated so far, which is an empty list at first. This will eventually be the return value of the resolver algorithm. On the right are the requirements from the Gemfile, which in my simple example is just the single uglifier gem.</p>
 <p>The resolver algorithm’s first step is to take the requirement, uglifier &gt;=0, and see whether it is satisfied by any of the gems already activated. It also checks whether any of the activated gems conflict with the requirement. Since there are no activated gems yet, Bundler looks for the latest version of uglifier that matches the requirement from rubygems.org; here it is:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/simple2.png" alt="step 2" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/simple2.png" alt="step 2" /></p>
 <p>As I wrote this, the latest version of uglifier was 1.0.3. Bundler also downloads uglifier’s dependencies from rubygems. Now it “activates” uglifier 1.0.3, adding it to the list of activated gems:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/simple3.png" alt="step 3" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/simple3.png" alt="step 3" /></p>
 <p>Bundler also adds the dependencies for the new gem to the list of requirements, as if they were written in the Gemfile directly. You can see here that multi_json and execjs were added to the list on the right.</p>
 <p>Now Bundler simply iterates and repeats the same process. The next requirement is popped off the top of the list on the right, checked against the activated gems, and a matching gem is found in the source index that was downloaded from rubygems.org. It turns out that the latest version of multi_json is 1.0.3 and has no dependencies at all. Also since there is no other version of multi_json already activated, Bundler just activates it:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/simple4.png" alt="step 4" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/simple4.png" alt="step 4" /></p>
 <p>And now we repeat the process again, fetching a gem that matches the execjs &gt;= 0.3.0 requirement on rubygems.org:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/simple5.png" alt="step 5" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/simple5.png" alt="step 5" /></p>
 <p>This turns out to be execjs 1.2.8, again the latest version at the time I wrote this. It has a single dependency on multi_json ~&gt; 1.0. Now repeating the process, Bundler activates execjs 1.2.8, which didn’t appear in the activated list yet, and adds multi_json ~&gt; 1.0 to the requirements list:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/simple6.png" alt="step 6" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/simple6.png" alt="step 6" /></p>
 <p>Finally Bundler checks the latest requirement and finds that there is a gem that was activated that already matches this requirement: multi_json 1.0.3. So there’s no need to download a new version of multi_json - this requirement is already satisfied.</p>
 <p>Now Bundler is done - the list on the left becomes our “bundle,” and the list is written out to a file called Gemfile.lock, along with dependency information:</p>
 <pre type="console">
@@ -96,19 +96,19 @@ Your bundle is updated! Use `bundle show [gemname]` to see where a bundled gem i
 </pre>
 <p>Here you can see that I got a different set of gems... Bundler was able to resolve the request for multi_json 1.0.1 by downloading and activating a different, older version of uglifier (0.5.2 vs. 1.0.3) - very cool! But how does this work? How does Bundler know to do this?</p>
 <p>Let’s repeat the same process again by starting with the same two columns, the activated gems on the left and the requirements on the right:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict1.png" alt="step 1" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/conflict1.png" alt="step 1" /></p>
 <p>Now my Gemfile has two requirements, so you see two entries on the right to start with. Repeating the same resolver algorithm, Bundler finds a matching version of multi_json on rubygems.org. This has to be version multi_json 1.0.1, since I specified that exact version in the Gemfile’s requirement.</p>
 <p>Since this is the first gem to be processed, Bundler just activates it immediately. There are also no dependencies, so the list of requirements just gets smaller.</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict2.png" alt="step 2" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/conflict2.png" alt="step 2" /></p>
 <p>Uglifier &gt;= 0 is the next requirement so Bundler will find the latest version of this gem available on rubygems.org:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict3.png" alt="step 3" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/conflict3.png" alt="step 3" /></p>
 <p>Just as above, Bundler finds there are two dependencies on execjs and multi_json. Now it activates uglifier 1.0.3 and adds it to the activated gems, and also adds the two dependencies to the requirements list:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict4.png" alt="step 4" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/conflict4.png" alt="step 4" /></p>
 <p>This leaves multi_json &gt;= 1.0.2 as the next requirement, but before Bundler checks for the latest version on rubygems.org, it will first check the list of gems that were already activated: uglifier 1.0.3 and multi_json 1.0.1. Now Bundler has a conflict! It can’t activate any version of multi_json &gt;= 1.0.2 since multi_json 1.0.1, was already activated.</p>
 <p>To resolve the conflict, Bundler now returns to the gem which depended on multi_json &gt;= 1.0.2, in this case uglifier 1.0.3. Discarding uglifier 1.0.3, Bundler uses the source index from rubygems.org to iterate through the older versions of the problem gem (uglifier) in descending order, running the same process with each one. To keep things simple I’ll skip a couple of intermediate versions and jump to this one next:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict5.png" alt="step 5" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/conflict5.png" alt="step 5" /></p>
 <p>Now Bundler tries the same process with this older version of the gem: it activates it and adds its dependencies to the list of requirements:</p>
-<p><img src="http://patshaughnessy.net/assets/2011/9/24/conflict6.png" alt="step 6" /></p>
+<p><img src="https://patshaughnessy.net/assets/2011/9/24/conflict6.png" alt="step 6" /></p>
 <p>Next Bundler returns to the same process as usual, and checks whether the next requirement conflicts with any previously activated gems. Multi_json 1.0.1 meets the multi_json &gt;= 0 requirement and doesn’t conflict.</p>
 <p>Now Bundler is free to continue the process, finding the newest version of execjs, and getting its dependencies.</p>
 <h2>To learn more...</h2>

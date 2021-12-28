@@ -3,7 +3,7 @@ date: 2014/9/23
 tag: Ruby
 
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/23/battle.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/9/23/battle.png"><br/>
   <i>In one of the climactic scenes in <a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea">20,000 Leagues Under the<br/>Sea</a>, Captain Nemo and his crew battle a giant octopus.</i>
 </div>
 
@@ -11,9 +11,9 @@ tag: Ruby
 This is the second of a series of four posts based on a presentation I did at the
 [Barcelona Ruby Conference](http://www.baruco.org) called “20,000 Leagues Under
 ActiveRecord.” (posts:
-[one](http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
-[three](http://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals)
-[four](http://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
+[one](https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
+[three](https://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals)
+[four](https://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
 and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).</b>
 
 I took an innocent and unsuspecting audience on an adventure
@@ -21,7 +21,7 @@ inside and underneath ActiveRecord to find out how Rails and PostgreSQL
 actually execute a simple SQL query.
 
 In the [first part of the
-presentation](http://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
+presentation](https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
 I showed what ActiveRecord does internally when you call methods such as <span
 class="code">where</span> and <span class="code">limit</span>. We saw how each
 scoping method returns a new instance of the <span
@@ -39,14 +39,14 @@ how it executes this SQL statement.
 Here again is the instance of the <span class="code">ActiveRecord::Relation</span> class that represents
 our query to find the user named “Captain Nemo:”
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/ar-relation1.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/ar-relation1.png"/>
 
 Now that we’ve specified the query we want to execute, what does ActiveRecord
 do next? How does it actually execute the query and return the results to us?
 We can find a clue by looking more closely at the relation object and the
 metadata values it stores:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/AR-Relation2.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/AR-Relation2.png"/>
 
 If you inspect an <span class="code">ActiveRecord::Relation</span> object in
 the Rails console, you’ll find that its instance variables are not simple
@@ -60,8 +60,8 @@ It turns out that ActiveRecord itself doesn’t convert your
 a separate gem called Arel to do that. Googling for “Arel” we can easily find
 its Github repo:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/arel1.png"/><br/>
-<img src="http://patshaughnessy.net/assets/2014/9/23/arel2.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/arel1.png"/><br/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/arel2.png"/>
 
 The gem’s description is simply “A Relational Algebra.” What in the world does
 this mean? And farther down in the Readme there’s another interesting line:
@@ -75,7 +75,7 @@ computer science history to find out what Relational Algebra is.
 ## Relational Algebra
 
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/23/codd.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/9/23/codd.jpg"><br/>
   <i>Edgar Codd</i>
 </div>
 
@@ -118,7 +118,7 @@ larger applications written in some other programming language, such as Ruby.
 Returning to our example, here’s the SQL statement that represents our search
 for the user named Captain Nemo:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/sql.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/sql.png"/>
 
 The SQL language existed before Codd wrote his paper on Relational Algebra in
 1970, but it didn’t resemble the version of SQL we all know and love today. The
@@ -136,7 +136,7 @@ represents a SQL statement.
 
 Here’s the AST Arel creates internally for our example query:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/tree1.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/tree1.png"/>
 
 You can see the top or root of the tree is a Ruby object called
 <span class="code">SelectStatement</span>, and under that the various branches
@@ -155,10 +155,10 @@ ActiveRecord calls the corresponding methods in the Arel gem.
 Here’s our example query written using both ActiveRecord (top) and Arel
 (bottom) method calls:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/arel-and-ar.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/arel-and-ar.png"/>
 
 <div style="float: right; padding: 7px 0px 60px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/23/window.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/9/23/window.png"><br/>
   <i>Professor Aronnax, Conseil and Ned Land spent hours marveling<br/>at the underwater world through the windows of the Nautilus.</i>
 </div>
 
@@ -190,7 +190,7 @@ To understand this a bit better, let’s take our example AST and follow Arel’
 visitor as it traverses the tree, starting at the <span
 class="code">SelectStatement</span> root node:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/tree2.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/tree2.png"/>
 
 The blue arrow at the top is the visitor, a Ruby object. Depending on which
 database server you are using, Arel creates a different visitor object. This is
@@ -206,7 +206,7 @@ Now let’s follow Arel’s visitor as it iterates over the Ruby objects in the
 AST, shown as a moving blue arrow. Above each diagram I’ll show the SQL string
 the visitor cumulatively builds up as it goes.
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/tree2b.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/tree2b.png"/>
 
 Here you can see the visitor arrow next to the <span
 class="code">SelectStatement</span> node. Above the diagram I’ve written the
@@ -215,7 +215,7 @@ class="code">SelectStatement</span> root node.
 
 Next Arel moves down to the left:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/tree3.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/tree3.png"/>
 
 This time Arel doesn’t write anything new into the string; <span
 class="code">SelectCode</span> is just a container for other branches of the
@@ -223,7 +223,7 @@ tree.
 
 Next, Arel moves down and left again:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/tree4.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/tree4.png"/>
 
 Now Arel’s visitor see the <span class="code">Attribute</span> node. This
 represents the projection or list of attributes we want in the result set. Arel
@@ -231,7 +231,7 @@ appends <span class="code">&quot;users&quot;.*</span> to the SQL string.
 
 Next, the visitor moves to the right:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/tree5.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/tree5.png"/>
 
 Encountering the <span class="code">JoinSource</span> node, Arel writes <span
 class="code">FROM &quot;users&quot;</span> onto the end of the SQL statement. <span
@@ -242,7 +242,7 @@ class="code">Table</span> child node.
 
 Next, the visitor moves to the right again:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/tree6.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/tree6.png"/>
 
 Now Arel writes the where clause for our SQL statement: <span class="code">WHERE &quot;users&quot;.&quot;name&quot; =
 $1</span>. The <span class="code">And</span> node is the root of a subbranch of the AST that represents the
@@ -254,13 +254,13 @@ really do anything in this case.
 
 Now the visitor continues to the right:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/tree7.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/tree7.png"/>
 
 Here you can see Arel finds the <span class="code">Ascending</span> node and appends our order by clause.
 
 Finally, the visitor moves to the right one last time:
 
-<img src="http://patshaughnessy.net/assets/2014/9/23/tree8.png"/>
+<img src="https://patshaughnessy.net/assets/2014/9/23/tree8.png"/>
 
 Finding the <span class="code">Limit</span> node, Arel’s visitor completes the
 SQL statement by concatenating <span class="code">LIMIT 1</span> onto our select statement.
@@ -277,7 +277,7 @@ Edgar Codd - who have already done the difficult theoretical work that makes
 building apps today possible.
 
 <div style="float: right; padding: 7px 0px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/23/south-pole.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/9/23/south-pole.png"><br/>
   <i>A citizen of no country, Captain Nemo claimed the <br/>south pole as his own using a black flag with a large "N."</i>
 </div>
 

@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 20px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/4/3/oniguruma.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/4/3/oniguruma.png"></td></tr>
   <tr><td align="center"><small><i>According to <a href="http://en.wikipedia.org/wiki/Oniguruma">Wikipedia</a>, Oniguruma means<br/>“Devil’s Chariot” in Japanese</i></small></td></tr>
 </table>
 </div>
@@ -30,7 +30,7 @@ Since version 1.9 MRI Ruby has implemented regular expressions using a slightly 
 
 At a very high level, here’s what happens when you first pass a regex pattern to Oniguruma: 
 
-![Oniguruma parses and compiles a regex](http://patshaughnessy.net/assets/2012/4/3/regex-high-level.png)
+![Oniguruma parses and compiles a regex](https://patshaughnessy.net/assets/2012/4/3/regex-high-level.png)
 
 In the first step, Oniguruma reads the regex search pattern, tokenizes it and parses it into a tree structure containing a series of syntax nodes - an Abstract Syntax Tree (AST). This is very similar to how Ruby itself parses your Ruby program. In fact, you can think of Oniguruma’s regex engine as a second programming language that is embedded right inside of Ruby. Whenever you use a regex pattern in your Ruby code, you’re really writing a second program in an entirely different language. After parsing your search pattern, Oniguruma compiles it into a series of instructions that will later be executed by a virtual machine. These instructions implement a state machine, as Russ Cox described in his articles.
 
@@ -68,7 +68,7 @@ size: 44, start offset: 10
 
 The key here is the text “0:[exact5:brown] 6:[end]” - this line describes the two VM instructions that Oniguruma has compiled the <span class="code">/brown/</span> pattern into. Here’s what this regex program looks like:
 
-![/brown/](http://patshaughnessy.net/assets/2012/4/3/regex1.png)
+![/brown/](https://patshaughnessy.net/assets/2012/4/3/regex1.png)
 
 You can think of this diagram as the state machine for the <span class="code">/brown/</span> search:
 
@@ -77,13 +77,13 @@ You can think of this diagram as the state machine for the <span class="code">/b
 
 When running a regex search Oniguruma steps through the VM instructions and the target string at the same time. Let’s walk through how this works for my example; first, the <span class="code">exact5:brown</span> instruction is executed on the target string at the location where the word “brown” appears:
 
-![exact5:brown VM instruction](http://patshaughnessy.net/assets/2012/4/3/regex2.png)
+![exact5:brown VM instruction](https://patshaughnessy.net/assets/2012/4/3/regex2.png)
 
 How did Oniguruma know where to start? Well, it turns out that it contains an optimizer that decides where to start the regex search based on the target string and the first VM instruction. You can see evidence of that above: “optimize: EXACT_BM... exact: [brown]: length: 5... start offset: 10”. In this case, since Oniguruma knew it was going to look for the word “brown” it jumped ahead to the first appearance of “brown.” Yes, I know this sounds like cheating, but actually this is just a simple optimization to speed up searches for common regex patterns.
 
 Next, Oniguruma executes the <span class="code">exact5:brown</span> instruction by checking whether the next 5 characters match or not. Since they match, Oniguruma steps past the 5 characters in the target string, and also moves to the next VM instruction:
 
-![end VM instruction](http://patshaughnessy.net/assets/2012/4/3/regex3.png)
+![end VM instruction](https://patshaughnessy.net/assets/2012/4/3/regex3.png)
 
 Now, Oniguruma executes the <span class="code">end</span> instruction - which simply means that it is done. Whenever the VM reaches the <span class="code">end</span> instruction it stops, declares success and returns the matching string.
 
@@ -119,27 +119,27 @@ size: 44, start offset: 10
 
 Again, the key line is: “0:[push:(11)] 5:[exact5:black] 11:[jump:(6)] 16:[exact5:brown] 22:[end]”. This is the VM program that will execute our <span class="code">/black|brown/</span> regex search:
 
-![/black/brown/](http://patshaughnessy.net/assets/2012/4/3/regex4.png)
+![/black/brown/](https://patshaughnessy.net/assets/2012/4/3/regex4.png)
 
 This is a lot more complicated! First of all, above you can see the optimizer is now only looking for the letter “b”: “optimize: EXACT exact: [b]: length: 1”. This is because the words “black” and “brown” both begin with the same letter “b”.
 
 Now let’s step through this more complex regex program, slowly:
 
-![push VM instruction](http://patshaughnessy.net/assets/2012/4/3/regex5.png)
+![push VM instruction](https://patshaughnessy.net/assets/2012/4/3/regex5.png)
 
 The <span class="code">push</span> command executes first, at the first occurrence of “b.” <span class="code">Push</span> pushes the location of another VM instruction and corresponding target string location onto something called the “Backtrack Stack:”
 
-![exact5:black VM instruction](http://patshaughnessy.net/assets/2012/4/3/regex6.png)
+![exact5:black VM instruction](https://patshaughnessy.net/assets/2012/4/3/regex6.png)
 
 The Backtrack Stack is central to the way Oniguruma works, as we’ll see in a moment. Oniguruma uses it to keep track of alternative match paths through the target string if one path doesn’t lead to a match. Let’s continue this example and you’ll see what I mean.
 
 Above we are now going to execute the <span class="code">exact5:black</span> command on the target string, but where the word “brown” appears. This means that the command will not match, and so the regex search will fail. However, before returning a failure to Ruby, Oniguruma will check the Backtrack Stack to see if some alternative path was saved there. In this case there is one: the <span class="code">exact5.brown</span> command - the second half of my OR condition in <span class="code">/black|brown/</span>. Now Oniguruma pops the <span class="code">exact5:brown</span> command and corresponding target string location off the stack and continues from there:
 
-![exact5:brown VM instruction](http://patshaughnessy.net/assets/2012/4/3/regex7.png)
+![exact5:brown VM instruction](https://patshaughnessy.net/assets/2012/4/3/regex7.png)
 
 Now there is a match, so Oniguruma steps past the 5 characters and moves to the next instruction:
 
-![end VM instruction](http://patshaughnessy.net/assets/2012/4/3/regex8.png)
+![end VM instruction](https://patshaughnessy.net/assets/2012/4/3/regex8.png)
 
 Now Oniguruma has reached the <span class="code">end</span> instruction again, and so returns the matched characters back to Ruby.
 
@@ -174,15 +174,15 @@ size: 44, start offset: 10
 
 And here’s the new state machine:
 
-![/brown.*/](http://patshaughnessy.net/assets/2012/4/3/regex9.png)
+![/brown.*/](https://patshaughnessy.net/assets/2012/4/3/regex9.png)
 
 This time you can see a new Oniguruma VM instruction: <span class="code">anychar\*</span>. As you can guess, this represents the <span class="code">.*</span> syntax in the regex pattern. Let’s step through the process again and see what happens:
 
-![exact5:brown VM instruction](http://patshaughnessy.net/assets/2012/4/3/regex10.png)
+![exact5:brown VM instruction](https://patshaughnessy.net/assets/2012/4/3/regex10.png)
 
 Again, we’ve started at position 10, where “brown” appears. And again it will match, causing Oniguruma to step past “brown” and move to the next instruction:
 
-![anychar* VM instruction](http://patshaughnessy.net/assets/2012/4/3/regex11.png)
+![anychar* VM instruction](https://patshaughnessy.net/assets/2012/4/3/regex11.png)
 
 The <span class="code">anychar\*</span> instruction is next. Here’s how <span class="code">anychar*</span> works:
 
@@ -190,19 +190,19 @@ The <span class="code">anychar\*</span> instruction is next. Here’s how <span 
 * But instead of stepping to the next instruction, Oniguruma loops back and runs <span class="code">anychar*</span> again on the next character.
 * It also pushes an entry onto the Backtrack Stack for the current character and the next instruction, <span class="code">end</span> in this program:
 
-![anychar* VM instruction 2](http://patshaughnessy.net/assets/2012/4/3/regex12.png)
+![anychar* VM instruction 2](https://patshaughnessy.net/assets/2012/4/3/regex12.png)
 
 Now from here Oniguruma simply iterates through the rest of the string, repeating the steps above for each character: “brown fox jumps over the lazy dog.” As it iterates through the rest of the target string, it repeatedly saves the <span class="code">end</span> command over and over again onto the backtrack stack:
 
-![anychar* VM instruction 3](http://patshaughnessy.net/assets/2012/4/3/regex13.png)
+![anychar* VM instruction 3](https://patshaughnessy.net/assets/2012/4/3/regex13.png)
 
 And again:
 
-![anychar* VM instruction 4](http://patshaughnessy.net/assets/2012/4/3/regex14.png)
+![anychar* VM instruction 4](https://patshaughnessy.net/assets/2012/4/3/regex14.png)
 
 Finally, after a number of iterations Oniguruma reaches the end of the string:
 
-![anychar* VM instruction 5](http://patshaughnessy.net/assets/2012/4/3/regex15.png)
+![anychar* VM instruction 5](https://patshaughnessy.net/assets/2012/4/3/regex15.png)
 
 Here <span class="code">anychar*</span> will fail, since there are no more characters left in the string. What happens when there’s a failure and some VM command doesn’t match? Well, like in the previous example Oniguruma will pop the last command off the stack, and continue the search from that point. So in this case it will pop off the <span class="code">end</span> command and the last target string location, pointing at the trailing period. This means Oniguruma will return all of the text up to the end of the string back to Ruby: “brown fox jumps over the lazy dog.”
 

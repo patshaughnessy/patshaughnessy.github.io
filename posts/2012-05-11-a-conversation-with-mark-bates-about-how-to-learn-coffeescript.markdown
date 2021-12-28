@@ -4,7 +4,7 @@ tag: Interviews
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><a href="http://books.markbates.com"><img src="http://patshaughnessy.net/assets/2012/5/11/programming_in_coffeescript.png"></a></td></tr>
+  <tr><td><a href="http://books.markbates.com"><img src="https://patshaughnessy.net/assets/2012/5/11/programming_in_coffeescript.png"></a></td></tr>
   <tr><td align="center"><small><i>Mark's <a href="http://books.markbates.com/">latest book</a> was just<br/>published by Addison-Wesley</i></small></td></tr>
 </table>
 </div>

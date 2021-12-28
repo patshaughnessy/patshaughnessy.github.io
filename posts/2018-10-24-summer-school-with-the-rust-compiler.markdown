@@ -3,7 +3,7 @@ date: 2018/10/24
 tag: Rust
 
 <div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2018/10/24/steves-tweet.png"><br/>
 <i> <small>(source: <a href="https://twitter.com/steveklabnik/status/1022518806814617601">Steve Klabnik via Twitter</a>)</small></i>
 </div>
 
@@ -46,7 +46,7 @@ $ ruby int-loop.rb
 </pre>
 
 <div style="float: right; padding: 70px 0px 30px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2018/10/24/garden-earthly-delights.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2018/10/24/garden-earthly-delights.png"><br/>
   <i><small><a href="https://en.wikipedia.org/wiki/The_Garden_of_Earthly_Delights">The Garden of Earthly Delights</a> (detail), by Hieronymus Bosch</small></i>
 </div>
 
@@ -178,12 +178,12 @@ integer. But what are references, exactly?
 Running my code above, Ruby passed each integer from the array to my code as a
 simple value:
 
-<img width="185" src="http://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png"/>
+<img width="185" src="https://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png"/>
 
 But Rust passed each integer from the array as a reference, or in other words
 as a pointer to the value itself:
 
-<img width="287" src="http://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png"/>
+<img width="287" src="https://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png"/>
 
 In Ruby, of course, I didn’t have to worry about references, pointers or even
 types, so none of this came up. Or at least that’s what I thought at the time.
@@ -236,7 +236,7 @@ class="code">main</span> function goes out of scope, Rust frees the memory for
 that array automatically. In this diagram, the red arrow shows where Rust
 allocates the array (at the top), and where Rust frees it (at the bottom):
 
-<img width="339" src="http://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png"/>
+<img width="339" src="https://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png"/>
 
 You can think of the red arrow as the “lifetime” of the array. When I pass a
 value from one spot to another, when I call a function or a closure, I can
@@ -246,7 +246,7 @@ elements inside the array, passing a reference to each element into the
 closure. The blue array in this diagram indicates each element of the array,
 <span class="code">i</span>, is a borrowed value inside the closure:
 
-<img width="334" src="http://patshaughnessy.net/assets/2018/10/24/rust-borrow.png"/>
+<img width="334" src="https://patshaughnessy.net/assets/2018/10/24/rust-borrow.png"/>
 
 ## Lesson Three: Immutable vs. Mutable Values
 

@@ -4,7 +4,7 @@ tag: Ruby
 
 <p>I just ported the RailsBench <a href="http://rubyforge.org/tracker/download.php/1814/7062/17676/3291/ruby186gc.patch">ruby186gc.patch</a> over to Ruby 1.8.7 - you can use this to measure garbage collection statistics for a Rails 3 app. I posted a <a href="http://github.com/patshaughnessy/ruby187gc">new ruby187gc.patch file</a> on github.</p>
 <h2>Why do you need this?</h2>
-<p>In <a href="http://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">my last post</a>, I ran some Rails profile performance tests and found the process time taken to execute ActiveRecord queries using find and select_all. However, I got &ldquo;unsupported&rdquo; for the amount of memory and number of Ruby objects created:</p>
+<p>In <a href="https://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">my last post</a>, I ran some Rails profile performance tests and found the process time taken to execute ActiveRecord queries using find and select_all. However, I got &ldquo;unsupported&rdquo; for the amount of memory and number of Ruby objects created:</p>
 <div class="CodeRay">
   <div class="code"><pre>$ rake test:profile
 (in /Users/pat/rails-apps/perf_test)
@@ -53,7 +53,7 @@ Successfully installed ruby-prof-0.9.2
 Installing ri documentation for ruby-prof-0.9.2...
 Installing RDoc documentation for ruby-prof-0.9.2...</pre></div>
 </div><br>
-<p>Repeating the select_all vs. find example from <a href="http://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">my last post</a>:</p>
+<p>Repeating the select_all vs. find example from <a href="https://patshaughnessy.net/2010/9/4/activerecord-with-large-result-sets-part-1-select_all-vs-find">my last post</a>:</p>
 <div class="CodeRay">
   <div class="code"><pre>$ rake test:profile
   (in /Users/pat/perf_test)

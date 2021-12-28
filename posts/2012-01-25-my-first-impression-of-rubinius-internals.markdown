@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/1/25/garden.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/1/25/garden.png"></td></tr>
   <tr><td align="center"><small><i>Reading the Rubinius source code is like<br/>walking through a well-kept, manicured garden</i></small></td></tr>
 </table>
 </div>
@@ -30,7 +30,7 @@ The Rubinius team, including contributions from 100s of different developers, ha
 
 There are a couple of nice diagrams on the Rubinius home page you should look at to get the lay of the land. After using it for only a few days, here’s a diagram of my own mental model that I developed for Rubinius internals:
 
-![mental model](http://patshaughnessy.net/assets/2012/1/25/mental_model.png)
+![mental model](https://patshaughnessy.net/assets/2012/1/25/mental_model.png)
 
 The way I think of Rubinius is: some of the Ruby standard library methods and classes are implemented with Ruby inside the “kernel” folder, while the rest of the standard library and the core behavior of the language is implemented with C++ code in the “vm/builtin” folder. So when your Ruby program makes a method call to one of the core methods sometimes it will be handled by Ruby code, and other times it will be handled by C++. Along with the C++ standard library method definitions, the Rubinius vm folder also contains code that actually executes your program and includes lots of other magic like a JIT (“just in time”) runtime compiler. 
 
@@ -49,7 +49,7 @@ puts str
 
 This is from the Rubinius home page, actually: “What started as a toy grew into a labour of love. We love building Rubinius and hope you'll love using it.” It’s not hard at all to find the implementation of <span class="code">String.upcase!</span> - a simple search and you’ll find it in the kernel/common/string.rb file. This diagram shows your Ruby program calling the <span class="code">upcase!</span> method:
 
-![upcase method calls](http://patshaughnessy.net/assets/2012/1/25/upcase.png)
+![upcase method calls](https://patshaughnessy.net/assets/2012/1/25/upcase.png)
 
 Here’s the actual definition:
 
@@ -182,7 +182,7 @@ alias_method :concat, :<<
 
 Unlike the <span class="code">String.upcase!</span> function, the Rubinius team had to implement the actual string concatenation part using the <span class="code">append</span> method implemented in C++. So what we have is your Ruby method call handled first by a Ruby method, which in turn calls into the underlying C++ method:
 
-![concat method calls](http://patshaughnessy.net/assets/2012/1/25/concat.png)
+![concat method calls](https://patshaughnessy.net/assets/2012/1/25/concat.png)
 
 And here’s the C++ code for append:
 

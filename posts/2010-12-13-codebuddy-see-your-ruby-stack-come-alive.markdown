@@ -4,9 +4,9 @@ url: /code_buddy
 tag: Ruby
 
 <p><a href="http://www.alexrothenberg.com/">Alex Rothenberg</a>, <a href="http://www.flyingmachinestudios.com/">Daniel Higginbotham</a> and I just published a new gem called <a href="http://github.com/patshaughnessy/code_buddy">CodeBuddy</a> that displays a Ruby stack trace inside your browser like this:
-<p><img src="http://patshaughnessy.net/assets/2010/12/13/code_buddy.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/12/13/code_buddy.png"></p>
 <p>The idea is that you can see both the stack trace and code snippets from the corresponding files at the same time, to make it easier to understand what was going on. You can move up and down the stack just by pressing the up/down arrow keys, or by clicking on a line in the stack trace:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/12/13/code_buddy_moved.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/12/13/code_buddy_moved.png"></p>
 <p>As you move, the code snippet in the center of the screen will update, showing you the path the Ruby interpreter took through your application&rsquo;s code.</p>
 <h2>Use it in your Rails app</h2>
 <p>If you&rsquo;re working on a Rails application, then just add the &ldquo;code_buddy&rdquo; gem to your Gemfile like this - to avoid security issues CodeBuddy will only function in the development environment:</p>
@@ -21,7 +21,7 @@ tag: Ruby
   <div class="code"><pre>$ bundle install</pre></div> 
 </div></p>
 <p>Now whenever an exception occurs in your Rails app, the Rails exception page will appear as usual, but each file in the stack trace will now appear as a link:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/12/13/exception.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/12/13/exception.png"></p>
 <p>When you click any of these links CodeBuddy will appear, displaying code from the selected file.</p>
 <p>If you&rsquo;re using Rails 2.3.x, you can use CodeBuddy by adding these two lines to your config/environments/development.rb file:</p>
 <p><div class="CodeRay"> 
@@ -36,7 +36,7 @@ $ code_buddy
   == Sinatra/1.1.0 has taken the stage on 4567 for development with backup from...</pre></div> 
 </div></p>
 <p>Now if you open <a href="http://localhost:4567">http://localhost:4567</a> you’ll get a form like this:</p>
-<p><img src="http://patshaughnessy.net/assets/2010/12/13/code_buddy_form.png"></p>
+<p><img src="https://patshaughnessy.net/assets/2010/12/13/code_buddy_form.png"></p>
 <p>Here you can copy/paste a Ruby stack from your console or elsewhere and click &ldquo;submit&rdquo; to see it inside CodeBuddy. As long as the file paths in the stack can be found on your machine they will appear properly in CodeBuddy. You can even paste a stack containing relative paths, as long as you run the code_buddy command from the directory the paths are relative to.</p>
 <p>This form is also available when CodeBuddy is running inside your Rails app if you click the &ldquo;Paste Stack&rdquo; link near the top right corner. By the way, the reason we disabled CodeBuddy outside of the development environment is that this form would be a huge, gaping security hole if CodeBuddy were active in the production or other server environment. This is because you can type any file path and line number you&rsquo;d like into the form, and CodeBuddy will display the contents of the specified files. This is definitely not something you want to make available to anonymous users on the Internet in production! In the future we may provide options for running CodeBuddy in non-development environments, such as on an integration or staging server, if you&rsquo;re sure it won&rsquo;t present a security risk.</p>
 <h2>Detailed example</h2>

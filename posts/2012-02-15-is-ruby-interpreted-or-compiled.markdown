@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/15/binary-data.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/15/binary-data.jpg"></td></tr>
   <tr><td align="center"><small><i>Both JRuby and Rubinius can compile your<br/>Ruby code into machine language!</i></small></td></tr>
 </table>
 </div>
@@ -21,7 +21,7 @@ Today I’m going to show you how to use these Ruby compilers, and I’ll also t
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/15/rubinius-compiler.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/15/rubinius-compiler.png"></td></tr>
 </table>
 </div>
 
@@ -60,7 +60,7 @@ This vaguely reminds me of how git saves the git repository data in a hidden fol
 
 Whenever you run a Ruby script, Rubinius uses a two step process to compile and run your code:
 
-![Rubinius compiler](http://patshaughnessy.net/assets/2012/2/15/rubinius-diagram.png)
+![Rubinius compiler](https://patshaughnessy.net/assets/2012/2/15/rubinius-diagram.png)
 
 On the top you can see that first Rubinius compiles your code into byte code, and then below later executes it using the Rubinius Virtual Machine, which can compile the byte code into native machine language. Rubinius also caches the byte code using the hexadecimal naming scheme I showed above, avoiding the need for the compile step entirely if the Ruby source code file didn’t change. 
 
@@ -112,7 +112,7 @@ At the bottom here we can see the compiled version of my silly <span class="code
   <li>And finally it returns.</li>
 </ul>
 
-The Rubinius virtual machine reminds me of those old “reverse polish” calculators from the 1980s, in which you would enter values on a stack in a similar way. [As I discussed 3 weeks ago](http://patshaughnessy.net/2012/1/25/my-first-impression-of-rubinius-internals), the Rubinius source code is actually quite easy to understand since a large portion of it is actually written in Ruby, while the rest is written in well documented C++. The Rubinius compiler is no exception: it’s actually written in Ruby too! If you’re interested, you can see how the Rubinius compiler works without having to understand C++ at all. To get started take a look in the “lib/compiler” directory.
+The Rubinius virtual machine reminds me of those old “reverse polish” calculators from the 1980s, in which you would enter values on a stack in a similar way. [As I discussed 3 weeks ago](https://patshaughnessy.net/2012/1/25/my-first-impression-of-rubinius-internals), the Rubinius source code is actually quite easy to understand since a large portion of it is actually written in Ruby, while the rest is written in well documented C++. The Rubinius compiler is no exception: it’s actually written in Ruby too! If you’re interested, you can see how the Rubinius compiler works without having to understand C++ at all. To get started take a look in the “lib/compiler” directory.
 
 The Rubinius virtual machine, which runs the Rubinius byte code, is implemented in C++ and leverages an open source project called [LLVM](http://llvm.org/). Like JRuby, it uses a “Just In Time” compiler to convert the byte code to machine language at runtime. This means that your Ruby code, for example the <span class="code">add_two</span> method above, ends up being converted into native machine language and run directly by your computer’s hardware!
 
@@ -120,7 +120,7 @@ The Rubinius virtual machine, which runs the Rubinius byte code, is implemented 
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/2/15/jruby-compiler.png"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/2/15/jruby-compiler.png"></td></tr>
 </table>
 </div>
 
@@ -132,11 +132,11 @@ $ ruby simple.rb
 5
 </pre>
 
-No surprise: we get the same result. At a high level, JRuby uses the same two step process to run your script - first it compiles the Ruby code into byte code, and then executes the byte code using the Java Virtual Machine (JVM). See my post last week called [Journey to the center of JRuby](http://patshaughnessy.net/2012/2/7/journey-to-the-center-of-jruby) to learn more about this.
+No surprise: we get the same result. At a high level, JRuby uses the same two step process to run your script - first it compiles the Ruby code into byte code, and then executes the byte code using the Java Virtual Machine (JVM). See my post last week called [Journey to the center of JRuby](https://patshaughnessy.net/2012/2/7/journey-to-the-center-of-jruby) to learn more about this.
 
 Here's another diagram showing the two step process, this time for JRuby:
 
-![JRuby compiler](http://patshaughnessy.net/assets/2012/2/15/jruby-diagram.png)
+![JRuby compiler](https://patshaughnessy.net/assets/2012/2/15/jruby-diagram.png)
 
 Like with Rubinius, it’s possible to run the JRuby compiler directly using the “jrubyc” command... following the Java executable naming pattern (“java” -> “javac”). Thanks to my friend [Alex Rothenberg](http://www.alexrothenberg.com/) for pointing this out. Running “jrubyc” will create a Java .class file, which we can inspect using the Java decompiler like I did last week:
 

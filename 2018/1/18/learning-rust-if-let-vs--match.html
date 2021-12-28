@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Learning Rust: If Let vs. Match - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Learning Rust: If Let vs. Match</h1><div class="metadata"><span class="date">January 18th 2018</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2018/1/18/learning-rust-if-let-vs--match" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Learning Rust: If Let vs. Match">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2018/1/18/dictionary.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2018/1/18/dictionary.jpg"><br/>
   <i>Human languages have similar words with different<br/> shades of meaning. Some computer languages do too.<br/>
   <small>(from: <a href="https://commons.wikimedia.org/wiki/File:ĸra_in_a_dictionary_(ubt).JPG">Wikimedia Commons</a>)</small></i> 
 </div>
@@ -20,7 +20,7 @@ Book</a>
 (TRPL). I read that <span class="code">if let</span> is really syntactic sugar
 for <span class="code">match</span>:</p>
 <div style="padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-<img width="500" src="http://patshaughnessy.net/assets/2018/1/18/trpl-quote.png"/>
+<img width="500" src="https://patshaughnessy.net/assets/2018/1/18/trpl-quote.png"/>
 </div>
 <p>This intrigued me. The phrase “syntactic sugar” implies the two code snippets
 don’t only produce the same results, it means the compiler generates exactly
@@ -34,7 +34,7 @@ I’ll take a look at how Rust compiles <span class="code">if let</span> and
 <h2>If Let Compares a Pattern with a Value</h2>
 <p>The idea behind <span class="code">if let</span> is that it compares a pattern
 with a value:</p>
-<img src="http://patshaughnessy.net/assets/2018/1/18/pattern-value.png"/>
+<img src="https://patshaughnessy.net/assets/2018/1/18/pattern-value.png"/>
 <p>In this example <span class="code">if let</span> compares the pattern <span
 class="code">Some(3)</span> with the value <span
 class="code">some_u8_value</span>. If there’s a match, <span class="code">if
@@ -75,7 +75,7 @@ fn main() {
 </pre>
 <p>To write this all I had to do was move things around a bit in my <span
 class="code">if let</span> code snippet from above:</p>
-<img src="http://patshaughnessy.net/assets/2018/1/18/if-let-match.png"/>
+<img src="https://patshaughnessy.net/assets/2018/1/18/if-let-match.png"/>
 <p>Because there was no else clause for the <span class="code">if let</span>
 statement, I used <span class="code">None =&gt; ()</span> in match.</p>
 <p>Saving this code in match.rs and running it I got the same result:</p>

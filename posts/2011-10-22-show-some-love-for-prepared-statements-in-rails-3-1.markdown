@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/10/22/heart.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/10/22/heart.jpg"></td></tr>
   <tr><td align="center"><small><i>@Tenderlove and the rest of the Rails core team<br/> deserve some love for speeding up your app!</i></small></td></tr>
 </table>
 </div>
@@ -61,7 +61,7 @@ If you’re not familiar at all with prepared statements, then a good way to sta
 
 For now, I’ll just show this simple diagram:
 
-![prepared statement](http://patshaughnessy.net/assets/2011/10/22/prepared%20statement.png)
+![prepared statement](https://patshaughnessy.net/assets/2011/10/22/prepared%20statement.png)
 
 The basic idea behind prepared statements and the log message above is that the SQL statement itself is compiled once and cached for future use. This is the left portion of the log message: <span class="code">SELECT ...etc... LIMIT 1</span>. Notice that the actual value of the id column is replaced with “?”. By caching the SQL statement the DB server only needs to perform the work of compiling the SQL string and building up an execution plan once.
 
@@ -71,11 +71,11 @@ Later when your application needs to use the prepared statement, it just needs t
 
 It turns out that in Rails 3.1 prepared statement support is implemented in the ActiveRecord connection adapters, not in ActiveRecord itself. This is because each RDBMS server implements prepared statements differently, using a slightly different API. Let’s take a look at how ActiveRecord connects to SQLite, for example:
 
-![sqlite3 stack](http://patshaughnessy.net/assets/2011/10/22/sqlite3%20stack.png)
+![sqlite3 stack](https://patshaughnessy.net/assets/2011/10/22/sqlite3%20stack.png)
 
 The magic for prepared statements happens inside the SQLiteAdapter class. The “StatementPool” inner class inside SQLiteAdapter is a simple hash-based cache implementation that holds on to all of the prepared statements returned by the SQLite database server. Each time your Rails 3.1 application executes a SQL statement the SQLiteAdapter class first checks whether there already is a prepared statement generated for that SQL statement and uses it if there is. If there isn’t a cached statement, it sends the SQL string along to SQLite to be processed and converted into a new prepared statement. Here’s the algorithm:
 
-![flowchart](http://patshaughnessy.net/assets/2011/10/22/flowchart.png)
+![flowchart](https://patshaughnessy.net/assets/2011/10/22/flowchart.png)
 
 ## How much is your Rails 3.1 app taking advantage of prepared statements?
 

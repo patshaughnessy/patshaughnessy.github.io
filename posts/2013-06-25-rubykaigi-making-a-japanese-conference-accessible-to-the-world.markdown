@@ -6,7 +6,7 @@ _Note: I co-wrote this article with [Chris
 Salzberg](https://twitter.com/shioyama), an Canadian Rubyist living in Japan who attended RubyKaigi._
 
 <div style="float: left; padding: 7px 30px 10px 0px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/6/24/take-a-receiver.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/6/24/take-a-receiver.jpg"><br/>
   <i>For the first time, RubyKaigi offered simultaneous<br/>
   translation from Japanese to English</i>
 </div>
@@ -24,7 +24,7 @@ conference organizers do it? Did it work? What did foreign attendees think? Did
 they get anything out of the conference? From a distance, I was fascinated!
 
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/6/24/kakutani-san.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/6/24/kakutani-san.jpg"><br/>
   <i>Shintaro Kakutani (Kakutani-san) lead <br/>
   the team organizing RubyKaigi 2013</i>
 </div>
@@ -50,7 +50,7 @@ event. He explained:
 </blockquote>
 
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/6/24/tenderlove-japanese.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/6/24/tenderlove-japanese.jpg"><br/>
   <i>A Japanese slide in Aaron Patterson’s talk</i>
 </div>
 
@@ -73,7 +73,7 @@ event. He explained:
 When we asked him about how international the conference was this year, he said:
 
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/6/24/map.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/6/24/map.jpg"><br/>
 </div>
 
 <blockquote>
@@ -105,13 +105,13 @@ English through the use of headsets. Non-Japanese attendees were able to listen 
 presentations live and not miss a thing. During the conference there was some
 positive feedback about this on Twitter.
 
-<img src="http://patshaughnessy.net/assets/2013/6/24/tweet1.png"/>
-<img src="http://patshaughnessy.net/assets/2013/6/24/tweet2.png"/><br/>
+<img src="https://patshaughnessy.net/assets/2013/6/24/tweet1.png"/>
+<img src="https://patshaughnessy.net/assets/2013/6/24/tweet2.png"/><br/>
 
 <div style="clear: left"></div>
 
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/6/24/bento.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/6/24/bento.jpg"><br/>
   <i>According to Richard, Aaron Patterson wrote this pun<br/>
    in Japanese: "At the evento have a bento"</i>
 </div>
@@ -142,7 +142,7 @@ However, Richard did think some of the humor might have been lost in translation
 </blockquote>
 
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <img src="http://patshaughnessy.net/assets/2013/6/24/is-this-an-irc-channel.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2013/6/24/is-this-an-irc-channel.jpg"><br/>
   <i>Photo by <a href="http://www.flickr.com/photos/sora_h/8918115497/in/set-72157633834333235">sora_h</a></i>
 </div>
 

@@ -3,7 +3,7 @@ date: 2021/11/6
 tag: Crystal
 
 <div style="float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2021/11/6/formula.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2021/11/6/formula.png"><br/>
   <i>In this formula, x is the bound variable, a is<br/>the free variable and e is constant.</i>
 </div>
 
@@ -32,7 +32,7 @@ how the Crystal team used generic type syntax to implement their array class.
 ## Array#uniq in Crystal
 
 [Last
-time](http://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library)
+time](https://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library)
 I looked at the Crystal standard library, specifically at how Crystal removes
 duplicate elements from an array in
 [Array#uniq](https://github.com/crystal-lang/crystal/blob/master/src/array.cr#L1843).
@@ -74,7 +74,7 @@ figure this out without much effort.
 Crystal identifies the unique elements of the array by converting it into a
 “lookup hash:”
 
-<img width="650" src="http://patshaughnessy.net/assets/2021/11/6/lookup-hash.svg"><br/>
+<img width="650" src="https://patshaughnessy.net/assets/2021/11/6/lookup-hash.svg"><br/>
 
 As you know, hash keys are unique. By converting the array into a hash, Crystal
 has quickly identified the unique elements of that array.
@@ -121,7 +121,7 @@ end
 Since the block `{ |elem| elem }` just returns whatever was passed into it, the
 keys and values of the lookup hash will be the same:
 
-<img width="275" src="http://patshaughnessy.net/assets/2021/11/6/keys-and-values.svg"><br/>
+<img width="275" src="https://patshaughnessy.net/assets/2021/11/6/keys-and-values.svg"><br/>
 
 This block adds a bit of flexibility to the code. The Crystal team might want
 to reuse this function someday with a different block and set of keys.
@@ -171,7 +171,7 @@ the second, type-level mirror program to find out how this works.
 You can imagine the Crystal compiler processing the generic type code like
 this:
 
-<img width="550" src="http://patshaughnessy.net/assets/2021/11/6/solved-puzzle.svg"><br/>
+<img width="550" src="https://patshaughnessy.net/assets/2021/11/6/solved-puzzle.svg"><br/>
 
 The first line is actually the most important:
 

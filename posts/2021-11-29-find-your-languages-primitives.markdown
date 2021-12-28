@@ -3,7 +3,7 @@ date: 2021/11/29
 tag: Crystal
 
 <div style="float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2021/11/29/dig1.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2021/11/29/dig1.jpg"><br/>
   <i>If you dig into your programming language's syntax, you might <br/>discover that it is capable of much more than you thought it was.
   </i>
 </div>
@@ -48,7 +48,7 @@ broken down into smaller pieces of Ruby code. As Wikipedia says, these methods
 are the smallest unit of processing available to Ruby programmers working with
 arrays.
 
-<img src="http://patshaughnessy.net/assets/2021/11/29/primitive1.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/11/29/primitive1.png"><br/>
 
 Ruby hides the details of how arrays actually work from us. To learn how Ruby
 actually saves and retrieves values from an array, we would need to switch
@@ -165,13 +165,13 @@ end
 </pre>
 
 <div style="float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2021/11/29/dig2.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2021/11/29/dig2.jpg"><br/>
 	<i><small>(source: <a href="https://commons.wikimedia.org/wiki/File:Digging_in_permafrost.jpg">Nick Bonzey via Wikimedia Commons</a>)</small></i>
 </div>
 
 So far, I’ve drilled down through 3 levels of Crystal implementation:
 
-<img src="http://patshaughnessy.net/assets/2021/11/29/primitive2.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/11/29/primitive2.png"><br/>
 
 But I haven’t found a primitive function yet. Let’s keep digging!
 
@@ -269,7 +269,7 @@ other classes.
 Now I’ve dug down through 4 levels of Crystal function calls, but I still
 haven’t found a language primitive yet.
 
-<img src="http://patshaughnessy.net/assets/2021/11/29/primitive3.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/11/29/primitive3.png"><br/>
 
 ## A Crystal Language Primitive
 
@@ -304,7 +304,7 @@ end
 As you can see, this is a language primitive - it says “primitive” right there
 above the method definition!
 
-<img src="http://patshaughnessy.net/assets/2021/11/29/primitive4.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/11/29/primitive4.png"><br/>
 
 Returning to Wikipedia’s definition of a language primitive, this is an atomic
 element of an expression. The Crystal compiler knows not to try to compile this
@@ -325,7 +325,7 @@ language, not Crystal.
 ## Retrieving an Array Element In x86 Assembly Language
 
 <div style="float: right; padding: 18px 0px 30px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2021/11/29/cave.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2021/11/29/cave.png"><br/>
 </div>
 
 What lower level language should we use? Since the Crystal team used the [Low
@@ -376,13 +376,13 @@ Assembly language is just another programming language like any other, but with
 a different set of primitives. The primitives in this language are hardware
 instructions that my laptop’s CPU can understand and execute directly:
 
-<img src="http://patshaughnessy.net/assets/2021/11/29/primitive5.png"><br/>
+<img src="https://patshaughnessy.net/assets/2021/11/29/primitive5.png"><br/>
 
 I won’t pretend to understand all the details here, but if you’re curious about
 what this code does - how my compiled Crystal program actually retrieves a
 value from an array - here are a few highlights you can look for:
 
-<img src="http://patshaughnessy.net/assets/2021/11/29/assembly-table.svg"><br/>
+<img src="https://patshaughnessy.net/assets/2021/11/29/assembly-table.svg"><br/>
 
 If you’d like to learn more about x86 assembly language, I wrote an article a
 few years ago explaining some of the basics: [Learning to Read x86 Assembly

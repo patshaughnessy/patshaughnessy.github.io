@@ -2,7 +2,7 @@ title: "Paperclip sample app part 2: downloading files through a controller"
 date: 2009/05/16
 tag: Paperclip
 
-<p><a href="http://patshaughnessy.net/2009/4/30/paperclip-sample-app">Last time</a> I wrote about how to quickly setup a Rails application using scaffolding that allows users to upload image files and then display them using the <a href="http://www.thoughtbot.com/projects/paperclip">Paperclip plugin</a>. Paperclip does the simplest thing possible by default: it saves the file attachments right on the file system of your web server, allowing you to download them to users easily using Apache or whatever web server you have installed.</p>
+<p><a href="https://patshaughnessy.net/2009/4/30/paperclip-sample-app">Last time</a> I wrote about how to quickly setup a Rails application using scaffolding that allows users to upload image files and then display them using the <a href="http://www.thoughtbot.com/projects/paperclip">Paperclip plugin</a>. Paperclip does the simplest thing possible by default: it saves the file attachments right on the file system of your web server, allowing you to download them to users easily using Apache or whatever web server you have installed.</p>
 <p>Today I&rsquo;d like to take that sample app one step further and show how to use a Rails controller to download the files, instead of directly through Apache. To get the finished code just go to <a href="http://github.com/patshaughnessy/paperclip-sample-app">http://github.com/patshaughnessy/paperclip-sample-app</a> and look at the &ldquo;part2&rdquo; folder.</p>
 <p>There are a variety of reasons why you might want to do this, including:
   <ul>
@@ -13,8 +13,8 @@ tag: Paperclip
   </ul>
 </p>
 <p>The common thread here is that you want to execute some Ruby code every time a users accesses a file, and the way to do that is by routing the download requests through a controller.</p>
-<p>Let&rsquo;s pick up where we left off <a href="http://patshaughnessy.net/2009/4/30/paperclip-sample-app">last time</a>:</p>
-<p><img src="http://patshaughnessy.net/assets/2009/4/30/mickey-index.png"></p>
+<p>Let&rsquo;s pick up where we left off <a href="https://patshaughnessy.net/2009/4/30/paperclip-sample-app">last time</a>:</p>
+<p><img src="https://patshaughnessy.net/assets/2009/4/30/mickey-index.png"></p>
 <p>If we take a look at some of the HTML source for this page:</p>
 <pre>&lt;h1&gt;Listing users&lt;/h1&gt;
 &lt;table&gt;
@@ -45,7 +45,7 @@ public/system/avatars/1/thumb/mickey-mouse.jpg</pre>
 <pre>$ mkdir non-public
 $ mv public/system non-public/.</pre>
 <p>Now let&rsquo;s double check that Apache can&rsquo;t find the files in their new location:<br/>
-  <img src="http://patshaughnessy.net/assets/2009/5/15/mickey-index-missing.png"></p>
+  <img src="https://patshaughnessy.net/assets/2009/5/15/mickey-index-missing.png"></p>
 <p>Great! We see a missing image as expected. No users can see the files unless we run some bit of Ruby code to enable access. Now&hellip; how can we use a controller to download the files through Rails, instead of through Apache? The first thing we need to do is add a route to routes.rb for accessing the files.</p>
 <p>If you open up routes.rb and look at what the scaffolding generator created for us, you&rsquo;ll see this:</p>
 <pre>ActionController::Routing::Routes.draw do |map|
@@ -128,7 +128,7 @@ Loading development environment (Rails 2.3.2)
     <li>The new action in UserController</li>
     <li>And the :url and :path parameters added to has_attached_file in the User model.</li>
   </ul><br/>
-  <img src="http://patshaughnessy.net/assets/2009/5/15/mickey-index-large.png"></p>
+  <img src="https://patshaughnessy.net/assets/2009/5/15/mickey-index-large.png"></p>
 </p>
 <p>Oops&hellip; we see the large image again. It doesn&rsquo;t work! What happened? Well, it turns our that we forgot one detail in our new avatars method in UserController. Our code always returns the default, or &ldquo;original&rdquo; style of the file attachment, but in the users index view we actually display the thumbnail image using image_tag user.avatar.url(:thumb). So our controller code needs to be able to handle requests for other styles as well. To do this, we need to pass the requested style somehow. The simplest thing to do is just to add the style as a URL parameter to the download request, like this:</p>
 <pre>
@@ -151,6 +151,6 @@ has_attached_file :avatar,
 end</pre>
 <p>I don&rsquo;t need to change anything in index.html.erb since there we call image_tag user.avatar.url(:thumb) which picks up the new URL pattern from Paperclip.</p>
 <p>And now, if I&rsquo;ve got all of this correct, I should be able to finally see the thumbnail image again on the index page:<br/>
-  <img src="http://patshaughnessy.net/assets/2009/4/30/mickey-index.png"></p>
+  <img src="https://patshaughnessy.net/assets/2009/4/30/mickey-index.png"></p>
 <p>And finally we have files being downloaded by Ruby code present in the UserController class. If we actually wanted to implement security, logging or some other sort of logic we would just add code to the avatars method in UserController. For example, avatars could return a 401 (unauthorized) error if the user wasn&rsquo;t logged in, or didn&rsquo;t have access to view Mickey&rsquo;s image for some reason.</p>
 <p>That&rsquo;s it for now; next time I&rsquo;ll modify this sample app once more to demonstrate how we can store the image files in a database table, instead of in the &ldquo;non-public&rdquo; folder or anywhere on the file system.</p>

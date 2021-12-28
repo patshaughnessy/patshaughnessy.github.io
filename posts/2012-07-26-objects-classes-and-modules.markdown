@@ -4,13 +4,13 @@ tag: Ruby
 
 <b>This is an excerpt from the third chapter of an eBook I’m writing this Summer called “Ruby Under a Microscope.” My goal is to teach you how Ruby works internally without assuming you know anything about the C programming language.
 
-If you’re interested in Ruby internals you can [sign up here](http://patshaughnessy.net/ruby-under-a-microscope) and I’ll send you an email when the eBook is finished.  I also posted [one entire chapter](http://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope) in May, and two other excerpts from [Chapter One](http://patshaughnessy.net/2012/6/18/the-start-of-a-long-journey-how-ruby-parses-and-compiles-your-code) and [Chapter Two](http://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code) last month.</b>
+If you’re interested in Ruby internals you can [sign up here](https://patshaughnessy.net/ruby-under-a-microscope) and I’ll send you an email when the eBook is finished.  I also posted [one entire chapter](https://patshaughnessy.net/2012/5/9/one-chapter-from-my-upcoming-ebook-ruby-under-a-microscope) in May, and two other excerpts from [Chapter One](https://patshaughnessy.net/2012/6/18/the-start-of-a-long-journey-how-ruby-parses-and-compiles-your-code) and [Chapter Two](https://patshaughnessy.net/2012/6/29/how-ruby-executes-your-code) last month.</b>
 
 <p></p>
 
 <div style="float: left; padding: 17px 30px 10px 0px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td><img src="http://patshaughnessy.net/assets/2012/7/26/three_peppers.jpg"></td></tr>
+    <tr><td><img src="https://patshaughnessy.net/assets/2012/7/26/three_peppers.jpg"></td></tr>
   </table>
 </div>
 
@@ -24,13 +24,13 @@ In this chapter I’m going to answer these questions by exploring how Ruby work
 
 Ruby saves all of your custom objects inside a C memory structure called <span class="code">RObject</span>, which looks like this in Ruby 1.9 and 2.0:
 
-<img src="http://patshaughnessy.net/assets/2012/7/26/ruby-object.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/ruby-object.png"/>
 
 On the left is a pointer to the <span class="code">RObject</span> structure. Internally Ruby always refers to any value using these <span class="code">VALUE</span> pointers. On the right you can see the <span class="code">RObject</span> value is divided into two halves: <span class="code">RBasic</span> and <span class="code">RObject</span>. The <span class="code">RBasic</span> section contains information that all values use, not only objects: a set of boolean values called <span class="code">flags</span> which store a variety of internal, technical values and also a class pointer, called <span class="code">klass</span>. The class pointer indicates which class this object is an instance of. At the bottom in the <span class="code">RObject</span> specific portion Ruby saves an array of instance variables that this object instance contains using two values: <span class="code">numiv</span>, the instance variable count, and <span class="code">ivptr</span>, a pointer to an array of values.
 
 <div style="float: right; padding: 0px 0px 0px 30px">
   <table cellpadding="0" cellspacing="0" border="0">
-    <tr><td><img src="http://patshaughnessy.net/assets/2012/7/26/cut_pepper.jpg"></td></tr>
+    <tr><td><img src="https://patshaughnessy.net/assets/2012/7/26/cut_pepper.jpg"></td></tr>
     <tr><td align="center"><small><i>If I could slice open a Ruby object, what would I see?</i></small></td></tr>
   </table>
 </div>
@@ -81,11 +81,11 @@ Here you can see Ruby now also displays the instance variable array for <span cl
 
 Now let’s take a look at Ruby’s C memory structures in a bit more detail - when you run this simple script, Ruby will create one <span class="code">RClass</span> structure and two <span class="code">RObject</span> structures:
 
-<img src="http://patshaughnessy.net/assets/2012/7/26/script-and-objects.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/script-and-objects.png"/>
 
 I’ll cover how Ruby implements classes with the <span class="code">RClass</span> structure in the next section, but here is how Ruby saves the the mathematician information in the two <span class="code">RObject</span> structures in more detail:
 
-<img src="http://patshaughnessy.net/assets/2012/7/26/more-detail.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/more-detail.png"/>
 
 You can see each of the <span class="code">klass</span> values point to the <span class="code">Mathematician</span> <span class="code">RClass</span> structure, and each <span class="code">RObject</span> structure has a separate array of instance variables. Both arrays contain <span class="code">VALUE</span> pointers, the same pointer that Ruby uses to refer to the <span class="code">RObject</span> structure. One of the objects contains two instance variables, while the other contains only one.
 
@@ -93,17 +93,17 @@ This is how Ruby saves custom classes, like my <span class="code">Mathematician<
 
 However, all of these different structures share the same <span class="code">RBasic</span> information that we saw in <span class="code">RObject</span>:
 
-<img src="http://patshaughnessy.net/assets/2012/7/26/three-structs.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/three-structs.png"/>
 
 Since the <span class="code">RBasic</span> structure contains the class pointer, each of these generic data types is also an object - they are all instances of some Ruby class, indicated by the class pointer saved inside of <span class="code">RBasic</span>.
 
 As a performance optimization, Ruby saves small integers, symbols and a few other simple values without any structure at all. Ruby saves these values right inside the <span class="code">VALUE</span> pointer:
 
-<img src="http://patshaughnessy.net/assets/2012/7/26/value-pointer.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/value-pointer.png"/>
 
 That is, these <span class="code">VALUE</span>s are not pointers at all; instead they are the values themselves. For these simple data types, there is no class pointer. Instead Ruby remembers the class using a series of bit flags saved in the first few bits of the <span class="code">VALUE</span>. For example, all integers have the <span class="code">FIXNUM_FLAG</span> bit set, like this:
 
-<img src="http://patshaughnessy.net/assets/2012/7/26/value-pointer-with-flag.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/value-pointer-with-flag.png"/>
 
 Whenever the <span class="code">FIXNUM_FLAG</span> is set, Ruby knows this <span class="code">VALUE</span> is really a small integer, an instance of the <span class="code">Fixnum</span> class, and not a pointer to a value structure. There is also a similar bit flag to indicate if the <span class="code">VALUE</span> is a symbol, and values such as <span class="code">nil</span>, <span class="code">true</span> and <span class="code">false</span> also have special values.
 
@@ -149,32 +149,32 @@ You can repeat the same exercise using symbols, arrays, or any Ruby value whatso
 
 Internally, Ruby uses a bit of a hack to save instance variables for generic objects - that is, for objects that don’t use an <span class="code">RObject</span> structure. When you save an instance variable in a generic object, Ruby saves it in a special hash called the <span class="code">generic_iv_table</span>. This hash maintains a map between generic objects and pointers to other hashes that contain each object’s instance variables. For my <span class="code">str</span> string example above, this would look like this:
 
-<img src="http://patshaughnessy.net/assets/2012/7/26/generic-iv-table.png"/>
+<img src="https://patshaughnessy.net/assets/2012/7/26/generic-iv-table.png"/>
 
 ## Experiment 3-1: How long does it take to save a new instance variable?
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Deducing what’s inside the RClass structure
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Experiment 3-2: Where does Ruby save class methods?
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## How Ruby implements modules and method lookup
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Experiment 3-3: Modifying a module after including it
 
-This experiment was suggested by [Xavier Noria](https://twitter.com/fxn/)… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+This experiment was suggested by [Xavier Noria](https://twitter.com/fxn/)… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## InvokeDynamic and method lookup in JRuby 1.7
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).
 
 ## Modules and methods in Rubinius
 
-… read it in the [finished eBook](http://patshaughnessy.net/ruby-under-a-microscope).
+… read it in the [finished eBook](https://patshaughnessy.net/ruby-under-a-microscope).

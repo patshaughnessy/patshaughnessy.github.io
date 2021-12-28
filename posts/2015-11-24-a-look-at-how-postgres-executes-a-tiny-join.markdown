@@ -3,7 +3,7 @@ date: 2015/11/24
 tag: Postgres
 
 <div style="float: left; padding: 7px 30px 0px 0px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2015/11/24/lecture-hall.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2015/11/24/lecture-hall.jpg"><br/>
   <i>
   Reading the Postgres source code is like attending a free<br/> Computer Science lecture, complete with working examples.
   </i>
@@ -34,7 +34,7 @@ But before we get to the Postgres source code, let’s start by reviewing what
 join queries are. Here's an introduction from [the excellent Postgres
 documentation](http://www.postgresql.org/docs/current/static/tutorial-join.html):
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/postgres-join-tutorial.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/postgres-join-tutorial.png"/>
 
 The Postgres docs then explain how to use joins: inner vs. outer joins, joining
 a table with itself, etc. But I’m intrigued by the highlighted disclaimer.
@@ -89,7 +89,7 @@ implements joins by “comparing each possible pair of rows,” and then selecti
 Reading this I imagine Postgres takes each publication and loops over all of
 the authors, looking for that publication’s author:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/scan1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/scan1.png"/>
 
 In blue on the left are the publications, and I show the author records on the
 right in green. This process of iterating over the rows in the authors table is
@@ -99,12 +99,12 @@ authors for the first publication, trying to find matching names.
 What do we do with each publication-author pair? We have to evaluate the <span
 class="code">WHERE</span> clause from my example SQL statement:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/where1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/where1.png"/>
 
 Do the names match? Yes. This pair should be included in the result set. What
 about the second pair?
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/where2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/where2.png"/>
 
 Do these names match? This time they don’t - this pair of rows should be
 filtered out.
@@ -112,7 +112,7 @@ filtered out.
 Once we have a matching pair of rows, we copy just the selected columns into a
 new, joined record and return that to the client:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/select1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/select1.png"/>
 
 ## A Nested Loop
 
@@ -124,17 +124,17 @@ does, although in a different order. (We’ll see why the order changes later.)
 The problem is that it’s very inefficient. First we scan over all of the
 authors for the first row in the publications table:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/scan1b.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/scan1b.png"/>
 
 And then we repeat the same scan of the authors table for the second
 publication:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/scan2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/scan2.png"/>
 
 And again for the third row. To find all of the matching pairs, in fact, we
 need to loop over all the authors for each publication:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/scan3.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/scan3.png"/>
 
 For my tiny query this isn’t a problem. There are 3\*2 or 6 combinations of
 rows; comparing names 6 times would only take a few microseconds on a modern
@@ -160,14 +160,14 @@ documentation, is that we loop over the authors table over and over again. To
 avoid those repeated loops, imagine if we scanned the authors only once and
 then saved them in some kind of data structure:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/bag1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/bag1.png"/>
 
 Now that we have the author records, what do we need to do with them? Well, we
 have to scan the publications, obtain each publication’s author, and find the
 matching author records, if any. In other words, we need to be able to quickly
 and easily find the author record with a given name:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/bag2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/bag2.png"/>
 
 You’ve probably seen this data structure before; in fact, it might be something
 you use everyday in your own code. If you’re a Rubyist like me, you call this a
@@ -176,7 +176,7 @@ _hash_. If you prefer Python it’s a _dictionary_, or in Clojure it’s _hash m
 With all the authors organized by their names, we can scan over the
 publications and quickly find out if there’s a matching author record:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/bag3.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/bag3.png"/>
 
 But what are hash tables, exactly? And how do they work? If only we could go
 back in time and sneak back into our college Computer Science classroom again.
@@ -195,7 +195,7 @@ decides to save the publications, not the authors, in the hash table.
 
 To do this, Postgres has to scan the publications just as we did above:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/scan4.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/scan4.png"/>
 
 And for each publication, Postgres selects just two of the three columns:
 author and title. Postgres refers to the query plan and finds out it will need
@@ -203,10 +203,10 @@ the author for the <span class="code">WHERE</span> join condition, and the
 title for the final <span class="code">SELECT</span> returning the result set.
 It leaves the year values behind.
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/project1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/project1.png"/>
 
 <div style="float: right; padding: 7px 0px 20px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2014/9/23/codd.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2014/9/23/codd.jpg"><br/>
   <i>Edgar Codd</i>
 </div>
 
@@ -237,7 +237,7 @@ algorithm in 1997.
     <div class="function-link"><a href="http://doxygen.postgresql.org/hashfunc_8c.html#a364b7d134ec3c770a3b40abf15b05d37">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2015/11/24/hash_any.png"/>
+    <img src="https://patshaughnessy.net/assets/2015/11/24/hash_any.png"/>
   </div>
 </div>
 </p>
@@ -247,7 +247,7 @@ column in the first publication record, to <span class="code">hash\_any</span>.
 The complex bitwise calculations in <span class="code">hash\_any</span> step
 over the characters in Edgar’s name and return this hash value:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/hash1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/hash1.png"/>
 
 ## Using a Bitmask to Choose a Hash Bucket
 
@@ -263,7 +263,7 @@ A hash table consists of an array of “buckets,” which are a series of pointe
 to linked lists. Initially Postgres creates an empty array of bucket pointers
 just before starting to scan the publications:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/buckets1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/buckets1.png"/>
 
 As you can guess, Postgres saves each publication in one of the buckets in the
 hash table, based on the calculated hash value. Later when it scans over the
@@ -294,7 +294,7 @@ of buckets it does have. By choosing a power of two for the bucket array size,
 Postgres can use a fast bitwise operation to decide which bucket to save each
 publication in, like this:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/hash2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/hash2.png"/>
 
 Above you can see how Postgres decides where to put “Edgar Codd” in the hash
 table: It subtracts one from the number of buckets: 1024-1 = 1023. Written in
@@ -303,7 +303,7 @@ circuits, Postgres quickly masks out the left bits, and keeps just the 10 least
 significant or rightmost bits. This yields 0000001111 binary, or the number 15.
 Using this fast calculation, Postgres decides to save Edgar in bucket #15:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/buckets2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/buckets2.png"/>
 
 Postgres also saves the title string, because it will need it later to produce
 the final result set. Along with the two strings, Postgres saves the hash value
@@ -314,14 +314,14 @@ and a “next” pointer that will form the linked list.
 Postgres now continues to scan over the publications, arriving at the second
 publication.
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/scan5.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/scan5.png"/>
 
 We have Edgar again! Clearly he was a central figure behind database theory.
 Calculating the hash again for the same string will always return the same
 value: 2130627599, yielding bucket #15 a second time. We know the Edgar Codd
 records will always appear in bucket 15.
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/buckets3.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/buckets3.png"/>
 
 Also notice that Postgres saves each new publication at the head of the linked
 list - this means we have the second Edgar publication first on the left, and
@@ -331,20 +331,20 @@ the reverse order of Edgar’s records we saw above in the conceptual algorithm.
 Finally Postgres continues scanning and saves the third publication in the hash
 table; this time Postgres calculates a hash for “Jim Gray:”
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/hash3.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/hash3.png"/>
 
 You can see this time the 10 rightmost bits of 3344886182 evaluate to 422. So
 Postgres saves Jim in bucket #422. Drawing the bucket array more to scale it
 might look something like this:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/buckets4.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/buckets4.png"/>
 
 ## Scanning Buckets
 
 After saving all the publications in the hash table, Postgres can now scan over
 the authors table:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/scan6.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/scan6.png"/>
 
 Now finding the matching publication is simple. Instead of scanning over all
 the publications, Postgres simply calls the hash function again on the name
@@ -371,19 +371,19 @@ Therefore, Postgres has to check each author in the matching bucket to be sure
 that it’s a match. This process is known as _scanning the bucket_. To do this,
 Postgres first checks the hash values:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/scan-buckets1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/scan-buckets1.png"/>
 
 This is a simple numerical comparison and so is quite fast. And if the hashes
 are the same, Postgres checks the actual strings just in case the hash function
 did return the same hash for different strings:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/scan-buckets2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/scan-buckets2.png"/>
 
 Because the author names match, Postgres can finally perform the join!  To do
 this, it projects the columns that our query selects into a single joined
 record, in the desired order:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/select2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/select2.png"/>
 
 This becomes the first record in our result set.
 
@@ -402,7 +402,7 @@ look at the hash join implementation, in nodeHashJoin.c.
     <div class="function-link"><a href="http://doxygen.postgresql.org/nodeHashjoin_8c.html#a538698b031186193de7da58537820e61">view on postgresql.org</a></div>
   </div>
   <div class="function-code">
-    <img src="http://patshaughnessy.net/assets/2015/11/24/ExecHashJoin.png"/>
+    <img src="https://patshaughnessy.net/assets/2015/11/24/ExecHashJoin.png"/>
   </div>
 </div>
 </p>
@@ -425,7 +425,7 @@ By appending <span class="code">limit 1</span> we tell Postgres to stop after 1
 record. For this query, to return just one record, <span class="code">ExecHashJoin</span> will use the
 following states in its state machine:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/states1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/states1.png"/>
 
 Here’s what <span class="code">ExecHashJoin</span> does to obtain the first joined record:
 
@@ -450,7 +450,7 @@ executes <span class="code">HJ\_NEED\_NEW\_OUTER</span> and <span
 class="code">HJ\_SCAN\_BUCKET</span> - it already created the hash table the
 first time it was called:
 
-<img src="http://patshaughnessy.net/assets/2015/11/24/states2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/11/24/states2.png"/>
 
 Postgres pays the large price of scanning the entire inner relation and
 building the hash table as soon as you ask for one record. Returning the second

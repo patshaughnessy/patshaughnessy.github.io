@@ -3,10 +3,10 @@ date: 2017/12/14
 tag: the Postgres LTREE Extension
 
 <div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/14/tree4.jpg">
+  <img src="https://patshaughnessy.net/assets/2017/12/14/tree4.jpg">
 </div>
 
-[Yesterday](http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
+[Yesterday](https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
 I used the [LTREE](https://www.postgresql.org/docs/current/static/ltree.html)
 extension to save a tree data structure in a Postgres table. After saving the
 tree, I used the <span class="code">@></span> or ancestor operator to count the
@@ -16,7 +16,7 @@ But that’s not all LTREE can do. Today I’ll show you how to delete, move and
 copy branches from one place to another in your tree, using <span
 class="code">@></span> in combination with other LTREE functions. After that,
 in [my last post in this
-series](http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index),
+series](https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index),
 I’ll look at how LTREE works under the hood, at the Computer Science that makes
 all of this possible.
 
@@ -24,10 +24,10 @@ all of this possible.
 
 Here’s the tree I’ve been working with during the last few blog posts:
 
-<img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png">
+<img src="https://patshaughnessy.net/assets/2017/12/11/example-tree.png">
 
 [In my last
-post](http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
+post](https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree),
 I saved this tree in my database using a series of insert statements:
 
 <pre>
@@ -52,7 +52,7 @@ select count(*) from tree where 'A.C' @> path;
 But suppose I wanted to remove these nodes from the tree entirely; that is,
 suppose I wanted to “cut off this branch” of the tree, so to speak:
 
-<img src="http://patshaughnessy.net/assets/2017/12/14/cut-branch.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/14/cut-branch.png"/>
 
 How can I do this? Simple! I just use a SQL delete statement:
 
@@ -70,7 +70,7 @@ table. That is, I want two trees: the original <span class="code">A</span> tree
 and a new tree consisting of the <span class="code">C</span> branch “replanted”
 as a new root:
 
-<img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
 
 Thinking about this for a moment, moving some nodes from one location to
 another in my tree means I’ll need to update their path values somehow in my
@@ -194,7 +194,7 @@ Now let’s return to the question of moving a branch into a new tree. As this
 diagram shows, I want to delete <span class="code">C</span> and its children
 from the <span class="code">A</span> tree, and move them to a new location:
 
-<img src="http://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
 
 Earlier I considered moving the nodes using a single update statement for each:
 
@@ -245,7 +245,7 @@ location in my tree to some other location, not necessary to the root? This is
 a more general problem. For example, suppose I want to move the <span
 class="code">C</span> branch under <span class="code">G</span>, like this:
 
-<img src="http://patshaughnessy.net/assets/2017/12/14/moving.png"/>
+<img src="https://patshaughnessy.net/assets/2017/12/14/moving.png"/>
 
 To write a formula for this transformation using SQL, we need to use one more
 important LTREE operator: the <span class="code">||</span> or concatenation
@@ -370,4 +370,4 @@ The special sauce that makes LTREE such a powerful tool is that it integrates
 with Postgres GiST indexes. By using an index, Postgres can execute any of the
 SQL expressions I wrote above equally fast on 7000 records as it would on 7!
 How? The only way to find out is by [Looking Inside Postgres at a GiST
-Index](http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index).
+Index](https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index).

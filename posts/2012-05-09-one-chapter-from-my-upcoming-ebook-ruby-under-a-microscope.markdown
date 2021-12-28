@@ -4,18 +4,18 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/1/4/microscope.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/1/4/microscope.jpg"></td></tr>
   <tr><td align="center"><small><i>In my eBook I’ll explore Ruby internals<br/>using an experimental approach.</i></small></td></tr>
 </table>
 </div>
 
-<b>Update:</b> I just setup an [email sign up form](http://patshaughnessy.net/ruby-under-a-microscope) - if you give me your email address I'll send you one - count ’em - one email messsage when the eBook is finished.
+<b>Update:</b> I just setup an [email sign up form](https://patshaughnessy.net/ruby-under-a-microscope) - if you give me your email address I'll send you one - count ’em - one email messsage when the eBook is finished.
 
 You may have noticed I haven’t been blogging here for a while; instead I’ve been working on a new eBook about Ruby language internals. I find this topic fascinating! In fact many of my blog posts this year have been about how Ruby, JRuby and Rubinius actually work on the inside, “under the hood.” Instead of continuing to blog about it, I’ve decided to write an entire book which I plan to release this Fall. For now, I’m calling the book “<u>Ruby Under a Microscope - Learning Ruby Internals Through Experiment</u>.”
 
 Today I’m excited to release a preview of one chapter of the eBook called “How Hashes Scale From One To One Million Elements.” Here’s a link to it:
 
-<a href="http://patshaughnessy.net/Ruby-Under-a-Microscope-Rough-Draft-May.pdf"><img src="http://patshaughnessy.net/assets/2012/5/9/pdficon_large.png"/></a>&nbsp;<a href="http://patshaughnessy.net/Ruby-Under-a-Microscope-Rough-Draft-May.pdf">Ruby Under A Microscope</a>
+<a href="https://patshaughnessy.net/Ruby-Under-a-Microscope-Rough-Draft-May.pdf"><img src="https://patshaughnessy.net/assets/2012/5/9/pdficon_large.png"/></a>&nbsp;<a href="https://patshaughnessy.net/Ruby-Under-a-Microscope-Rough-Draft-May.pdf">Ruby Under A Microscope</a>
 
 I might release another chapter in the next couple of months, or at least some excerpts from the book as blog posts. Ultimately I might charge some money for the finished version. To hear when the book is finished and available, just follow me on Twitter and/or subscribe to my RSS feed.
 

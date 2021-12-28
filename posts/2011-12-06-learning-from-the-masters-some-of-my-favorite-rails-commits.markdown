@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/bach.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/6/bach.jpg"></td></tr>
   <tr><td align="center"><small><i>Reading the Rails source code is like looking<br/>at the score of a Bach sonata or partita</i></small></td></tr>
 </table>
 </div>
@@ -19,7 +19,7 @@ Read on to find out more about some of my favorite Rails commits... and then let
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/polishing.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/6/polishing.jpg"></td></tr>
   <tr><td align="center"><small><i>No, this is not DHH</i></small></td></tr>
 </table>
 </div>
@@ -29,7 +29,7 @@ Read on to find out more about some of my favorite Rails commits... and then let
 
 One recent ActiveSupport commit from DHH that caught my eye, [9482554 - Added Array#prepend as an alias for Array#unshift and Array#append as an alias for Array](https://github.com/rails/rails/commit/9482554f31f3ac7f941e6239890c60fcc01975e1), might not seem interesting at all at first glance. Let’s take a look:
 
-![9482554](http://patshaughnessy.net/assets/2011/12/6/9482554.png)
+![9482554](https://patshaughnessy.net/assets/2011/12/6/9482554.png)
 
 Here DHH has added a couple of new aliases - or alternative method names - for the commonly used Array operations of <span class="code">&lt;&lt;</span> and <span class="code">unshift</span>, which have somewhat confusing names in core Ruby. His code comments say it all: “The human way of thinking about...” He felt these aliases better reflected the way developers - humans - think about these Array operations and made the change in ActiveSupport to allow Rails apps, at least, to be more readable.
 
@@ -39,7 +39,7 @@ Well, to me it shows his passion: 8 years later DHH still cares enough about Rai
 
 The accompanying test code is also super simple - but at the same time very readable and explanatory:
 
-![9482554 tests](http://patshaughnessy.net/assets/2011/12/6/9482554_tests.png)
+![9482554 tests](https://patshaughnessy.net/assets/2011/12/6/9482554_tests.png)
 
  Reading this I know exactly what “append” and “prepend” do, and how to use them. No documentation needed; end of story.
 
@@ -47,13 +47,13 @@ The accompanying test code is also super simple - but at the same time very read
 
 <div style="float: right; padding: 15px 0px 10px 15px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/weeding.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/6/weeding.jpg"></td></tr>
 </table>
 </div>
 
 Another Rails commit that I came across this week is [fb6b805 - code gardening: we have assert_(nil|blank|present), more concise, with better default failure messages - let's use them](https://github.com/rails/rails/commit/fb6b80562041e8d2378cad1b51f8c234fe76fd5e), made by [Xavier Noria (@fxn)](http://hashref.com/), back in August of 2010. The commit message is certainly memorable: “code gardening...” what could Xavier be talking about? When I saw this commit message I just had to take a closer look. When I looked at the changes, at first glance they appeared to be nothing... just a few minor changes to a test file (I'm showing two here - there are more similar changes in the commit):
 
-![fb6b805](http://patshaughnessy.net/assets/2011/12/6/fb6b805.png)
+![fb6b805](https://patshaughnessy.net/assets/2011/12/6/fb6b805.png)
 
 What? Yes, I know; now you’re thinking: “Pat is completely nuts.” This is a trivial change that adds no value whatsoever to Rails at all! Just last week Xavier made the fantastic change to ActiveRecord that I mentioned above, git commit [0306f82](https://github.com/rails/rails/commit/0306f82e0c3cda3aad1b45eb0c3a359c254b62cc), that implements automatic explain plans for slow queries... doesn’t this creative, useful change from Xavier deserve more attention than a very minor refactor that no one even noticed from 2010? Commit [fb6b805](https://github.com/rails/rails/commit/fb6b80562041e8d2378cad1b51f8c234fe76fd5e) does nothing more than change a few lines of test code - what’s the value in that? With this commit he hasn’t added even a single feature or bug fix to Rails. Not only that, the tests don’t run faster or work any better than they did before his change, except possibly they might display a more helpful error message.
 
@@ -81,7 +81,7 @@ Date:   Sat Jul 23 14:41:30 2011 +0200
 
 If you [open the commit](https://github.com/rails/rails/commit/d352e0dff2c88bc1519ee7040b8381231b2b2fac) in github, you’ll see:
 
-![d352e0d](http://patshaughnessy.net/assets/2011/12/6/d352e0d.png)
+![d352e0d](https://patshaughnessy.net/assets/2011/12/6/d352e0d.png)
 
 In this example, there aren’t even any Ruby code changes at all!  What Xavier has done here is run a search through the Rails source tree to find Ruby code files that were  missing the UTF-8 encoding comment at the top. Whatever you think of this style and the need to include this comment in every file, what impresses me about this is that Xavier, in his code gardener role, took the time to write a shell script to search for this mistake. He showed interest, concern, initiative, and passion - like a gardener would have while removing weeds from a flower bed.
 
@@ -99,7 +99,7 @@ Date:   Sat Aug 14 02:13:00 2010 -0300
 
 <div style="float: right; padding: 15px 0px 10px 15px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/12/6/chalkboard.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/12/6/chalkboard.jpg"></td></tr>
 </table>
 </div>
 
@@ -131,11 +131,11 @@ end
 
 Now let's take a look at commit [401393b](https://github.com/rails/rails/commit/401393b6561adc1ce7101945163c9601257c057a) made by José Valim just last month:
 
-![d352e0d](http://patshaughnessy.net/assets/2011/12/6/401393b_message.png)
+![d352e0d](https://patshaughnessy.net/assets/2011/12/6/401393b_message.png)
 
 I love the commit message, but what I like more is that this commit helps me be a better Rails developer. It turns out the InstanceMethods module is unnecessary. Simply adding methods to MyModule is sufficient; any methods in MyModule will be included in Host because of the call to include (class methods, however, still work the same way as before). Let’s take a look at José’s code changes:
 
-![d352e0d](http://patshaughnessy.net/assets/2011/12/6/401393b.png)
+![d352e0d](https://patshaughnessy.net/assets/2011/12/6/401393b.png)
 
 There are more changes I’m not showing here; [refer to github](https://github.com/rails/rails/commit/401393b6561adc1ce7101945163c9601257c057a) for the complete commit. What’s interesting and helpful about this is that José deprecates the behavior related to the InstanceMethods module: that is, he leaves it in, but takes the time to add a line of code that displays this message whenever a developer uses InstanceMethods:
 

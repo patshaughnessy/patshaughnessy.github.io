@@ -4,7 +4,7 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra1.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/3/7/sinatra1.jpg"></td></tr>
   <tr><td align="center"><small><i>More than a web framework, Sinatra is an elegant,<br/>stylish Ruby program we can all learn from<br/></i></small></td></tr>
 </table>
 </div>
@@ -29,7 +29,7 @@ Looking at Sinatra’s internals, the first thing I wanted to find out was how i
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra3.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/3/7/sinatra3.jpg"></td></tr>
 </table>
 </div>
 
@@ -46,7 +46,7 @@ Before understanding what <span class="code">throw</span> is doing here, we need
 
 Let’s take a look at how Sinatra uses <span class="code">throw</span> and <span class="code">catch</span>:
 
-![throw/catch used in Sinatra](http://patshaughnessy.net/assets/2012/3/7/route-eval.png)
+![throw/catch used in Sinatra](https://patshaughnessy.net/assets/2012/3/7/route-eval.png)
 
 Here you can see that after one of your route code blocks returns a value to <span class="code">route_eval</span>, Sinatra jumps back up the call stack to a method called <span class="code">invoke</span>, where it had actually started processing the current request earlier:
 
@@ -64,7 +64,7 @@ Ruby sets the catch block’s return value to the second argument passed to <spa
 
 This is just the simplest example of throw in Sinatra - it turns out that many of the helper methods like <span class="code">last_modified</span>, <span class="code">redirect</span>, <span class="code">error</span>, etc., all use <span class="code">throw</span> to jump back to the invoke in a similar way, providing the appropriate return value. Here’s another example showing how Sinatra’s <span class="code">redirect</span> helper method works:
 
-![throw used by redirect](http://patshaughnessy.net/assets/2012/3/7/redirect.png)
+![throw used by redirect](https://patshaughnessy.net/assets/2012/3/7/redirect.png)
 
 The big benefit here is that when the client code decides to call <span class="code">redirect</span>, Sinatra avoids the need to execute everything following the <span class="code">redirect</span> call (“... lots of code here...”) - or the need for the client code itself to have to use an if/else statement to avoid executing it. Sinatra has taken what should be a normal, mundane Ruby programming task - calling a code block - and done it in a stylish, elegant way. The result is faster, cleaner code, both for Sinatra’s internals and for you!
 
@@ -104,7 +104,7 @@ This doesn’t look like Test::Unit at all! Instead, it seems like Sinatra is us
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra2.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/3/7/sinatra2.jpg"></td></tr>
 </table>
 </div>
 
@@ -239,7 +239,7 @@ This sounds fairly mundane and simple - I would have used much simpler code than
 
 <div style="float: right; padding: 15px 0px 10px 30px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2012/3/7/sinatra4.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2012/3/7/sinatra4.jpg"></td></tr>
 </table>
 </div>
 

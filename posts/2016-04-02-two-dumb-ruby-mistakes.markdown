@@ -3,7 +3,7 @@ date: 2016/4/2
 tag: Ruby
 
 <div style="float: right; padding: 0px 0px 20px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2016/4/2/rope-climber.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/4/2/rope-climber.jpg"><br/>
   <i>Coding is like climbing: You need equipment<br/> that will catch you when you make a mistake.<br/>
 	<small>(source: <a href="https://commons.wikimedia.org/wiki/File:Free_climbing_20060701.jpg">Elke Wetzig via Wikimedia Commons</a>)</small></i>
 </div>
@@ -43,7 +43,7 @@ insult count:
 A couple of weeks ago (using different data of course) I wrote this line of
 code to search for a specific element in the array:
 
-<img src="http://patshaughnessy.net/assets/2016/4/2/mistake1.png"/>
+<img src="https://patshaughnessy.net/assets/2016/4/2/mistake1.png"/>
 
 <div style="clear: both"></div>
 
@@ -58,7 +58,7 @@ p marco
 
 Of course, I should have known better. The proper line of code is:
 
-<img src="http://patshaughnessy.net/assets/2016/4/2/correct1.png"/>
+<img src="https://patshaughnessy.net/assets/2016/4/2/correct1.png"/>
 
 I should have used <span class="code">==</span> instead of <span
 class="code">=</span>. What a dumb mistake. I can’t believe I wrote this code;
@@ -70,7 +70,7 @@ problem.
 Ruby started with the <span class="code">candidates</span> array, and called
 the <span class="code">find</span> method on it:
 
-<img src="http://patshaughnessy.net/assets/2016/4/2/array1.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/4/2/array1.svg"/>
 
 The <span class="code">find</span> method is actually a member of the <span
 class="code">Enumerable</span> module, which Ruby includes automatically into
@@ -79,7 +79,7 @@ ran, it iterated over the elements of the array and called the block I
 provided, passing in each element. The first element was the “Ted Cruz” person
 object:
 
-<img src="http://patshaughnessy.net/assets/2016/4/2/call-block1.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/4/2/call-block1.svg"/>
 
 Now the block executed. And my dumb mistake came into play. What I intended was
 for the block to return whether or not the first name of the given person was
@@ -94,7 +94,7 @@ But my block didn’t check whether the person is named “Marco;” instead, it
 called the <span class="code">Person#first_name=</span> method, setting the
 person’s name to “Marco!”
 
-<img src="http://patshaughnessy.net/assets/2016/4/2/set-first-name.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/4/2/set-first-name.svg"/>
 
 And now, to make matters worse, the block returned the value returned by
 <span class="code">Person#first_name=</span>, which was the string “Marco,” the new value of the first
@@ -106,7 +106,7 @@ Cruz, renamed to Marco Cruz. What a mess.
 ## Why Didn’t Ruby Tell Me Something Was Wrong?
 
 <div style="float: right; padding: 0px 0px 20px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2016/4/2/bouldering.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/4/2/bouldering.jpg"><br/>
   <i> As a developer, you’re always just one<br/> keystroke away from falling off a cliff.  <br/>
 	<small>(source: <a href="https://commons.wikimedia.org/wiki/File:Bouldering.jpg">DecafGrub47393 via Wikimedia Commons</a>)</small></i>
 </div>
@@ -164,7 +164,7 @@ candidate data set easily.
 Suppose I wanted to find the candidate with the maximum number of insults.
 Easy, right? Here’s the line of code I wrote:
 
-<img src="http://patshaughnessy.net/assets/2016/4/2/mistake2.png"/>
+<img src="https://patshaughnessy.net/assets/2016/4/2/mistake2.png"/>
 
 Can you spot the problem here? When I run that code I don’t get Donald Trump, who has the most insults. Instead, I get:
 
@@ -177,7 +177,7 @@ Again a simple, dumb mistake. I should have called <span
 class="code">max_by</span>, instead of <span class="code">max</span>. Here’s
 the correct code:
 
-<img src="http://patshaughnessy.net/assets/2016/4/2/correct2.png"/>
+<img src="https://patshaughnessy.net/assets/2016/4/2/correct2.png"/>
 
 <span class="code">Enumerable#max_by</span> does what I thought <span
 class="code">Enumerable#max</span> would do: It sorts the values returned by
@@ -198,13 +198,13 @@ class="code">Enumerable#find</span>.
 Again Ruby started by calling <span class="code">Enumerable#max</span> on the
 candidates array:
 
-<img src="http://patshaughnessy.net/assets/2016/4/2/array2.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/4/2/array2.svg"/>
 
 And again, just like </span>find</span>, <span class="code">max</span> iterates
 over the array elements. However, instead of passing each person to the block
 one at a time, it actually passes the array elements in pairs:
 
-<img src="http://patshaughnessy.net/assets/2016/4/2/call-block2.svg"/>
+<img src="https://patshaughnessy.net/assets/2016/4/2/call-block2.svg"/>
 
 Why did Ruby pass two <span class="code">Person</span> objects to my block?
 <span class="code">Enumerable#max</span> searches for the array element - not
@@ -306,7 +306,7 @@ language. It doesn't check the types of method and block arguments, or their
 return values.
 
 <div style="float: right; padding: 70px 0px 30px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2016/4/2/carabiner.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2016/4/2/carabiner.jpg"><br/>
   <i>Your coding equipment should catch you<br/>when you make a mistake and fall.</i><br/>
 	<small>(source: <a
 href="https://commons.wikimedia.org/wiki/File:Carabiner.jpg">Marcin Jahr via

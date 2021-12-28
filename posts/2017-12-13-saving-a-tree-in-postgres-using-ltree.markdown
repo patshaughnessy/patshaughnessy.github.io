@@ -3,15 +3,15 @@ date: 2017/12/13
 tag: the Postgres LTREE Extension
 
 <div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/13/tree3.jpg">
+  <img src="https://patshaughnessy.net/assets/2017/12/13/tree3.jpg">
 </div>
 
 In [my last
-post](http://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
+post](https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension),
 I showed you how to install and enable a Postgres extension called
 [LTREE](https://www.postgresql.org/docs/current/static/ltree.html). LTREE
 allows me to save, query on and manipulate trees or hierarchical data
-structures using a relational database table. [As we’ll see](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension), using LTREE I can
+structures using a relational database table. [As we’ll see](https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension), using LTREE I can
 count leaves, cut off branches, and climb up and down trees easily - all using
 SQL right inside my application’s existing Postgres database!
 
@@ -22,10 +22,10 @@ I possibly save a beautiful tree structure into an ugly, boring database table?
 ## Path Enumeration
 
 Let’s return to the example tree from the [first
-post](http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres)
+post](https://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres)
 in this series:
 
-<img src="http://patshaughnessy.net/assets/2017/12/11/example-tree.png">
+<img src="https://patshaughnessy.net/assets/2017/12/11/example-tree.png">
 
 The LTREE extension uses the _path enumeration_ algorithm, which calls for each
 node in the tree to record the path from the root you would have to follow to
@@ -35,21 +35,21 @@ For example, to find <span class="code">G</span> starting from <span
 class="code">A</span>, the root, I would move down to <span
 class="code">B</span>, and then down again to <span class="code">G</span>:
 
-<img src="http://patshaughnessy.net/assets/2017/12/13/tree-path1.png">
+<img src="https://patshaughnessy.net/assets/2017/12/13/tree-path1.png">
 
 So the path to <span class="code">G</span> is:
 
-<img src="http://patshaughnessy.net/assets/2017/12/13/path1.png">
+<img src="https://patshaughnessy.net/assets/2017/12/13/path1.png">
 
 Here’s another example:
 
-<img src="http://patshaughnessy.net/assets/2017/12/13/tree-path2.png">
+<img src="https://patshaughnessy.net/assets/2017/12/13/tree-path2.png">
 
 This time I’ve traced a path from <span class="code">A</span> to <span
 class="code">D</span>, via <span class="code">C</span>. So the path of <span
 class="code">D</span> is:
 
-<img src="http://patshaughnessy.net/assets/2017/12/13/path2.png">
+<img src="https://patshaughnessy.net/assets/2017/12/13/path2.png">
 
 ## Saving Tree Paths Using LTREE
 
@@ -79,11 +79,11 @@ column, encoded as a series of strings joined together by periods. For example
 to save the path of <span class="code">G</span> into my table I use this insert
 statement:
 
-<img src="http://patshaughnessy.net/assets/2017/12/13/insert1.png">
+<img src="https://patshaughnessy.net/assets/2017/12/13/insert1.png">
 
 And to save the path to node D I write:
 
-<img src="http://patshaughnessy.net/assets/2017/12/13/insert2.png">
+<img src="https://patshaughnessy.net/assets/2017/12/13/insert2.png">
 
 Following this pattern, I can save my entire tree using these insert
 statements, one for each node in my tree:
@@ -113,7 +113,7 @@ me to query and manipulate tree data structures. The most powerful of these is
 another.
 
 Returning to my question from [the first post in this
-series](http://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres),
+series](https://patshaughnessy.net/2017/12/11/trying-to-represent-a-tree-structure-using-postgres),
 what if I needed to know how many children <span class="code">A</span> had,
 recursively? That is, what if I needed to count its children, grandchildren,
 great-grandchildren, etc.? Earlier we saw that using a <span
@@ -181,7 +181,7 @@ And the <span class="code">@></span> ancestor operator is just one way of using
 operators and functions!  For a complete list, see
 [https://www.postgresql.org/docs/current/static/ltree.html](https://www.postgresql.org/docs/current/static/ltree.html).
 
-In [my next post](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension), I’ll explore more of these functions and show you how to
+In [my next post](https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension), I’ll explore more of these functions and show you how to
 perform some tree operations that I’ve found useful.
 
 ## Maybe You’re Not Impressed
@@ -225,7 +225,7 @@ create index tree_path_idx on tree using gist (path);
 
 What is a “GiST” index? How does it help LTREE find and count tree nodes
 efficiently? Read the [last post in this
-series](http://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index)
+series](https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index)
 to find out. There I describe the Generalized Search Index (GiST) project,
 explore the Computer Science behind GiST and look at how LTREE uses GiST to
 make fast tree operations inside of Postgres possible.
@@ -236,7 +236,7 @@ But before we dive into LTREE’s internal implementation, first we should see
 what else LTREE can do. So far I’ve shown you how to count descendant tree
 nodes. Tomorrow in my next post, [Manipulating Trees Using SQL and the Postgres
 LTREE
-Extension](http://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension),
+Extension](https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension),
 I’ll show you how to use other LTREE’s operators and functions to work with
 tree data.
 

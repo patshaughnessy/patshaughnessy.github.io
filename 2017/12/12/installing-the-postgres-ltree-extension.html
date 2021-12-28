@@ -1,10 +1,10 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Installing the Postgres LTREE Extension - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Installing the Postgres LTREE Extension</h1><div class="metadata"><span class="date">December 12th 2017</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Installing the Postgres LTREE Extension">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: right; padding: 8px 0px 40px 30px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2017/12/12/tree2.jpg">
+  <img src="https://patshaughnessy.net/assets/2017/12/12/tree2.jpg">
 </div>
 <p>Hidden inside of your Postgres server is code that provides special SQL
 operators and functions designed to support tree operations. It’s called the
 <a href="https://www.postgresql.org/docs/current/static/ltree.html">LTREE extension</a>.
-I’m guessing this stands for <em>left-tree</em>. In <a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">my next
+I’m guessing this stands for <em>left-tree</em>. In <a href="https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">my next
 post</a>, I’ll
 write about some of these functions and operators: what they do and how to use
 them.</p>
@@ -73,7 +73,7 @@ message because the Postgres Makefile doesn’t compile and install LTREE by
 default. Don’t worry! It turns out the Postgres source tree already contains
 the code for LTREE and many other extensions in a subdirectory called
 “contrib.”</p>
-<img src="http://patshaughnessy.net/assets/2017/12/12/ltree-source.png">
+<img src="https://patshaughnessy.net/assets/2017/12/12/ltree-source.png">
 <p>Compile it as follows:</p>
 <pre>
 $ cd /path/to/postgres-9.6.5/contrib/ltree
@@ -97,7 +97,7 @@ server’s lib directory: /usr/local/pgsql/lib, and ran a couple other commands
 as well. Now I can run the <span class="code">create extension ltree</span>
 command as shown above. I don’t even need to restart Postgres; it will find and
 load ltree.so automatically.</p>
-<p>Now that you have LTREE installed and enabled, you can read <a href="http://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">my next
+<p>Now that you have LTREE installed and enabled, you can read <a href="https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">my next
 post</a>, I’ll
 to learn how to use it.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Installing the Postgres LTREE Extension';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article><script type="text/javascript">(function () {

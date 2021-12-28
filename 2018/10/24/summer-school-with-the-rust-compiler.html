@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Summer School With The Rust Compiler - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Summer School With The Rust Compiler</h1><div class="metadata"><span class="date">October 24th 2018</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Summer School With The Rust Compiler">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px">
-  <img src="http://patshaughnessy.net/assets/2018/10/24/steves-tweet.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2018/10/24/steves-tweet.png"><br/>
 <i> <small>(source: <a href="https://twitter.com/steveklabnik/status/1022518806814617601">Steve Klabnik via Twitter</a>)</small></i>
 </div>
 <p>A few months ago, I saw this tweet from Steve. I'm not even sure what
@@ -34,7 +34,7 @@ $ ruby int-loop.rb
 3
 </pre>
 <div style="float: right; padding: 70px 0px 30px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2018/10/24/garden-earthly-delights.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2018/10/24/garden-earthly-delights.png"><br/>
   <i><small><a href="https://en.wikipedia.org/wiki/The_Garden_of_Earthly_Delights">The Garden of Earthly Delights</a> (detail), by Hieronymus Bosch</small></i>
 </div>
 <p>Ruby’s syntax and feature set are designed to make my life easier as a
@@ -142,10 +142,10 @@ integers, but my code expected an actual integer, not a reference to an
 integer. But what are references, exactly?</p>
 <p>Running my code above, Ruby passed each integer from the array to my code as a
 simple value:</p>
-<img width="185" src="http://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png"/>
+<img width="185" src="https://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png"/>
 <p>But Rust passed each integer from the array as a reference, or in other words
 as a pointer to the value itself:</p>
-<img width="287" src="http://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png"/>
+<img width="287" src="https://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png"/>
 <p>In Ruby, of course, I didn’t have to worry about references, pointers or even
 types, so none of this came up. Or at least that’s what I thought at the time.</p>
 <h2>Lesson Two: Borrowed Values</h2>
@@ -188,7 +188,7 @@ by the <span class="code">main</span> function. When the <span
 class="code">main</span> function goes out of scope, Rust frees the memory for
 that array automatically. In this diagram, the red arrow shows where Rust
 allocates the array (at the top), and where Rust frees it (at the bottom):</p>
-<img width="339" src="http://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png"/>
+<img width="339" src="https://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png"/>
 <p>You can think of the red arrow as the “lifetime” of the array. When I pass a
 value from one spot to another, when I call a function or a closure, I can
 either “move” that value to the new function, or the function can ”borrow” it.
@@ -196,7 +196,7 @@ In this example, the call to <span class="code">iter()</span> borrowed the
 elements inside the array, passing a reference to each element into the
 closure. The blue array in this diagram indicates each element of the array,
 <span class="code">i</span>, is a borrowed value inside the closure:</p>
-<img width="334" src="http://patshaughnessy.net/assets/2018/10/24/rust-borrow.png"/>
+<img width="334" src="https://patshaughnessy.net/assets/2018/10/24/rust-borrow.png"/>
 <h2>Lesson Three: Immutable vs. Mutable Values</h2>
 <p>But using borrowed values isn’t the problem here. The problem is that my code
 tries to change them, or mutate them:</p>

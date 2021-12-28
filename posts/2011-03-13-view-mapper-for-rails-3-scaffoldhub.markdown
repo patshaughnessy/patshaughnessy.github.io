@@ -2,11 +2,11 @@ title: "View Mapper for Rails 3: ScaffoldHub"
 date: 2011/3/13
 tag: ScaffoldHub
 
-Back in 2009 I wrote a gem called [View Mapper](http://patshaughnessy.net/2009/10/1/view-mapper-generate-complex-view-code-for-your-models) which created different variations on the standard Rails scaffolding user interface. This was cool because it could show you how to use a certain plugin or gem, and it even worked with existing models and their associations.
+Back in 2009 I wrote a gem called [View Mapper](https://patshaughnessy.net/2009/10/1/view-mapper-generate-complex-view-code-for-your-models) which created different variations on the standard Rails scaffolding user interface. This was cool because it could show you how to use a certain plugin or gem, and it even worked with existing models and their associations.
 
 This year I’ve been thinking about how to upgrade View Mapper to work with Rails 3 properly... and in the end I decided not to upgrade View Mapper at all but instead to create something entirely new: [ScaffoldHub](http://scaffoldhub.org).
 
-![ScaffoldHub](http://patshaughnessy.net/assets/2011/3/13/scaffoldhub.png)
+![ScaffoldHub](https://patshaughnessy.net/assets/2011/3/13/scaffoldhub.png)
 
 This is both a web site and a gem... the [http://scaffoldhub.org](http://scaffoldhub.org) site displays a gallery of variations on the Rails scaffolding generator, while a single scaffoldhub gem allows you to run any of these “scaffolds” inside your own app!
 
@@ -16,7 +16,7 @@ Each scaffolding variation might use a certain JQuery plugin (e.g. autocomplete 
 
 As as example, here’s the screen shot shown on scaffoldhub.org for the “autocomplete scaffold:”
 ￼
-![ScaffoldHub](http://patshaughnessy.net/assets/2011/3/13/autocomplete.png)
+![ScaffoldHub](https://patshaughnessy.net/assets/2011/3/13/autocomplete.png)
 
 Once you have the ScaffoldHub gem installed, all you need to do is type in the command line shown on the web site to create that version of the scaffolding right inside your Rails 3 app. See my example below for more details.
 

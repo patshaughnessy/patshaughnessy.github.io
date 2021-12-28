@@ -4,12 +4,12 @@ tag: Ruby
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/11/4/jeweler.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/11/4/jeweler.jpg"></td></tr>
   <tr><td align="center"><small><i>Bundler 1.1 can help you sort through your gems</i></small></td></tr>
 </table>
 </div>
 
-Three weeks ago I explained [why Bundler 1.1 will be much faster](http://patshaughnessy.net/2011/10/14/why-bundler-1-1-will-be-much-faster) than Bundler 1.0, which is clearly its most important new feature. However, there are a few new commands and options the Bundler team implemented in version 1.1 that can help you better manage and sort through the gems you have installed on your development computer and servers. Bundler 1.1’s new commands will tell you which gems you can upgrade, and also help keep things clean by deleting gems you no longer need.
+Three weeks ago I explained [why Bundler 1.1 will be much faster](https://patshaughnessy.net/2011/10/14/why-bundler-1-1-will-be-much-faster) than Bundler 1.0, which is clearly its most important new feature. However, there are a few new commands and options the Bundler team implemented in version 1.1 that can help you better manage and sort through the gems you have installed on your development computer and servers. Bundler 1.1’s new commands will tell you which gems you can upgrade, and also help keep things clean by deleting gems you no longer need.
 
 Today I’m going to do a quick walk through of <span class="code">bundle outdated</span>, <span class="code">bundle clean</span>, and <span class="code">bundle install -—standalone</span>, using examples illustrating how to use each one. After you upgrade Bundler you’ll immediately notice the speed improvement, but also be sure to take the time to learn how Bundler 1.1’s new commands can help you better organize your gems.
 
@@ -52,7 +52,7 @@ Outdated gems included in the bundle:
   * mysql2 (0.3.7 > 0.2.13)
 </pre>
 
-First we see the “Fetching gem metadata...” message appear as Bundler connects to the RubyGems API and gets the latest gem dependency information. See [my article from 3 weeks ago](http://patshaughnessy.net/2011/10/14/why-bundler-1-1-will-be-much-faster) for more details about this. Next, Bundler lists the gems that are out of date, in other words, gems that have newer versions available and that would be updated if I now ran <span class="code">bundle update</span>. In this example, I can see that all of the Rails 3.0.7 gems are out of date, because the Rails 3.1.1 gems are now available. I can also see that during the last year a newer version of rake was released, along with newer versions of mysql2 and other gems related to Rails 3.1.1.
+First we see the “Fetching gem metadata...” message appear as Bundler connects to the RubyGems API and gets the latest gem dependency information. See [my article from 3 weeks ago](https://patshaughnessy.net/2011/10/14/why-bundler-1-1-will-be-much-faster) for more details about this. Next, Bundler lists the gems that are out of date, in other words, gems that have newer versions available and that would be updated if I now ran <span class="code">bundle update</span>. In this example, I can see that all of the Rails 3.0.7 gems are out of date, because the Rails 3.1.1 gems are now available. I can also see that during the last year a newer version of rake was released, along with newer versions of mysql2 and other gems related to Rails 3.1.1.
 
 What’s convenient about this is that Bundler displays the gems it would download and install, but without actually doing it. This gives me the freedom to inspect the list and update just the gems I would like to. In this example, I might want the newer version of mysql2 but maybe I don’t want to upgrade to Rails 3.1.1. In that case I can just run <span class="code">bundle update mysql2</span>. With Bundler 1.0, I would probably have just run <span class="code">bundle update</span> to update all of my gems and hoped for the best. If there was a problem - a failing test or a gem version conflict - then I could have used git to start over again.
 

@@ -4,7 +4,7 @@ tag: Redis
 
 <div style="float: left; padding: 7px 30px 10px 0px">
 <table cellpadding="0" cellspacing="0" border="0">
-  <tr><td><img src="http://patshaughnessy.net/assets/2011/11/23/romantic-couple.jpg"></td></tr>
+  <tr><td><img src="https://patshaughnessy.net/assets/2011/11/23/romantic-couple.jpg"></td></tr>
   <tr><td align="center"><small><i>Fast autocomplete with Soulmate can help<br/>users fall in love with your Rails app</i></small></td></tr>
 </table>
 </div>
@@ -12,13 +12,13 @@ tag: Redis
 Back in February the [SeatGeek](http://seatgeek.com/) team open sourced a gem they call [Soulmate](https://github.com/seatgeek/soulmate) that implements autocomplete using a [Redis](http://redis.io/) back end. “Soulmate finishes your sentences” as they say on their Github readme page. You can see it in action on [SeatGeek.com](http://seatgeek.com/). Soulmate is very useful: many of us need type ahead search behavior and using Redis is a great way to make it fast and snappy. But more importantly, Soulmate is a great example of how to create an index in Redis ahead of time, allowing for very fast lookups later. Take a few minutes to learn how Soulmate works; chances are you’ll be able to use the same approach in your own app with a completely different data set.
 
 <br/>
-I'll get started today by showing you step by step how to setup a new Rails 3.1 app with Soulmate and Redis, using the jQuery UI autocomplete widget. [Next week I’ll follow this up with a second article](http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index) on the details of exactly how Soulmate’s Redis caching algorithm works. But before we start building the sample app, let’s learn something about the Soulmate gem....
+I'll get started today by showing you step by step how to setup a new Rails 3.1 app with Soulmate and Redis, using the jQuery UI autocomplete widget. [Next week I’ll follow this up with a second article](https://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index) on the details of exactly how Soulmate’s Redis caching algorithm works. But before we start building the sample app, let’s learn something about the Soulmate gem....
 
 ## How Soulmate was intended to work
 
 Here’s a conceptual diagram showing how you would normally use Soulmate:
 
-![How Soulmate was intended to work](http://patshaughnessy.net/assets/2011/11/23/soulmate-as-intended.png)
+![How Soulmate was intended to work](https://patshaughnessy.net/assets/2011/11/23/soulmate-as-intended.png)
 
 The Soulmate gem contains two components that you interact with directly:
 
@@ -33,7 +33,7 @@ Check out Soulmate’s [github readme page](https://github.com/seatgeek/soulmate
 
 Using Sinatra is a great way to get started with Soulmate quickly; however, I decided to set up the gem inside my Rails 3.1 app today in a slightly different way. Instead of interacting with Soulmate via the load script and Sinatra, I called the <span class="code">Soulmate::Loader</span> and <span class="code">Soulmate::Matcher</span> Ruby classes found inside the Soulmate gem directly from an ActiveRecord model. Here’s a diagram showing my setup:
 
-![Calling Soulmate from Rails](http://patshaughnessy.net/assets/2011/11/23/calling-soulmate-from-rails.png)
+![Calling Soulmate from Rails](https://patshaughnessy.net/assets/2011/11/23/calling-soulmate-from-rails.png)
 
 My ActiveRecord model's database table contains the words my users will search for using autocomplete, and uses an <span class="code">after_save</span> callback to save them in Soulmate by calling the same code that Soulmate’s loader script does: the <span class="code">Soulmate::Loader</span> class. This allows me to keep my SQL database in sync with my Redis autocomplete cache. Later when my users perform a search from an autocomplete text field, my app will call the same code that Soulmate’s Sinatra app did: the <span class="code">Soulmate::Matcher</span> class, without the need for a separate Rack app to service these results.
 
@@ -213,21 +213,21 @@ If you try this yourself, you’ll get different values since the Faker gem crea
 
 What we see here is really a search index: Soulmate has expanded all the possible combinations of matching letters your users might type as keys in this sorted set. The values corresponding to these keys are the id’s found above in the Redis hash - also the id’s of my ActiveRecord model objects! When a user types “lau” for example, Soulmate can issue a Redis query to figure out very quickly which person objects match... all without ever calling ActiveRecord to issue a single SQL query!
 
-There are a lot of interesting details here; stay tuned for a [follow up post next week](http://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index) on how this algorithm actually works, and the computer science theory behind it.
+There are a lot of interesting details here; stay tuned for a [follow up post next week](https://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index) on how this algorithm actually works, and the computer science theory behind it.
 
 ## Step 4: Putting it all together with JQuery in Rails 3.1
 
 Ok, let’s finish up our Rails 3.1 app and see Soulmate in action! I decided not to use a Rails autocomplete gem, such as the excellent [rails3-jquery-autocomplete](https://github.com/crowdint/rails3-jquery-autocomplete), since I don’t need any help with my server code; Soulmate is doing it all for me. Instead, I’ll just write the view code manually using the jQuery UI autocomplete widget. First I’ll head over to jquery-ui.org:
 
-![jqueryui.com](http://patshaughnessy.net/assets/2011/11/23/jquery-ui.png)
+![jqueryui.com](https://patshaughnessy.net/assets/2011/11/23/jquery-ui.png)
 
 ... and then deselect everything and then check off just the autocomplete widget:
 
-![select autocomplete widget](http://patshaughnessy.net/assets/2011/11/23/select-autocomplete.png)
+![select autocomplete widget](https://patshaughnessy.net/assets/2011/11/23/select-autocomplete.png)
 
 Finally I’ll select the jQuery UI theme I want - hmm.... “Swanky Purse” sounds interesting:
 
-![select swanky purse](http://patshaughnessy.net/assets/2011/11/23/select-swanky-purse.png)
+![select swanky purse](https://patshaughnessy.net/assets/2011/11/23/select-swanky-purse.png)
 
 And I’ll download the tar ball to my laptop. Now I just need to copy the “Swanky Purse” jQuery UI files into my Rails 3.1 asset folder like this:
 
@@ -306,7 +306,7 @@ Just like I did earlier in the after_save callback, here i’m calling the Soulm
 
 Now running my Rails server and trying it out, I can see that “Swanky Purse” style:
 
-![working autocomplete](http://patshaughnessy.net/assets/2011/11/23/working-autocomplete.png)
+![working autocomplete](https://patshaughnessy.net/assets/2011/11/23/working-autocomplete.png)
 
 ## Stay tuned for more...
 

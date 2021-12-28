@@ -1,7 +1,7 @@
 <!DOCTYPE html><html><head><link rel="stylesheet" href="/assets/css/1140.css" type="text/css" media="screen"><link rel="stylesheet" href="/assets/css/main.css" type="text/css" media="screen"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Ruby MRI Source Code Idioms #1: Accessing Data Via Macros - Pat Shaughnessy</title></head><body><div id="banner"><div class="row"><div class="onecol"></div><div class="elevencol last"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div></div></div><div id="container"><div class="row"><div class="onecol"></div><div class="ninecol white"><article class="post"><header><h1>Ruby MRI Source Code Idioms #1: Accessing Data Via Macros</h1><div class="metadata"><span class="date">January 23rd 2013</span>&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2013/1/23/ruby-mri-source-code-idioms-1-accessing-data-via-macros" class="date">&nbsp; Comments and &nbsp; Reactions</a><br><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="pat_shaughnessy" data-text="Ruby MRI Source Code Idioms #1: Accessing Data Via Macros">Tweet</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script></div></header><section class="content"><div style="float: left; margin: 8px 25px 5px 0px; line-height:16px;">
   <table cellpadding="0" cellspacing="0" border="0">
     <tr><td align="center" style="background-color: rgb(248, 248, 255);padding: 5px;"><img
-    src="http://patshaughnessy.net/assets/2013/1/23/definition.png"></td></tr>
+    src="https://patshaughnessy.net/assets/2013/1/23/definition.png"></td></tr>
     <tr><td align="center"><i>From: <a href="http://en.wiktionary.org/wiki/idiom">wiktionary.org</a></i></td></tr>
   </table>
 </div>
@@ -19,7 +19,7 @@ have time to learn.</p>
 times it almost resembles another dialect or language. To see what I mean, take
 a look at this snippet from MRI’s array.c file, which implements the
 <span class="code">Array#compact!</span> method:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/code1.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/code1.png"/>
 <p>Most of the code in this function is composed of C macros; these appear in
 capital letters. Macros are text formulas that C developers can use to make
 their code more concise and easier to read. The Ruby core team very often uses
@@ -36,7 +36,7 @@ MRI idioms as well.</p>
 <p>Before we get to the C code, let’s review what the <span
   class="code">compact!</span> method does in Ruby. Here’s the example used in
 the Ruby docs, the C comment that appears just above this code in array.c:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/code-comment1.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/code-comment1.png"/>
 <p>The <span class="code">rb_ary_compact_bang</span> C function I showed above
 actually implements this behavior. Whenever you use the <span
   class="code">compact!</span> method in your code, Ruby internally calls this
@@ -50,15 +50,15 @@ there were no changes made to the array.</p>
 <p>To understand how MRI accesses data via macros, let’s first look at how it
 stores data, at least for array objects. Ruby stores all arrays and their
 contents using the <span class="code">RArray</span> C struct, like this:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/rarray1.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/rarray1.png"/>
 <p>I won’t cover all the details here today; in fact, you can see some other MRI
 idioms at work here, such as the <span
   class="code">ary[RARRY_EMBED_LEN_MAX]</span> struct member which is used for
 space optimization, or the <span class="code">shared</span> value, which is
 used for copy-on-write optimization. I wrote about these how these idioms work
-in the String class last year; see: <a href="http://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23
+in the String class last year; see: <a href="https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23
 characters</a>,
-and <a href="http://patshaughnessy.net/2012/1/18/seeing-double-how-ruby-shares-string-values">Seeing double: how Ruby shares string
+and <a href="https://patshaughnessy.net/2012/1/18/seeing-double-how-ruby-shares-string-values">Seeing double: how Ruby shares string
 values</a>.</p>
 <p>The details to learn for today are that: Ruby stores the Array data values in a
 C memory array, tracked by the <span class="code">VALUE *ptr</span> pointer.  Ruby (usually) tracks the
@@ -78,7 +78,7 @@ are formulas that the C “pre-processor” evaluates and substitutes into the C
 code just before the C compiler runs.</p>
 <p>So let’s just take a look at these macros and see what they do - should be simple,
 right?</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/gibberish.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/gibberish.png"/>
 <p>Oops! C programming isn’t that simple! One of the most challenging parts of
 reading and understanding Ruby’s code is figuring out what these macros mean
 and do. But this is essential, since they are used so frequently across the
@@ -93,11 +93,11 @@ normally the same as the <span class="code">ptr</span> value. In <span
   class="code">rb_ary_compact_bang</span>, Ruby initializes the <span
   class="code">p</span> and <span class="code">t</span> pointers using <span
   class="code">RARRAY_PTR</span>:
-<p><img src="http://patshaughnessy.net/assets/2013/1/23/rarray2.png"/></p></li>
+<p><img src="https://patshaughnessy.net/assets/2013/1/23/rarray2.png"/></p></li>
 <li><span class="code">RARRAY_LEN(ary)</span> - this returns the length of the array, normally just the
 <span class="code">len</span> value. <span class="code">rb_ary_compact_bang</span> initializes the <span class="code">end</span> pointer using
 <span class="code">RARRAY_LEN,</span> by adding the length to <span class="code">p</span>:
-<p><img src="http://patshaughnessy.net/assets/2013/1/23/rarray3.png"/></p>
+<p><img src="https://patshaughnessy.net/assets/2013/1/23/rarray3.png"/></p>
 <p>In this diagram, I assume the length of the array is 3, and the
 capacity of the array is 5.</p><br/></li>
 <li><span class="code">ARY_CAPA(ary)</span> - the returns the capacity of the array, or the amount of memory Ruby
@@ -105,18 +105,18 @@ actually allocated for the array’s elements. Ruby allocates more memory than
 necessary to avoid repeated memory allocations when an array changes size. This
 normally just returns <span class="code">capa</span> (except when Ruby is using certain optimizations):
 <p/>
-<p><img src="http://patshaughnessy.net/assets/2013/1/23/rarray4.png"/></li></p>
+<p><img src="https://patshaughnessy.net/assets/2013/1/23/rarray4.png"/></li></p>
 <li><span class="code">ARY_SET_LEN(ary, n)</span> - this updates the array length, which is normally the <span class="code">len</span>
 value:
 <p/>
-<p><img src="http://patshaughnessy.net/assets/2013/1/23/rarray5.png"/></li></p>
+<p><img src="https://patshaughnessy.net/assets/2013/1/23/rarray5.png"/></li></p>
 </ol>
 <h2>Putting it all together</h2>
 <p>Now that we understand how MRI accesses data values via macros, it’s not hard
 to follow most of the code in <span class="code">rb_ary_compact_bang</span>:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/rb_ary_compact_bang.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/rb_ary_compact_bang.png"/>
 <p>Let’s walk through it, starting with this loop:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/compact-loop.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/compact-loop.png"/>
 <p>This C pointer arithmetic loop actually does the compact operation - if
 you’re not familiar with C, here’s a 5 second lesson on how pointers work:</p>
 <ul>
@@ -134,30 +134,30 @@ next value.</p>
 </ul>
 <p>Let’s walk through this loop visually, to get a sense of how it works. I’ll use
 the example from the Ruby docs:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/ruby-example.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/ruby-example.png"/>
 <p>First, Ruby checks whether the first value in the array is nil, using another
 macro: <span class="code">NIL_P(*t)</span>:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/compacting1.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/compacting1.png"/>
 <p>Since it is not nil, Ruby copies the “a” onto itself:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/else.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/else.png"/>
 <p>This has no effect, but both <span class="code">p</span> and <span class="code">t</span> move forward to the next element:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/compacting2.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/compacting2.png"/>
 <p>Now <span class="code">NIL_P(*t)</span> is true, so Ruby just increments <span class="code">t</span> and not <span class="code">p</span>:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/if.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/if.png"/>
 <p>Now <span class="code">t</span> points to the “b”, while <span class="code">p</span> remains the same:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/compacting3.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/compacting3.png"/>
 <p>This time, <span class="code">NIL_P(*t)</span> is false, so Ruby copies the value “b” back, and
 increments both pointers:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/else.png"/>
-<img src="http://patshaughnessy.net/assets/2013/1/23/compacting4.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/else.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/compacting4.png"/>
 <p>Continuing through the loop again, <span class="code">NIL_P(*t)</span> will be true this time:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/if.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/if.png"/>
 <p>And Ruby will again only increment <span class="code">t</span>:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/compacting5.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/compacting5.png"/>
 <p>Iterating again, <span class="code">t</span> points to the “c”, and so Ruby will copy it back:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/else.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/else.png"/>
 <p>And again now both pointers will be incremented:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/compacting6.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/compacting6.png"/>
 <p>Finally, Ruby increments <span class="code">t</span> past the last nil value,
 and exits the loop when <span class="code">t == end</span>. This leaves us with
 the compacted array, which ends at the current location of <span
@@ -168,7 +168,7 @@ leave the array’s internal values in a self consistent state.</p>
 <p>First, Ruby calculates the new length, using the <span class="code">p</span>
 pointer and <span class="code">RARRAY_PTR</span> which returns the start of the
 array again:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/calc-length.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/calc-length.png"/>
 <p>You can see if the new length is the same as the original length was Ruby will
 return <span class="code">nil</span> and exit immediately. Otherwise, Ruby uses
 <span class="code">ARY_SET_LEN</span> to save the new length back in the <span
@@ -177,7 +177,7 @@ be 3.</p>
 <p>The last bit of confusing code in <span class="code">rb_ary_compact_bang</span>
 updates the array’s capacity, using the <span class="code">ARY_CAPA</span>
 macro:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/reset-capacity.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/reset-capacity.png"/>
 <p>This code is still very confusing, but at least we know now that <span
   class="code">ARY_CAPA(ary)</span> returns the current capacity of the array.
 Remember the capacity is the actual size of the memory allocated to hold the
@@ -186,7 +186,7 @@ array data, measured as an element count. Here Ruby calls the <span
 compacted  array is less than half of the current capacity, which will free up
 some memory. The condition about <span class="code">ARY_DEFAULT_SIZE</span>
 enforces a minimum capacity - this constant is set to 16 at the top of array.c:</p>
-<img src="http://patshaughnessy.net/assets/2013/1/23/default-size.png"/>
+<img src="https://patshaughnessy.net/assets/2013/1/23/default-size.png"/>
 <p>Note: this doesn’t mean that all new, empty arrays allocate enough memory to have a
 capacity of at least 16; things aren’t so simple. I’ll explain how new arrays
 look in my next post.</p>

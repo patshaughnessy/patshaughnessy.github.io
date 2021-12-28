@@ -20,9 +20,9 @@ features you expect and need for using objects and classes.</p>
 <h2>Writing a Perl Function</h2>
 <p>Let’s suppose I want to calculate the density of Jupiter, based on its mass and
 diameter. Using Perl, I could write:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/perl1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/perl1.png"/>
 <div style="float: right; padding: 25px 8px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2015/9/25/vw.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2015/9/25/vw.jpg"><br/>
   <i>
   Writing Perl feels like riding a vintage VW bus. Things don’t<br/>
   work the way you expect, but you can always feel the love.
@@ -49,10 +49,10 @@ support for objects among other things).</p>
 <p>Now I decide to use an object oriented style instead. I want a Jupiter object
 which has mass and radius attributes, and I’d like the density function to be a
 method, like this:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/perl2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/perl2.png"/>
 <p>In other words, I’d like to think of <span class="code">$jupiter</span> as an
 instance of the Planet class.</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/jupiter-class.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/jupiter-class.png"/>
 <p>By writing a <span class="code">Planet</span> class, I group together data
 values that describe each planet (mass and radius) with the functions that use
 those values (density).  Object oriented languages refer to the data values as
@@ -65,7 +65,7 @@ Wall and the Perl team introduced some support for object oriented programming
 concepts in Perl 5. They converted Perl into an object oriented language after
 the fact - at least a partially object oriented language.</p>
 <p>To create a Perl class, I first group my planet functions together using the Perl <span class="code">package</span> keyword. In this example I have only one:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/perl3.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/perl3.png"/>
 <p>This gives me a place to put all of the methods of the <span
 class="code">Planet</span> class - the <span class="code">package</span>
 keyword plays the same role the <span class="code">class</span> keyword would
@@ -77,7 +77,7 @@ reference to get the mass and radius values, for example: <span
 class="code">$self-&gt;{'mass'}</span>. This is object oriented code. I’ve created
 a class and added a method to it.</p>
 <p>However, let’s think about this for another moment:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/words1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/words1.png"/>
 <p>Notice there’s a difference between what I want to say, and the words I have to
 use to say it. The Perl language doesn’t include the <span
 class="code">class</span> keyword; instead, I need to use <span
@@ -85,16 +85,16 @@ class="code">package</span>. We’ll see this again in a moment.</p>
 <p>To create an instance of my new <span class="code">Planet</span> class, an
 object, I need to create a hash (technically a reference to a hash) and then
 “bless” it:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/perl4.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/perl4.png"/>
 <p>This creates a connection between the hash (the object) and the package that
 contains the methods I want to use (the class). Now I can use syntax such as
 <span class="code">$jupiter-&gt;density()</span>. I’ve done it! I’ve created an object using Perl.</p>
 <p>However, once again the language doesn’t supply the words I want to use to
 express the idea I’m thinking of:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/words2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/words2.png"/>
 <h2>Expressing Object Oriented Concepts Using Perl</h2>
 <p>Here’s the complete, object oriented version of my example:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/perl5.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/perl5.png"/>
 <p>To me, the Perl code I wrote above seems very confusing. But it’s not Perl’s
 strange, old-fashioned syntax that confuses me. After a while, all the <span
 class="code">$</span> symbols and the use of <span class="code">shift</span>
@@ -111,7 +111,7 @@ confusing at best.</p>
 released, is planning to introduce more explicit support for objects using the
 <span class="code">class</span> and <span class="code">new</span> keywords.</em></p>
 <div style="float: right; padding: 25px 8px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2015/9/25/driverless-car.png"><br/>
+  <img src="https://patshaughnessy.net/assets/2015/9/25/driverless-car.png"><br/>
   <i>
 Writing Go code feels like riding in a Google driverless car:<br/>
 the compiler and <span class="code">gofmt</span> tool are in complete control.
@@ -125,19 +125,19 @@ version with the Perl code I wrote above.</p>
 to define a place to put my class’s methods. In Go, I define a group of
 methods in a different way: by associating them with a type. Therefore, I’ll
 start my Go code by creating a <span class="code">Planet</span> type:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/go1.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/go1.png"/>
 <p>The two versions look very different. In Go I define a static type that always
 consists of mass and radius values, while in Perl I dynamically create a hash
 that might contain any values. </p>
 <p>Once again, however, I’m forced to think about my code one way and write it
 another:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/words3.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/words3.png"/>
 <p>What Go and Perl really have in common is this: Neither language contains the
 words and syntax I really would like to use to express the object oriented
 concepts I’m trying to use.</p>
 <p>So far I’ve created a type, a static collection of values. Let’s take the next
 step and convert that into a class:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/go2.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/go2.png"/>
 <p>In Go I don’t need to connect my instance data with the class; the mass and
 radius values are already contained inside the <span class="code">Planet</span>
 struct type. Instead, I need to create a connection between the method and the
@@ -152,7 +152,7 @@ object oriented programming, but they make the connection between instance
 variables and methods from opposite directions. </p>
 <p>Once again, however, there’s an impedance mismatch between the concepts I’m
 imagining and the words I have to use to to express them:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/words4.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/words4.png"/>
 <p>Go doesn’t provide me with the vocabulary I want to use. I want to type <span
 class="code">class</span>, but Go only allows me to use <span class="code">type
 struct</span>. And because there’s no <span class="code">class</span> keyword,
@@ -160,7 +160,7 @@ my blessed function, my method, could be anywhere and not necessary right next
 to my type definition.</p>
 <h2>Expressing Object Oriented Concepts Using Go</h2>
 <p>Here’s the complete, object oriented version of my example in Go:</p>
-<img src="http://patshaughnessy.net/assets/2015/9/25/go3.png"/>
+<img src="https://patshaughnessy.net/assets/2015/9/25/go3.png"/>
 <p>I find this Go code just as confusing and misleading as the Perl version above,
 and for the same reason. Both Perl and Go take the first step towards object
 oriented programming, but stop short of providing a complete solution. Instead
@@ -177,7 +177,7 @@ developers to create object-like structures, but with a confusing syntax? Or
 why not go all the way and introduce the <span class="code">class</span>
 keyword to properly support object structures?</p>
 <div style="float: right; padding: 25px 8px 0px 30px; text-align: center;">
-  <img src="http://patshaughnessy.net/assets/2015/9/25/jupiter.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2015/9/25/jupiter.jpg"><br/>
   <i>
 The density of Jupiter is 1,326 kg/m<sup>3</sup>, only <br/>
 1/4th the density of Earth. (source: <a

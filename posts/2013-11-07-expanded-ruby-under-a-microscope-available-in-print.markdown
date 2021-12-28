@@ -3,7 +3,7 @@ date: 2013/11/7
 tag: Ruby
 
 <div style="float: left; padding: 0px 30px 10px 0px; text-align: center; margin-top: 8px; margin-bottom: 9px">
-  <a href="http://nostarch.com/rum"><img src="http://patshaughnessy.net/assets/2013/11/7/RUM_coverfront.png"><br/><i>Order your copy today at NoStarch.com</a>.<br/>
+  <a href="http://nostarch.com/rum"><img src="https://patshaughnessy.net/assets/2013/11/7/RUM_coverfront.png"><br/><i>Order your copy today at NoStarch.com</a>.<br/>
     Use coupon code LENS to get a 40% discount!</i></a>
 </div>
 
@@ -48,7 +48,7 @@ more interesting: Aaron had a number of great suggestions for new content which
 I included as well.
 
 <div style="float: right; padding: 7px 0px 10px 30px; text-align: center; margin-top: 20px">
-  <a href="http://nostarch.com/download/samples/RUM_CH6_excerpt.pdf"><img src="http://patshaughnessy.net/assets/2013/11/7/ch6.png"><br/><i>Download Chapter 6 as a free PDF</i></a>.
+  <a href="http://nostarch.com/download/samples/RUM_CH6_excerpt.pdf"><img src="https://patshaughnessy.net/assets/2013/11/7/ch6.png"><br/><i>Download Chapter 6 as a free PDF</i></a>.
 </div>
 
 ## A 40% Discount
