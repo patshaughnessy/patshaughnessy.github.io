@@ -326,7 +326,7 @@ file. Some interesting details to note:
   patterns the Crystal parser checked for after one of the recursive parse
   calls.
 
-## Next TIme
+## Next Time
 
 What’s the point of all of this? What does the Crystal compiler do next with
 the AST? This tree structure is a fantastic summary of how Crystal parsed my

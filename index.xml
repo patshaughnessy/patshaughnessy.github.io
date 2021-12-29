@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2021-12-28T16:30:37Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Reading Code Like a Compiler</title><link href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2022-01-01T17:18:57Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Reading Code Like a Compiler</title><link href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Imagine trying to read an entire book while &lt;br/&gt;
   focusing on only one or two words at a time
@@ -272,7 +272,7 @@ patterns the Crystal parser checked for after one of the recursive parse
 calls.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2&gt;Next TIme&lt;/h2&gt;
+&lt;h2&gt;Next Time&lt;/h2&gt;
 &lt;p&gt;What’s the point of all of this? What does the Crystal compiler do next with
 the AST? This tree structure is a fantastic summary of how Crystal parsed my
 code, and, as we’ll see later, also provides a convenient way for Crystal later
