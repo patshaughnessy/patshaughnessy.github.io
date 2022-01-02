@@ -86,7 +86,7 @@ pub fn render(post: &Post, all_posts: &Vec<Post>, draft: bool) -> String {
           }
 
           div class="header" {
-              "Buy my book"
+              "Buy My Book"
           }
           div class="links" {
             ul {

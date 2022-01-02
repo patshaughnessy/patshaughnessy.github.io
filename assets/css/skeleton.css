@@ -538,9 +538,32 @@ a:visited {
   section.content div i {
     width: 100%;
     font-size: 80%;
+    line-height: 14px;
   }
 
   #sidebar {
-    margin-left: 30px;
+    display: none;
+  }
+
+  .mobile-header {
+    float: left;
+    margin-right: 13px;
+  }
+
+  .mobile-header ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 0;
+  }
+
+  .mobile-header #feed {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+}
+
+@media (min-width: 550px) {
+  .mobile-header {
+    display: none;
   }
 }

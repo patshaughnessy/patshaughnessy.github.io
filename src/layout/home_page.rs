@@ -11,26 +11,54 @@ pub fn render(all_posts: &Vec<Post>) -> String {
       div class="ten columns" {
         div class="container" {
           div class="row" {
-            article class="post" {
-              header {
-                h1 { "All Articles" }
+            div class="mobile-header" {
+              h1 { "Buy My Book" }
+              div class="links" {
+                ul {
+                  li {
+                    a href="/ruby-under-a-microscope" {
+                      img src="/assets/images/book-cover.png" { }
+                    }
+                  }
+                  li id="eBook" {
+                    a href="/ruby-under-a-microscope" {
+                      "Ruby Under a Microscope"
+                    }
+                  }
+                }
               }
-              section class="content" {
-                table id="archive-table" {
-                  @for link in PostLink::all_from(&all_posts) {
-                    tr {
-                      td id="date" {
-                        @if let Some(str) = link.date_string {
-                          (str)
-                        } else {
-                          ""
-                        }
-                      }
-                      td {
-                        a href=(link.url) {
-                          (link.title)
-                        }
-                      }
+            }
+            div class="mobile-header" {
+              h1 { "Subscribe" }
+              div class="links" {
+                ul {
+                  li {
+                    a id="feed" href="http://feeds.feedburner.com/patshaughnessy" {
+                      img src="/assets/images/feed-icon16x16B.png" { }
+                    }
+                    a href="http://twitter.com/pat_shaughnessy" {
+                      img width="20" height="20" src="/assets/images/twitter.svg" { }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          div class="row" {
+            h1 { "All Articles" }
+            table id="archive-table" {
+              @for link in PostLink::all_from(&all_posts) {
+                tr {
+                  td id="date" {
+                    @if let Some(str) = link.date_string {
+                      (str)
+                    } else {
+                      ""
+                    }
+                  }
+                  td {
+                    a href=(link.url) {
+                      (link.title)
                     }
                   }
                 }
@@ -59,7 +87,7 @@ pub fn render(all_posts: &Vec<Post>) -> String {
             }
           }
           div class="header" {
-              "Buy my book"
+              "Buy My Book"
           }
           div class="links" {
             ul {
