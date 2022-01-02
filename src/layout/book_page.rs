@@ -12,16 +12,7 @@ pub fn render(draft: bool) -> String {
           div class="row" {
             article class="book" {
               header {
-                h1 { "Ruby Under a Microscope" }
-                div class="metadata" {
-                  @if !draft {
-                    "November 8th 2013"
-                    (PreEscaped("&nbsp;&mdash;&nbsp;"))
-                    a href="#disqus_thread" data-disqus-identifier={ "https://patshaughnessy.net/ruby-under-a-microscope" } {
-                        (PreEscaped("&nbsp; Comments and &nbsp; Reactions"))
-                    }
-                  }
-                }
+                h1 { "Have You Ever Wondered How Ruby Works Internally?" }
               }
               section class="content" {
                 div style="float: right; margin: 5px 0 0 15px;" {
@@ -32,7 +23,6 @@ pub fn render(draft: bool) -> String {
                     img id="book-cover" src="/assets/images/RUM_coverfront.png" {}
                   }
                 }
-                h2 { "Have You Ever Wondered How Ruby Works Internally?" }
                 p {}
               }
               p {
@@ -44,10 +34,6 @@ pub fn render(draft: bool) -> String {
                 " is breathed into C to enable Ruby's features - closures, metaprogramming, and so much more?"
               }
               h2 { "Find out with Science!" }
-
-
-
-
               p {
                 "Ruby Under a Microscope will guide you through the internals of some of Ruby's
                 most-used facets. Using experimentation, theory, and two truckloads of diagrams,
@@ -55,7 +41,6 @@ pub fn render(draft: bool) -> String {
                 span { "clearly see how Ruby is implemented" }
                 "."
               }
-
               div class="diagram" {
                 img src="/assets/images/tokenize.png" {}
                 div class="caption" {
@@ -92,10 +77,6 @@ pub fn render(draft: bool) -> String {
                 span { "Ruby Under a Microscope" }
                 ":"
               }
-
-
-
-
 
               blockquote {
                 div class="pic" {
@@ -198,11 +179,8 @@ pub fn render(draft: bool) -> String {
                 }
               }
 
-
-
               h2 { "Table of Contents" }
               p {}
-
               table id="toc" {
                 tr {
                   td class="main" {
@@ -332,7 +310,6 @@ pub fn render(draft: bool) -> String {
                     "327"
                   }
                 }
-
               }
 
               h2 { "About Pat" }
