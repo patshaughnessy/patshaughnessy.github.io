@@ -6,6 +6,7 @@ use self::maud::PreEscaped;
 
 pub mod post;
 pub mod home_page;
+pub mod book_page;
 pub mod rss;
 
 pub fn render(content: String, title: Option<&String>) -> String {

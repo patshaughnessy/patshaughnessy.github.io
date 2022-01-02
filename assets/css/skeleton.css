@@ -560,10 +560,130 @@ a:visited {
     margin-left: 4px;
     margin-right: 4px;
   }
+
+  #book-cover img {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 @media (min-width: 550px) {
   .mobile-header {
     display: none;
   }
+}
+
+#book-tweet {
+    margin-left: 0px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.top-buy-now {
+  float: left;
+  display: block;
+  background: #DE4632;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  padding: 0 .5em;
+  margin-bottom: 5px;
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  -ms-border-radius: 1em;
+  -o-border-radius: 1em;
+  border-radius: 1em;
+}
+
+a.top-buy-now:visited {
+    color: white;
+}
+
+.book span {
+  background: #f8f9d3;
+}
+
+#book-cover img {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.diagram {
+  margin-bottom: 1.5em;
+  text-align: center;
+}
+
+.diagram .caption {
+  font-style: italic;
+}
+
+blockquote {
+  font-family: Palatino Linotype, Book Antiqua, Palatino, serif;
+  margin-bottom: 1.5em;
+  overflow: hidden;
+  *zoom: 1;
+}
+
+blockquote cite {
+  font-style: italic;
+}
+
+blockquote .pic {
+  float: left;
+  background: white;
+  border-left: 1px solid #ebf2ec;
+  border-bottom: 1px solid #ebf2ec;
+  padding: 1em;
+  height: 48px;
+  margin-top: 6px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+}
+
+blockquote .content {
+  background: #ebf2ec;
+  padding: 0 1em;
+  padding-bottom: 0.75em;
+  padding-top: 0.75em;
+  margin-left: 72px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+}
+
+#toc {
+  width: 100%;
+  margin-bottom: 1.5em;
+}
+
+#toc td {
+  border-bottom: 1px dotted #ccc;
+}
+
+#toc td:first-child {
+  text-indent: 1em;
+}
+
+#toc td:last-child {
+  text-align: right;
+}
+
+#toc .main:first-child {
+  text-indent: 0;
+  font-weight: bold;
+}
+
+#toc tr:last-child td {
+  border-bottom: none;
+}
+
+#mugshot {
+  float: right;
+  margin-left: 1em;
 }

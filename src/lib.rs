@@ -42,6 +42,7 @@ pub fn run(input_path: PathBuf, output_path: PathBuf, draft: bool) -> Result<usi
     let params = CompileParams {all_posts: all_posts, output_path: output_path, draft: draft};
     Ok(params).and_then(compile_posts)
               .and_then(compile_home_page)
+              .and_then(compile_book_page)
               .and_then(compile_rss_feed)
               .map(|_output| count)
 }
@@ -73,6 +74,16 @@ fn compile_home_page(params: CompileParams) -> Result<CompileParams, InvalidPost
     output_path.push("index.html");
     let mut file = File::create(output_path)?;
     let content = layout::home_page::render(&params.all_posts);
+    let content = layout::render(content, None);
+    file.write_all(content.as_bytes())?;
+    Ok(params)
+}
+
+fn compile_book_page(params: CompileParams) -> Result<CompileParams, InvalidPostError> {
+    let mut output_path = params.output_path.clone();
+    output_path.push("ruby-under-a-microscope.html");
+    let mut file = File::create(output_path)?;
+    let content = layout::book_page::render(params.draft);
     let content = layout::render(content, None);
     file.write_all(content.as_bytes())?;
     Ok(params)
