@@ -12,7 +12,7 @@ pub fn render(draft: bool) -> String {
           div class="row" {
             article class="book" {
               header {
-                h1 { "Have You Ever Wondered How Ruby Works Internally?" }
+                h1 { "Ruby Under a Microscope" }
                 div class="metadata" {
                   @if !draft {
                     "November 8th 2013"
@@ -24,7 +24,6 @@ pub fn render(draft: bool) -> String {
                 }
               }
               section class="content" {
-                p {}
                 div style="float: right; margin: 5px 0 0 15px;" {
                   div id="book-tweet" {
                     a class="top-buy-now" href="http://nostarch.com/rum" { "Buy Now at NoStarch.com" }
@@ -33,6 +32,8 @@ pub fn render(draft: bool) -> String {
                     img id="book-cover" src="/assets/images/RUM_coverfront.png" {}
                   }
                 }
+                h2 { "Have You Ever Wondered How Ruby Works Internally?" }
+                p {}
               }
               p {
                 "Everyone knows that Ruby is a powerful language. Its dynamic nature allows you to concisely write the code you need to actually solve a problem instead of burying yourself under mountains of boilerplate. You don't have to fight it; you just get to enjoy the ride."
@@ -42,7 +43,7 @@ pub fn render(draft: bool) -> String {
                 span { "dark voodoo" }
                 " is breathed into C to enable Ruby's features - closures, metaprogramming, and so much more?"
               }
-              h1 { "Find out with Science!" }
+              h2 { "Find out with Science!" }
 
 
 
@@ -85,7 +86,7 @@ pub fn render(draft: bool) -> String {
                 span { "Ruby Under a Microscope is accessible to anyone" }
                 " with an interest in learning how Ruby works internally."
               }
-              h1 { "People Already Love It" }
+              h2 { "People Already Love It" }
               p {
                 "Here's what people are already saying about "
                 span { "Ruby Under a Microscope" }
@@ -199,7 +200,7 @@ pub fn render(draft: bool) -> String {
 
 
 
-              h1 { "Table of Contents" }
+              h2 { "Table of Contents" }
               p {}
 
               table id="toc" {
