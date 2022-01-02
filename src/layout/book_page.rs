@@ -15,6 +15,8 @@ pub fn render(draft: bool) -> String {
                 h1 { "Have You Ever Wondered How Ruby Works Internally?" }
                 div class="metadata" {
                   @if !draft {
+                    "November 8th 2013"
+                    (PreEscaped("&nbsp;&mdash;&nbsp;"))
                     a href="#disqus_thread" data-disqus-identifier={ "https://patshaughnessy.net/ruby-under-a-microscope" } {
                         (PreEscaped("&nbsp; Comments and &nbsp; Reactions"))
                     }
