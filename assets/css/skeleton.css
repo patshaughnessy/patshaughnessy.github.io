@@ -525,55 +525,6 @@ a:visited {
   font-size: 1.5rem; 
 }
 
-@media (max-width: 550px) {
-  section.content div {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-
-  section.content div img {
-    width: 100%;
-  }
-
-  section.content div i {
-    width: 100%;
-    font-size: 80%;
-    line-height: 14px;
-  }
-
-  #sidebar {
-    display: none;
-  }
-
-  .mobile-header {
-    float: left;
-    margin-right: 13px;
-  }
-
-  .mobile-header ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 0;
-  }
-
-  .mobile-header #feed {
-    margin-left: 4px;
-    margin-right: 4px;
-  }
-
-  #book-cover img {
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
-  }
-}
-
-@media (min-width: 550px) {
-  .mobile-header {
-    display: none;
-  }
-}
-
 #book-tweet {
     margin-left: 0px;
   margin-right: 10px;
@@ -686,4 +637,61 @@ blockquote .content {
 #mugshot {
   float: right;
   margin-left: 1em;
+}
+
+@media (max-width: 550px) {
+  section.content div {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  section.content div img {
+    width: 100%;
+  }
+
+  section.content div i {
+    width: 100%;
+    font-size: 80%;
+    line-height: 14px;
+  }
+
+  #sidebar {
+    display: none;
+  }
+
+  .mobile-header {
+    float: left;
+    margin-right: 13px;
+  }
+
+  .mobile-header ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 0;
+  }
+
+  .mobile-header #feed {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+  #book-cover img {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  blockquote .content {
+    margin-left: 0px;
+  }
+
+  blockquote .pic {
+    display: none;
+  }
+}
+
+@media (min-width: 550px) {
+  .mobile-header {
+    display: none;
+  }
 }
