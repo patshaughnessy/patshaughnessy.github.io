@@ -187,7 +187,8 @@ fn with_highlighted_code_snippets(html: &String) -> String {
     CODE_SNIPPET.replace_all(html, |captures: &Captures| {
         let attributes = captures.get(1).map(|m| m.as_str().to_string());
         let snippet = captures.get(2).map_or("", |m| m.as_str()).to_string();
-        highlighted_html_for(&snippet, attributes)
+        let trimmed_snippet = snippet.trim().to_string();
+        highlighted_html_for(&trimmed_snippet, attributes)
     }).to_string()
 }
 
