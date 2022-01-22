@@ -23,9 +23,7 @@ management.</p>
 handling. Let’s take an example: opening and reading a text file. In Ruby, this
 is a one-liner and error handling is completely optional:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">string </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">File</span><span style="color:#000000;">.read(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">foo.txt</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#000000;">string </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">File</span><span style="color:#000000;">.read(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">foo.txt</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)</span></pre>
 
 <p>In Ruby, <span class="code">File.read</span> returns a simple string. Will this
 ever return an error? Who knows. Maybe Ruby will raise an exception, maybe not.
@@ -33,14 +31,12 @@ I don’t have to worry about that at the call site when I’m writing the code.
 can focus on the happy path, but I end up with a program that can’t handle
 errors.</p>
 <p>Golang, at least, returns an error value explicitly when I try to read a file:</p>
-<pre>
-b, err := ioutil.ReadFile("foo.txt")
+<pre>b, err := ioutil.ReadFile("foo.txt")
 if err != nil {
     fmt.Print(err)
 } else {
     str := string(b)
-}
-</pre>
+}</pre>
 <p>Here the Golang <span class="code">ioutil.ReadFile</span> function returns two
 values: the string I want and also an error value. The Go compiler forces me to
 think about errors that might occur, at least for a moment. But error handling
@@ -52,17 +48,13 @@ and over again.</p>
 <p>In Rust error handling in mandatory. Let’s try to rewrite the same example
 using Rust:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> file </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">File::open(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">foo.txt</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">);
+<span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> file </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">File::open(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">foo.txt</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">);
 </span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> contents </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String::new();
-</span><span style="color:#000000;">file.read_to_string(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#a71d5d;">mut</span><span style="color:#000000;"> contents);
-</span></pre>
+</span><span style="color:#000000;">file.read_to_string(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#a71d5d;">mut</span><span style="color:#000000;"> contents);</span></pre>
 
 <p>Right away I run into trouble when I try to compile this:</p>
-<pre class="console">
-error[E0599]: no method named `read_to_string` found for type
-`std::result::Result&lt;std::fs::File, std::io::Error>` in the current scope
-</pre>
+<pre class="console">error[E0599]: no method named `read_to_string` found for type
+`std::result::Result&lt;std::fs::File, std::io::Error>` in the current scope</pre>
 <p>What? What is the Rust compiler talking about? I can see there’s a <span
 class="code">read_to_string</span> method on the <span class="code">File</span>
 struct <a href="https://doc.rust-lang.org/std/io/trait.Read.html#method.read_to_string">right in the
@@ -72,9 +64,7 @@ class="code">File</span> implements.) The problem is the <span
 class="code">File::open</span> function doesn’t return a file at all. It
 returns a value of type <span class="code">io::Result&lt;File&gt;</span>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">pub fn </span><span style="color:#795da3;">open</span><span style="color:#000000;">&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -&gt; io::Result&lt;File&gt;
-</span></pre>
+<span style="color:#a71d5d;">pub fn </span><span style="color:#795da3;">open</span><span style="color:#000000;">&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -&gt; io::Result&lt;File&gt;</span></pre>
 
 <p>How do I use this? What does <span class="code">io::Result&lt;File&gt;</span> even
 mean? When I try to write Rust code the way I write Ruby or Go code, I get
@@ -134,9 +124,7 @@ programming languages.</p>
 <p>Rust borrowed the concept behind the <span class="code">Result&lt;T, E&gt;</span>
 type from Haskell, a strongly typed functional programming language. Haskell
 includes a type called <span class="code">Either</span>:</p>
-<pre>
-data Either a b = Left a | Right b
-</pre>
+<pre>data Either a b = Left a | Right b</pre>
 <p>This syntax seems bizarre at first glance but in fact it’s simple. Haskell
 makes it easy to create new types by combining other types together. This line
 of code means the <span class="code">Either</span> type is a combination of two
@@ -198,21 +186,18 @@ operation is an error of type <span class="code">E</span>.</p>
 Rust is to check the <span class="code">Result</span> values returned by the
 Rust standard library functions:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">main</span><span style="color:#000000;">() {
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">main</span><span style="color:#000000;">() {
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> file </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">File::open(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">foo.txt</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">);
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">match</span><span style="color:#000000;"> file {
 </span><span style="color:#000000;">        Ok(file) </span><span style="color:#4f5b66;">=&gt; </span><span style="color:#000000;">println!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">I have a file: </span><span style="color:#d08770;">{:?}</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, file),
 </span><span style="color:#000000;">        Err(e) </span><span style="color:#4f5b66;">=&gt; </span><span style="color:#000000;">println!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">There was an error: </span><span style="color:#d08770;">{}</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, e)
 </span><span style="color:#000000;">    }
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>And If I want to actually read in the contents of that file, I would check that
 return value also:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">main</span><span style="color:#000000;">() {
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">main</span><span style="color:#000000;">() {
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> file </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">File::open(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">foo.txt</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">);
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">match</span><span style="color:#000000;"> file {
 </span><span style="color:#000000;">        Ok(</span><span style="color:#a71d5d;">mut</span><span style="color:#000000;"> file) </span><span style="color:#4f5b66;">=&gt; </span><span style="color:#000000;">{
@@ -224,8 +209,7 @@ return value also:</p>
 </span><span style="color:#000000;">        }
 </span><span style="color:#000000;">        Err(e) </span><span style="color:#4f5b66;">=&gt; </span><span style="color:#000000;">println!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">There was an error: </span><span style="color:#d08770;">{}</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, e)
 </span><span style="color:#000000;">    }
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <h2>The ? Operator In Rust</h2>
 <p>That last code snippet is quite a mouthful - error checking with Rust is even
@@ -238,13 +222,11 @@ that checks the <span class="code">Result&lt;T, E&gt;</span> value, and returns
 underlying <span class="code">T</span> value if the result is <span
 class="code">Ok(T)</span>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">main</span><span style="color:#000000;">() {
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">main</span><span style="color:#000000;">() {
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> file </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">File::open(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">foo.txt</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)</span><span style="color:#4f5b66;">?</span><span style="color:#000000;">;
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> contents </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String::new();
 </span><span style="color:#000000;">    file.read_to_string(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#a71d5d;">mut</span><span style="color:#000000;"> contents)</span><span style="color:#4f5b66;">?</span><span style="color:#000000;">;
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>Here, the use of <span class="code">?</span> after <span
 class="code">File::open(&quot;foo.txt&quot;)</span> tells the Rust compiler to check the
@@ -258,8 +240,7 @@ Rust jumps to the end of the <span class="code">main</span> function
 immediately and returns.</p>
 <p>The program above is much more concise and easy to understand. The only problem
 is that it doesn’t work! When I try to compile this, I get:</p>
-<pre class="console">
-error[E0277]: the `?` operator can only be used in a function that returns `Result` or `Option`
+<pre class="console">error[E0277]: the `?` operator can only be used in a function that returns `Result` or `Option`
 (or another type that implements `std::ops::Try`)
  --> src/main.rs:5:20
   |
@@ -268,8 +249,7 @@ error[E0277]: the `?` operator can only be used in a function that returns `Resu
   a function that returns `()`
   |
   = help: the trait `std::ops::Try` is not implemented for `()`
-  = note: required by `std::ops::Try::from_error`
-</pre>
+  = note: required by `std::ops::Try::from_error`</pre>
 <h2>Rust Programs Revolve Around Error Handling</h2>
 <p>As the error message says, the problem here is that the <span
 class="code">?</span> operator generates code that will jump to the end of the
@@ -277,18 +257,15 @@ main function and return the <span class="code">Err(E)</span> value, where E is
 of type <span class="code">std::io::Error</span>. The problem is that I haven’t
 declared a return value for <span class="code">main</span>. Therefore the Rust
 compiler gives me an error:</p>
-<pre class="console">
-the `?` operator can only be used in a function that returns `Result` or
-`Option` (or another type that implements `std::ops::Try`)
-</pre>
+<pre class="console">the `?` operator can only be used in a function that returns `Result` or
+`Option` (or another type that implements `std::ops::Try`)</pre>
 <p>The function containing the use of the <span class="code">?</span> operator has
 to return a value of type <span class="code">Result&lt;T, E&gt;</span> with a
 matching <span class="code">E</span> type in order for this to make sense. I
 have to extract my <span class="code">File</span> calls into a separate
 function, like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">read</span><span style="color:#000000;">() -&gt; Result&lt;String, std::io::Error&gt; {
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">read</span><span style="color:#000000;">() -&gt; Result&lt;String, std::io::Error&gt; {
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> file </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">File::open(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">foo.txt</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)</span><span style="color:#4f5b66;">?</span><span style="color:#000000;">;
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> contents </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String::new();
 </span><span style="color:#000000;">    file.read_to_string(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#a71d5d;">mut</span><span style="color:#000000;"> contents)</span><span style="color:#4f5b66;">?</span><span style="color:#000000;">;
@@ -300,8 +277,7 @@ function, like this:</p>
 </span><span style="color:#000000;">        Ok(</span><span style="color:#a71d5d;">str</span><span style="color:#000000;">) </span><span style="color:#4f5b66;">=&gt; </span><span style="color:#000000;">println!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#d08770;">{}</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#a71d5d;">str</span><span style="color:#000000;">),
 </span><span style="color:#000000;">        Err(e) </span><span style="color:#4f5b66;">=&gt; </span><span style="color:#000000;">println!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#d08770;">{:?}</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, e)
 </span><span style="color:#000000;">    }
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>Note the new <span class="code">read()</span> function above returns a value of
 type <span class="code">Result&lt;String, std::io::Error&gt;</span>. This allows the

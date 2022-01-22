@@ -11,8 +11,7 @@
 <h2>Step 2: Write your new scaffold</h2>
 <p>To write a new scaffold for ScaffoldHub, you first need to write a Ruby code file called a “scaffold spec.” Here’s an example:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#008080;">Scaffoldhub</span><span style="color:#000000;">::</span><span style="color:#008080;">Specification</span><span style="color:#000000;">.</span><span style="color:#795da3;">new </span><span style="color:#a71d5d;">do
+<span style="color:#008080;">Scaffoldhub</span><span style="color:#000000;">::</span><span style="color:#008080;">Specification</span><span style="color:#000000;">.</span><span style="color:#795da3;">new </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Github URL where you will post your scaffold - the specified folder must contain this file
 </span><span style="color:#000000;">  base_url  </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">https://github.com/your_name/your_repo</span><span style="color:#4f5b66;">&#39;
@@ -72,14 +71,12 @@
 </span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Copy any file without running an ERB transformation
 </span><span style="color:#000000;">  </span><span style="color:#a7adba;"># file &#39;xyz.html&#39;, :dest =&gt; &#39;path/to/xyz.html&#39;
 </span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>As you can see, this file describes in a simple way what files your scaffold will generate on the end user's machine. It refers to a series of ERB templates that you would write also. In the “metadata” section, the scaffold spec provides some additional info that is only used for display purposes on scaffoldhub.org.</p>
 <p>The scaffoldhub gem provides a generator called “new_scaffold” to help save you some typing; run it inside of any Rails 3 app to generate the scaffold spec above along with a copy of the standard Rails scaffold generator ERB templates that are mentioned in the example spec:</p>
 <div class="CodeRay">
-  <div class="code"><pre>
-$ rails generate new_scaffold example
+  <div class="code"><pre>$ rails generate new_scaffold example
       <span class="s">create</span>  example_scaffold/scaffold_spec.rb
       <span class="s">create</span>  example_scaffold/example_screenshot.png
       <span class="s">create</span>  example_scaffold/templates/_form.html.erb
@@ -89,16 +86,14 @@ $ rails generate new_scaffold example
       <span class="s">create</span>  example_scaffold/templates/show.html.erb
       <span class="s">create</span>  example_scaffold/templates/model.rb
       <span class="s">create</span>  example_scaffold/templates/migration.rb
-      <span class="s">create</span>  example_scaffold/templates/controller.rb
-</pre></div>
+      <span class="s">create</span>  example_scaffold/templates/controller.rb</pre></div>
 </div>
 <p>This example screenshot image is also generated:</p>
 <p><img src="https://patshaughnessy.net/assets/2011/4/30/example_screenshot.png" alt="example screenshot" /></p>
 <h2>Step 3: Test your new scaffold locally</h2>
 <p>Before pushing your new scaffold to ScaffoldHub, you should test that it works locally. To do this, run the scaffoldhub generator with the “--local” option set, and specify the local path of the scaffold spec file as the scaffold, for example like this:</p>
 <div class="CodeRay">
-  <div class="code"><pre>
-$ rails generate scaffoldhub person name:string --scaffold example_scaffold/scaffold_spec.rb --local
+  <div class="code"><pre>$ rails generate scaffoldhub person name:string --scaffold example_scaffold/scaffold_spec.rb --local
       invoke  active_record
       <span class="s">create</span>    db/migrate/20110430115456_create_people.rb
       <span class="s">create</span>    app/models/person.rb
@@ -122,8 +117,7 @@ $ rails generate scaffoldhub person name:string --scaffold example_scaffold/scaf
       invoke      test_unit
       <span class="s">create</span>        test/unit/helpers/people_helper_test.rb
       invoke  stylesheets
-      <span class="s">create</span>    public/stylesheets/scaffold.css
-</pre></div>
+      <span class="s">create</span>    public/stylesheets/scaffold.css</pre></div>
 </div>
 <p>You might get errors here if there are mistakes in the scaffold spec file, or in one of the ERB templates, for example. Fix and repeat as necessary. Once the scaffoldhub generator runs cleanly, then you can test that your generated scaffolding code also works.</p>
 <p>Also be sure to take a screen shot so people can see what your new scaffolding will look like on scaffoldhub.org, even before they run it. On a Mac you can use Cmd-Shift-F4 to capture part of your screen; try to capture or crop your screen shot image so that it uses a 4x3 aspect ratio. Then save this image into your new scaffold folder and reference it the scaffold spec, similar to the example_screenshot.png file generated above.</p>

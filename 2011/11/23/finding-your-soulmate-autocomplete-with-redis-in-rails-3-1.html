@@ -23,15 +23,12 @@ I'll get started today by showing you step by step how to setup a new Rails 3.1 
 <p>This was actually all very easy to do! Soulmate’s code was quite easy to follow and everything just worked for me. To prove it, let’s spend 10 or 20 minutes together and setup a new sample Rails 3.1 app right now that will use Soulmate and Redis for autocomplete.</p>
 <h2>Step 1: Installing Redis and creating a new Rails 3.1 app</h2>
 <p>I’ll assume most of you have already installed and used Redis by now; if not then I hope reading this article will encourage you to take the time to download and become familiar with it. If you have <a href="https://github.com/mxcl/homebrew">Homebrew</a>, then it’s just a matter of running:</p>
-<pre type="console">
-$ brew install redis  
+<pre type="console">$ brew install redis  
 ==> Downloading http://redis.googlecode.com/files/redis-2.2.14.tar.gz
-etc...
-</pre>
+etc...</pre>
 <p>If not, then you easily built it from source; see: <a href="http://redis.io/download">http://redis.io/download</a> for details.</p>
 <p>Now that we have Redis, let’s create a new example Rails 3.1 app that we can try out Soulmate with:</p>
-<pre type="console">
-$ rails -v 
+<pre type="console">$ rails -v 
 Rails 3.1.3
 $ rails new soulmate_example
 {^s: create^}
@@ -46,59 +43,45 @@ etc...
 Using sass-rails (3.1.5) 
 Using sqlite3 (1.3.4) 
 Using uglifier (1.1.0) 
-{^s: Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.^}
-</pre>
+{^s: Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.^}</pre>
 <p>And let’s add the Soulmate gem to the Gemfile, along with <a href="http://faker.rubyforge.org/rdoc/">Faker</a>, which will give us some silly names to test autocomplete with:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">source </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">http://rubygems.org</span><span style="color:#4f5b66;">&#39;
+<span style="color:#000000;">source </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">http://rubygems.org</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">
 </span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">rails</span><span style="color:#4f5b66;">&#39;</span><span style="color:#795da3;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">3.1.3</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">soulmate</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">faker</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">
-</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
-</span></pre>
+</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...</span></pre>
 
 <p>Now we need to run <span class="code">bundle update</span> to install Soulmate and Faker, since Rails already ran <span class="code">bundle install</span> for us when we created the new app:</p>
-<pre type="console">
-$ bundle update
-</pre>
+<pre type="console">$ bundle update</pre>
 <h2>Step 2: Creating a model and some test data</h2>
 <p>Now let’s create a new ActiveRecord model called “Person” with a single string attribute called “name:”</p>
-<pre type="console">
-$ rails g model person name:string
-</pre>
+<pre type="console">$ rails g model person name:string</pre>
 <p>And next let’s write some code to create 1000 test person records using the Faker gem we added above. Editing db/seeds.rb:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#d08770;">1000</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
+<span style="color:#d08770;">1000</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  </span><span style="color:#008080;">Person</span><span style="color:#000000;">.create </span><span style="color:#008080;">:name </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{</span><span style="color:#008080;">Faker</span><span style="color:#000000;">::</span><span style="color:#008080;">Name</span><span style="color:#000000;">.first_name} #{</span><span style="color:#008080;">Faker</span><span style="color:#000000;">::</span><span style="color:#008080;">Name</span><span style="color:#000000;">.last_name}</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Finally we can create our database along with 1000 silly names:</p>
-<pre type="console">
-$ rake db:migrate
-$ rake db:seed
-</pre>
+<pre type="console">$ rake db:migrate
+$ rake db:seed</pre>
 <h2>Step 3: Adding the after_save callback, and loading the data into Redis</h2>
 <p>As I discussed above, today I’m going to call the Soulmate code directly to load the Redis cache with data, instead of using the load script. To do that, all we need to do is add an <span class="code">after_save</span> callback to our Person model:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Person </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Person </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
 </span><span style="color:#000000;">  after_save </span><span style="color:#008080;">:load_into_soulmate
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">load_into_soulmate
 </span><span style="color:#000000;">    loader </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Soulmate</span><span style="color:#000000;">::</span><span style="color:#008080;">Loader</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">person</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
 </span><span style="color:#000000;">    loader.add(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">term</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">=&gt; name, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">id</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">=&gt; id)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>My Person model can access the <span class="code">Soulmate::Loader</span> class since I included the Soulmate gem in my bundle when I created the app. Now if I drop and recreate my database, all of the 1000 names will be loaded right into Redis via Soulmate, since the after_save callback will be called 1000 times when the “db:seed” rake task is called by “db:reset:”</p>
-<pre type="console">
-$ rake db:reset
+<pre type="console">$ rake db:reset
 -- create_table("people", {:force=>true})
    -> 0.0027s
 -- initialize_schema_migrations_table()
@@ -106,43 +89,34 @@ $ rake db:reset
 -- assume_migrated_upto_version(20111122161511, ["/path/to/db/migrate"])
    -> 0.0013s
 rake aborted!
-Connection refused - Unable to connect to Redis on 127.0.0.1:6379
-</pre>
+Connection refused - Unable to connect to Redis on 127.0.0.1:6379</pre>
 <p>Oops - I forgot to start my redis server; let’s do that in a separate terminal window:</p>
-<pre type="console">
-$ redis-server 
+<pre type="console">$ redis-server 
 [1467] 22 Nov 11:20:12 # Warning: no config file specified, using the default config...
 [1467] 22 Nov 11:20:12 * Server started, Redis version 2.2.14
 [1467] 22 Nov 11:20:12 * DB loaded from disk: 0 seconds
 [1467] 22 Nov 11:20:12 * The server is now ready to accept connections on port 6379
 [1467] 22 Nov 11:20:13 - DB 0: 35 keys (0 volatile) in 96 slots HT.
-[1467] 22 Nov 11:20:13 - 0 clients connected (0 slaves), 957552 bytes in use
-</pre>
+[1467] 22 Nov 11:20:13 - 0 clients connected (0 slaves), 957552 bytes in use</pre>
 <p>And back in my first terminal window I’ll try again:</p>
-<pre type="console">
-$ rake db:reset
+<pre type="console">$ rake db:reset
 -- create_table("people", {:force=>true})
    -> 0.0041s
 -- initialize_schema_migrations_table()
    -> 0.0027s
 -- assume_migrated_upto_version(20111122161511, ["/path/to/db/migrate"])
-   -> 0.0015s
-</pre>
+   -> 0.0015s</pre>
 <h2>A window into your soul: taking a quick peek at the Redis data set</h2>
 <p>Let’s take a look at the special sauce that makes Soulmate interesting, how it saves the autocomplete data inside of Redis. To get sense of how this works, I’ll open the Redis command line interface:</p>
-<pre type="console">
-$ redis-cli
-redis 127.0.0.1:6379> 
-</pre>
+<pre type="console">$ redis-cli
+redis 127.0.0.1:6379></pre>
 <p>Next week I’ll cover this in a lot more detail, but for now let’s take a quick look at how the autocomplete data are saved in Redis. First, I’ll take a look at a few entries in the “soulmate-data:person” hash:</p>
-<pre type="console">
-redis 127.0.0.1:6379> hget soulmate-data:person 1
+<pre type="console">redis 127.0.0.1:6379> hget soulmate-data:person 1
 "{\"term\":\"Eda Lueilwitz\",\"id\":1}"
 redis 127.0.0.1:6379> hget soulmate-data:person 2
 "{\"term\":\"Abbey Lindgren\",\"id\":2}"
 redis 127.0.0.1:6379> hget soulmate-data:person 3
-"{\"term\":\"Brooklyn Mayer\",\"id\":3}"
-</pre>
+"{\"term\":\"Brooklyn Mayer\",\"id\":3}"</pre>
 <p>These wonderful names were generated by the call to <span class="code">Faker::Name.first_name</span> and <span class="code">Faker::Name.last_name</span> above in seeds.rb. The Redis key names use the pattern “soulmate-data:person” because I passed “person” into the constructor for the <span class="code">Soulmate::Loader</span> class above. You can see the Soulmate saves each name as a separate element in this Redis hash object.</p>
 <p>The real magic happens next: Soulmate also calculates a series of substrings for each phrase, or name in my example, and saves them separately into a search index, using a Redis sorted set object. For example, the name “Laurel” would be split into these possible substrings:</p>
 <p>La<br/>
@@ -151,16 +125,14 @@ Laur<br/>
 Laure<br/>
 Laurel<br/></p>
 <p>We can also see these values, along with a few other &quot;Lau&quot; substrings from other names, using the Redis command line:</p>
-<pre type="console">
-redis 127.0.0.1:6379> keys soulmate-index:person:lau*
+<pre type="console">redis 127.0.0.1:6379> keys soulmate-index:person:lau*
 1) "soulmate-index:person:laur"
 2) "soulmate-index:person:laurel"
 3) "soulmate-index:person:laurie"
 4) "soulmate-index:person:laure"
 5) "soulmate-index:person:lauri"
 6) "soulmate-index:person:laury"
-7) "soulmate-index:person:lau"
-</pre>
+7) "soulmate-index:person:lau"</pre>
 <p>If you try this yourself, you’ll get different values since the Faker gem creates random names. You might have to try different combinations of two or more letters to see the data.</p>
 <p>What we see here is really a search index: Soulmate has expanded all the possible combinations of matching letters your users might type as keys in this sorted set. The values corresponding to these keys are the id’s found above in the Redis hash - also the id’s of my ActiveRecord model objects! When a user types “lau” for example, Soulmate can issue a Redis query to figure out very quickly which person objects match... all without ever calling ActiveRecord to issue a single SQL query!</p>
 <p>There are a lot of interesting details here; stay tuned for a <a href="https://patshaughnessy.net/2011/11/29/two-ways-of-using-redis-to-build-a-nosql-autocomplete-search-index">follow up post next week</a> on how this algorithm actually works, and the computer science theory behind it.</p>
@@ -172,30 +144,21 @@ redis 127.0.0.1:6379> keys soulmate-index:person:lau*
 <p>Finally I’ll select the jQuery UI theme I want - hmm.... “Swanky Purse” sounds interesting:</p>
 <p><img src="https://patshaughnessy.net/assets/2011/11/23/select-swanky-purse.png" alt="select swanky purse" /></p>
 <p>And I’ll download the tar ball to my laptop. Now I just need to copy the “Swanky Purse” jQuery UI files into my Rails 3.1 asset folder like this:</p>
-<pre type="console">
-$ cd ~/Downloads/jquery-ui-1
+<pre type="console">$ cd ~/Downloads/jquery-ui-1
 $ cp js/* /path/to/app/assets/javascripts/.
-$ cp -r css/swanky-purse /path/to/app/assets/stylesheets/.
-</pre>
+$ cp -r css/swanky-purse /path/to/app/assets/stylesheets/.</pre>
 <p>This gives me both the Javascript I need to perform the autocomplete, and also the styling required to make it look “swanky!” Now I’ll generate a controller and view codes files for my sample web site like this:</p>
-<pre type="console">
-$ rails g controller people index autocomplete_person_name
-</pre>
+<pre type="console">$ rails g controller people index autocomplete_person_name</pre>
 <p>This will create an index action, and also a second action to handle the AJAX requests generated by the autocomplete widget. Next I’ll enable the default root in routes.rb:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># You can have the root of your site routed with &quot;root&quot;
+<span style="color:#a7adba;"># You can have the root of your site routed with &quot;root&quot;
 </span><span style="color:#a7adba;"># just remember to delete public/index.html.
-</span><span style="color:#000000;">root </span><span style="color:#008080;">:to </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">people#index</span><span style="color:#4f5b66;">&#39;
-</span></pre>
+</span><span style="color:#000000;">root </span><span style="color:#008080;">:to </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">people#index</span><span style="color:#4f5b66;">&#39;</span></pre>
 
 <p>... and delete the default Rails index page:</p>
-<pre type="console">
-$ rm public/index.html
-</pre>
+<pre type="console">$ rm public/index.html</pre>
 <p>And finally my view will consist of a single text field; editing app/views/people/index.html.erb:</p>
-<pre type="rhtml">
-Please enter the name of a person:
+<pre type="rhtml">Please enter the name of a person:
 <%= text_field_tag 'person_name' %>
 
 &lt;script>
@@ -204,35 +167,30 @@ $(function() {
     source: "&lt;%= people_autocomplete_person_name_path %>"
   });
 })
-&lt;/script>
-</pre>
+&lt;/script></pre>
 <p>Here I call the jQuery UI autocomplete widget on page load, and set it up against my single text field. I’ve set the source attribute to be the path of the “autocomplete_person_name” action, which I included in the people controller generate command above. Using unobtrusive Javascript would be much better, but for today this keeps things simple. If I have time, I’ll try to add Soulmate support to an existing Rails autocomplete gem, such as rails3-jquery-autocomplete.</p>
 <h2>Step 5: Calling Soulmate for autocomplete searches</h2>
 <p>The last thing we need to do to finish our Soulmate sample app is to actually call Soulmate when users start typing. To do this, all we need to do is implement the <span class="code">autocomplete_person_name</span> action in the <span class="code">PeopleController</span>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">PeopleController </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ApplicationController
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">PeopleController </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ApplicationController
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">index
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">autocomplete_person_name
 </span><span style="color:#000000;">    render </span><span style="color:#008080;">:json </span><span style="color:#000000;">=&gt; </span><span style="color:#008080;">Person</span><span style="color:#000000;">.search(params[</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">term</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">])
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>This just passes the “term” parameter, sent by JQuery, to the Person model’s search method and then renders the return value, the matching names, as JSON. And now let’s write that <span class="code">Person.search</span> method like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Person </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Person </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#000000;">self.</span><span style="color:#795da3;">search</span><span style="color:#000000;">(term)
 </span><span style="color:#000000;">    matches </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Soulmate</span><span style="color:#000000;">::</span><span style="color:#008080;">Matcher</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">person</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">).matches_for_term(term)
 </span><span style="color:#000000;">    matches.collect {</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">match</span><span style="color:#4f5b66;">| </span><span style="color:#000000;">{</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">id</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">=&gt; match[</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">id</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">], </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">label</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">=&gt; match[</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">term</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">], </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">value</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">=&gt; match[</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">term</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">] } }
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
-</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
-</span></pre>
+</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...</span></pre>
 
 <p>Just like I did earlier in the after_save callback, here i’m calling the Soulmate gem directly, this time using the <span class="code">Soulmate::Matcher</span> class. I pass the same “person” string into the constructor, and then just call the same method the Soulmate Sinatra app does: <span class="code">matches_for_term</span>, which calls Redis to perform the search! Once I have the matches, all I need to do is convert them into the format that the jQuery UI widget expects: an array of hashes containing the id, label and value for each name.</p>
 <p>Now running my Rails server and trying it out, I can see that “Swanky Purse” style:</p>

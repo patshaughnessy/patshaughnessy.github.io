@@ -5,8 +5,7 @@ easy to stop and start asynchronous tasks</i><br/>
   <small>(from: <a href="https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20111210.jpg">Wikimedia Commons</a>)</small></i> 
 </div>
 <p>Imagine if you had a text file containing thousands of URLs:</p>
-<pre>
-$ cat urls.txt
+<pre>$ cat urls.txt
 https://example.com/1.html
 https://example.com/2.html
 https://example.com/3.html
@@ -14,8 +13,7 @@ https://example.com/3.html
 etc...
 
 https://example.com/99999.html
-https://example.com/100000.html
-</pre>
+https://example.com/100000.html</pre>
 <p>…and you needed to download all of those HTML pages efficiently. How would you
 do it? Maybe a shell script using <span class="code">xargs</span> and <span
 class="code">curl</span>? Maybe a simple Golang program? Go’s powerful
@@ -38,8 +36,7 @@ McArthur</a>. He just updated it to work with Tokio,
 Rust’s new async/await engine, so this is the perfect time to try using it.
 Here’s the example from the readme:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">use </span><span style="color:#000000;">std::collections::HashMap;
+<span style="color:#a71d5d;">use </span><span style="color:#000000;">std::collections::HashMap;
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">#[tokio::main]
 </span><span style="color:#000000;">async </span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">main</span><span style="color:#000000;">() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
@@ -49,8 +46,7 @@ Here’s the example from the readme:</p>
 </span><span style="color:#000000;">        .await</span><span style="color:#4f5b66;">?</span><span style="color:#000000;">;
 </span><span style="color:#000000;">    println!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#d08770;">{:#?}</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, resp);
 </span><span style="color:#000000;">    Ok(())
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>This version downloads some JSON and parses it. Notice the new <span
 class="code">async</span> and <span class="code">await</span> keywords. The
@@ -62,8 +58,7 @@ functions to run on the same thread.</p>
 <p>I decided to modify this to print out the number of bytes downloaded instead; you could
 easily change it to save the data to a file or do whatever you want.</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> path </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">https://httpbin.org/ip</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">;
+<span style="color:#a71d5d;">let</span><span style="color:#000000;"> path </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">https://httpbin.org/ip</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">;
 </span><span style="color:#a71d5d;">match </span><span style="color:#000000;">reqwest::get(path).await {
 </span><span style="color:#000000;">    Ok(resp) </span><span style="color:#4f5b66;">=&gt; </span><span style="color:#000000;">{
 </span><span style="color:#000000;">        </span><span style="color:#a71d5d;">match</span><span style="color:#000000;"> resp.text().await {
@@ -75,8 +70,7 @@ easily change it to save the data to a file or do whatever you want.</p>
 </span><span style="color:#000000;">    }
 </span><span style="color:#000000;">    Err(</span><span style="color:#4f5b66;">_</span><span style="color:#000000;">) </span><span style="color:#4f5b66;">=&gt; </span><span style="color:#000000;">println!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">ERROR downloading </span><span style="color:#d08770;">{}</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, path),
 </span><span style="color:#000000;">}
-</span><span style="color:#000000;">Ok(())
-</span></pre>
+</span><span style="color:#000000;">Ok(())</span></pre>
 
 <p>This is a two step process:</p>
 <ul>
@@ -103,20 +97,17 @@ code. I do one thing, then I do another.</p>
 <h2>Sending 3 Concurrent Requests</h2>
 <p>The magic happens when I have more than one request I want to make in parallel. Let’s use three hard coded path strings:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> paths </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">vec![
+<span style="color:#a71d5d;">let</span><span style="color:#000000;"> paths </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">vec![
 </span><span style="color:#000000;">    </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">https://example.com/1.html</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">.to_string(),
 </span><span style="color:#000000;">    </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">https://example.com/2.html</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">.to_string(),
 </span><span style="color:#000000;">    </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">https://example.com/3.html</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">.to_string(),
-</span><span style="color:#000000;">];
-</span></pre>
+</span><span style="color:#000000;">];</span></pre>
 
 <p>To download the 3 HTML files in parallel, I spawn three Tokio “tasks” and wait
 for them all to complete. (This requires adding the futures crate to
 Cargo.toml, which implements <span class="code">join_all</span>.)</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;">// Iterate over the paths.
+<span style="color:#a7adba;">// Iterate over the paths.
 </span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> tasks: Vec&lt;JoinHandle&lt;Result&lt;(), ()&gt;&gt;&gt;</span><span style="color:#4f5b66;">= </span><span style="color:#000000;">vec![];
 </span><span style="color:#a71d5d;">for</span><span style="color:#000000;"> path </span><span style="color:#4f5b66;">in</span><span style="color:#000000;"> paths {
 </span><span style="color:#000000;">
@@ -143,8 +134,7 @@ Cargo.toml, which implements <span class="code">join_all</span>.)</p>
 </span><span style="color:#000000;">
 </span><span style="color:#a7adba;">// Wait for them all to finish
 </span><span style="color:#000000;">println!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Started </span><span style="color:#d08770;">{}</span><span style="color:#008080;"> tasks. Waiting...</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, tasks.len());
-</span><span style="color:#000000;">join_all(tasks).await;
-</span></pre>
+</span><span style="color:#000000;">join_all(tasks).await;</span></pre>
 
 <p>Each Tokio task is a closure passed to the <span
 class="code">tokio::spawn</span> function, marked <span class="code">async
@@ -196,8 +186,7 @@ all of the futures I pushed onto the tasks array have completed.</p>
 <h2>Sending 100,000 Concurrent Requests</h2>
 <p>I can scale this up to 100,000 requests by reading the URLs in from a file instead:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">read_lines</span><span style="color:#000000;">(path: </span><span style="color:#4f5b66;">&amp;</span><span style="color:#a71d5d;">str</span><span style="color:#000000;">) -&gt; Result&lt;Vec&lt;String&gt;, Box&lt;dyn Error&gt;&gt; {
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">read_lines</span><span style="color:#000000;">(path: </span><span style="color:#4f5b66;">&amp;</span><span style="color:#a71d5d;">str</span><span style="color:#000000;">) -&gt; Result&lt;Vec&lt;String&gt;, Box&lt;dyn Error&gt;&gt; {
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> file </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">File::open(path)</span><span style="color:#4f5b66;">?</span><span style="color:#000000;">;
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> reader </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">BufReader::new(file);
 </span><span style="color:#000000;">    Ok(
@@ -210,8 +199,7 @@ all of the futures I pushed onto the tasks array have completed.</p>
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">	</span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> paths: Vec&lt;String&gt; </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">read_lines(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">urls.txt</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)</span><span style="color:#4f5b66;">?</span><span style="color:#000000;">;
 </span><span style="color:#000000;">
-</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
-</span></pre>
+</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...</span></pre>
 
 <p>When I tried this out for the first time I was excited: How long would it take
 to download 100,000 HTML pages simultaneously like this? Would it be 100,000x
@@ -245,8 +233,7 @@ etc., in this manner processing all 100,000 tasks 8 at a time.</p>
 href="https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.5/futures/stream/trait.StreamExt.html#method.buffer_unordered"><span
 class="code">buffer_unordered</span></a> function:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> fetches </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">futures::stream::iter(
+<span style="color:#a71d5d;">let</span><span style="color:#000000;"> fetches </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">futures::stream::iter(
 </span><span style="color:#000000;">    paths.into_iter().map(|path| {
 </span><span style="color:#000000;">        async </span><span style="color:#a71d5d;">move </span><span style="color:#000000;">{
 </span><span style="color:#000000;">            </span><span style="color:#a71d5d;">match </span><span style="color:#000000;">reqwest::get(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">path).await {
@@ -264,8 +251,7 @@ class="code">buffer_unordered</span></a> function:</p>
 </span><span style="color:#000000;">})
 </span><span style="color:#000000;">).buffer_unordered(</span><span style="color:#d08770;">8</span><span style="color:#000000;">).collect::&lt;Vec&lt;()&gt;&gt;();
 </span><span style="color:#000000;">println!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Waiting...</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">);
-</span><span style="color:#000000;">fetches.await;
-</span></pre>
+</span><span style="color:#000000;">fetches.await;</span></pre>
 
 <p>First I create an iterator which maps all of the paths to my closures, and passes
 them to <span class="code">futures::stream::iter</span>.

@@ -26,13 +26,11 @@ indexing system, exactly? Read on to find out!</p>
 <h2>Searching Without an Index</h2>
 <p>Here again is the tree table I used as an example in the earlier posts in this
 series:</p>
-<pre>
-create table tree(
+<pre>create table tree(
     id serial primary key,
     letter char,
     path ltree
-);
-</pre>
+);</pre>
 <p>Note the path column uses the custom <span class="code">ltree</span> data type
 the LTREE extension provides. If you missed the previous posts, <span
 class="code">ltree</span> columns represent hierarchical data by joining
@@ -44,9 +42,7 @@ have a tree containing hundreds or thousands of records in the <span
 class="code">path</span> column:</p>
 <img src="https://patshaughnessy.net/assets/2017/12/15/table.png"/>
 <p>Now suppose I search for a single tree node using a select statement:</p>
-<pre>
-select letter from tree where path = 'A.B.T.V'
-</pre>
+<pre>select letter from tree where path = 'A.B.T.V'</pre>
 <p>Without an index on this table, Postgres has to resort to a <em>sequence scan</em>,
 which is a technical way of saying that Postgres has to iterate over all of the
 records in the table:</p>
@@ -61,9 +57,7 @@ way to know how many matches there might be in the data ahead of time.</p>
 <h2>Searching With a B-Tree Index</h2>
 <p>Of course, there’s a simple solution to this problem; I just need to create an
 index on the path column:</p>
-<pre>
-create index tree_path_idx on tree (path);
-</pre>
+<pre>create index tree_path_idx on tree (path);</pre>
 <p>As you probably know, executing a search using an index is much faster. If you
 see a performance problem with a SQL statement in your application, the first
 thing you should check for is a missing index. But why? Why does creating an
@@ -107,18 +101,14 @@ pointers to grandchild segments, etc.</p>
 <p>But there’s a serious problem here I’ve overlooked so far. Postgres’s index
 search code only supports certain operators. Above I was searching using this
 select statement:</p>
-<pre>
-select letter from tree where path = 'A.B.T.V'
-</pre>
+<pre>select letter from tree where path = 'A.B.T.V'</pre>
 <p>I was looking for records that were equal to my query: <span class="code">p ==
 q</span>. Using a B-Tree index I could also have searched for records greater
 than or less than my query: <span class="code">p &lt; q</span> or <span
 class="code">p &gt; q</span>.</p>
 <p>But what if I want to use the custom LTREE <span class="code">&lt;@</span>
 (ancestor) operator? What if I want to execute this select statement?</p>
-<pre>
-select letter from tree where path <@ 'A.B.V'
-</pre>
+<pre>select letter from tree where path <@ 'A.B.V'</pre>
 <p>As we saw in the previous posts in this series, this search will return all of
 the LTREE records that appear somewhere on the branch under <span
 class="code">A.B.V</span>, that are descendants of the <span
@@ -191,10 +181,8 @@ algorithm.</p>
 <p>I can use these custom functions on my own data simply by creating a GiST
 index. Returning to my LTREE example, I’ll drop my B-Tree index and create a
 GiST index instead:</p>
-<pre>
-drop index tree_path_idx;
-create index tree_path_idx on tree using gist (path);
-</pre>
+<pre>drop index tree_path_idx;
+create index tree_path_idx on tree using gist (path);</pre>
 <p>Notice the <span class="code">using gist</span> keywords in the <span
 class="code">create index</span> command. That’s all it takes; Postgres
 automatically finds, loads and uses the <span class="code">ltree_union</span>,
@@ -205,20 +193,16 @@ extension</a>
 also.</p>
 <p>Let’s see how this works - suppose I add a few random tree records to my empty
 tree table after creating the index:</p>
-<pre>
-insert into tree (letter, path) values ('A', 'A.B.G.A');
+<pre>insert into tree (letter, path) values ('A', 'A.B.G.A');
 insert into tree (letter, path) values ('E', 'A.B.T.E');
 insert into tree (letter, path) values ('M', 'A.B.R.M');
 insert into tree (letter, path) values ('F', 'A.B.E.F');
-insert into tree (letter, path) values ('P', 'A.B.R.P');
-</pre>
+insert into tree (letter, path) values ('P', 'A.B.R.P');</pre>
 <p>To get things started, Postgres will allocate a new memory segment for the GiST
 index and insert my five records:</p>
 <img src="https://patshaughnessy.net/assets/2017/12/15/gist1.png"/>
 <p>If I search now using the ancestor operator:</p>
-<pre>
-select count(*) from tree where path <@ 'A.B.T'
-</pre>
+<pre>select count(*) from tree where path <@ 'A.B.T'</pre>
 <p>…Postgres will simply iterate over the records in the same order I inserted
 then, and call the <span class="code">ltree_consistent</span> function for each
 one. Here again is what the GiST API calls for the Consistent function to do:</p>
@@ -299,9 +283,7 @@ large multi-level tree.</p>
 <p>After creating this GiST index tree, searching for a value is straightforward.
 Postgres uses the <span class="code">ltree_consistent</span> function. As an
 example, let’s repeat the same SQL query from above:</p>
-<pre>
-select count(*) from tree where path <@ 'A.B.T'
-</pre>
+<pre>select count(*) from tree where path <@ 'A.B.T'</pre>
 <p>To execute this using the GiST index, Postgres iterates over the union values
 in the root memory segment and calls the <span
 class="code">ltree_consistent</span> function for each one:</p>

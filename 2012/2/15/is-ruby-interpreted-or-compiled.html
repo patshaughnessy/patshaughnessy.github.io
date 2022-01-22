@@ -16,42 +16,33 @@
 </div>
 <p>Using the Rubinius compiler is as simple as running any Ruby script. Here’s a very silly but simple Ruby program I’ll use as an example today:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Adder
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Adder
 </span><span style="color:#343d46;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">add_two</span><span style="color:#000000;">(x)
 </span><span style="color:#000000;">    x</span><span style="color:#4f5b66;">+</span><span style="color:#d08770;">2
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
-</span><span style="color:#000000;">puts </span><span style="color:#008080;">Adder</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">.add_two(</span><span style="color:#d08770;">3</span><span style="color:#000000;">)
-</span></pre>
+</span><span style="color:#000000;">puts </span><span style="color:#008080;">Adder</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">.add_two(</span><span style="color:#d08770;">3</span><span style="color:#000000;">)</span></pre>
 
 <p>Now if I save that into a file called “simple.rb,” switch to Rubinius using RVM, and run the script I’ll get the number “5” as expected:</p>
-<pre type="console">
-$ rvm rbx-1.2.4-20110705
+<pre type="console">$ rvm rbx-1.2.4-20110705
 $ ruby simple.rb
-5
-</pre>
+5</pre>
 <p>Not very interesting, I know. But what is interesting is that when I ran simple.rb Rubinius created a new, hidden directory called “.rbx” with a strange, cryptically named file in it:</p>
-<pre type="console">
-$ ls -a
+<pre type="console">$ ls -a
 .         ..        .rbx      simple.rb
 $ find .rbx
 .rbx
 .rbx/a7
-.rbx/a7/a7fc1eb2edc84efed8db760d37bee43753483f41
-</pre>
+.rbx/a7/a7fc1eb2edc84efed8db760d37bee43753483f41</pre>
 <p>This vaguely reminds me of how git saves the git repository data in a hidden folder called “.git,” also using cryptic hexadecimal names. What we are looking at here is a compiled version of simple.rb: the “a7fc1eb2e...” file contains my Ruby code converted into Rubinius byte code.</p>
 <p>Whenever you run a Ruby script, Rubinius uses a two step process to compile and run your code:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/2/15/rubinius-diagram.png" alt="Rubinius compiler" /></p>
 <p>On the top you can see that first Rubinius compiles your code into byte code, and then below later executes it using the Rubinius Virtual Machine, which can compile the byte code into native machine language. Rubinius also caches the byte code using the hexadecimal naming scheme I showed above, avoiding the need for the compile step entirely if the Ruby source code file didn’t change. </p>
 <p>As <a href="http://rubini.us/2011/03/17/running-ruby-with-no-ruby/">Brian Ford explained on the Rubinius blog</a>, you can actually run the Rubinius compiler directly like this:</p>
-<pre type="console">
-$ rbx compile simple.rb -o simple.bytecode
-</pre>
+<pre type="console">$ rbx compile simple.rb -o simple.bytecode</pre>
 <p>This compiles my Ruby code and saves the byte code in the specified file. If we look at the simple.bytecode file, we’ll see a series of alphanumeric tokens that don’t make any sense. But if you run the compiler using the “-B” option you can see an annotated version of the Rubinius byte code:</p>
-<pre type="console">
-$ rbx compile simple.rb -o simple.bytecode -B
+<pre type="console">$ rbx compile simple.rb -o simple.bytecode -B
 ============= :__script__ ==============
 Arguments:   0 required, 0 post, 0 total
 Arity:       0
@@ -79,8 +70,7 @@ Lines to IP: 2: -1..-1, 3: 0..5
 0003:  meta_send_op_plus          :+
 0005:  ret                        
 
-... etc ...
-</pre>
+... etc ...</pre>
 <p>At the bottom here we can see the compiled version of my silly <span class="code">add_two</span> method. It’s actually somewhat easy to understand the byte code, since it’s annotated so well:</p>
 <ul>
   <li>First “push_local” saves the value of the “x” parameter on the virtual machine stack.</li>
@@ -97,24 +87,19 @@ Lines to IP: 2: -1..-1, 3: 0..5
 </table>
 </div>
 <p>Now let’s take a look at how JRuby compiles Ruby code; I’ll start by using RVM to switch over to JRuby, and then I’ll run the same simple.rb script:</p>
-<pre type="console">
-$ rvm jruby-head
+<pre type="console">$ rvm jruby-head
 $ ruby simple.rb
-5
-</pre>
+5</pre>
 <p>No surprise: we get the same result. At a high level, JRuby uses the same two step process to run your script - first it compiles the Ruby code into byte code, and then executes the byte code using the Java Virtual Machine (JVM). See my post last week called <a href="https://patshaughnessy.net/2012/2/7/journey-to-the-center-of-jruby">Journey to the center of JRuby</a> to learn more about this.</p>
 <p>Here's another diagram showing the two step process, this time for JRuby:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/2/15/jruby-diagram.png" alt="JRuby compiler" /></p>
 <p>Like with Rubinius, it’s possible to run the JRuby compiler directly using the “jrubyc” command... following the Java executable naming pattern (“java” -&gt; “javac”). Thanks to my friend <a href="http://www.alexrothenberg.com/">Alex Rothenberg</a> for pointing this out. Running “jrubyc” will create a Java .class file, which we can inspect using the Java decompiler like I did last week:</p>
-<pre type="console">
-$ jrubyc simple.rb
+<pre type="console">$ jrubyc simple.rb
 $ ls
 simple.class simple.rb
-$ javap -c simple.class > simple.bytecode
-</pre>
+$ javap -c simple.class > simple.bytecode</pre>
 <p>Now the simple.bytecode file will contain an annotated version of the Java byte code the  JVM will execute. Unlike Rubinius, which creates byte code that is fairly clean, simple and easy to understand, Java byte code is much more cryptic and confusing. Searching through the simple.bytecode file for my method <span class="code">add_two</span>, I found the following snippet of byte code:</p>
-<pre type="console">
-  public static org.jruby.runtime.builtin.IRubyObject method__1$RUBY$add_two(simple, org.jruby.runtime.Thread...
+<pre type="console">public static org.jruby.runtime.builtin.IRubyObject method__1$RUBY$add_two(simple, org.jruby.runtime.Thread...
     Code:
        0: aload_3       
        1: astore        9
@@ -122,8 +107,7 @@ $ javap -c simple.class > simple.bytecode
        4: aload_2       
        5: aload         9
        7: invokedynamic #80,  0             // InvokeDynamic #1:"fixnumOperator:+":(Lorg/jruby/runtime/Thread...
-      12: areturn       
-</pre>
+      12: areturn</pre>
 <p>Although quite difficult to understand, there are a couple of important details to notice:</p>
 <p>First, JRuby has compiled my Ruby <span class="code">add_two</span> method into a byte code method called <span class="code">method__1$RUBY$add_two</span>. This proves that my Ruby script has been compiled! That is, when JRuby ran simple.rb above, it did not read the Ruby code, interpret it and just follow the instructions like the MRI interpreter would do. Instead, it converted my Ruby script into byte code, and specifically my <span class="code">add_two</span> method into the byte code snippet above.</p>
 <p>Second, notice the use of the “invokedynamic” byte code instruction. This is a new innovation of the Java Virtual Machine, making it easier for the JVM to support dynamic languages like Ruby. Here you can see it’s used by the <span class="code">add_two</span> method to call the <span class="code">+</span> operator of the Ruby Fixnum class, for my <span class="code">x+2</span> Ruby code. If you’re interested in what invokedynamic actually means, be sure to check out <a href="http://blog.headius.com/2008/09/first-taste-of-invokedynamic.html">a very detailed post Charles Nutter wrote</a> about it back in 2008. This use of invokedynamic is actually new for Java 1.7 and JRuby 1.7, so if you’re using the current release version of JRuby (1.6.4) or earlier you won’t see it appear in the byte code.</p>

@@ -7,15 +7,11 @@
 <p>Obviously this is an utterly preposterous statement: it’s hard to think of a more ridiculous and esoteric coding requirement. I can just imagine all sorts of amusing conversations with designers and business sponsors: “No... the size of this &lt;input&gt; field should be 23... 24 is just too long!”  Or: “We need to explain to users that their subject lines should be less than 23 letters...” Or: “Twitter got it all wrong... the 140 limit should have been 23!”</p>
 <p>Why in the world would I even imagine saying this? As silly as this requirement might be, there is actually a grain of truth behind it: creating shorter Ruby strings is actually much faster than creating longer ones. It turns out that this line of Ruby code:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">1234567890123456789012</span><span style="color:#4f5b66;">&quot; + &quot;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">1234567890123456789012</span><span style="color:#4f5b66;">&quot; + &quot;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p>... is executed about twice as fast by the MRI 1.9.3 Ruby interpreter than this line of Ruby code:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">12345678901234567890123</span><span style="color:#4f5b66;">&quot; + &quot;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">12345678901234567890123</span><span style="color:#4f5b66;">&quot; + &quot;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p>Huh? What’s the difference? These two lines look identical! Well, the difference is that the first line creates a new string containing 23 characters, while the second line creates one with 24. It turns out that the MRI Ruby 1.9 interpreter is optimized to handle strings containing 23 characters or less more quickly than longer strings. This isn’t true for Ruby 1.8.</p>
 <p>Today I’m going to take a close look at the MRI Ruby 1.9 interpreter to see how it actually handles saving string values... and why this is actually true.</p>
@@ -32,84 +28,64 @@
 <h2>Heap Strings</h2>
 <p>The standard and most common way for Ruby to save string data is in the “heap.” The heap is a core concept of the C language: it’s a large pool of memory that C programmers can allocate from and use via a call to the <span class="code">malloc</span> function. For example, this line of C code allocates a 100 byte chunk of memory from the heap and saves its memory address into a pointer:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">ptr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">malloc(</span><span style="color:#d08770;">100</span><span style="color:#000000;">);
-</span></pre>
+<span style="color:#a71d5d;">char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">ptr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">malloc(</span><span style="color:#d08770;">100</span><span style="color:#000000;">);</span></pre>
 
 <p>Later, when the C programmer is done with this memory, she can release it and return it to the system using <span class="code">free</span>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">free</span><span style="color:#000000;">(ptr);
-</span></pre>
+<span style="color:#795da3;">free</span><span style="color:#000000;">(ptr);</span></pre>
 
 <p>Avoiding the need to manage memory in this very manual and explicit way is one of the biggest benefits of using any high level programming language, such as Ruby, Java, C#, etc. When you create a string value in Ruby code like this, for example:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p>... the Ruby interpreter creates a structure called “RString” that conceptually looks like this:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/1/4/heap-string.png" alt="heap strings" /></p>
 <p>You can see here that the RString structure contains two values: <span class="code">ptr</span> and <span class="code">len</span>, but not the actual string data itself. Ruby actually saves the string character values themselves in some memory allocated from the heap, and then sets <span class="code">ptr</span> to the location of that heap memory, and <span class="code">len</span> to the length of the string.</p>
 <p>Here’s a simplified version of the C RString structure:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">struct </span><span style="color:#000000;">RString {
+<span style="color:#a71d5d;">struct </span><span style="color:#000000;">RString {
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">long</span><span style="color:#000000;"> len;
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">ptr;
-</span><span style="color:#000000;">};
-</span></pre>
+</span><span style="color:#000000;">};</span></pre>
 
 <p>I’ve simplified this a lot; there are actually a number of other values saved in this C struct. I’ll discuss some of them next, and others I’ll skip over for today. If you’re not familiar with C, you can think of <span class="code">struct</span> (short for “structure”) as an object that contains a set of instance variables, except in C there’s no object at all - a struct is just a chunk of memory containing a few values.</p>
 <p>I refer to this type of Ruby string as “Heap String,” since the actual string data is saved in the heap.</p>
 <h2>Shared Strings</h2>
 <p>Another type of string value that the Ruby interpreter uses is called a “Shared String” in the Ruby C source code. You create a Shared String every time you write a line of Ruby code that copies one string to another, similar to this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str</span></pre>
 
 <p>Here the Ruby interpreter has realized that you are assigning the same string value to two variables: str and str2. So in fact there’s no need to create two copies of the string data itself; instead Ruby creates two RString values that share the single copy of the string data. The way this works is that both RString structs contain the same ptr value to the shared data... meaning both strings contain the same value. There’s also a <span class="code">shared</span> value saved in the second RString struct that points to the first RString struct. There are some other details which I’m not showing here, such as some bit mask flags that Ruby uses to keep track of which RString’s are shared and which are not.</p>
 <p><img src="https://patshaughnessy.net/assets/2012/1/4/shared-string.png" alt="shared strings" /></p>
 <p>Aside from saving memory, this also speeds up execution of your Ruby programs dramatically by avoiding the need to allocate more memory from the heap using another call to <span class="code">malloc</span>. <span class="code">Malloc</span> is actually a fairly expensive operation: it takes time to track down available memory of the proper size in the heap, and also to keep track of it for freeing later.</p>
 <p>Here’s a somewhat more accurate version of the C RString structure, including the <span class="code">shared</span> value:</p>
-<pre type="console">
-struct RString {
+<pre type="console">struct RString {
     long len;
     char *ptr;
     VALUE shared;
-};
-</pre>
+};</pre>
 <p>Strings that are copied from one variable to another like this I call “Shared Strings.”</p>
 <h2>Embedded Strings</h2>
 <p>The third and last way that MRI Ruby 1.9 saves string data is by embedding the characters into the RString structure itself, like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str3 </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+<span style="color:#000000;">str3 </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p><img src="https://patshaughnessy.net/assets/2012/1/4/embedded-string.png" alt="embedded strings" /></p>
 <p>This RString structure contains a character array called <span class="code">ary</span> and not the <span class="code">ptr</span>, <span class="code">len</span> and <span class="code">shared</span> values we saw above. Here’s another simplified definition of the same RString structure, this time containing the <span class="code">ary</span> character array:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">struct </span><span style="color:#000000;">RString {
+<span style="color:#a71d5d;">struct </span><span style="color:#000000;">RString {
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">char</span><span style="color:#000000;"> ary[RSTRING_EMBED_LEN_MAX </span><span style="color:#4f5b66;">+ </span><span style="color:#d08770;">1</span><span style="color:#000000;">];
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>If you’re not familiar with C code, the syntax <span class="code">char ary[100]</span> creates an array of 100 characters (bytes). Unlike Ruby, C arrays are not objects; instead they are really just a collection of bytes. In C you have to specify the length of the array you want to create ahead of time.</p>
 <p>How do Embedded Strings work? Well, the key is the size of the <span class="code">ary</span> array, which is set to <span class="code">RSTRING_EMBED_LEN_MAX+1</span>. If you’re running a 64-bit version of Ruby <span class="code">RSTRING_EMBED_LEN_MAX</span> is set to 24. That means a short string like this will fit into the RString <span class="code">ary</span> array:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p>... while a longer string like this will not:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <h2>How Ruby creates new string values</h2>
 <p>Whenever you create a string value in your Ruby 1.9 code, the interpreter goes through an algorithm similar to this:</p>
@@ -121,8 +97,7 @@ struct RString {
 <h2>The actual RString structure</h2>
 <p>For those of you familiar with the C language, here’s the actual Ruby 1.9 definition of RString:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">struct </span><span style="color:#000000;">RString {
+<span style="color:#a71d5d;">struct </span><span style="color:#000000;">RString {
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">struct</span><span style="color:#000000;"> RBasic basic;
 </span><span style="color:#000000;">
@@ -138,8 +113,7 @@ struct RString {
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">char</span><span style="color:#000000;"> ary[RSTRING_EMBED_LEN_MAX </span><span style="color:#4f5b66;">+ </span><span style="color:#d08770;">1</span><span style="color:#000000;">];
 </span><span style="color:#000000;">  } as;
-</span><span style="color:#000000;">};
-</span></pre>
+</span><span style="color:#000000;">};</span></pre>
 
 <p>I won’t try to explain all the code details here, but here are a couple important things to learn about Ruby strings from this definition:</p>
 <ul>
@@ -150,23 +124,18 @@ struct RString {
 </ul>
 <p>Here’s the line of code from ruby.h that defines this value:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">#define </span><span style="color:#000000;">RSTRING_EMBED_LEN_MAX ((</span><span style="color:#a71d5d;">int</span><span style="color:#000000;">)((</span><span style="color:#4f5b66;">sizeof</span><span style="color:#000000;">(VALUE)</span><span style="color:#4f5b66;">*</span><span style="color:#d08770;">3</span><span style="color:#000000;">)</span><span style="color:#4f5b66;">/sizeof</span><span style="color:#000000;">(</span><span style="color:#a71d5d;">char</span><span style="color:#000000;">)</span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">1</span><span style="color:#000000;">))
-</span></pre>
+<span style="color:#a71d5d;">#define </span><span style="color:#000000;">RSTRING_EMBED_LEN_MAX ((</span><span style="color:#a71d5d;">int</span><span style="color:#000000;">)((</span><span style="color:#4f5b66;">sizeof</span><span style="color:#000000;">(VALUE)</span><span style="color:#4f5b66;">*</span><span style="color:#d08770;">3</span><span style="color:#000000;">)</span><span style="color:#4f5b66;">/sizeof</span><span style="color:#000000;">(</span><span style="color:#a71d5d;">char</span><span style="color:#000000;">)</span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">1</span><span style="color:#000000;">))</span></pre>
 
 <p>On a 64 bit machine, sizeof(VALUE) is 8, leading to the limit of 23 characters. This will be smaller for a 32 bit machine.</p>
 <h2>Benchmarking Ruby string allocation</h2>
 <p>Let’s try to measure how much faster short strings are vs. long strings in Ruby 1.9.3 - here’s a simple line of code that dynamically creates a new string by appending a single character onto the end:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">new_string </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str </span><span style="color:#4f5b66;">+ &#39;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&#39;
-</span></pre>
+<span style="color:#000000;">new_string </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str </span><span style="color:#4f5b66;">+ &#39;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&#39;</span></pre>
 
 <p>The <span class="code">new_string</span> value will either be a Heap String or an Embedded String, depending on how long the <span class="code">str</span> variable’s value is. The reason I need to use a string concatenation operation, the <span class="code">+ 'x'</span> part, is to force Ruby to allocate a new string dynamically. Otherwise if I just used <span class="code">new_string = str</span>, I would get a Shared String.</p>
 <p>Now I’ll call this method from a loop and benchmark it:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">benchmark</span><span style="color:#4f5b66;">&#39;
+<span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">benchmark</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">ITERATIONS </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">1000000
 </span><span style="color:#000000;">
@@ -176,13 +145,11 @@ struct RString {
 </span><span style="color:#000000;">      new_string </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str </span><span style="color:#4f5b66;">+ &#39;</span><span style="color:#008080;">x</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Here I’m using the benchmark library to measure how long it takes to call that method 1 million times. Now running this with a variety of different string lengths:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#008080;">Benchmark</span><span style="color:#000000;">.bm </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">bench</span><span style="color:#4f5b66;">|
+<span style="color:#008080;">Benchmark</span><span style="color:#000000;">.bm </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">bench</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">12345678901234567890</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
 </span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">123456789012345678901</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
 </span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">1234567890123456789012</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
@@ -190,20 +157,17 @@ struct RString {
 </span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">123456789012345678901234</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
 </span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">1234567890123456789012345</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
 </span><span style="color:#000000;">  run(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">12345678901234567890123456</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, bench)
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>We get an interesting result:</p>
-<pre type="console">
-       user     system      total        real
+<pre type="console">user     system      total        real
 21 chars  0.250000   0.000000   0.250000 (  0.247459)
 22 chars  0.250000   0.000000   0.250000 (  0.246954)
 23 chars  0.250000   0.000000   0.250000 (  0.248440)
 24 chars  0.480000   0.000000   0.480000 (  0.478391)
 25 chars  0.480000   0.000000   0.480000 (  0.479662)
 26 chars  0.480000   0.000000   0.480000 (  0.481211)
-27 chars  0.490000   0.000000   0.490000 (  0.490404)
-</pre>
+27 chars  0.490000   0.000000   0.490000 (  0.490404)</pre>
 <p>Note that when the string length is 23 or less, it takes about 250ms to create 1 million new strings. But when my string length is 24 or more, it takes around 480ms, almost twice as long!</p>
 <p>Here’s a graph showing some more data; the bars show how long it takes to allocate 1 million strings of the given length:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/1/4/string-allocations.png" alt="string allocation chart" /></p>

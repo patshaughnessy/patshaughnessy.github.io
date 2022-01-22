@@ -80,12 +80,10 @@ Using toto (0.4.9) from https://github.com/yourname/toto.git (at master)
 Using bundler (1.0.0) 
 <span class="s">Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.</span></pre></div>
 <p>You use a simple Ruby DSL in config.ru to specify the rewrite/redirect rules to Rack-Rewrite; here’s an example from my site:</p>
-<div class="CodeRay"><pre>
-require <span class="s"><span class="dl">'</span><span class="k">rack/rewrite</span><span class="dl">'</span></span> 
+<div class="CodeRay"><pre>require <span class="s"><span class="dl">'</span><span class="k">rack/rewrite</span><span class="dl">'</span></span> 
 use <span class="co">Rack</span>::<span class="co">Rewrite</span> <span class="r">do</span> 
   r301 <span class="s"><span class="dl">'</span><span class="k">/code_buddy</span><span class="dl">'</span></span>, <span class="s"><span class="dl">'</span><span class="k">/2010/12/13/codebuddy-see-your-ruby-stack-come-alive</span><span class="dl">'</span></span> 
-<span class="r">end</span>
-</pre></div>
+<span class="r">end</span></pre></div>
 <p>This redirects requests for the “/code_buddy” page to the actual article’s full path. With rack-rewrite I’m able to do this without writing a single line of code.</p>
 <h2><a id="tip4"></a>Take the time to learn and use Toto’s Riot/RR test suite</h2>
 <p>As I mentioned above, Toto’s source code is very concise and elegant... an entire blog application in just 200 or 300 lines of code. Toto’s test suite is equally concise and elegant. Alexis Sellier chose to use <a href="https://github.com/thumblemonks/riot">Riot</a>, an alternative to RSpec, and also <a href="https://github.com/btakita/rr">RR</a> for mocking and stubbing. The result is a super fast and effective test suite. To use it you’ll probably just need to install Riot, like this:</p>

@@ -154,13 +154,11 @@ From git://github.com/rails/auto_complete
 <div class="CodeRay">
   <div class="code"><pre>$ ./script/generate scaffold_for_view employee name:string
                     --view belongs_to_auto_complete:office
-     warning  Model Office does not have a name attribute.
-</pre></div>
+     warning  Model Office does not have a name attribute.</pre></div>
 </div>
 <p>This time we get a warning that our existing model doesn&rsquo;t have a &ldquo;name&rdquo; attribute (we chose &ldquo;display_name&rdquo; instead). To make this a bit more interesting, let&rsquo;s use the &ldquo;code&rdquo; attribute for the auto_complete options. You can specify this to View Mapper with this syntax:</p>
 <div class="CodeRay">
-  <div class="code"><pre>
-$ ./script/generate scaffold_for_view employee name:string
+  <div class="code"><pre>$ ./script/generate scaffold_for_view employee name:string
                     --view belongs_to_auto_complete:office[code]
       exists  app/models/
       exists  app/controllers/

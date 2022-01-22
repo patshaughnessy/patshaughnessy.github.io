@@ -15,21 +15,15 @@
 </div>
 <p>One of the nicest things about JRuby is its apparent simplicity: you use it more or less as a drop in replacement for MRI Ruby. That is, once you <a href="http://jruby.org/getting-started">install JRuby</a>, running a JRuby program works the same way as running a Ruby program. For example, here’s the trivial, one line Ruby program that I’ll look at today:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Journey to the Center of JRuby</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">.upcase
-</span></pre>
+<span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Journey to the Center of JRuby</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">.upcase</span></pre>
 
 <p>Since I installed JRuby using RVM on my Mac, switching to JRuby and running a Ruby program is as simple as:</p>
-<pre type="console">
-$ rvm jruby-head
+<pre type="console">$ rvm jruby-head
 $ ruby upcase.rb 
-JOURNEY TO THE CENTER OF JRUBY
-</pre>
+JOURNEY TO THE CENTER OF JRUBY</pre>
 <p>I could also have used the “jruby” executable in the same way:</p>
-<pre type="console">
-$ jruby upcase.rb
-JOURNEY TO THE CENTER OF JRUBY
-</pre>
+<pre type="console">$ jruby upcase.rb
+JOURNEY TO THE CENTER OF JRUBY</pre>
 <p>But don’t be deceived! Things are not as simple as they seem. </p>
 <h2>Java</h2>
 <p>Let’s get started by reviewing the basics of how JRuby works: JRuby is a Java program that interprets Ruby code. Here’s a simple diagram comparing the standard MRI setup with JRuby:</p>
@@ -41,17 +35,12 @@ JOURNEY TO THE CENTER OF JRUBY
 <p><img src="https://patshaughnessy.net/assets/2012/2/7/basics.png" alt="basics" /></p>
 <p>On the left, you can see MRI executing a Ruby program, while on the right JRuby is doing the same thing. The difference is that JRuby is actually a Java program, which means it requires a Java Virtual Machine in order to run. MRI, on the other hand, is written in C and is compiled into native machine language and can run directly as a standalone program on your computer.</p>
 <p>Now let’s dive in a take a look at the Java code that implements the Ruby <span class="code">upcase</span> method. Since I installed JRuby using RVM, the JRuby source code is located at this location on my machine:</p>
-<pre type="console">
-$ cd ~/.rvm/src/jruby-head/src 
-</pre>
+<pre type="console">$ cd ~/.rvm/src/jruby-head/src</pre>
 <p>And since JRuby uses the “org.jruby” Java package you can find most of the Java source code for JRuby under the “org/jruby” subfolder. Think of Java packages the same way you do Ruby namespaces.</p>
-<pre type="console">
-$ cd org/jruby
-</pre>
+<pre type="console">$ cd org/jruby</pre>
 <p>Now let’s take a look at the JRuby implementation of the Ruby <span class="code">String</span> class, located in the “RubyString.java” file in this folder:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">package </span><span style="color:#000000;">org.jruby;
+<span style="color:#a71d5d;">package </span><span style="color:#000000;">org.jruby;
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">... etc ...
 </span><span style="color:#000000;">
@@ -69,14 +58,12 @@ $ cd org/jruby
 </span><span style="color:#a7adba;">
 </span><span style="color:#a7adba;">    private ByteList value;
 </span><span style="color:#a7adba;">
-</span><span style="color:#a7adba;">... etc...
-</span></pre>
+</span><span style="color:#a7adba;">... etc...</span></pre>
 
 <p>You can see here the RubyString.java file contains a Java class called <span class="code">RubyString</span> which corresponds to the Ruby <span class="code">String</span> class. In fact it looks like the JRuby team used the “@JRubyClass” annotation to indicate this. The one important detail I’ve shown here is that the <span class="code">RubyString</span> class stores the actual string value in an instance variable called <span class="code">value</span>, which is a <span class="code">ByteList</span> Java object.</p>
 <p>Farther down in the file we can see the definition of the <span class="code">upcase</span> and <span class="code">upcase!</span> methods:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">@JRubyMethod(name </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">upcase</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, compat </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">RUBY1_8</span><span style="color:#000000;">)
+<span style="color:#000000;">@JRubyMethod(name </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">upcase</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, compat </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">RUBY1_8</span><span style="color:#000000;">)
 </span><span style="color:#a71d5d;">public </span><span style="color:#008080;">RubyString </span><span style="color:#795da3;">upcase</span><span style="color:#000000;">(</span><span style="color:#008080;">ThreadContext</span><span style="color:#000000;"> context) {
 </span><span style="color:#000000;">    </span><span style="color:#008080;">RubyString</span><span style="color:#000000;"> str </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">strDup</span><span style="color:#000000;">(context.</span><span style="color:#795da3;">getRuntime</span><span style="color:#000000;">());
 </span><span style="color:#000000;">    str.</span><span style="color:#795da3;">upcase_bang</span><span style="color:#000000;">(context);
@@ -93,14 +80,12 @@ $ cd org/jruby
 </span><span style="color:#000000;">    </span><span style="color:#795da3;">modify</span><span style="color:#000000;">();
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">return </span><span style="color:#795da3;">singleByteUpcase</span><span style="color:#000000;">(runtime, value.</span><span style="color:#795da3;">getUnsafeBytes</span><span style="color:#000000;">(),
 </span><span style="color:#000000;">                            value.</span><span style="color:#795da3;">getBegin</span><span style="color:#000000;">(), value.</span><span style="color:#795da3;">getBegin</span><span style="color:#000000;">() </span><span style="color:#4f5b66;">+</span><span style="color:#000000;"> value.</span><span style="color:#795da3;">getRealSize</span><span style="color:#000000;">());
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>This Java code is executed when you use the <span class="code">String.upcase</span> method in your Ruby script. This is the version used for Ruby 1.8; the Ruby 1.9 version is slightly more complicated since it handles multibyte characters. JRuby supports a Ruby 1.8 mode and a Ruby 1.9 mode, allowing you to pick the version of Ruby you need for your code. Reading this code and ignoring some of the details, we can see that <span class="code">upcase</span> simply calls <span class="code">strDup</span> and then <span class="code">upcase!</span> on the new copy. <span class="code">Upcase!</span> then returns <span class="code">nil</span> if the size of the string is zero, and calls <span class="code">singleByteUpcase</span> otherwise. On the last line you can see it passes an actual byte array (“byte[]”) into <span class="code">singleByteUpcase</span>.</p>
 <p>Just below in RubyString.java, you’ll find the Java <span class="code">singleByteUpcase</span> method that actually performs the upcase operation:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">private </span><span style="color:#008080;">IRubyObject </span><span style="color:#795da3;">singleByteUpcase</span><span style="color:#000000;">(</span><span style="color:#008080;">Ruby</span><span style="color:#000000;"> runtime, </span><span style="color:#a71d5d;">byte[]</span><span style="color:#000000;">bytes, </span><span style="color:#a71d5d;">int</span><span style="color:#000000;"> s, </span><span style="color:#a71d5d;">int</span><span style="color:#000000;"> end) {
+<span style="color:#a71d5d;">private </span><span style="color:#008080;">IRubyObject </span><span style="color:#795da3;">singleByteUpcase</span><span style="color:#000000;">(</span><span style="color:#008080;">Ruby</span><span style="color:#000000;"> runtime, </span><span style="color:#a71d5d;">byte[]</span><span style="color:#000000;">bytes, </span><span style="color:#a71d5d;">int</span><span style="color:#000000;"> s, </span><span style="color:#a71d5d;">int</span><span style="color:#000000;"> end) {
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">boolean</span><span style="color:#000000;"> modify </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">false</span><span style="color:#000000;">;
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">while </span><span style="color:#000000;">(s </span><span style="color:#4f5b66;">&lt;</span><span style="color:#000000;"> end) {
 </span><span style="color:#000000;">        </span><span style="color:#a71d5d;">int</span><span style="color:#000000;"> c </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> bytes[s] </span><span style="color:#4f5b66;">&amp; </span><span style="color:#d08770;">0xff</span><span style="color:#000000;">;
@@ -111,8 +96,7 @@ $ cd org/jruby
 </span><span style="color:#000000;">        s</span><span style="color:#4f5b66;">++</span><span style="color:#000000;">;
 </span><span style="color:#000000;">    }
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">return</span><span style="color:#000000;"> modify </span><span style="color:#4f5b66;">? </span><span style="color:#000000;">this </span><span style="color:#4f5b66;">:</span><span style="color:#000000;"> runtime.</span><span style="color:#795da3;">getNil</span><span style="color:#000000;">();
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>Again glossing over some of the details, you can see that JRuby is iterating over the bytes in the string and checking whether each one is lower case or not. If a byte is lower case, it converts it to upper case and sets the modify flag to true. Finally, it returns the same string (<span class="code">this</span>) or else <span class="code">nil</span> if the string was not modified.</p>
 <p>That’s enough Java for one day! Let’s move on to see how this Java code is actually executed by your computer.</p>
@@ -125,13 +109,10 @@ $ cd org/jruby
 <p>In the diagram above, I showed how the JRuby interpreter is actually a Java program executed by the Java Virtual Machine (“JVM”). However, as you may know, Java is not interpreted the same way that Ruby is. Instead Java is a compiled, statically typed language. This means that the JRuby Java code, like the RubyString.java file we saw above, is compiled into something called “Java byte code” ahead of time. The byte code is what the JVM interprets and executes. Here’s a diagram showing how this process works:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/2/7/java-compiler.png" alt="Java compiler" /></p>
 <p>To get a sense of what Java byte code looks like, let’s actually open up the RubyString.class file and see what’s contained inside. Since RubyString.class is a binary file, we need to use a Java utility called “javap” to be able to read and inspect its contents:</p>
-<pre type="console">
-$ cd .rvm/src/jruby-head/build/classes/jruby/org/jruby
-$ javap -c -private RubyString.class > RubyString.txt
-</pre>
+<pre type="console">$ cd .rvm/src/jruby-head/build/classes/jruby/org/jruby
+$ javap -c -private RubyString.class > RubyString.txt</pre>
 <p>Here the “-c” option means I want to see the actual byte code, and the “-private” option means include the private methods as well, such as <span class="code">singleByteUpcase</span>. Since the output is very large, I’ve redirected it into a file called RubyString.txt. Now let’s take a look inside RubyString.txt at how the <span class="code">singleByteUpcase</span> method looks compiled into byte code:</p>
-<pre type="console">
-Compiled from "RubyString.java"
+<pre type="console">Compiled from "RubyString.java"
 public class org.jruby.RubyString extends org.jruby.RubyObject
              implements org.jruby.runtime.encoding.EncodingCapable {
 
@@ -174,28 +155,21 @@ public class org.jruby.RubyString extends org.jruby.RubyObject
       53: goto          60
       56: aload_1       
       57: invokevirtual #200 // Method org/jruby/Ruby.getNil:()Lorg/jruby/runtime/builtin/IRubyObject;
-      60: areturn       
-</pre>
+      60: areturn</pre>
 <p>Wow - that’s crazy! What in the world does it mean? Java byte code is actually a platform independent version of machine language. These cryptic commands, e.g. “istore” and ”baload,” correspond to native, machine language commands that your computer can execute directly. However, the basic idea behind Java is that the same Java byte code will run on any hardware architecture: your i386 Linux or Mac laptop, your Android phone, etc. etc. The JVM, built for whatever platform you are using, interprets these byte codes and executes your program.</p>
 <p>I don’t pretend to understand any of the byte code commands above - although it is tempting to look up their meanings somewhere and try to trace this code back to the Java version of <span class="code">singleByteUpcase</span> above. I don’t have time or space for that today, but it is easy to see how some of the commands work, for example:</p>
-<pre type="console">
-23: invokevirtual #288 // Method org/jcodings/specific/ASCIIEncoding.isLower:(I)Z
-</pre>
+<pre type="console">23: invokevirtual #288 // Method org/jcodings/specific/ASCIIEncoding.isLower:(I)Z</pre>
 <p>... must be a virtual method call to the “isLower” method of the <span class="code">ASCIIEncoding</span> class. And:</p>
-<pre type="console">
-47: iload         5
+<pre type="console">47: iload         5
 49: ifeq          56
 52: aload_0       
 53: goto          60
 56: aload_1       
 57: invokevirtual #200 // Method org/jruby/Ruby.getNil:()Lorg/jruby/runtime/builtin/IRubyObject;
-60: areturn       
-</pre>
+60: areturn</pre>
 <p>... seems to correspond to the last line of Java code in <span class="code">singleByteUpcase</span>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">return</span><span style="color:#000000;"> modify </span><span style="color:#4f5b66;">? </span><span style="color:#000000;">this </span><span style="color:#4f5b66;">:</span><span style="color:#000000;"> runtime.</span><span style="color:#795da3;">getNil</span><span style="color:#000000;">();
-</span></pre>
+<span style="color:#a71d5d;">return</span><span style="color:#000000;"> modify </span><span style="color:#4f5b66;">? </span><span style="color:#000000;">this </span><span style="color:#4f5b66;">:</span><span style="color:#000000;"> runtime.</span><span style="color:#795da3;">getNil</span><span style="color:#000000;">();</span></pre>
 
 <p>However, I’m not sure. I feel like a 19th Century egyptologist trying to understand a newly discovered hieroglyphic passage for the first time.</p>
 <h2>Assembly Language</h2>
@@ -208,19 +182,14 @@ public class org.jruby.RubyString extends org.jruby.RubyObject
 <p>This last compilation step, which is performed dynamically while your program is running, is called “Just In Time” (JIT) compilation. As the JVM runs your program, whether it’s Java, JRuby or any other program that uses the JVM platform, it monitors which code functions are executed most often. Identifying these as “hotspots,” the JIT compiler inside the JVM will dynamically compile these sections of Java byte code, like what we saw above, into native machine language.</p>
 <p>Let’s see how the JIT compiler works for a Ruby program. But first we need to create a hotspot - a bit of code that is executed many times - in order to trigger the JIT compiler. To do that, I’ll just put the call to upcase into a loop, and remove the puts statement so I don’t get drowned in output:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#d08770;">10000</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
+<span style="color:#d08770;">10000</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Journey to the Center of JRuby</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">.upcase
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Now if you set the <span class="code">-J-XX:+PrintCompilation</span> option while running JRuby, you’ll get lots of output showing which Java methods were compiled by the JIT compiler. I’ll redirect the output into a text file so I can search through it more easily:</p>
-<pre type="console">
-$ ruby -J-XX:+PrintCompilation upcase.rb > compilation.log
-</pre>
+<pre type="console">$ ruby -J-XX:+PrintCompilation upcase.rb > compilation.log</pre>
 <p>Reading through the compilation.log file:</p>
-<pre type="console">
-51    1       3       java.lang.String::equals (88 bytes)
+<pre type="console">51    1       3       java.lang.String::equals (88 bytes)
 53    2       3       java.lang.Object::<init> (1 bytes)
 54    3       3       java.lang.Number::<init> (5 bytes)
 54    4       3       java.lang.Integer::<init> (10 bytes)
@@ -234,28 +203,22 @@ $ ruby -J-XX:+PrintCompilation upcase.rb > compilation.log
 1026  899       3       org.jruby.RubyString::singleByteUpcase (61 bytes)
 1026  204       3       java.util.ArrayList::get (11 bytes)   made not entrant
 1027  756       4       org.jruby.util.ByteList::append (36 bytes)
-1028  904       1       org.jruby.RubyString::getCodeRange (8 bytes)
-</pre>
+1028  904       1       org.jruby.RubyString::getCodeRange (8 bytes)</pre>
 <p>At the top of the file we see that many of the basic, intrinsic Java methods like <span class="code">java.lang.String.equals</span>, are compiled into machine language first. This is because the JRuby interpreter is actually quite complex and uses all of these methods often. Later in the file the <span class="code">org.jruby.RubyString::singleByteUpcase</span> method we saw above is compiled since it is executed so many times in my loop.</p>
 <p>To finish things off for today, let’s take a look at part of the assembly language that our call to <span class="code">upcase</span> was converted to... it turns out that there’s another JVM option that will actually display the assembly language generated by the JIT compiler. But to use it I first needed to download and build a debug version of the OpenJDK JVM source code (following <a href="https://wikis.oracle.com/display/OpenJDK/Mac+OS+X+Port">these instructions</a>, and specifying “make debug_build” instead of “make”).</p>
 <p>Here’s what I get running “ruby --version” and “java -version”</p>
-<pre type="console">
-$ ruby --version
+<pre type="console">$ ruby --version
 jruby 1.7.0.dev (ruby-1.9.3-p28) (2012-02-04 9aac4bd) (OpenJDK 64-Bit Server VM 1.7.0-internal-debug)
 [darwin-amd64-java]
 
 $ java -version 
 openjdk version "1.7.0-internal-debug"
 OpenJDK Runtime Environment (build 1.7.0-internal-debug-pat_2012_02_04_07_35-b00)
-OpenJDK 64-Bit Server VM (build 23.0-b12-jvmg, mixed mode)
-</pre>
+OpenJDK 64-Bit Server VM (build 23.0-b12-jvmg, mixed mode)</pre>
 <p>And here’s the command to view the assembly output from the JIT - I got this from <a href="http://blog.headius.com/2009/01/my-favorite-hotspot-jvm-flags.html">Charles Nutter’s list of his favorite JVM options</a>:</p>
-<pre type="console">
-$ ruby -J-XX:+PrintOptoAssembly upcase.rb > assembly.log
-</pre>
+<pre type="console">$ ruby -J-XX:+PrintOptoAssembly upcase.rb > assembly.log</pre>
 <p>Finally, here’s a small portion of the assembly.log file:</p>
-<pre type="console">
-{method} 
+<pre type="console">{method} 
  - klass: {other class}
  - this oop:          0x0000000132798980
  - method holder:     'org/jruby/RubyString'
@@ -293,8 +256,7 @@ $ ruby -J-XX:+PrintOptoAssembly upcase.rb > assembly.log
 08d   	cmpq    R10, R11	# ptr
 090   	jne,u  B51  P=0.000001 C=-1.000000
 
-... etc...
-</pre>
+... etc...</pre>
 <p>And there you have it: the actual i386 assembly language code that’s executing our <span class="code">&quot;Journey to the Center of JRuby&quot;.upcase</span> Ruby code! We’ve finally reached the “center of JRuby;” we can’t go any farther from here.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2012/2/7/journey-to-the-center-of-jruby'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Journey to the center of JRuby';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on JRuby</div><div class="links"><ul><li><a href="/2012/3/16/learning-more-about-jruby-from-charles-nutter">Learning More About JRuby from Charles Nutter</a></li><li><a href="/2009/6/25/taming-the-beast-using-jruby-and-rspec-to-test-a-j2ee-application">Taming the beast: Using JRuby and RSpec to test a J2EE application</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;

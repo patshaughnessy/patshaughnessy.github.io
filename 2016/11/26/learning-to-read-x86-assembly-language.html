@@ -55,29 +55,21 @@ understand it.</p>
 <p>I started by writing an extremely simple program that adds 42 to a given
 integer:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(n)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(n)
 </span><span style="color:#000000;">  n</span><span style="color:#4f5b66;">+</span><span style="color:#d08770;">42  
 </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
-</span><span style="color:#000000;">puts add_forty_two(</span><span style="color:#d08770;">10</span><span style="color:#000000;">)
-</span></pre>
+</span><span style="color:#000000;">puts add_forty_two(</span><span style="color:#d08770;">10</span><span style="color:#000000;">)</span></pre>
 
 <p>This was both Ruby code:</p>
-<pre>
-$ ruby add_forty_two.rb 
-52
-</pre>
+<pre>$ ruby add_forty_two.rb 
+52</pre>
 <p>And Crystal code:</p>
-<pre>
-$ crystal add_forty_two.rb
-52
-</pre>
+<pre>$ crystal add_forty_two.rb
+52</pre>
 <p>Both produced the same result, of course. But only Crystal could produce a copy
 in assembly language:  </p>
-<pre>
-$ crystal build add_forty_two.rb --emit asm
-</pre>
+<pre>$ crystal build add_forty_two.rb --emit asm</pre>
 <p>This created a file called add_forty_two.s which contained 10,000s of lines of
 assembly language code. (Most of this was the compiled version of the Crystal
 runtime library.) I opened add_forty_two.s in a text editor and searched for
@@ -162,8 +154,7 @@ guess, it moves whatever value is found in the <span class="code">rsp</span>
 register to the <span class="code">rbp</span> register.</p>
 <p>How many registers are there? What are they called? Let’s look at them using
 LLDB:</p>
-<pre>
-(lldb) register read
+<pre>(lldb) register read
 General Purpose Registers:
        rax = 0x0000000100300268
        rbx = 0x0000000000000000
@@ -185,8 +176,7 @@ General Purpose Registers:
     rflags = 0x0000000000000202
         cs = 0x000000000000002b
         fs = 0x0000000000000000
-        gs = 0x0000000000000000
-</pre>
+        gs = 0x0000000000000000</pre>
 <p>You can see there are over 20 registers inside my Mac’s Intel CPU, each
 containing a 64 bit or 8 byte value. LLDB shows the values in hexadecimal. I
 don’t have time today to explain what all of these registers are used for, but

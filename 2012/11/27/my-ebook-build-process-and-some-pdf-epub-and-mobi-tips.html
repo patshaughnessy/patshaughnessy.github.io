@@ -67,8 +67,7 @@ as - or as hard as - creating a beautiful web site.</p>
 not be familiar from web development, such as the “page-break-before” attribute
 or the @page directive. For example, I used this CSS code to indicate I wanted
 page numbers in the lower left corner for left side pages:</p>
-<pre type="css">
-@page :left {
+<pre type="css">@page :left {
   @bottom-left {
     font: 8pt "Helvetica Neue", serif;
     content: counter(page);
@@ -76,8 +75,7 @@ page numbers in the lower left corner for left side pages:</p>
     vertical-align: top;
     color: #880000;
   }
-}
-</pre>
+}</pre>
 <p>One of the nicest features of Bookshop was that out of the box it provided a
 series of CSS templates to get me started, containing a series of example CSS
 styles I could use for page numbers, the table of contents and more.</p>
@@ -153,11 +151,9 @@ Omnigraffle doesn’t support this):</p>
 standard &lt;img&gt; tag, PrinceXML generates a PDF file that includes the vector
 commands to render the diagram! In fact, I also noticed that PrinceXML includes
 whatever font I used in the Omnigraffle diagram right inside the PDF file:</p>
-<pre type="console">
-prince: loading image: builds/pdf/assets/images/ch01/process.svg
+<pre type="console">prince: loading image: builds/pdf/assets/images/ch01/process.svg
 prince: used font: Menlo, Bold
-prince: used font: Menlo, Regular
-</pre>
+prince: used font: Menlo, Regular</pre>
 <p>Here’s what same diagram looks like in the final version of <a href="https://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
 Microscope</a>:</p>
 <img src="https://patshaughnessy.net/assets/2012/11/27/correct-text.png"/>
@@ -179,8 +175,7 @@ Java! You might remember J2EE from the early 2000s and 1990s - it was how we
 created web sites before Rails came along in 2004 and made all our lives
 easier.</p>
 <p>Unzipping my EPUB file, here’s what you’ll see:</p>
-<pre type="console">
-$ unzip ruby-under-a-microscope.epub 
+<pre type="console">$ unzip ruby-under-a-microscope.epub 
 Archive:  ruby-under-a-microscope.epub
  extracting: mimetype                
   inflating: META-INF/container.xml  
@@ -207,8 +202,7 @@ Archive:  ruby-under-a-microscope.epub
   inflating: OEBPS/preface.html      
   inflating: OEBPS/title.html        
   inflating: OEBPS/toc.html          
-  inflating: OEBPS/toc.ncx          
-</pre>
+  inflating: OEBPS/toc.ncx</pre>
 <p>It really does look like a committee of Java programmers designed the EPUB
 spec! We have something called “META-INF/container.xml,” a directory called
 “OEBPS,” and there are lots of confusing XML files with names like content.opf
@@ -258,8 +252,7 @@ relative font sizes in my CSS code: <span class="code">font-size: 50%</span>
 instead of <span class="code">font-size: 10pt</span>, for example. I was also
 able to distinguish between newer and older Kindles using this special CSS
 media type directive invented by Amazon:</p>
-<pre type="css">
-@media  amzn-mobi
+<pre type="css">@media  amzn-mobi
 {
 
 .section-caption {
@@ -279,8 +272,7 @@ media type directive invented by Amazon:</p>
   font-size: 75%;
 }
 
-}
-</pre>
+}</pre>
 <h2>Why go to all this trouble?</h2>
 <p>If you made it this far, then you must really be interested in self-publishing.
 I have to admit that the technical work involved with producing an eBook myself

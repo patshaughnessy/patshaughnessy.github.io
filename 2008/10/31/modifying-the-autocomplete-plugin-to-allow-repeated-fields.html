@@ -21,8 +21,7 @@ Let’s start by writing the code we would like to use, or wished could work som
 <p>This name is used on the server to mass-assign the attributes of all of the person records to the parent group record. The only way text_field_with_auto_complete could possibly work is if it generated an &lt;input&gt; tag with the desired name: “group[person_attributes][][name]”. I could just pass this value into text_field_with_auto_complete, but that not be very DRY since I would have to repeat the name more than once.</p>
 What if I could just call text_field_with_auto_complete directly on the person_form object yielded by fields_for? For example:
 <pre>&lt;% fields_for "group[person_attributes][]", person do |person_form| %&gt;
-  &lt;%= person_form.text_field_with_auto_complete :person, :name %&gt;
-</pre>
+  &lt;%= person_form.text_field_with_auto_complete :person, :name %&gt;</pre>
 <p>Then this call could generate an &lt;input&gt; tag with a name generated from the fields_for object name and my form code would remain very simple, readable and maintainable.</p>
 I found a way to do this following John Ford’s example (<a href="http://www.aldenta.com/2006/09/19/writing-a-custom-formbuilder-in-rails/">Writing a Custom FormBuilder in Rails</a>) by adding a new version of form_for and fields_for to ActionView. First I modified the auto_complete plugin’s init.rb file and added a line to mixin a new form helper module into ActionView like this:
 <pre>ActionView::Base.send :include, AutoCompleteFormHelper</pre>

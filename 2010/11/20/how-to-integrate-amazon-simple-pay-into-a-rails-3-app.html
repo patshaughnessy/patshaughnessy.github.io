@@ -112,8 +112,7 @@ etc...
 <span class="ta">&lt;tr&gt;</span>
 <span class="ta">&lt;th&gt;</span>Amount<span class="ta">&lt;/th&gt;</span>
 <span class="ta">&lt;th&gt;</span>Transaction<span class="ta">&lt;/th&gt;</span></p>
-<p>etc...
-</pre></div></p>
+<p>etc...</pre></div></p>
 </div><br/>
 <p>Aside from the important accessKey and the amazonPaymentsAccountId values, you might have noticed there&rsquo;s another value called &ldquo;signature,&rdquo; along with &ldquo;signatureVersion&rdquo; and &ldquo;signatureMethod.&rdquo; As I mentioned above, the signature is actually an encrypted hash of all of the other form values. When users submit the form, Amazon will check that all of the form parameters are valid by comparing them against the signature value. The problem is that for Amazon &ldquo;valid&rdquo; means equal to what you entered on the Amazon create button form earlier - not what is actually valid for your site or business rules.</p>
 <p>To make the Amazon Simple Pay form work with different payment amounts and with different return URLs (e.g. &ldquo;localhost:3000&rdquo; vs. your production hostname) we can&rsquo;t use this signature security scheme... at least not for now. Later in a future blog post I&rsquo;ll show a way to dynamically generate the signature value each time the payment form is submitted.</p>
@@ -140,8 +139,7 @@ etc...
 <span class="ta">&lt;tr&gt;</span>
 <span class="ta">&lt;th&gt;</span>Amount<span class="ta">&lt;/th&gt;</span>
 <span class="ta">&lt;th&gt;</span>Transaction<span class="ta">&lt;/th&gt;</span></p>
-<p>etc...
-</pre></div></p>
+<p>etc...</pre></div></p>
 </div>
 <br/>
 <p>Next let&rsquo;s add a new route for confirming payments; edit config/routes.rb:</p>
@@ -153,8 +151,7 @@ etc...
 </div><br>
 <p>And now let&rsquo;s write a new action in the payments controller for this; edit app/controllers/payments_controller.rb:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">PaymentsController </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ApplicationController
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">PaymentsController </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ApplicationController
 </span><span style="color:#000000;">
 </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">confirm
 </span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">payment </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Payment</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(
@@ -168,14 +165,12 @@ etc...
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
-</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
-</span></pre>
+</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...</span></pre>
 
 <p>This looks similar to the create action we got from the scaffolding generator. This action will be called when users return from the Amazon Payments site, and will record the transaction in our application&rsquo;s payments table. More on this in a moment.</p>
 <p>Finally in the payment model we need a bit of code to parse the transaction amount string passed back from Amazon:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Payment </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Payment </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  validates_presence_of </span><span style="color:#008080;">:amount
 </span><span style="color:#000000;">  validates_presence_of </span><span style="color:#008080;">:transaction_id
@@ -193,8 +188,7 @@ etc...
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">parse</span><span style="color:#000000;">(currency_and_amount)
 </span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">parsed </span><span style="color:#4f5b66;">||=</span><span style="color:#000000;"> currency_and_amount.split
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>The &ldquo;transaction amount&rdquo; parameter from Amazon may contain a prefix &ldquo;USD&rdquo; specifying the currency. However, sometimes this is not present. The code above parses the string as necessary in a virtual attribute &ldquo;transaction_amount&rdquo; and then saves the corresponding amount as the &ldquo;amount&rdquo; float value in the database. The Payment model also validates that both amount and transaction id are specified by Amazon in order to consider the payment valid.</p>
 <p>Now let&rsquo;s fire up the app and try it out!</p>
@@ -215,8 +209,7 @@ etc...
 <h2>Step 7: Using a helper to generate the payment form easily</h2>
 <p>Of course our view code is very ugly - all of that complex HTML is hard to read and confusing, and also if we want more than one button in our app we will have to repeat all of the HTML. The best thing to do render the payment form using a helper. This code will do the trick - save this code in app/helpers/amazon_simple_pay_helper.rb:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">module </span><span style="color:#000000;">AmazonSimplePayHelper
+<span style="color:#a71d5d;">module </span><span style="color:#000000;">AmazonSimplePayHelper
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  AMAZON_ACCESS_KEY </span><span style="color:#4f5b66;">= &#39;</span><span style="color:#008080;">11SEM03K88SD016FS1G2</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">
@@ -239,8 +232,7 @@ etc...
 </span><span style="color:#000000;">    output.safe_concat(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">&lt;/form&gt;</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>This helper uses the same code the standard &ldquo;form_tag&rdquo; Rails view helper does, except that it provides the additional fields and attributes required by Amazon. Here&rsquo;s how it works:</p>
 <ul>

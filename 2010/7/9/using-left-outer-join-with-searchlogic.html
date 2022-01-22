@@ -184,8 +184,7 @@ WHERE (authors.name IS NULL)
   <div class="code"><pre>&gt;&gt; Book.without_author.collect { |book| book.title }
    Book Load (1.3ms)   SELECT &quot;books&quot;.* FROM &quot;books&quot; LEFT OUTER JOIN authors
    ON authors.book_id = books.id WHERE (authors.id IS NULL) 
-=&gt; [&quot;Four&quot;, &quot;Five&quot;]
-</pre></div>
+=&gt; [&quot;Four&quot;, &quot;Five&quot;]</pre></div>
 </div><br>
 <p>Works perfectly! All we need to do now is generalize this for any model and association. Following the pattern from the <a href="http://github.com/binarylogic/searchlogic/blob/master/lib/searchlogic/named_scopes/association_ordering.rb">SearchLogic source code</a>, to get a list of associated models I can call &ldquo;reflect_on_all_associations.&rdquo; This will return a list of AssociationReflection objects, each of which represents an association between this model (Book) and some other model (Author). See the <a href="http://github.com/rails/rails/blob/v2.3.8/activerecord/lib/active_record/reflection.rb#L55">ActiveRecord source code</a> for more details.</p>
 <p>Here&rsquo;s what the code looks like with the call to reflect_on_all_associations:</p>
@@ -245,8 +244,7 @@ associated_key = matching_association(<span class="gv">$1</span>).primary_key_na
 </div><br>
 <p>Finally, we can put it all together like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Book </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Book </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
 </span><span style="color:#000000;">  has_one </span><span style="color:#008080;">:author
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">class </span><span style="color:#4f5b66;">&lt;&lt; </span><span style="color:#000000;">self
@@ -283,8 +281,7 @@ associated_key = matching_association(<span class="gv">$1</span>).primary_key_na
 </span><span style="color:#000000;">      </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{associated_table}</span><span style="color:#008080;">.</span><span style="color:#000000;">#{associated_key}</span><span style="color:#008080;"> IS NULL</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Note that I used &ldquo;send(name)&rdquo; to call the named scope we just created with named_scope. Let&rsquo;s make sure it still all works properly in the console:</p>
 <div class="CodeRay">
@@ -297,8 +294,7 @@ associated_key = matching_association(<span class="gv">$1</span>).primary_key_na
 <p>Phew &ndash; it does! Ideally I would have some RSpec examples setup to test this, instead of using the console.</p>
 <p>Just like in <a href="https://patshaughnessy.net/2010/6/12/using-method_missing-to-customize-searchlogic">my last article</a>, the last thing I&rsquo;ll do today is move these class methods out of the Book model and into a new module called SearchLogicExtensions, which in my application I saved into a file called config/initializers/search_logic_extensions.rb. This causes the method missing code to be loaded when my app starts up. At the bottom I extend ActiveRecord::Base with the new module, so the named scope can be used by every model in my application:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">module </span><span style="color:#000000;">SearchLogicExtensions
+<span style="color:#a71d5d;">module </span><span style="color:#000000;">SearchLogicExtensions
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(name, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">args, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
 </span><span style="color:#000000;">    association_names </span><span style="color:#4f5b66;">=
 </span><span style="color:#000000;">      reflect_on_all_associations.collect { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">assoc</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> assoc.name }
@@ -333,8 +329,7 @@ associated_key = matching_association(<span class="gv">$1</span>).primary_key_na
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
-</span><span style="color:#008080;">ActiveRecord</span><span style="color:#000000;">::</span><span style="color:#008080;">Base</span><span style="color:#000000;">.</span><span style="color:#795da3;">extend</span><span style="color:#000000;">(SearchLogicExtensions)
-</span></pre>
+</span><span style="color:#008080;">ActiveRecord</span><span style="color:#000000;">::</span><span style="color:#008080;">Base</span><span style="color:#000000;">.</span><span style="color:#795da3;">extend</span><span style="color:#000000;">(SearchLogicExtensions)</span></pre>
 
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2010/7/9/using-left-outer-join-with-searchlogic'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Using LEFT OUTER JOIN with SearchLogic';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;

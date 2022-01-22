@@ -45,45 +45,37 @@ block.</p>
 pattern matches the value. This is the idea behind including the <span class="code">let</span> keyword
 after <span class="code">if</span>. This is more apparent if I rewrite the example using a variable <span class="code">i</span>
 instead of 3. I'll also add a main function so I can execute the code:</p>
-<pre>
-fn main() {
+<pre>fn main() {
   let some_u8_value = Some(3u8);
   if let Some(i) = some_u8_value {
      println!("assigned {} to i", i);
   }
-}
-</pre>
+}</pre>
 <p>When I saved this in a file called if-let.rs and ran it, I got:</p>
-<pre>
-$ rustc if-let.rs
+<pre>$ rustc if-let.rs
 $ ./main
-Assigned 3 to i
-</pre>
+Assigned 3 to i</pre>
 <p><span class="code">if let</span> “unwrapped” the option structure, and assigned
 the value 3 to the identifier <span class="code">i</span>.</p>
 <h2>Match: If Let’s Big Brother</h2>
 <p>As TRPL explains, I could also have written this using the <span
 class="code">match</span> keyword, as follows:</p>
-<pre>
-fn main() {
+<pre>fn main() {
     let some_u8_value = Some(3u8);
     match some_u8_value {
         Some(i) => println!("Matched: {}", i),
         None => (),
     }
-}
-</pre>
+}</pre>
 <p>To write this all I had to do was move things around a bit in my <span
 class="code">if let</span> code snippet from above:</p>
 <img src="https://patshaughnessy.net/assets/2018/1/18/if-let-match.png"/>
 <p>Because there was no else clause for the <span class="code">if let</span>
 statement, I used <span class="code">None =&gt; ()</span> in match.</p>
 <p>Saving this code in match.rs and running it I got the same result:</p>
-<pre>
-$ rustc match.rs
+<pre>$ rustc match.rs
 $ ./main
-Matched: 3
-</pre>
+Matched: 3</pre>
 <h2>Mid-Level IR (MIR)</h2>
 <p>I was curious though: If these two code snippets are entirely equivalent, then
 the Rust compiler should generate <em>exactly the same executable program</em> when I
@@ -97,21 +89,17 @@ output.</p>
 on the Rust blog</a>. MIR is an
 internal text language the rust compiler produces when you include the
 <span class="code">—emit-mir</span> flag, like this:</p>
-<pre>
-$ rustc --emit mir if-let.rs
-</pre>
+<pre>$ rustc --emit mir if-let.rs</pre>
 <p>With this option specified, rust generates a file called if-let.mir. Opening up
 this file, I see:</p>
-<pre>
-// WARNING: This output format is intended for human consumers only
+<pre>// WARNING: This output format is intended for human consumers only
 // and is subject to change without notice. Knock yourself out.
 fn main() -> () {
     let mut _0: ();                      // return pointer
     scope 1 {
         let _1: std::option::Option<u8>; // "some_u8_value" in scope 1 at src/if-let.rs:16:9: 16:22
 
-etc…
-</pre>
+etc…</pre>
 <p>“Knock yourself out;” now I’m really intrigued!</p>
 <h2>A First Look at MIR</h2>
 <p>I decided to compare the MIR text file the Rust compiler produced for the <span class="code">if
@@ -121,8 +109,7 @@ class="code">match</span>, then the MIR representation of the two snippets
 should be the same.</p>
 <p>But when I started reading the MIR code, I found the call to the <span
 class="code">println!</span> macro generated a lot of verbose text:</p>
-<pre>
-let mut _3: isize;
+<pre>let mut _3: isize;
 let mut _4: ();
 let mut _5: std::fmt::Arguments;
 let mut _6: &[&str];
@@ -136,62 +123,49 @@ let mut _13: (&u8,);
 let mut _14: &u8;
 let mut _16: std::fmt::ArgumentV1;
 let mut _17: &u8;
-let mut _18: fn(&u8, &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error>;
-</pre>
+let mut _18: fn(&u8, &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error>;</pre>
 <p>All of this MIR pseudocode might confuse my comparison unnecessarily, so I
 decided to simplify my <span class="code">if let</span> example by removing the
 <span class="code">println!</span> call entirely. I rewrote the <span
 class="code">if let</span> snippet like this (if-let.rs):</p>
-<pre>
-fn main() {
+<pre>fn main() {
     let some_u8_value = Some(3u8);
     if let Some(i) = some_u8_value {
         let _ = i;
     }
-}
-</pre>
+}</pre>
 <p>And the <span class="code">match</span> snippet like this (match.rs):</p>
-<pre>
-fn main() {
+<pre>fn main() {
     let some_u8_value = Some(3u8);
     match some_u8_value {
         Some(i) => { let _ = i; }
         None => ()
     }
-}
-</pre>
+}</pre>
 <p>I also noticed the MIR file contained many comments with line numbers:</p>
-<pre>
-_2 = ((_1 as Some).0: u8);       // scope 3 at if-let.rs:3:17: 3:18
+<pre>_2 = ((_1 as Some).0: u8);       // scope 3 at if-let.rs:3:17: 3:18
 StorageLive(_5);                 // scope 3 at <print macros>:2:27: 2:58
-StorageLive(_6);                 // scope 3 at <println macros>:3:18: 3:43
-</pre>
+StorageLive(_6);                 // scope 3 at <println macros>:3:18: 3:43</pre>
 <p>I realized the line numbers would likely cause problems comparing one MIR file
 to another, so I removed all of the comments using sed:</p>
-<pre>
-$ rustc if-let.rs --emit mir
-$ cat if-let.mir | sed -e 's/\/\/.*$//' > if-let.mir.nocomments
-</pre>
+<pre>$ rustc if-let.rs --emit mir
+$ cat if-let.mir | sed -e 's/\/\/.*$//' > if-let.mir.nocomments</pre>
 <p>This generates a new text file called if-let.mir.nocomments, which contains the
 same content as if-let.mir, but with no comments. And this command processes
 the match.rs file in the same way:</p>
-<pre>
-$ rustc match.rs --emit mir
-$ cat match.mir | sed -e 's/\/\/.*$//' > match.mir.nocomments
-</pre>
+<pre>$ rustc match.rs --emit mir
+$ cat match.mir | sed -e 's/\/\/.*$//' > match.mir.nocomments</pre>
 <h2>Comparing MIR Files</h2>
 <p>Now I ran a simple diff command on the simplified MIR text files. If the
 compiler considers <span class="code">if let</span> to be exactly the same as
 <span class="code">match</span> then there should be no difference, then the
 output of diff should be empty.</p>
 <p>But running diff I saw:</p>
-<pre>
-$ diff if-let.mir.nocomments match.mir.nocomments
+<pre>$ diff if-let.mir.nocomments match.mir.nocomments
 19c19
 <         switchInt(_3) -> [1isize: bb2, otherwise: bb1];
 ---
->         switchInt(_3) -> [0isize: bb1, otherwise: bb2];
-</pre>
+>         switchInt(_3) -> [0isize: bb1, otherwise: bb2];</pre>
 <p>My two MIR files are <em>almost</em> identical; the MIR text Rust generates for <span
 class="code">if let</span> is exactly the same as the MIR text Rust generates
 for <span class="code">match</span>, except for line 19. I’ve <em>almost</em> proven
@@ -200,8 +174,7 @@ the hypothesis that <span class="code">if let</span> is syntactic sugar for
 <p>Let’s take a close look at the MIR code around line 19 and try to understand
 what it means. Here’s a portion of if-let.mir.nocomments, produced by the Rust
 compiler from my <span class="code">if let</span> code above:</p>
-<pre>
-bb0: {
+<pre>bb0: {
     StorageLive(_1);
     _1 = std::option::Option<u8>::Some(const 3u8,);
     _3 = discriminant(_1);
@@ -218,8 +191,7 @@ bb2: {
     _2 = ((_1 as Some).0: u8);
     _0 = ();
     goto -> bb3;
-}
-</pre>
+}</pre>
 <p>I don’t understand MIR syntax, but it’s not hard to guess what’s going on. Each
 of these “bb” blocks of code <span class="code">{ … }</span> probably
 represents a logical piece of my program.</p>
@@ -230,9 +202,7 @@ jumps to <span class="code">bb2</span>, or otherwise to <span
 class="code">bb1</span>. So <span class="code">bb0</span> likely represents the
 <span class="code">if</span> portion of my <span class="code">if let</span>
 snippet, testing a condition:</p>
-<pre>
-if let Some(i) = some_u8_value
-</pre>
+<pre>if let Some(i) = some_u8_value</pre>
 <p>The <span class="code">bb1</span> block saves <span class="code">()</span> in <span
 class="code">_0</span> and jumps to <span class="code">bb3</span>. This likely represents the
 missing/default else clause of my <span class="code">if let</span> statement.</p>
@@ -240,20 +210,16 @@ missing/default else clause of my <span class="code">if let</span> statement.</p
 jumps to <span class="code">bb3</span>. Probably <span class="code">_2</span> is the variable <span class="code">i</span>, and this block of MIR text
 represents the <span class="code">let</span> portion of my <span
 class="code">if let</span> snippet:</p>
-<pre>
-let Some(i) = some_u8_value
-let _ = i;
-</pre>
+<pre>let Some(i) = some_u8_value
+let _ = i;</pre>
 <p>Now let’s take a look at the <span class="code">match</span> version, the contents of
 match.mir.nocomments. It’s entirely the same, except for the <span class="code">switchInt</span> line:</p>
-<pre>
-bb0: {
+<pre>bb0: {
     StorageLive(_1);
     _1 = std::option::Option<u8>::Some(const 3u8,);
     _3 = discriminant(_1);
     <b>switchInt(_3) -> [0isize: bb1, otherwise: bb2];</b>
-}
-</pre>
+}</pre>
 <p>Reading this carefully, I saw that actually it does mean the same thing: If the
 discriminant is 0, Rust calls the <span class="code">bb1</span> block, or
 otherwise the <span class="code">bb2</span> block.</p>

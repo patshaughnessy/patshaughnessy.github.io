@@ -44,27 +44,23 @@
 <p>One of the challenges YARV has implementing some control structures is that, similar to dynamic variable access, Ruby sometimes can jump from one scope to another. The simplest example of this is the <span class="code">break</span> statement. <span class="code">break</span> can be used both to exit a simple loop like this:</p>
 <p></p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">i </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">0
+<span style="color:#000000;">i </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">0
 </span><span style="color:#a71d5d;">while</span><span style="color:#000000;"> i</span><span style="color:#4f5b66;">&lt;</span><span style="color:#d08770;">10
 </span><span style="color:#000000;">  puts i
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">break
 </span><span style="color:#000000;">  i </span><span style="color:#4f5b66;">+= </span><span style="color:#d08770;">1
 </span><span style="color:#a71d5d;">end
-</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">continue from here</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">continue from here</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p></p>
 <p>… or from a block iteration like this:</p>
 <p></p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#d08770;">10</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">n</span><span style="color:#4f5b66;">|
+<span style="color:#d08770;">10</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">n</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  puts n
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">break
 </span><span style="color:#a71d5d;">end
-</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">continue from here</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">continue from here</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p></p>
 <p>In the first case, YARV can exit the while loop using simple <span class="code">jump</span> instructions like we saw above in the if/else example. However, exiting a block is not so simple: in this case YARV needs to jump to the parent scope and continue execution after the call to <span class="code">10.times</span>. How does it do this? How does it know where to jump to? And how does it adjust both it’s internal stack and your Ruby call stack to be able to continue execution properly in the parent scope?</p>

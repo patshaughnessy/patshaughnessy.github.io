@@ -14,30 +14,24 @@ find out.</p>
 <p>Depending on where you downloaded Postgres from and how you installed it, you
 may have already installed LTREE with Postgres. To find out, execute this SQL
 statement:</p>
-<pre>
-=> create extension ltree;
-CREATE EXTENSION
-</pre>
+<pre>=> create extension ltree;
+CREATE EXTENSION</pre>
 <p>If you see the “CREATE EXTENSION” message like this, then you’re all set! LTREE
 was already installed and you just enabled it. Skip to my next post to find out
 what it can do and how to use it.</p>
 <p>Or if you see:</p>
-<pre>
-=> create extension ltree;
-ERROR:  extension "ltree" already exists
-</pre>
+<pre>=> create extension ltree;
+ERROR:  extension "ltree" already exists</pre>
 <p>…then your Postgres server already had LTREE enabled.</p>
 <p>FYI The <span class="code">pg_available_extensions</span> table will show you
 all the Postgres extensions that are available and installed in your server:</p>
-<pre>
-select * from pg_available_extensions;
+<pre>select * from pg_available_extensions;
 
   name   | default_version | installed_version |                     comment
 ---------+-----------------+-------------------+-------------------------------------------------
  ltree   | 1.1             | 1.1               | data type for hierarchical tree-like structures
  plpgsql | 1.0             | 1.0               | PL/pgSQL procedural language
-(2 rows)
-</pre>
+(2 rows)</pre>
 <p>As you can see, “ltree” already appears in my server’s list. The value “1.1”
 for <span class="code">installed_version</span> indicates that I’ve already
 enabled it too. This would have been blank before running the <span
@@ -49,11 +43,9 @@ still needed to enable it using <span class="code">create extension</span>.</p>
 <h2>Using LTREE on a Shared Postgres Server</h2>
 <p>Running the <span class="code">create extension ltree</span> command may fail
 with this error message:</p>
-<pre>
-=> create extension ltree;
+<pre>=> create extension ltree;
 ERROR:  permission denied to create extension "ltree"
-HINT:  Must be superuser to create this extension.
-</pre>
+HINT:  Must be superuser to create this extension.</pre>
 <p>Enabling Postgres extensions requires super user access. If you’re using a
 shared Postgres server and don’t have super-user access, you’ll need to find
 someone who does. Or you may just need to login to Postgres using the proper
@@ -61,10 +53,8 @@ Postgres user account.</p>
 <h2>How to Install the LTREE Extension</h2>
 <p>Running the <span class="code">create extension</span> command may also fail
 with this error message:</p>
-<pre>
-=> create extension ltree;
-ERROR:  could not open extension control file "/usr/local/pgsql/share/extension/ltree.control": No such file or directory
-</pre>
+<pre>=> create extension ltree;
+ERROR:  could not open extension control file "/usr/local/pgsql/share/extension/ltree.control": No such file or directory</pre>
 <p>This error means the LTREE code isn’t even installed on your Postgres server.
 If you’re running on Linux and installed Postgres using a package manager, you
 may have to install a second package called “postgresql-contrib.”</p>
@@ -75,8 +65,7 @@ the code for LTREE and many other extensions in a subdirectory called
 “contrib.”</p>
 <img src="https://patshaughnessy.net/assets/2017/12/12/ltree-source.png">
 <p>Compile it as follows:</p>
-<pre>
-$ cd /path/to/postgres-9.6.5/contrib/ltree
+<pre>$ cd /path/to/postgres-9.6.5/contrib/ltree
 $ make
 
 gcc -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -Wno-unused-command-line-argument -O2  -DLOWER_NODE -I. -I. -I../../src/include   -c -o ltree_io.o ltree_io.c
@@ -90,8 +79,7 @@ $ sudo make install
 /bin/sh ../../config/install-sh -c -d '/usr/local/pgsql/share/extension'
 /usr/bin/install -c -m 755  ltree.so '/usr/local/pgsql/lib/ltree.so'
 /usr/bin/install -c -m 644 ./ltree.control '/usr/local/pgsql/share/extension/'
-/usr/bin/install -c -m 644 ./ltree--1.1.sql ./ltree--1.0--1.1.sql ./ltree--unpackaged--1.0.sql  ‘/usr/local/pgsql/share/extension/'
-</pre>
+/usr/bin/install -c -m 644 ./ltree--1.1.sql ./ltree--1.0--1.1.sql ./ltree--unpackaged--1.0.sql  ‘/usr/local/pgsql/share/extension/'</pre>
 <p>You can see above the install step copied the ltree.so library into my Postgres
 server’s lib directory: /usr/local/pgsql/lib, and ran a couple other commands
 as well. Now I can run the <span class="code">create extension ltree</span>

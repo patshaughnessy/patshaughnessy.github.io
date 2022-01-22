@@ -11,29 +11,23 @@
 <h2>Taking a closer look at a Rails 3.1 log file</h2>
 <p>If you’ve already upgraded your app to Rails 3.1, you might have noticed some subtle changes in the log file on the lines showing the SQL statements your app executes. For example, suppose I have a Rails 3.0 or Rails 2.x app with a “Person” model:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Person </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
-</span><span style="color:#a71d5d;">end
-</span></pre>
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Person </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActiveRecord::Base
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>If I open a console and set the ActiveRecord log output to STDOUT, then I can see the SQL statement ActiveRecord uses to load a single person record:</p>
-<pre type="console">
-$ rails c
+<pre type="console">$ rails c
 Loading development environment (Rails 3.0.10)
 ruby-1.8.7-p352 :001 > ActiveRecord::Base.logger = Logger.new(STDOUT)
 ruby-1.8.7-p352 :002 > Person.find 1
   Person Load (0.1ms)  SELECT "people".* FROM "people" WHERE "people"."id" = 1 LIMIT 1
- => #&lt;Person id: 1, name: "one", age: 23, created_at...
-</pre>
+ => #&lt;Person id: 1, name: "one", age: 23, created_at...</pre>
 <p>No surprise here: ActiveRecord has constructed a simple SELECT statement that finds a record in the “people” table with the primary key “id” set to 1.</p>
 <p>Now after I upgrade my sample app to Rails 3.1 and try the same simple query in the console, I’ll get:</p>
-<pre type="console">
-$ rails c
+<pre type="console">$ rails c
 Loading development environment (Rails 3.1.1)
 ruby-1.8.7-p352 :001 > Person.find 1
   Person Load (5.6ms)  SELECT "people".* FROM "people" WHERE "people"."id" = ? LIMIT 1  [["id", 1]]
- => #&lt;Person id: 1, name: "one", age: 23, created_at...
-</pre>
+ => #&lt;Person id: 1, name: "one", age: 23, created_at...</pre>
 <p>Do you see the subtle difference? ActiveRecord 3.0 generated a select statement that contained a where clause: <span class="code">WHERE people.id = 1</span>, but ActiveRecord 3.1 generated a slightly different where clause: <span class="code">WHERE people.id = ?</span> followed by: <span class="code">[[&quot;id&quot;, 1]]</span>. Why is there a difference? What does the <span class="code">[[&quot;id&quot;, 1]]</span> notation mean? Why does any of this matter at all?</p>
 <p>Note you won't see this change in the log file if you're using MySQL; more on that later...</p>
 <h2>What are prepared statements?</h2>
@@ -52,8 +46,7 @@ ruby-1.8.7-p352 :001 > Person.find 1
 <p>OK - now let’s find out how much love you need to send to the Ruby core team for all of this great work! We’ll do that by displaying a message in the Rails log file each time your application uses a cached prepared statement from the StatementPool class.</p>
 <p>First, add this code to one of your Rails 3.1 apps in a new file called config/initializers/love_meter.rb. This only works for the SQLiteAdapter so you'll have to reconfigure your developement environment to use SQLite for this test.</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#008080;">ActiveSupport</span><span style="color:#000000;">.on_load </span><span style="color:#008080;">:active_record </span><span style="color:#a71d5d;">do
+<span style="color:#008080;">ActiveSupport</span><span style="color:#000000;">.on_load </span><span style="color:#008080;">:active_record </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">class </span><span style="color:#008080;">ActiveRecord::ConnectionAdapters::SQLiteAdapter::StatementPool
 </span><span style="color:#343d46;">    </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">[]</span><span style="color:#000000;">(key)
@@ -66,29 +59,24 @@ ruby-1.8.7-p352 :001 > Person.find 1
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>What it does is monkey patch the StatementPool class to generate some additional log file output by overriding the <span class="code">def []</span> method. This is the method that the SQLiteAdapter uses to look for a prepared statement in StatementPool.</p>
 <p>The value of “key” here is the actual SQL string your application is about to execute; for example: <span class="code">SELECT &quot;people&quot;.* FROM &quot;people&quot; WHERE &quot;people&quot;.&quot;id&quot; = ? LIMIT 1</span>.</p>
 <p>The value of <span class="code">cache[key]</span> - what StatementPool saves in its hash - is an object representing the prepared statement object from the database.</p>
 <p>The code checks to see if the value of <span class="code">cache[key]</span> is not nil, and if so displays a message. Now if we repeat our console exercise from above:</p>
-<pre type="console">
-$ rails c
+<pre type="console">$ rails c
 Loading development environment (Rails 3.1.1)
 ruby-1.8.7-p352 :001 > Person.find 3
   Person Load (3.4ms)  SELECT "people".* FROM "people" WHERE "people"."id" = ? LIMIT 1  [["id", 3]]
- => #&lt;Person id: 3, name: "three", age: 43, created_at...
-</pre>
+ => #&lt;Person id: 3, name: "three", age: 43, created_at...</pre>
 <p>The first time we execute a query for a person, the StatementPool class will have an empty cache, and the SQLiteAdapter class will have to send the SQL statement to the database to be compiled and processed - to be “prepared.” But during this call SQLiteAdapter saves the new prepared statement into the StatementPool cache.</p>
 <p>Now if we load another person record:</p>
-<pre type="console">
-ruby-1.8.7-p352 :002 > Person.find 1
+<pre type="console">ruby-1.8.7-p352 :002 > Person.find 1
 SEND SOME LOVE TO THE RAILS CORE TEAM FOR SPEEDING UP YOUR APP!
 Using cached prepared statement for SELECT  "people".* FROM "people"  WHERE "people"."id" = ? LIMIT 1
   Person Load (0.4ms)  SELECT "people".* FROM "people" WHERE "people"."id" = ? LIMIT 1  [["id", 1]]
- => #&lt;Person id: 1, name: "one", age: 23, created_at...
-</pre>
+ => #&lt;Person id: 1, name: "one", age: 23, created_at...</pre>
 <p>... you can see that we now reuse the cached prepared statement from StatementPool and save some database execution time. Notice this was true even though I was loading a different person record, not id=3, but id=1. If you add this code to one of your Rails 3.1 apps and take a look at the log file, you’ll find out how much love you need to send to the Rails core team!</p>
 <p>If there's any interest I'll package up this test script as a gem and support Postgres, Oracle etc., as well as SQLite. Then if you drop the gem into any Rails app it could produce a more helpful and complete report on prepared statement usage.</p>
 <h2>No MySQL support</h2>

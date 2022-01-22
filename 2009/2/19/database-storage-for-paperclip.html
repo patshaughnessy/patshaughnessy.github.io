@@ -8,7 +8,7 @@
 <p>For now, here&rsquo;s the usage description from <a href="http://github.com/patshaughnessy/paperclip/blob/ee96901d349598f04a65347e4568e46b9fe0583b/lib/paperclip/storage.rb">lib/paperclip/storage.rb</a> for specifying database storage for your Paperclip app. You need to follow these steps in addition to the <a href="http://thoughtbot.com/projects/paperclip">standard Paperclip setup steps from Thoughtbot</a>.</p>
 <ol>
   <li>In your model specify the &quot;database&quot; storage option; for example:
-<pre>  has_attached_file :avatar, :storage =&gt; :database</pre>
+<pre>has_attached_file :avatar, :storage =&gt; :database</pre>
 The files will be stored in a new database table named with the plural attachment name
 by default, &quot;avatars&quot; in this example.</li>
 <li><p>You need to create this new storage table with at least these columns:<br>
@@ -25,20 +25,20 @@ depending on which database server you are using. Here&#x27;s an example migrati
 end
 execute &#x27;ALTER TABLE avatars ADD COLUMN file_contents LONGBLOB&#x27;</pre>
 You can optionally specify any storage table name you want as follows:
-<pre>  has_attached_file :avatar, :storage =&gt; :database,
+<pre>has_attached_file :avatar, :storage =&gt; :database,
                     :database_table =&gt; &#x27;avatar_files&#x27;</pre></li>
 <li>By default, URLs will be set to this pattern:
-<pre>  /:relative_root/:class/:attachment/:id?style=:style</pre>
+<pre>/:relative_root/:class/:attachment/:id?style=:style</pre>
 Example:
-<pre>  /app-root-url/users/avatars/23?style=original</pre>
+<pre>/app-root-url/users/avatars/23?style=original</pre>
 The idea here is that to retrieve a file from the database storage, you will need some
 controller's code to be executed. Once you pick a controller to use for downloading, you can add this line
 to generate the download action for the default URL/action (the plural attachment name),
 &quot;avatars&quot; in this example:</p>
-<pre>  downloads_files_for :user, :avatar</pre>
+<pre>downloads_files_for :user, :avatar</pre>
 Or you can write a download method manually if there are security, logging or other
 requirements. If you prefer a different URL for downloading files you can specify that in the model; e.g.:
-<pre>  has_attached_file :avatar, :storage =&gt; :database,
+<pre>has_attached_file :avatar, :storage =&gt; :database,
                     :url =&gt; &#x27;/users/show_avatar/:id/:style&#x27;</pre></li>
 <li>Add a route for the download to the controller which will handle downloads, if necessary.
 <p>The default URL (/:relative_root/:class/:attachment/:id?style=:style) will be matched by

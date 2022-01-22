@@ -74,8 +74,7 @@ This will remove the new route from routes.rb.
 <p>It turns out a cleaner way to implement the &ldquo;route&rdquo; method is to directly add the method to both the Create and Destroy command classes. This allows me to call a utility method called &ldquo;gsub_file&rdquo; in the Rails::Generator::Commands::Base class which I wouldn&rsquo;t have direct access to from my generator class. It also avoids the somewhat ugly if statement on the options[:command] value, and finally it might make it easier for me someday to refactor the new route methods into a separate module that I could use with various different generators that might need to add and remove routes.</p>
 <p>Anyway, here&rsquo;s the finished code for the entire generator:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">VersionGenerator </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">Rails::Generator::NamedBase
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">VersionGenerator </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">Rails::Generator::NamedBase
 </span><span style="color:#000000;">  </span><span style="color:#795da3;">attr_reader </span><span style="color:#008080;">:version_path
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">initialize</span><span style="color:#000000;">(runtime_args, runtime_options </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">{})
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">super
@@ -128,8 +127,7 @@ This will remove the new route from routes.rb.
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>More or less copied from the existing route_resources action found in <a href="http://github.com/rails/rails/blob/a147becfb86b689ab25e92edcfbb4bcc04108099/railties/lib/rails_generator/commands.rb">commands.rb</a>, this works as follows: If we call script/generate then the route action method in the Create command class is called. This uses gsub_file to look for the &ldquo;sentinel&rdquo; or target area of the file and replaces it with the sentinel + the new route code. I also use the &ldquo;logger&rdquo; method to display log messages using the Rails::Generator::SimpleLogger class. Here&rsquo;s what it looks like on the command line:</p>
 <pre>$ ./script/generate version ../build-info/version.txt

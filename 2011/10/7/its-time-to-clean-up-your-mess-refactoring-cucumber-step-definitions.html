@@ -14,76 +14,60 @@
 <h2>My dirty laundry</h2>
 <p>At risk of personal embarrassment and professional suicide, here’s an actual Cucumber step definition from a project I’m working on now:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
+<span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">    page.should_not have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">input[value=&#39;right click on first file&#39;]</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>This step definition isn’t all that bad; at least I’ve written a custom step using business domain language instead of calling one of the steps from web_steps.rb. However, the CSS selector string I’m using here is a bit verbose and could be improved.</p>
 <p>Here’s a worse example:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+<span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  page.should have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">#file_access_container .per_file_container:nth-child(2):contains(&#39;</span><span style="color:#000000;">#{text}</span><span style="color:#008080;">&#39;)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Look at that crazy CSS selector string! I wrote this myself a week or two ago and even I have no idea what it really means now... clearly it needs to be refactored.</p>
 <h2>Using Capybara finder methods and RSpec matchers</h2>
 <p>Capybara has a fairly complex and sophisticated DSL that can help you simplify or even remove some of your CSS selector strings. In my first example above, I can replace the <span class="code">page.have_css</span> call with <span class="code">page.find_button</span>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">button </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> page.find_button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#000000;">button </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> page.find_button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)</span></pre>
 
 <p>Here I’m just passing the value or visible text of the button and Capybara will return the button element to me. Then I can continue to test it’s attributes or contents further. To see a list of all the available finder methods, just look at the <a href="https://github.com/jnicklas/capybara/blob/master/lib/capybara/node/finders.rb">lib/capbyara/node/finders.rb</a> file in the Capybara source code. There are finder methods such as find_field, find_link, find_by_id, etc.</p>
 <p>One catch here is that if the button doesn’t exist Capybara will raise an exception which can prevent you from testing the negative case: that the button doesn’t exist. Instead, you can use the <span class="code">first</span> method like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
+<span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  page.first(</span><span style="color:#008080;">:xpath</span><span style="color:#000000;">, </span><span style="color:#008080;">XPath</span><span style="color:#000000;">::</span><span style="color:#008080;">HTML</span><span style="color:#000000;">.button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)).should be_nil
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Here I’m using a gem called <a href="https://github.com/jnicklas/xpath">XPath</a>, also developed by <a href="http://elabs.se/blog">Jonas Nicklas</a> the author of Capybara, that contains a series of XPath related utilities. If you use XPath a lot, you may want to take the time to check that gem out.</p>
 <p>There’s a related method called <span class="code">all</span> which returns all of the matching objects found on the page; for example:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">page.all(</span><span style="color:#008080;">:xpath</span><span style="color:#000000;">, </span><span style="color:#008080;">XPath</span><span style="color:#000000;">::</span><span style="color:#008080;">HTML</span><span style="color:#000000;">.button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">))
-</span></pre>
+<span style="color:#000000;">page.all(</span><span style="color:#008080;">:xpath</span><span style="color:#000000;">, </span><span style="color:#008080;">XPath</span><span style="color:#000000;">::</span><span style="color:#008080;">HTML</span><span style="color:#000000;">.button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">))</span></pre>
 
 <p>... would return all the buttons with this value, name or id. Then you could test things like how many there were, or iterate through them and test each one in turn.</p>
 <p>If you’re using RSpec in your proejct, then Capybara automatically provides you with a series of matchers which are very readable and useful. For example, I can just write:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
+<span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  page.should_not have_button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>To browse through all of the available Capybara Rspec matches, just take a look at <a href="https://github.com/jnicklas/capybara/blob/master/lib/capybara/rspec/matchers.rb">lib/capbyara/rspec/matchers.rb</a>. Here are some examples: have_checkbox, have_field, have_table, have_selector, etc.</p>
 <p><span class="reminder"><img class="tip-image" src="/assets/images/tip.png">Tip: remember to DRY up your step code</span></p>
 <p>Another good way to improve your step code is to move commonly used selectors into shared utility methods. That way you can DRY up the step code and reduce the number of place where you depend on CSS class names or other user interface details. In my example, I might want to refer to the “right click” button in a few different steps. In that case I could just write a new method like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">share_button
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">share_button
 </span><span style="color:#000000;">  page.first(</span><span style="color:#008080;">:xpath</span><span style="color:#000000;">, </span><span style="color:#008080;">XPath</span><span style="color:#000000;">::</span><span style="color:#008080;">HTML</span><span style="color:#000000;">.button(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">right click on first file</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">))
 </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^the share first file button should not appear$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  share_button.should be_nil
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <h2>Scoping your selectors using &quot;Within&quot;</h2>
 <p>Here’s my other ugly Cucumber step definition again:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+<span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  page.should have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">#file_access_container .per_file_container:nth-child(2):contains(&#39;</span><span style="color:#000000;">#{text}</span><span style="color:#008080;">&#39;)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Wow - I can’t believe I wrote this; how embarrassing! I suppose I’m just copying the CSS selector info straight from the Chrome console into my Ruby step file... I need to train myself to stop and think about writing better step code.</p>
 <p>Anyway, the real problem here is the cryptic CSS selector string. There must be a way to break this down and make it more understandable using the Capybara DSL. First let’s examine what it means in more detail:</p>
@@ -94,76 +78,60 @@
 </ul>
 <p>The first thing we can do here is to separate the first part into a separate method call, using Capybara’s <span class="code">within</span> method:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+<span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  within(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">#file_access_container</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">    page.should have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">.per_file_container:nth-child(2):contains(&#39;</span><span style="color:#000000;">#{text}</span><span style="color:#008080;">&#39;)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>This allows you to scope your CSS or XPath selectors to a specified area of the HTML page you’re testing. It’s a great way to break up complex CSS selector strings like this.</p>
 <p><span class="reminder"><img class="tip-image" src="/assets/images/tip.png">Tip: remember to DRY up your step code</span></p>
 <p>We can DRY this up a bit more by writing a custom “within” method. If and when the HTML ID attribute changes, I’ll just need to update one line of code. It’s likely that I’m going to write a few different steps to test this content area in different ways, all in the same step file. For example, I could write a method called “within_the_file_container:”</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">within_the_file_container</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">within_the_file_container</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
 </span><span style="color:#000000;">  within(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">#file_access_container</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <h2>Custom selectors</h2>
 <p>Now my step is a lot easier to understand, but clearly still can be improved:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+<span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  within_the_file_container </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">    page.should have_css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">.per_file_container:nth-child(2):contains(&#39;</span><span style="color:#000000;">#{text}</span><span style="color:#008080;">&#39;)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Next let’s look at a little known feature of the Capybara DSL:  the <span class="code">add_selector</span> method. This allows you to add special, custom selectors to your app that your step definitions can refer to. You can use them just as utilities for dealing with complex HTML patterns, or you can even tie them to business or domain concepts from the page you’re trying to test. For more details on <span class="code">add_selector</span> and for more examples, check out the nice article Plataforma wrote about this a few months ago: <a href="http://blog.plataformatec.com.br/2011/02/improving-your-tests-with-capybara-custom-selectors/">Improving your tests with Capybara custom selectors</a>.</p>
 <p>You define a custom selector like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#008080;">Capybara</span><span style="color:#000000;">.add_selector(</span><span style="color:#008080;">:file</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do
+<span style="color:#008080;">Capybara</span><span style="color:#000000;">.add_selector(</span><span style="color:#008080;">:file</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  xpath { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">num</span><span style="color:#4f5b66;">| </span><span style="color:#008080;">XPath</span><span style="color:#000000;">.css(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">.per_file_container:nth-child(</span><span style="color:#000000;">#{num}</span><span style="color:#008080;">)</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">) }
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>What this means is that I’m defining a new type of Capybara selector called “file” that will apply the given number to the given XPath selector. Now I don’t need to repeat this XPath code over and over again throughout my step code. For example, now I can write:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+<span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  within_the_file_container </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">    find(</span><span style="color:#008080;">:file</span><span style="color:#000000;">, </span><span style="color:#d08770;">2</span><span style="color:#000000;">).should have_content(text)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Or I can even use:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
+<span style="color:#000000;">Then </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">^I should see &quot;([^&quot;]*)&quot; in the second file section$</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">text</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  within_the_file_container </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">    within(</span><span style="color:#008080;">:file</span><span style="color:#000000;">, </span><span style="color:#d08770;">2</span><span style="color:#000000;">) { page.should have_content(text) }
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Note that right now the code inside the <span class="code">add_selector</span> definitions must be expressed as XPath expressions, and not as CSS. But using the <span class="code">XPath.css</span> function like I did above we can easily convert my CSS to XPath, and then pass it along to Capybara.</p>
 <p>A nice side benefit here is that I get a more readable error message if there’s a Cucumber failure:</p>
-<pre type="console">
-{^error:And I should see "Things.txt" in the second file section
-  Unable to find file 3 (Capybara::ElementNotFound)^}
-</pre>
+<pre type="console">{^error:And I should see "Things.txt" in the second file section
+  Unable to find file 3 (Capybara::ElementNotFound)^}</pre>
 <p>Instead of:</p>
-<pre type="console">
-{^error:And I should see "Things.txt" in the second file section
+<pre type="console">{^error:And I should see "Things.txt" in the second file section
   expected css ".per_file_container:nth-child(3):contains('Things.txt')" to return something
-(RSpec::Expectations::ExpectationNotMetError)^}
-</pre>
+(RSpec::Expectations::ExpectationNotMetError)^}</pre>
 <h2>Conclusion</h2>
 <p>Aslak Hellesøy’s made a lot of great points in <a href="http://aslakhellesoy.com/post/11055981222/the-training-wheels-came-off">his article explaining why the Cucumber team removed web_steps.rb</a>. In a nutshell the reason is that your step definitions should reflect the business domain of your application, and therefore be less dependent on the user interface details. After sorting through the dirty laundry in my step code, I’ve realized it is equally important to pay close attention to <em>how your step code is written</em> and not just to which steps you are writing. </p>
 <p>One of the benefits of using TDD is that once you get to green you can easily refactor your code to DRY it up, make it more readable or just work better. Remember to refactor your Cucumber step definition code the same way you refactor your production code or specs. And take the time to learn a bit about the Capybara DSL; using it properly can make things a lot easier to read and maintain.</p>

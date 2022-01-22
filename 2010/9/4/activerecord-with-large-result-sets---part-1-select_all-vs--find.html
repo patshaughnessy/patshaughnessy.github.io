@@ -44,8 +44,7 @@
       <span class="s">create  config.ru</span>
       <span class="s">create  .gitignore</span>
       <span class="s">create  Gemfile</span>
-etc....
-</pre></div>
+etc....</pre></div>
 </div><br>
 <p>And now I&rsquo;ll create a user model from the example above:</p>
 <div class="CodeRay">
@@ -62,8 +61,7 @@ $ rails generate model user name:string email:string
 ==  CreateUsers: migrating ==============================
 -- create_table(:users)
 -&gt; 0.0013s
-==  CreateUsers: migrated (0.0014s) =====================
-</pre></div></p>
+==  CreateUsers: migrated (0.0014s) =====================</pre></div></p>
 </div><br>
 <p>Next I&rsquo;ll write a simple rake task in a file called lib/tasks/users.rake to create a specified number of users, so we can time queries based on different numbers of records. Also, having a separate rake task for this avoids the possibility of including the record create time in the performance tests.</p>
 <div class="CodeRay">
@@ -86,8 +84,7 @@ $ rm test/performance/browsing_test.rb</pre></div>
 </div><br>
 <p>Editing the load_users_test.rb file, I&rsquo;ll add a couple simple tests that load all of the user records:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">test_helper</span><span style="color:#4f5b66;">&#39;
+<span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">test_helper</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">rails/performance_test_help</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">
 </span><span style="color:#a71d5d;">class </span><span style="color:#008080;">LoadUsersTest </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ActionDispatch::PerformanceTest
@@ -101,8 +98,7 @@ $ rm test/performance/browsing_test.rb</pre></div>
 </span><span style="color:#000000;">      </span><span style="color:#008080;">ActiveRecord</span><span style="color:#000000;">::</span><span style="color:#008080;">Base</span><span style="color:#000000;">.connection.select_all(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">SELECT users.* FROM users</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
 </span><span style="color:#000000;">    puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Loaded </span><span style="color:#000000;">#{user_hashes.size}</span><span style="color:#008080;"> users</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Finally, I&rsquo;ll install &ldquo;ruby-prof,&rdquo; a helpful profiling tool that will allow us to use the rake test:profile command:</p>
 <div class="CodeRay">

@@ -23,14 +23,12 @@
 <p><a href="http://dancroak.com">Dan Croak</a> jumpstarted the project on Rails 3 using <a href="http://github.com/thoughtbot/suspenders">ThoughtBot&rsquo;s suspenders</a> and also setup a continuous integration server for us in a matter of just minutes using <a href="http://github.com/defunkt/cijoe">CI Joe</a> on an Ubuntu server graciously donated to us for the week by <a href="http://railsmachine.com/">Rails Machine</a>.</p>
 <p>Dan also helped the team get up to speed on the latest testing tools and ideas from ThoughtBot, like <a href="http://github.com/thoughtbot/bourne">Bourne</a>, <a href="http://robots.thoughtbot.com/post/159805987/speculating-with-shoulda">Shoulda RSpec matchers:</a></p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">describe Project </span><span style="color:#a71d5d;">do
+<span style="color:#000000;">describe Project </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  let(</span><span style="color:#008080;">:project</span><span style="color:#000000;">) { Factory(</span><span style="color:#008080;">:project</span><span style="color:#000000;">) }
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  it { should belong_to(</span><span style="color:#008080;">:organization</span><span style="color:#000000;">) }
 </span><span style="color:#000000;">  it { should have_many(</span><span style="color:#008080;">:donations</span><span style="color:#000000;">) }
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>... and <a href="http://robots.thoughtbot.com/post/284805810/gimme-three-steps">Factory Girl cucumber steps</a>:</p>
 <pre><span class="r">Scenario:</span> Visitor reviews project
@@ -40,8 +38,7 @@
   <span class="r">And</span> the following project exists:
     | name                | funds purpose           | organization              
     | Christmas Toy Drive | New or gently used toys | name: Mission des Eglis...
-etc...
-</pre>
+etc...</pre>
 <p>Dan taught us a lot more than this, and also singlehandedly implemented a number of the user stories.</p>
 <p><a href="http://theagiledeveloper.com/">Matt Deiters</a> implemented some other key user stories, did a lot of user interface implementation work and also wrote a rake task to seed our database with development data.</p>
 <p><a href="http://github.com/klobuczek">Heinrich Klobuczek</a> used the <a href="http://github.com/iain/http_accept_language">http_accept_language gem</a> to provide internationalization support, and then proceeded to translate the site into French himself... despite being Polish! We&rsquo;ll have to have Rousseau check his French soon... lol.</p>

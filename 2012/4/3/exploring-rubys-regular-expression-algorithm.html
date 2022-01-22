@@ -25,14 +25,11 @@
 <h2>Example 1: Matching a simple substring</h2>
 <p>Here’s a very simple Ruby script that searches for the word “brown” in a target string:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">brown</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">brown</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)</span></pre>
 
 <p>If I run this using my modified version of Ruby, I see lots of additional debug output (much more than I display here):</p>
-<pre type="console">
-$ ruby regex.rb
+<pre type="console">$ ruby regex.rb
 PATTERN: /brown/ (US-ASCII)
 optimize: EXACT_BM
 exact: [brown]: length: 5
@@ -45,8 +42,7 @@ size: 44, start offset: 10
   10> "brown f..."         [exact5:brown]
   15> " fox ju..."         [end]
 
-#&lt;MatchData "brown">
-</pre>
+#&lt;MatchData "brown"></pre>
 <p>The key here is the text “0:[exact5:brown] 6:[end]” - this line describes the two VM instructions that Oniguruma has compiled the <span class="code">/brown/</span> pattern into. Here’s what this regex program looks like:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/4/3/regex1.png" alt="/brown/" /></p>
 <p>You can think of this diagram as the state machine for the <span class="code">/brown/</span> search:</p>
@@ -63,14 +59,11 @@ size: 44, start offset: 10
 <h2>Example 2: matching one string or another</h2>
 <p>Now let’s take a more complex example and see what happens - in this pattern I want to match either “black” or “brown”:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">black|brown</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">black|brown</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)</span></pre>
 
 <p>Running again:</p>
-<pre type="console">
-$ ruby regex.rb
+<pre type="console">$ ruby regex.rb
 PATTERN: /black|brown/ (US-ASCII)
 optimize: EXACT
 exact: [b]: length: 1
@@ -85,8 +78,7 @@ size: 44, start offset: 10
   10> "brown f..."         [exact5:brown]
   15> " fox ju..."         [end]
 
-#&lt;MatchData "brown">
-</pre>
+#&lt;MatchData "brown"></pre>
 <p>Again, the key line is: “0:[push:(11)] 5:[exact5:black] 11:[jump:(6)] 16:[exact5:brown] 22:[end]”. This is the VM program that will execute our <span class="code">/black|brown/</span> regex search:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/4/3/regex4.png" alt="/black/brown/" /></p>
 <p>This is a lot more complicated! First of all, above you can see the optimizer is now only looking for the letter “b”: “optimize: EXACT exact: [b]: length: 1”. This is because the words “black” and “brown” both begin with the same letter “b”.</p>
@@ -103,14 +95,11 @@ size: 44, start offset: 10
 <h2>Example 3: the anychar* instruction</h2>
 <p>Now for my last example today, let’s see what happens when I run this command regex pattern instead:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">brown.*</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">brown.*</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)</span></pre>
 
 <p>Now, of course, we want to match “brown” followed by any series of characters until the end of the line. Here’s the debug output:</p>
-<pre type="console">
-$ ruby regex.rb
+<pre type="console">$ ruby regex.rb
 PATTERN: /brown.*/ (US-ASCII)
 optimize: EXACT_BM
 exact: [brown]: length: 5
@@ -124,8 +113,7 @@ size: 44, start offset: 10
   15> " fox ju..."         [anychar*]
   44> ""                   [end]
 
-#&lt;MatchData "brown fox jumps over the lazy dog.">
-</pre>
+#&lt;MatchData "brown fox jumps over the lazy dog."></pre>
 <p>And here’s the new state machine:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/4/3/regex9.png" alt="/brown.*/" /></p>
 <p>This time you can see a new Oniguruma VM instruction: <span class="code">anychar*</span>. As you can guess, this represents the <span class="code">.*</span> syntax in the regex pattern. Let’s step through the process again and see what happens:</p>
@@ -151,36 +139,26 @@ size: 44, start offset: 10
 <h2>A pathological regex pattern</h2>
 <p>I mentioned at the top that Ruby displays the same poor performance that Perl does when given a pathological, or very complex regex pattern. It’s actually very easy to see this happen using Ruby on your own computer. Try running this very simple regex search on your computer:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">aaa</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">a?a?a?aaa</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">aaa</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">a?a?a?aaa</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)</span></pre>
 
 <p>This should run very quickly:</p>
-<pre type="console">
-$ time ruby regex.rb
+<pre type="console">$ time ruby regex.rb
 #&lt;MatchData "aaa">
-ruby regex.rb  0.02s user 0.01s system 30% cpu 0.080 total
-</pre>
+ruby regex.rb  0.02s user 0.01s system 30% cpu 0.080 total</pre>
 <p>However, if you repeat this pattern using 29 repetitions instead of 3 the time required to find the match begins to explode, just as Russ shows in the <a href="http://swtch.com/%7Ersc/regexp/regexp1.html">graph on the left in his first article</a>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">aaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span><span style="color:#4f5b66;">&quot;  </span><span style="color:#a7adba;"># 29 repetitions
-</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">aaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span><span style="color:#4f5b66;">&quot;  </span><span style="color:#a7adba;"># 29 repetitions
+</span><span style="color:#000000;">p str.match(</span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)</span></pre>
 
 <p>Running with 29 repetitions:</p>
-<pre type="console">
-$ time ruby regex.rb
+<pre type="console">$ time ruby regex.rb
 #&lt;MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
-ruby regex.rb  17.09s user 0.01s system 99% cpu 17.098 total
-</pre>
+ruby regex.rb  17.09s user 0.01s system 99% cpu 17.098 total</pre>
 <p>Or with 30 repetitions:</p>
-<pre type="console">
-$ time ruby regex.rb
+<pre type="console">$ time ruby regex.rb
 #&lt;MatchData "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
-ruby regex.rb  34.00s user 0.01s system 99% cpu 34.025 total
-</pre>
+ruby regex.rb  34.00s user 0.01s system 99% cpu 34.025 total</pre>
 <p>For 31 repetitions the time is 67 seconds and it increases exponentially from there. The reason this happens is that the Backtracking algorithm Oniguruma uses has to iterate through a list of combinations that increases exponentially with the length of the regex pattern. If Oniguruma and Ruby had used the Thompson NFA algorthim that Russ explained this wouldn’t happen!</p>
 <h2>Scratching the surface</h2>
 <p>As I said at the beginning, here I’m just scratching the surface of what Oniguruma and Ruby can do. As you probably know, there are many, many more regex operators and options available for you to use, each of which have corresponding Oniguruma VM instructions. In addition, my examples today were extremely simple and straightforward - in a typical Ruby application you might have very complex regex patterns that compile to a program containing hundreds of different Oniguruma VM instructions and many different match paths to follow through the target string. </p>

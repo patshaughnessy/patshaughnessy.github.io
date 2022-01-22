@@ -32,8 +32,7 @@ for small or empty arrays.</p>
 from large arrays? If I remove the small array optimizations, the Crystal
 implementation of <code>Array#uniq</code> reads like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Array</span><span style="color:#000000;">(T)
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Array</span><span style="color:#000000;">(T)
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">uniq
 </span><span style="color:#000000;">    </span><span style="color:#a7adba;"># Convert the Array into a Hash and then ask for its values
@@ -53,8 +52,7 @@ implementation of <code>Array#uniq</code> reads like this:</p>
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>This is <em>almost</em> easy to read. Admittedly, I’m a Ruby developer, so the Ruby-like
 syntax makes perfect sense to me. However, most developers will be able to
@@ -72,11 +70,9 @@ second, runtime program first, working our way from the inside out.</p>
 contains a given element. If the element isn’t already in the hash, Crystal
 adds it:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> h.has_key?(key)
+<span style="color:#a71d5d;">unless</span><span style="color:#000000;"> h.has_key?(key)
 </span><span style="color:#000000;">  h[key] </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> o
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>This is the crux of the unique algorithm. Crystal won’t insert a given key
 value twice. (Although the <code>unless</code> clause is technically unnecessary; saving a
@@ -84,21 +80,17 @@ repeated value would be harmless, overwriting the previous copy in the hash.)</p
 <p>Looking up one line, we can see the <code>to_lookup_hash</code> function accepts a block,
 and calls it to calculate the a key value for each array element:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">key </span><span style="color:#4f5b66;">= </span><span style="color:#a71d5d;">yield</span><span style="color:#000000;"> o
+<span style="color:#000000;">key </span><span style="color:#4f5b66;">= </span><span style="color:#a71d5d;">yield</span><span style="color:#000000;"> o
 </span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> h.has_key?(key)
 </span><span style="color:#000000;">  h[key] </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> o
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>And reading farther up, we can see another definition of <code>to_lookup_hash</code> passes
 in such a block:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">protected </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">to_lookup_hash
+<span style="color:#795da3;">protected </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">to_lookup_hash
 </span><span style="color:#000000;">  to_lookup_hash { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">elem</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> elem }
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Since the block <code>{ |elem| elem }</code> just returns whatever was passed into it, the
 keys and values of the lookup hash will be the same:</p>
@@ -107,14 +99,12 @@ keys and values of the lookup hash will be the same:</p>
 to reuse this function someday with a different block and set of keys.</p>
 <p>Finally, let’s look at how Crystal iterates over the array:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">each_with_object(Hash(U, T).</span><span style="color:#795da3;">new</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">o, h</span><span style="color:#4f5b66;">|
+<span style="color:#000000;">each_with_object(Hash(U, T).</span><span style="color:#795da3;">new</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">o, h</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  key </span><span style="color:#4f5b66;">= </span><span style="color:#a71d5d;">yield</span><span style="color:#000000;"> o
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> h.has_key?(key)
 </span><span style="color:#000000;">    h[key] </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> o
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Crystal calls <code>each_with_object</code> on the array and provides a single argument:
 <code>Hash(U, T).new</code>. Here’s our first example of generic type syntax. I’ll come
@@ -127,9 +117,7 @@ block inserts each value <code>o</code> into the hash <code>h</code>, skipping d
 <p>Finally, after the iteration completes, Crystal returns the values from the new
 hash, a new array containing only the unique elements from the original array:`</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">to_lookup_hash.values
-</span></pre>
+<span style="color:#000000;">to_lookup_hash.values</span></pre>
 
 <h2>Converting An Array To A Hash At Compile Time</h2>
 <p>But there’s more to this program than meets the eye. Crystal actually runs part
@@ -146,9 +134,7 @@ this:</p>
 <p><img width="550" src="https://patshaughnessy.net/assets/2021/11/6/solved-puzzle.svg"><br/></p>
 <p>The first line is actually the most important:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Array</span><span style="color:#000000;">(T)
-</span></pre>
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Array</span><span style="color:#000000;">(T)</span></pre>
 
 <p>This line means the Crystal team is not implementing a simple array of
 elements. Instead, they are implementing an array that must contain elements of
@@ -172,9 +158,7 @@ Crystal compiler automatically maps the type we happen to choose in our code to
 the variable <code>T</code>.</p>
 <p>Next, take a look at the <code>to_lookup_hash</code> function declaration:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">protected </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">to_lookup_hash</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&amp; </span><span style="color:#000000;">: T </span><span style="color:#4f5b66;">-&gt; </span><span style="color:#000000;">U) forall U
-</span></pre>
+<span style="color:#795da3;">protected </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">to_lookup_hash</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&amp; </span><span style="color:#000000;">: T </span><span style="color:#4f5b66;">-&gt; </span><span style="color:#000000;">U) forall U</span></pre>
 
 <p>What in the world does this mean? What is <code>forall U</code> referring to?</p>
 <p>The first thing to note here is Crystal’s block parameter syntax: <code>&amp; : T -&gt; U</code>.
@@ -187,9 +171,7 @@ block takes a single parameter of type <code>T</code>, and returns a single valu
 <p>This is our math puzzle for the day. Just like in a limit, integral or infinite
 series from Calculus, this formula contains <em>bound and free variables</em>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#4f5b66;">&amp; : </span><span style="color:#000000;">T </span><span style="color:#4f5b66;">-&gt; </span><span style="color:#000000;">U forall U
-</span></pre>
+<span style="color:#4f5b66;">&amp; : </span><span style="color:#000000;">T </span><span style="color:#4f5b66;">-&gt; </span><span style="color:#000000;">U forall U</span></pre>
 
 <p>Since the enclosing class statement above declared the class to be <code>Array(T)</code>,
 Crystal binds the <code>T</code> type variable here to be the same type as above. In order
@@ -203,9 +185,7 @@ any type <code>U</code>, “for all” possible types <code>U</code>.</p>
 <p>The Crystal compiler solves this math puzzle using the <code>yield</code> statement we saw
 above:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">key </span><span style="color:#4f5b66;">= </span><span style="color:#a71d5d;">yield</span><span style="color:#000000;"> o
-</span></pre>
+<span style="color:#000000;">key </span><span style="color:#4f5b66;">= </span><span style="color:#a71d5d;">yield</span><span style="color:#000000;"> o</span></pre>
 
 <p>Here Crystal knows the value <code>o</code> has a type of <code>T</code>. How? Because Crystal knows
 that all of the elements of the array have a type <code>T</code>, (this is the <code>Array(T)</code>
@@ -214,9 +194,7 @@ by <code>each_with_object</code>.</p>
 <p>Next, the Crystal compiler can determine that <code>U == T</code>, that both types are the
 same. How? When Crystal compiles the block’s code above:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">to_lookup_hash { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">elem</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> elem }
-</span></pre>
+<span style="color:#000000;">to_lookup_hash { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">elem</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> elem }</span></pre>
 
 <p>…Crystal notices that the return value of the block is the same as the value
 passed into the block, that <code>elem == elem</code>. Then, the Crystal compiler maps
@@ -225,9 +203,7 @@ this return value to the block declaration: <code>&amp; : T -&gt; U</code>. Beca
 also the same, that <code>U == T</code>.</p>
 <p>Finally, let’s return to the line above that iterates over the array:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">each_with_object(Hash(U, T).</span><span style="color:#795da3;">new</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">o, h</span><span style="color:#4f5b66;">|
-</span></pre>
+<span style="color:#000000;">each_with_object(Hash(U, T).</span><span style="color:#795da3;">new</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">o, h</span><span style="color:#4f5b66;">|</span></pre>
 
 <p>Now the Crystal compiler can use the knowledge that types <code>U == T</code> when it
 creates the lookup hash. In Crystal when you create a hash, just as when you
@@ -239,12 +215,10 @@ that <code>U == T</code>, the Crystal compiler can emit the correct, optimized c
 finding and inserting hash values when it produces machine language
 instructions for this passage:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">key </span><span style="color:#4f5b66;">= </span><span style="color:#a71d5d;">yield</span><span style="color:#000000;"> o
+<span style="color:#000000;">key </span><span style="color:#4f5b66;">= </span><span style="color:#a71d5d;">yield</span><span style="color:#000000;"> o
 </span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> h.has_key?(key)
 </span><span style="color:#000000;">  h[key] </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> o
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Crystal knows that both <code>o</code> and <code>key</code> have the same type <code>T</code>, which allows the
 <code>has_key?</code> and <code>[]=</code> methods to run quickly and correctly.</p>
@@ -264,7 +238,7 @@ compiler that my code is consistent and mathematically correct at a type level.<
 what code you are writing, how fast it needs to run, how many times and for how
 long that code will be used - and most importantly, how much time you have to
 solve math problems.</p>
-</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Generic Types: Adding Math Puzzles To Your Code';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Crystal</div><div class="links"><ul><li><a href="/2021/12/22/reading-code-like-a-compiler">Reading Code Like a Compiler</a></li><li><a href="/2021/11/29/find-your-languages-primitives">Find Your Language’s Primitives</a></li><li><a href="/2021/10/23/to-learn-a-new-language-read-its-standard-library">To Learn a New Language, Read Its Standard Library</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Generic Types: Adding Math Puzzles To Your Code';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Crystal</div><div class="links"><ul><li><a href="/2022/1/22/visiting-an-abstract-syntax-tree">Visiting an Abstract Syntax Tree</a></li><li><a href="/2021/12/22/reading-code-like-a-compiler">Reading Code Like a Compiler</a></li><li><a href="/2021/11/29/find-your-languages-primitives">Find Your Language’s Primitives</a></li><li><a href="/2021/10/23/to-learn-a-new-language-read-its-standard-library">To Learn a New Language, Read Its Standard Library</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';

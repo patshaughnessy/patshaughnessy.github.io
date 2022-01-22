@@ -19,28 +19,22 @@ all of this possible.</p>
 <p><a href="https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree">In my last
 post</a>,
 I saved this tree in my database using a series of insert statements:</p>
-<pre>
-insert into tree (letter, path) values ('A', 'A');
+<pre>insert into tree (letter, path) values ('A', 'A');
 insert into tree (letter, path) values ('B', 'A.B');
 insert into tree (letter, path) values ('C', 'A.C');
 insert into tree (letter, path) values ('D', 'A.C.D');
 insert into tree (letter, path) values ('E', 'A.C.E');
 insert into tree (letter, path) values ('F', 'A.C.F');
-insert into tree (letter, path) values ('G', 'A.B.G');
-</pre>
+insert into tree (letter, path) values ('G', 'A.B.G');</pre>
 <p>And we saw how easy it is to count the number of tree nodes in a given branch
 using the <span class="code">@&gt;</span> operator:</p>
-<pre>
-select count(*) from tree where 'A.C' @> path;
-</pre>
+<pre>select count(*) from tree where 'A.C' @> path;</pre>
 <h2>Cutting Off a Branch</h2>
 <p>But suppose I wanted to remove these nodes from the tree entirely; that is,
 suppose I wanted to “cut off this branch” of the tree, so to speak:</p>
 <img src="https://patshaughnessy.net/assets/2017/12/14/cut-branch.png"/>
 <p>How can I do this? Simple! I just use a SQL delete statement:</p>
-<pre>
-delete from tree where 'A.C' @> path;
-</pre>
+<pre>delete from tree where 'A.C' @> path;</pre>
 <p>As you can see, I can use <span class="code">@&gt;</span> equally well in delete
 statements as in select statements.</p>
 <h2>Replanting a Branch as a New Tree</h2>
@@ -57,14 +51,10 @@ know what the new path of each tree node will be? Let’s take <span
 class="code">C</span> as an example. Because <span class="code">C</span> will
 become the root node of my new tree, I want to change its path from <span
 class="code">A.C</span> to just <span class="code">C</span>:</p>
-<pre>
-update tree set path = 'C' where path = 'A.C';
-</pre>
+<pre>update tree set path = 'C' where path = 'A.C';</pre>
 <p>And I will want to update <span class="code">D</span>, one of <span
 class="code">C</span>’s children, in a similar way:</p>
-<pre>
-update tree set path = 'C.D' where path = 'A.C.D';
-</pre>
+<pre>update tree set path = 'C.D' where path = 'A.C.D';</pre>
 <p>I could write a separate update statement for each node, just 4 SQL statements
 for my example. But imagine I had 100s or 1000s of nodes in my tree. Updating
 the records one SQL statement at a time would require repeated network
@@ -77,8 +67,7 @@ class="code">SUBPATH()</span>, can help.</p>
 <h2>The NLEVEL Function</h2>
 <p>First, <span class="code">NLEVEL</span>. As you might guess, this returns the
 number of levels in a given path string:</p>
-<pre>
-select letter, path, nlevel(path) from tree;
+<pre>select letter, path, nlevel(path) from tree;
 
 letter | path  | nlevel 
 -------+-------+--------
@@ -89,8 +78,7 @@ D      | A.C.D |      3
 E      | A.C.E |      3
 F      | A.C.F |      3
 G      | A.B.G |      3
-(7 rows)
-</pre>
+(7 rows)</pre>
 <p>Looking at this, it’s easy to understand what the function returns: For a root
 node like <span class="code">A</span>, <span class="code">NLEVEL</span> returns 1.
 For <span class="code">A</span>’s child nodes, <span class="code">A.B</span>
@@ -108,11 +96,9 @@ seamlessly integrate with SQL, harnessing and extending the power of Postgres.</
 tree path formula: <span class="code">SUBPATH</span>. As you might guess, this
 returns a selected substring from a given path. Let’s try running it on my
 example tree:</p>
-<pre>
-select letter, subpath(path, 1) from tree;
+<pre>select letter, subpath(path, 1) from tree;
 ERROR:  invalid positions
-STATEMENT:  select letter, subpath(path, 1) from tree;
-</pre>
+STATEMENT:  select letter, subpath(path, 1) from tree;</pre>
 <p>Oops - I’ve done something wrong here. Calling <span class="code">SUBPATH(path,
 1)</span> returns the portion of the path starting with offset 1. Not a
 character offset, but a <em>path offset</em>. So <span class="code">SUBPATH(path,
@@ -125,16 +111,14 @@ number of path levels and removes the extra leading period.</p>
 returns an error in this case.</p>
 <p>Let’s try using <span class="code">SUBPATH</span> only on the <span
 class="code">C</span> branch, the branch we want to move:</p>
-<pre>
-select letter, subpath(path, 1) from tree where path <@ 'A.C';
+<pre>select letter, subpath(path, 1) from tree where path <@ 'A.C';
 letter | subpath 
 -------+---------
 C      | C
 D      | C.D
 E      | C.E
 F      | C.F
-(4 rows)
-</pre>
+(4 rows)</pre>
 <p>Now I get only four records in the result, one for <span class="code">C</span>
 and one for each node that appears under <span class="code">C</span>. And you
 can see the <span class="code">subpath</span> column contains the portion of
@@ -151,35 +135,27 @@ diagram shows, I want to delete <span class="code">C</span> and its children
 from the <span class="code">A</span> tree, and move them to a new location:</p>
 <img src="https://patshaughnessy.net/assets/2017/12/14/replanting.png"/>
 <p>Earlier I considered moving the nodes using a single update statement for each:</p>
-<pre>
-update tree set path = 'C' where path = 'A.C';
+<pre>update tree set path = 'C' where path = 'A.C';
 update tree set path = 'C.D' where path = 'A.C.D';
 update tree set path = 'C.E' where path = 'A.C.E';
-update tree set path = 'C.F' where path = 'A.C.F';
-</pre>
+update tree set path = 'C.F' where path = 'A.C.F';</pre>
 <p>Now that I know about <span class="code">SUBPATH</span>, it’s easy to write a
 single SQL update statement that will move all 4 nodes in the <span
 class="code">C</span> branch in one operation:</p>
-<pre>
-update tree set path = subpath(path, 1) where path <@ 'A.C';
-</pre>
+<pre>update tree set path = subpath(path, 1) where path <@ 'A.C';</pre>
 <p>I use <span class="code">where path &lt;@ 'A.C'</span> to scope the update to the
 <span class="code">C</span> branch, and I use <span class="code">subpath(path,
 1)</span> to remove the <span class="code">A</span> root element from the path
 of <span class="code">C</span> and each of its descendants.</p>
 <p>I can generalize this a bit more using the <span class="code">NLEVEL</span>
 function also:</p>
-<pre>
-update tree set path = subpath(path, nlevel('A.C')-1) where path <@ 'A.C';
-</pre>
+<pre>update tree set path = subpath(path, nlevel('A.C')-1) where path <@ 'A.C';</pre>
 <p>This follows because <span class="code">nlevel('A.C') = 2</span>, and
 therefore, <span class="code">nlevel('A.C')-1</span> returns the same formula
 we had above. Replacing <span class="code">A.C</span> with “BRANCH_PATH” I
 arrive at a general formula for “replanting” a branch as a new tree using a
 single SQL statement:</p>
-<pre>
-update tree set path = subpath(path, nlevel(BRANCH_PATH)-1) where path <@ BRANCH_PATH
-</pre>
+<pre>update tree set path = subpath(path, nlevel(BRANCH_PATH)-1) where path <@ BRANCH_PATH</pre>
 <p>…assuming <span class="code">nlevel(BRANCH_PATH) &gt; 1</span>, that is assuming
 the branch we want to replant isn’t already a root.</p>
 <h2>The || Concatenation Operator</h2>
@@ -191,8 +167,7 @@ class="code">C</span> branch under <span class="code">G</span>, like this:</p>
 <p>To write a formula for this transformation using SQL, we need to use one more
 important LTREE operator: the <span class="code">||</span> or concatenation
 operator. Let’s try it out with an example first:</p>
-<pre>
-select 'A.B.G' || path as concatenated from tree;
+<pre>select 'A.B.G' || path as concatenated from tree;
 concatenated 
 --------------
 A.B.G.A
@@ -202,8 +177,7 @@ A.B.G.A.C.D
 A.B.G.A.C.E
 A.B.G.A.C.F
 A.B.G.A.B.G
-(7 rows)
-</pre>
+(7 rows)</pre>
 <p>You can see LTREE has automatically added <span class="code">A.B.G</span> along
 with a period separator to each path in my table. And it has done this for all
 the paths in my table in a single operation.</p>
@@ -211,16 +185,14 @@ the paths in my table in a single operation.</p>
 <p>Now using <span class="code">||</span> I can write a single SQL statement to
 move a tree branch from one location to another. First, of course, I need to
 scope the SQL operation to the target branch using the ancestor operator:</p>
-<pre>
-select 'A.B.G' || path as concatenated from tree where path <@ 'A.C';
+<pre>select 'A.B.G' || path as concatenated from tree where path <@ 'A.C';
 concatenated 
 ---------------
 A.B.G.A.C
 A.B.G.A.C.D
 A.B.G.A.C.E
 A.B.G.A.C.F
-(4 rows)
-</pre>
+(4 rows)</pre>
 <p>I get the same results as above, but now only for the tree nodes I want to
 move.</p>
 <p>But my next problem is the new paths above start with <span
@@ -228,47 +200,37 @@ class="code">A.B.G.A.C</span>…. Instead, I want them to be <span
 class="code">A.B.G.C</span>…. I need to remove that extra <span
 class="code">A</span> character from the new paths, using the <span
 class="code">SUBPATH</span> operator:</p>
-<pre>
-select 'A.B.G' || subpath(path, 1) as concatenated from tree where path <@ 'A.C';
+<pre>select 'A.B.G' || subpath(path, 1) as concatenated from tree where path <@ 'A.C';
 concatenated 
 --------------
 A.B.G.C
 A.B.G.C.D
 A.B.G.C.E
 A.B.G.C.F
-(4 rows)
-</pre>
+(4 rows)</pre>
 <p>And finally, converting this into an update statement:</p>
-<pre>
-update tree set path = 'A.B.G' || subpath(path, 1) where path <@ 'A.C'
-</pre>
+<pre>update tree set path = 'A.B.G' || subpath(path, 1) where path <@ 'A.C'</pre>
 <p>…I have the single SQL statement I need!</p>
 <p>And generalizing this, we arrive at a SQL formula you could use in your own
 Postgres database:</p>
-<pre>
-update tree set path = DESTINATION_PATH || subpath(path, nlevel(SOURCE_PATH)-1)
-where path <@ SOURCE_PATH;
-</pre>
+<pre>update tree set path = DESTINATION_PATH || subpath(path, nlevel(SOURCE_PATH)-1)
+where path <@ SOURCE_PATH;</pre>
 <h2>Copying a Branch</h2>
 <p>One last puzzle: How can I copy a tree branch instead of moving it? I just use
 an insert SQL statement instead of update. Simple, right?</p>
 <p>But how, exactly? I need to insert multiple rows, one record for each node in
 the branch I copy. Again, I could write a series of insert statements like
 this:</p>
-<pre>
-insert into tree (letter, path) values ('C', 'A.B.G.C');
+<pre>insert into tree (letter, path) values ('C', 'A.B.G.C');
 insert into tree (letter, path) values ('D', 'A.B.G.C.D');
 insert into tree (letter, path) values ('E', 'A.B.G.C.E');
-insert into tree (letter, path) values ('F', 'A.B.G.C.F');
-</pre>
+insert into tree (letter, path) values ('F', 'A.B.G.C.F');</pre>
 <p>But using LTREE functions and operators, I can achieve this using a single SQL
 statement! I just have to write SQL that will insert the result of a select,
 like this:</p>
-<pre>
-insert into tree (letter, path) (
+<pre>insert into tree (letter, path) (
     select letter, 'A.B.G' || subpath(path, 1) from tree where 'A.C' @> path
-)
-</pre>
+)</pre>
 <p>Executing this, Postgres will first find all the nodes inside the branch I want
 to copy, and recalculate their paths. Then it will insert that result set into
 the tree as a copy, leaving my original branch unchanged!</p>

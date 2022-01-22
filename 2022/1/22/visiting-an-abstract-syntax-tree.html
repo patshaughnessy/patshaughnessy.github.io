@@ -1,0 +1,283 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Visiting an Abstract Syntax Tree - Pat Shaughnessy</title><meta name="description" content=""><meta name="author" content=""><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/css/normalize.css"><link rel="stylesheet" href="/assets/css/skeleton.css"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><link rel="icon" type="image/png" href="images/favicon.png"></head><body><div id="banner"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div><div style="margin-top: 35px"><div class="ten columns"><div class="container"><div class="row"><article class="post"><header><h1>Visiting an Abstract Syntax Tree</h1><div class="metadata">January 22nd 2022&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree">&nbsp; Comments and &nbsp; Reactions</a></div></header><section class="content"><div style="float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px">
+  <img src="https://patshaughnesy.net/assets/2022/1/22/visit-tree.jpg"><br/>
+  <i>Joshua Tree National Park
+  <small>(via: <a href="https://commons.wikimedia.org/wiki/File:Backpacker_at_Sunset_(22849298523).jpg">Wikimedia Commons</a>)</small>
+  </i>
+</div>
+<p>In my <a href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler">last
+post</a>, I
+explored how <a href="https://crystal-lang.org">Crystal</a> parsed a simple program and
+produced a data structure called an <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">abstract syntax
+tree</a> (AST). But what does
+Crystal do with the AST? Why bother going to such lengths to create it?</p>
+<p>After Crystal parses my code, it repeatedly steps through all the entries or
+nodes in the AST and builds up a description of the intended meaning and
+behavior of my code. This process is known as <em>semantic analysis</em>. Later,
+Crystal will use this description to convert my program into a machine language
+executable.</p>
+<p>But what does this description contain? What does it really mean for a compiler
+to <em>understand</em> anything? Let’s pack our bags and visit an abstract syntax tree
+with Crystal to find out.</p>
+<div style="clear: both"></div>
+<h2>The Visitor Pattern</h2>
+<p>Imagine several tourists visiting a famous tree: Each of them sees the same
+tree in a different way. The tree doesn’t change, but the perspective of each
+person looking at it is different. They each take a different photo, or
+remember different details.</p>
+<p>In Computer Science this separation of the data structure (the tree) from the
+algorithms using it (the tourists) is known as the <a href="https://en.wikipedia.org/wiki/Visitor_pattern">visitor
+pattern</a>. This technique allows
+compilers and other programs to run multiple algorithms on the same data
+structure without making a mess.</p>
+<p>The visitor pattern calls for two functions: <code>accept</code> and <code>visit</code>. First, a
+node in the data structure “accepts” a visitor:</p>
+<img class="svg" width="400px" src="https://patshaughnesy.net/assets/2022/1/22/visitor1.svg">
+<p>After accepting a visitor, the node turns around and calls the <code>visit</code> method on
+<code>Visitor</code>:</p>
+<img class="svg" width="400px" src="https://patshaughnesy.net/assets/2022/1/22/visitor2.svg">
+<p>The <code>visit</code> method implements whatever algorithm that visitor is interested in.</p>
+<p>This seems kind of pointless… why use <code>accept</code> at all? We could just call
+<code>visit</code> directly. The key is that, after calling the visitor and passing
+itself, the node passes the visitor to each of its children, recursively:</p>
+<img class="svg" width="400px" src="https://patshaughnesy.net/assets/2022/1/22/visitor3.svg">
+<p>And then the visitor can visit each of the child nodes also. The <code>Visitor</code>
+class doesn’t necessarily need to know anything about how to navigate the node
+data structure. And more and more visitor classes can implement new algorithms
+without changing the underlying data structure and breaking each other.</p>
+<h2>The Visitor Pattern in the Crystal Compiler</h2>
+<p>In order to understand what my code means, Crystal reads through my program’s
+AST over and over again using different visitors. Each algorithm looks for
+certain syntax, records information about the types and objects my code uses or
+possibly even transforms my code into a different form.</p>
+<div style="float: right; padding: 8px 0px 0px 30px; text-align: center; line-height:18px">
+  <img src="https://patshaughnesy.net/assets/2022/1/22/angel-oak.jpg"><br/>
+  <i>A photo I took in 2018 of <a href="https://en.wikipedia.org/wiki/Angel_Oak">Angel Oak</a>,<br/> a 400-500 year old tree in South Carolina.</i>
+</div>
+<p>Crystal implements the basics of the visitor pattern in
+<a href="https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/visitor.cr#L24">visitor.cr</a>,
+inside the superclass of all AST nodes:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">ASTNode
+</span><span style="color:#343d46;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">accept</span><span style="color:#000000;">(visitor)
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> visitor.visit_any self
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> visitor.visit self
+</span><span style="color:#000000;">        accept_children visitor
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">      visitor.end_visit self
+</span><span style="color:#000000;">      visitor.end_visit_any self
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
+</span><span style="color:#a71d5d;">end</span></pre>
+
+<p>Each subclass of <code>ASTNode</code> implements its own version of <code>accept_children</code>.</p>
+<h2>My Tiny Crystal Program</h2>
+<p>To get a sense of how the visitor pattern works inside of Crystal, let’s look
+at one line of code from my last post:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">arr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">]</span></pre>
+
+<p>As I explained last month, the Crystal parser generates this AST tree fragment:</p>
+<img class="svg" width="400px" src="https://patshaughnesy.net/assets/2022/1/22/ast1.svg">
+<p>Once the parser is finished and has created this small tree, the Crystal
+compiler steps through it a number of different times, looking for classes,
+variables, type declarations, etc. Each of these passes through the AST is
+performed by a different visitor class: <code>TopLevelVisitor</code>,
+<code>InstanceVarsInitializerVisitor</code> or <code>ClassVarsInitializerVisitor</code> among many
+others.</p>
+<p>The most important visitor class the Crystal compiler uses is called simply
+<code>MainVisitor</code>. You can find the code for <code>MainVisitor</code> in
+<a href="https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/semantic/main_visitor.cr#L26">main_visitor.cr</a>:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#a7adba;"># This is the main visitor of the program, ran after types have been declared
+</span><span style="color:#a7adba;"># and their type declarations (like `@x : Int32`) have been processed.
+</span><span style="color:#a7adba;">#
+</span><span style="color:#a7adba;"># This visits the &quot;main&quot; code of the program and resolves calls, instantiates
+</span><span style="color:#a7adba;"># methods and visits them, recursively, with other MainVisitors.
+</span><span style="color:#a7adba;">#
+</span><span style="color:#a7adba;"># The visitor keeps track of a method&#39;s variables (or the main program, split into
+</span><span style="color:#a7adba;"># several files, in case of top-level code). It keeps track both of the type of a
+</span><span style="color:#a7adba;"># variable at a single point (stored in @vars) and the combined type of all assignments
+</span><span style="color:#a7adba;"># to it (in @meta_vars).
+</span><span style="color:#a7adba;">#
+</span><span style="color:#a7adba;"># Call resolution logic is in `Call#recalculate`, where method lookup is done.
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">MainVisitor </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">SemanticVisitor</span></pre>
+
+<p>Since Crystal supports typed parameters and method overloading, the visitor
+class implements a different <code>visit</code> method for each type of node that it visits,
+for example:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">MainVisitor </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">SemanticVisitor
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">visit</span><span style="color:#000000;">(node : Assign)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">visit</span><span style="color:#000000;">(node : Var)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">visit</span><span style="color:#000000;">(node : ArrayLiteral)
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">visit</span><span style="color:#000000;">(node : NumberLiteral)
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">Etc…</span></pre>
+
+<p>Now let’s look at three examples of what the <code>MainVisitor</code> class does with my
+code: identifying variables, assigning types and expanding array literals. The
+Crystal compiler is much too complex to describe in a single blog post, but
+hopefully I can give you glimpse into the sort of work Crystal does during
+semantic analysis.</p>
+<h2>Identifying Variables</h2>
+<p>Obviously, my example code creates and initializes a variable called <code>arr</code>:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">arr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">]</span></pre>
+
+<p>But how does Crystal identify this variable’s name and value? What does it do
+with <code>arr</code>?</p>
+<p>The <code>MainVisitor</code> class starts to process my code by visiting the root node of
+this branch of my AST, the <code>Assign</code> node:</p>
+<img class="svg" width="375px" src="https://patshaughnesy.net/assets/2022/1/22/visit-assign1.svg">
+<p>As you can see, earlier during the parsing phrase Crystal had saved the target
+variable and value of this assign statement in the child AST nodes. The target
+variable, <code>arr</code>, appears in the <code>Var</code> node, and the value to assign is an
+<code>ArrayLiteral</code> node. The <code>MainVisitor</code> now knows I declared a new variable, called
+<code>arr</code>, in the current lexical scope. Since my program has no classes, methods or
+any other lexical scopes, Crystal saves this variable in a table of variables
+for the top level program:</p>
+<img class="svg" width="300px" src="https://patshaughnesy.net/assets/2022/1/22/table.svg">
+<p>Actually, to be more accurate, there will always be many other variables in
+this table along with <code>arr</code>. All Crystal programs automatically include the
+standard library, so Crystal also saves all of the top level variables from the
+standard library in this table.</p>
+<p>In a more normal program, there will be many lexical scopes for different
+method and class or module definitions, and <code>MainVisitor</code> will save each
+variable in the corresponding table.</p>
+<h2>Assigning Types</h2>
+<p>Probably the most important function of <code>MainVisitor</code> is to assign a type to each
+value in my program. The simplest example of this is when <code>MainVisitor</code> visits a
+<code>NumberLiteral</code> node:</p>
+<img class="svg" width="300px" src="https://patshaughnesy.net/assets/2022/1/22/visit-number-literal.svg">
+<p>Looking at the size of the numeric value, Crystal determines the type should be
+<code>Int32</code>. Crystal then saves this type right inside of the <code>NumberLiteral</code> node:</p>
+<img class="svg" width="114px" src="https://patshaughnesy.net/assets/2022/1/22/updated-number-literal.svg">
+<p>Strictly speaking, this violates the visitor pattern because the visitors
+shouldn’t be modifying the data structure they visit. But the type of each
+node, the type of each programming construct in my program, is really an
+integral part of that node. In this case the <code>MainVisitor</code> is really just
+completing each node. It’s not changing the structure of the AST in this case…
+although as we’ll see in a minute the <code>MainVisitor</code> does this for other nodes!</p>
+<h2>Type Inference</h2>
+<p>Sometimes type values can’t be determined from the intrinsic value of an AST
+node. Often the type of a node is determined by other nodes in the AST.</p>
+<p>Recall my example line of code is:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">arr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">]</span></pre>
+
+<p>Here Crystal automatically sets the type of the arr variable to the type of the
+array literal expression: <code>Array(Int32)</code>. In Computer Science, this is known as
+<em>type inference</em>. Because Crystal can automatically determine the type of
+<code>arr</code>, I don’t need to declare it explicitly by writing something more
+complicated like this:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">arr </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> uninitialized Array(Int32)
+</span><span style="color:#000000;">arr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">]</span></pre>
+
+<p>Type inference allows me to write concise, clean code with fewer type
+annotations. Most modern, statically typed languages such as Swift, Rust,
+Julia, Kotlin, etc., use type inference in the same way as Crystal. Even newer
+versions of Java or C++ use type inference.</p>
+<p>The Crystal compiler implements type inference when the MainVisitor encounters
+an <code>Assign</code> AST node, what we saw above.</p>
+<img class="svg" width="375px" src="https://patshaughnesy.net/assets/2022/1/22/visit-assign1.svg">
+<p>After encountering the <code>Assign</code> node, Crystal recursively processes one of the
+two child nodes, the <code>ArrayLiteral</code> value, and its child nodes. When this process
+finishes, Crystal knows the type of the <code>ArrayLiteral</code> node is <code>Array(Int32)</code>:</p>
+<img class="svg" width="425px" src="https://patshaughnesy.net/assets/2022/1/22/set-type.svg">
+<p>I’ll take a closer look at how Crystal processes the <code>ArrayLiteral</code> node next.
+But for now, once Crystal has the type of the <code>ArrayLiteral</code> node it copies that
+type over to the <code>Var</code> node and sets its type also:</p>
+<img class="svg" width="425px" src="https://patshaughnesy.net/assets/2022/1/22/set-type2.svg">
+<p>But Crystal does something else interesting here: It sets up a dependency
+between the two AST nodes: it “binds” the variable to the value:</p>
+<img class="svg" width="325px" src="https://patshaughnesy.net/assets/2022/1/22/bind.svg">
+<p>This binding dependency allows Crystal to later update the type of the <code>arr</code>
+variable whenever necessary. In this case the value <code>[12345, 67890]</code> will always
+have the same type, but I suspect that sometimes the Crystal compiler can
+update types during semantic analysis. In this way if the Crystal compiler ever
+changed its mind about the type of some value, it can easy update the types of
+any dependent values. I also suspect Crystal uses these type dependency
+connections to produce error messages whenever you pass an incorrect type to
+some function, for example. These are just guesses, however; if anyone from the
+Crystal team knows exactly what these type bindings are used for let me know.</p>
+<h2>Expanding an Array Literal</h2>
+<p>So far we’ve seen Crystal set the type of the <code>NumberLiteral</code> node to <code>Int32</code>,
+and we’ve seen Crystal assign <code>arr</code> a type of <code>Array(Int32)</code>. But how did Crystal
+determine the type of the array literal <code>[12345, 67890]</code>?</p>
+<p>This is where things get even more complicated. Sometimes during semantic
+analysis the Crystal compiler completely rewrites parts of your code, replacing
+it with something else. This happens even with my simple example. When visiting
+the <code>ArrayLiteral</code> node, the <code>MainVisitor</code> expands this simple line of code into
+something more complex:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">__temp_621 </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">::Array(typeof(</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">)).unsafe_build(</span><span style="color:#d08770;">2</span><span style="color:#000000;">)
+</span><span style="color:#000000;">__temp_622 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> __temp_621.to_unsafe
+</span><span style="color:#000000;">__temp_622[</span><span style="color:#d08770;">0</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">12345
+</span><span style="color:#000000;">__temp_622[</span><span style="color:#d08770;">1</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">67890
+</span><span style="color:#000000;">__temp_621</span></pre>
+
+<p>Reading this, you can see how later my compiled program will create the new
+array. First Crystal creates an empty array with a capacity of 2, and an
+element type of <code>Int32</code>. <code>typeof(12345, 67890)</code> returns the type (or multiple
+types inside a union type) found in the given set of values, in this case just
+<code>Int32</code>. Later Crystal sets the two elements in the array just by assigning
+them.</p>
+<p>Crystal achieves this by replacing part of my program’s AST with a new branch:</p>
+<img class="svg" width="375px" src="https://patshaughnesy.net/assets/2022/1/22/expanded-ast.svg">
+<p>For clarity, I’m not drawing the AST nodes for the inner assign operations,
+only the first line:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">__temp_621 </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">::Array(typeof(</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">)).unsafe_build(</span><span style="color:#d08770;">2</span><span style="color:#000000;">)</span></pre>
+
+<h2>Putting It All Together</h2>
+<p>With this new, updated AST we can see exactly how Crystal determines the type
+of my variable <code>arr</code>. Starting at the root of my AST, <code>MainVisitor</code> visits all of
+the AST nodes in this order in a series of recursive calls:</p>
+<img class="svg" width="114px" src="https://patshaughnesy.net/assets/2022/1/22/call-recurse.svg">
+<p>And it determines the types of each of these nodes as it returns from the
+recursive calls:</p>
+<img class="svg" width="240px" src="https://patshaughnesy.net/assets/2022/1/22/return-recurse.svg">
+<p>Some interesting details here that I don’t understand completely or have space
+to explain here:</p>
+<ul>
+<li>
+<p>The <code>TypeOf</code> node calculates a common union type using a type formula. In this
+example, it just returns <code>Int32</code> because both elements of my array, <code>12345</code> and
+<code>67890</code>, are simple 32 bit integers.</p>
+</li>
+<li>
+<p>I believe the <code>Generic</code> node refers to a Crystal generic class via the <code>Path</code> node
+shown above, in this example <code>Array(T)</code>. When <code>MainVisitor</code> processes the <code>Generic</code>
+node, it sets <code>T</code> to the type <code>Int32</code>, arriving at the type <code>Array(Int32).class</code>.</p>
+</li>
+<li>
+<p>The <code>Call</code> node looks up the method my code is calling (<code>unsafe_build</code>) and
+uses the type from that method’s return value. I didn’t have time to explore
+how method lookup works in Crystal, however, so I’m not sure about this.</p>
+</li>
+</ul>
+<h2>Scratching the Surface</h2>
+<p>Today we looked at a tiny piece of what the Crystal compiler can do. There are
+many more types of AST nodes, each of which the <code>MainVisitor</code> class handles
+differently. And there are many different visitor classes also, beyond
+<code>MainVisitor</code>. When analyzing a more complex program Crystal has to understand
+class and module definitions, instance and class variables, type annotations,
+different lexical scopes, macros, and much, much more. Crystal will need all of
+this information later, during the code generation phase, the next step that
+follows semantic analysis.</p>
+<p>But I hope this article gave you a sense of what sort of work a compiler has to
+do in order to understand your code. As you can see, for a statically typed
+language like Crystal the compiler spends much of its time identifying all of
+the types in your code, and determining which programming constructs or AST
+nodes have which types.</p>
+<p>Next time I’ll look at code generation: Now that Crystal has identified the
+variables, function calls and types in my code it is ready to generate the
+machine language code needed to execute my program. To do that, it will
+leverage the LLVM framework.</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Visiting an Abstract Syntax Tree';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Crystal</div><div class="links"><ul><li><a href="/2021/12/22/reading-code-like-a-compiler">Reading Code Like a Compiler</a></li><li><a href="/2021/11/29/find-your-languages-primitives">Find Your Language’s Primitives</a></li><li><a href="/2021/11/6/generic-types-adding-math-puzzles-to-your-code">Generic Types: Adding Math Puzzles To Your Code</a></li><li><a href="/2021/10/23/to-learn-a-new-language-read-its-standard-library">To Learn a New Language, Read Its Standard Library</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());</script></div><div id="footer" class="ten columns"><p>Content and UI design &copy; 2008-2022 Pat Shaughnessy</p></div></body></html>

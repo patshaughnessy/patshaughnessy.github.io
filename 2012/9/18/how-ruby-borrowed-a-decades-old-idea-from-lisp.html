@@ -21,12 +21,10 @@
 <p>Starting with the most obvious attribute of blocks, we know each block must consist of a piece of Ruby code, or internally a set of compiled YARV byte code instructions. For example, if I call a method and pass a block as a parameter:</p>
 <br/>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#d08770;">10</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
+<span style="color:#d08770;">10</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#000000;">  puts str
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>...it’s clear that when executing the <span class="code">10.times</span> call Ruby needs to know what code to iterate over. Therefore, we know the <span class="code">rb_block_t</span> structure must contain a pointer to that code:</p>
 <img src="https://patshaughnessy.net/assets/2012/9/18/block-and-code.png"/>
@@ -34,13 +32,11 @@
 <p>Another obvious but often overlooked behavior of blocks is that they can access variables in the surrounding or parent Ruby scope. For example:</p>
 <br/>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox</span><span style="color:#4f5b66;">&quot;
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">The quick brown fox</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#d08770;">10</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  str2 </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">jumps over the lazy dog.</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#000000;">  puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{str} #{str2}</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Here the <span class="code">puts</span> function call refers equally well to the <span class="code">str2</span> variable located inside the block and the <span class="code">str</span> variable from the surrounding code. We often take this for granted - obviously blocks can access values from the code surrounding them. This ability is one of the things that makes blocks useful. But if you think about this for a moment, you’ll realize blocks have in some sense a dual personality. On the one hand they behave like separate functions: you can call them and pass them arguments just as you would with any function. But on the other hand they are part of the surrounding function or method. As I wrote the sample code above I didn’t think of the block as a separate function - I thought of the block’s code as just part of the simple, top level script that printed a string 10 times.</p>
 <p>How does this work internally? Does Ruby internally implement blocks as separate functions? Or as part of the surrounding function? Let’s step through the example above, slowly, and see what happens inside of Ruby when you call a block.</p>
@@ -89,15 +85,13 @@ In order to solve this problem we introduce the notion of a closure [11, 14] whi
 </b>
 <p>In Ruby 1.9 and later you can find the actual definition of the <span class="code">rb_block_t</span> structure in the vm_core.h file. Here it is:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">typedef struct</span><span style="color:#000000;"> rb_block_struct {
+<span style="color:#a71d5d;">typedef struct</span><span style="color:#000000;"> rb_block_struct {
 </span><span style="color:#000000;">    VALUE self;			</span><span style="color:#a7adba;">/* share with method frame if it&#39;s only block */
 </span><span style="color:#000000;">    VALUE </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">lfp;			</span><span style="color:#a7adba;">/* share with method frame if it&#39;s only block */
 </span><span style="color:#000000;">    VALUE </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">dfp;			</span><span style="color:#a7adba;">/* share with method frame if it&#39;s only block */
 </span><span style="color:#000000;">    rb_iseq_t </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">iseq;
 </span><span style="color:#000000;">    VALUE proc;
-</span><span style="color:#000000;">} rb_block_t;
-</span></pre>
+</span><span style="color:#000000;">} rb_block_t;</span></pre>
 
 <p>You can see the <span class="code">iseq</span> and <span class="code">DFP</span> values I described above, along with a few other values:</p>
 <ul>
@@ -107,8 +101,7 @@ In order to solve this problem we introduce the notion of a closure [11, 14] whi
 </ul>
 <p>Right above the definition of <span class="code">rb_block_t</span> in vm_core.h you’ll see the <span class="code">rb_control_frame_t</span> structure defined:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">typedef struct </span><span style="color:#000000;">{
+<span style="color:#a71d5d;">typedef struct </span><span style="color:#000000;">{
 </span><span style="color:#000000;">    VALUE </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">pc;			</span><span style="color:#a7adba;">/* cfp[0] */
 </span><span style="color:#000000;">    VALUE </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">sp;			</span><span style="color:#a7adba;">/* cfp[1] */
 </span><span style="color:#000000;">    VALUE </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">bp;			</span><span style="color:#a7adba;">/* cfp[2] */
@@ -120,8 +113,7 @@ In order to solve this problem we introduce the notion of a closure [11, 14] whi
 </span><span style="color:#000000;">    rb_iseq_t </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">block_iseq;	</span><span style="color:#a7adba;">/* cfp[8] / block[3] */
 </span><span style="color:#000000;">    VALUE proc;			</span><span style="color:#a7adba;">/* cfp[9] / block[4] */
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">const</span><span style="color:#000000;"> rb_method_entry_t </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">me;</span><span style="color:#a7adba;">/* cfp[10] */
-</span><span style="color:#000000;">} rb_control_frame_t;
-</span></pre>
+</span><span style="color:#000000;">} rb_control_frame_t;</span></pre>
 
 <p>Notice that this C structure also contains all of the same values the <span class="code">rb_block_t</span> structure did: everything from <span class="code">self</span> down to <span class="code">proc</span>. The fact these two structures share the same values is actually one of the interesting, but confusing, optimizations Ruby uses internally to speed things up a bit. Whenever you refer to a block for the first time by passing it into a method call, as I explained above Ruby creates a new <span class="code">rb_block_t</span> structure and copies values such as the LFP from the current <span class="code">rb_control_frame_t</span> structure into it. However, by making the members of these two structures similar – <span class="code">rb_block_t</span> is a subset of <span class="code">rb_control_frame_t</span> – Ruby is able to avoid creating a new <span class="code">rb_block_t</span> structure and instead sets the pointer to the new block to refer to the common portion of the <span class="code">rb_control_frame_t</span> structure. In other words, instead of allocating new memory to hold a new <span class="code">rb_block_t</span> structure, Ruby simple passes around a pointer to the middle of the <span class="code">rb_control_frame_t</span> structure. This is very confusing, but does avoid unnecessary calls to malloc, and speeds up the process of creating blocks.</p>
 </div>

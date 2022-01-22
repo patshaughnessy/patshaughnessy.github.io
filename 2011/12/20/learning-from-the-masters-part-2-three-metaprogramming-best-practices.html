@@ -17,8 +17,7 @@
 <p>One of the most commonly used and well known examples of metaprogramming in Rails is the way ActiveRecord implements dynamic finder and scope methods. For example, suppose I have an ActiveRecord model called “Shirt” with a color field. I can get all the red shirt records just by calling <span class="code">Shirt.find_all_by_color('red')</span>. ActiveRecord also supports dynamic scope methods that return a scope object; for example calling <span class="code">Shirt.scoped_by_color('red')</span> will return a scope that you can then chain with other methods.</p>
 <p>Rails implements dynamic finder and scope methods using <span class="code">method_missing</span>. Since I didn’t actually write a method called “scoped_by_color” in my Shirt class, the Ruby interpreter calls <span class="code">method_missing</span> and gives ActiveRecord a chance to handle the missing method call. Here’s a small part of ActiveRecord’s <span class="code">method_missing</span> implementation for these dynamic finder and scope methods - in edge Rails you can find the complete method_missing implementation in ActiveRecord::DynamicMatchers (see <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/dynamic_matchers.rb#L24">dynamic_matchers.rb</a>) or in Rails 3.1 and earlier you’ll find this in ActiveRecord::Base (see <a href="https://github.com/rails/rails/blob/3-1-stable/activerecord/lib/active_record/base.rb#L1051">base.rb</a>):</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
 </span><span style="color:#000000;">
 </span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">... 
 </span><span style="color:#000000;">
@@ -30,45 +29,36 @@
 </span><span style="color:#4f5b66;">  METHOD
 </span><span style="color:#000000;">  send(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments)
 </span><span style="color:#000000;">
-</span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
-</span></pre>
+</span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...</span></pre>
 
 <p>Hmm - what the heck does this mean? I’ve removed a lot of the surrounding code from method_missing, but this snippet is still very confusing. When I first saw this code, I was definitely intimidated! What in the world is going on here? Maybe metaprogramming is not for me after all!</p>
 <p>Then I noticed a very helpful comment right next to the actual production code - just to the right, actually:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># def self.scoped_by_user_name_and_password(*args)
+<span style="color:#a7adba;"># def self.scoped_by_user_name_and_password(*args)
 </span><span style="color:#a7adba;">#   attributes = Hash[[:user_name, :password].zip(args)]
 </span><span style="color:#a7adba;">#
 </span><span style="color:#a7adba;">#   scoped(:conditions =&gt; attributes)
-</span><span style="color:#a7adba;"># end
-</span></pre>
+</span><span style="color:#a7adba;"># end</span></pre>
 
 <p>I view this comment as a translation, sort of a “clear text” version of the actual metaprogramming code above, that uses two example attributes “user_name” and “password.” Immediately I can make the mental leap that for my case, the Shirt model with a single “color” attribute, the generated code would be:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># def self.scoped_by_color(*args)
+<span style="color:#a7adba;"># def self.scoped_by_color(*args)
 </span><span style="color:#a7adba;">#   attributes = Hash[[:color].zip(args)]
 </span><span style="color:#a7adba;">#
 </span><span style="color:#a7adba;">#   scoped(:conditions =&gt; attributes)
-</span><span style="color:#a7adba;"># end
-</span></pre>
+</span><span style="color:#a7adba;"># end</span></pre>
 
 <p>This is still far from obvious, but after looking up the meaning of the <a href="http://www.ruby-doc.org/core-1.9.3/Array.html#method-i-zip">Array.zip method</a> and experimenting with the Hash[] syntax in the console:</p>
-<pre type="console">
-> args = ["red"]
+<pre type="console">> args = ["red"]
  => ["red"] 
 > [:color].zip(args)
  => [[:color, "red"]] 
 > Hash[ [[:color, "red"]] ]
- => {:color=>"red"} 
-</pre>
+ => {:color=>"red"}</pre>
 <p>...I can finally get to a good understanding of what the original metaprogramming was doing. It was defining a new class method called <span class="code">scoped_by_color</span> that simply calls <span class="code">scoped(:conditions =&gt; {:color=&gt;&quot;red&quot;})</span> - giving me the same behavior I would have gotten by using an anonymous scope directly:</p>
-<pre type="console">
-> Shirt.scoped(:conditions => {:color => 'red'})
+<pre type="console">> Shirt.scoped(:conditions => {:color => 'red'})
   Shirt Load (0.2ms)  SELECT "shirts".* FROM "shirts" WHERE "shirts"."color" = 'red'
- => [#&lt;Shirt id: 1, color: "red", created_at... >] 
-</pre>
+ => [#&lt;Shirt id: 1, color: "red", created_at... >]</pre>
 <p>I found this translated code comment to be so helpful that I believe it’s a metaprogramming best practice that we should all learn from! The idea isn’t new, actually. In fact <a href="http://yehudakatz.com/">Yehuda Katz</a>, by all accounts a master of Ruby programming, <a href="http://yehudakatz.com/2008/12/29/another-rails-2x3-update">originally mentioned the idea</a> of “annotating metaprogramming” while he was working on Rails 3 back in 2008, saying he was inspired by Michael Klishin (antares), and the next day <a href="http://hashref.com/">Xavier Noria</a> went ahead and added the annotations to the Rails source code in this <a href="https://github.com/rails/rails/commit/a2270ef2594b97891994848138614657363f2806">one large commit</a>.</p>
 <p>But wait a minute... aren’t code comments frowned upon and largely unnecessary, especially in a language as expressive as Ruby is? Also comments instantly become a maintenance problem - as soon as you change your code the comments are now out of date. However, in the case of metaprogramming, I think this is a small price to pay. I’m impressed that the Rails team took some time to make their code more readable and understandable for other developers, and not just for the Rails interpreter. We should all do the same whenever we use metaprogramming.</p>
 <h2>Plan ahead for accidents</h2>
@@ -78,15 +68,12 @@
 </table>
 </div>
 <p>Using the same <span class="code">Shirt.scoped_by_color</span> example, let’s suppose I forget to pass in the color parameter (note: if you try this yourself you won’t get this error unless you’re using edge Rails. In Rails 3.1 and earlier a warning is put into the log file instead.):</p>
-<pre type="console">
-> Shirt.scoped_by_color
+<pre type="console">> Shirt.scoped_by_color
 ArgumentError: wrong number of arguments (0 for 1)
- from .../dynamic_matchers.rb:29:in `scoped_by_color'
-</pre>
+ from .../dynamic_matchers.rb:29:in `scoped_by_color'</pre>
 <p>You can see I now get a fairly obvious exception message: I passed in zero arguments when the <span class="code">scoped_by_color</span> method expects 1. But wait a minute: there actually is no “scoped_by_color” method in my Shirt class! This error message is actually generated dynamically by the following code, also in the same <span class="code">method_missing</span> implementation in <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/dynamic_matchers.rb#L24">dynamic_matchers.rb</a>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
 </span><span style="color:#000000;">
 </span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
 </span><span style="color:#000000;">
@@ -98,27 +85,23 @@ ArgumentError: wrong number of arguments (0 for 1)
 </span><span style="color:#000000;">
 </span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
 </span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>This isn’t very glamourous code; all it’s doing is generating a string containing the dynamic method name, <span class="code">scoped_by_color</span> in this example, along with file name and line number information and manually adding it to a backtrace array. Then it raises an exception using the manually generated backtrace.</p>
 <p>What I like about this, however, is that the Rails team spent some time thinking about what might go wrong with <span class="code">scoped_by_color</span>. They realized that not passing in enough parameters might be a very common mistake, especially with a dynamically generated method, and wrote some code to anticipate that situation and display a more helpful error message. Because of this, my Rails log file will display dynamic method names such as <span class="code">scoped_by_color</span> in exception backtraces just the same as it does any other method.</p>
 <p>I call this practice “planning ahead for accidents.” You should probably do this for any code, but for metaprogramming it’s especially important since it’s often not at all obvious how many or which parameters to pass in to generated code. If you’re using metaprogramming, anything at all you can do to make life easier for developers, including yourself, who will later use your code is worthwhile. When you can’t simply look at a method definition it can be very hard to understand how to call that method.</p>
 <p>There’s another simple example of planning ahead for accidents you may not have noticed in the code I showed above:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">self.class_eval </span><span style="color:#4f5b66;">&lt;&lt;-METHOD</span><span style="color:#000000;">, __FILE__, __LINE__ </span><span style="color:#4f5b66;">+ </span><span style="color:#d08770;">1
+<span style="color:#000000;">self.class_eval </span><span style="color:#4f5b66;">&lt;&lt;-METHOD</span><span style="color:#000000;">, __FILE__, __LINE__ </span><span style="color:#4f5b66;">+ </span><span style="color:#d08770;">1
 </span><span style="color:#008080;">  def self.</span><span style="color:#000000;">#{method_id}</span><span style="color:#008080;">(*args)
 </span><span style="color:#008080;">etc...
-</span><span style="color:#4f5b66;">METHOD
-</span></pre>
+</span><span style="color:#4f5b66;">METHOD</span></pre>
 
 <p>Here by passing <span class="code">__FILE__</span> and <span class="code">_<em>LINE</em>_+1</span> into the call to <span class="code">class_eval</span>, the Rails team has insured that any errors or exceptions that occur inside this new, generated method will contain the proper file and line number information.</p>
 <h2>Be a good neighbor</h2>
 <p>Here’s some more code from the same file, <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/dynamic_matchers.rb#L24">dynamic_matchers.rb</a> in edge Rails, containing the <span class="code">method_missing</span> implementation of dynamic finder and scope methods:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">respond_to?</span><span style="color:#000000;">(method_id, include_private </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">false</span><span style="color:#000000;">)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">respond_to?</span><span style="color:#000000;">(method_id, include_private </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">false</span><span style="color:#000000;">)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if </span><span style="color:#000000;">match </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">DynamicFinderMatch</span><span style="color:#000000;">.match(method_id)
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">return </span><span style="color:#d08770;">true </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> all_attributes_exists?(match.attribute_names)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">elsif </span><span style="color:#000000;">match </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">DynamicScopeMatch</span><span style="color:#000000;">.match(method_id)
@@ -126,8 +109,7 @@ ArgumentError: wrong number of arguments (0 for 1)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">super
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Here we can see that ActiveRecord implements <span class="code">respond_to?</span> to indicate which dynamic finder and scope methods <span class="code">method_missing</span> will handle. It returns true if the method_id matches one or more of the model’s attributes, and false if not. This is important since other code in your application that uses the Shirt model, for example, might call <span class="code">respond_to?</span> to determine whether or not Shirt has a color attribute.</p>
 <div style="float: right; padding: 15px 0px 10px 30px">
@@ -139,8 +121,7 @@ ArgumentError: wrong number of arguments (0 for 1)
 <p>I consider this to be one example of another metaprogramming best practice: “Being a good neighbor.” Here the Rails team has taken some extra time to be sure that the Shirt model will work well and cooperate with other nearby code in the same application.</p>
 <p>Another example of “being a good neighbor” is the way the Rails team calls <span class="code">super</span> in the case where a missing method actually does not match one of the Shirt model’s attributes:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">method_missing</span><span style="color:#000000;">(method_id, </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">arguments, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">block)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if </span><span style="color:#000000;">match </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">(</span><span style="color:#008080;">DynamicFinderMatch</span><span style="color:#000000;">.match(method_id) </span><span style="color:#4f5b66;">|| </span><span style="color:#008080;">DynamicScopeMatch</span><span style="color:#000000;">.match(method_id))
 </span><span style="color:#000000;">
 </span><span style="color:#4f5b66;">...</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
@@ -148,8 +129,7 @@ ArgumentError: wrong number of arguments (0 for 1)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">else
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">super
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Just as <span class="code">respond_to?</span> returns false if the method_id doesn’t match one or more of the attributes, <span class="code">method_missing</span> will call <span class="code">super</span> so Ruby will call any other <span class="code">method_missing</span> functions that might be defined elsewhere. If ActiveRecord didn’t call <span class="code">super</span> when it’s <span class="code">method_missing</span> didn’t handle the method call, then no other modules included into the Shirt class or it's superclasses would receive a <span class="code">method_missing</span> call. This is really less of a best practice and more of an absolute requirement when using <span class="code">method_missing</span>: you always, always need to call <span class="code">super</span> when you don’t handle the call.</p>
 <p>Although implementing <span class="code">respond_to?</span> and calling <span class="code">super</span> are specific to <span class="code">method_missing</span>, for me being a good neighbor more generally means you need to think about the larger system around you - your neighborhood. This is especially true of metaprogramming, since something as simple as forgetting to call <span class="code">super</span> can have a profound effect on other parts of your application.</p>

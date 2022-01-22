@@ -56,8 +56,7 @@ headers[<span class="s"><span class="dl">&quot;</span><span class="k">Content-di
 </div><br></p>
 <p>As I said earlier, for Rails 3.0 you need to directly set self.response_body, instead of calling render :text.
 <div class="CodeRay">
-  <div class="code"><pre><span class="pc">self</span>.response_body = proc { |response, output|
-</pre></div>
+  <div class="code"><pre><span class="pc">self</span>.response_body = proc { |response, output|</pre></div>
 </div><br></p>
 <p>Finally, inside the proc, I have two variables available to me: the response object and also the output stream. By calling output.write, I&rsquo;m able to send whatever text I would like to the client, which will be immediately streamed to the network. In this example, what I do inside the response proc is call User.find_each to iterate over all of the user records, calling output.write for each one.
 <div class="CodeRay">
@@ -137,7 +136,7 @@ ruby-1.8.7-p302 ?>  end
  </div><br></p>
 <p>Now let&rsquo;s take a look at the index action in the users_controller.rb file created by the scaffolding generator:
 <div class="CodeRay">
-  <div class="code"><pre>  <span class="r">def</span> <span class="fu">index</span>
+  <div class="code"><pre><span class="r">def</span> <span class="fu">index</span>
     <span class="iv">@users</span> = <span class="co">User</span>.all
 <pre><code>respond_to &lt;span class=&quot;r&quot;&gt;do&lt;/span&gt; |format|
   format.html &lt;span class=&quot;c&quot;&gt;# index.html.erb&lt;/span&gt;
@@ -156,7 +155,7 @@ ruby-1.8.7-p302 > GC.enable_stats
 ruby-1.8.7-p302 > users = User.all; nil
  => nil 
 ruby-1.8.7-p302 > GC.allocated_size
- => 129630037 </pre></div>
+ => 129630037</pre></div>
  </div><br></p>
 <p>That&rsquo;s 129MB of data loaded into memory just for this simple &ldquo;user&rdquo; example with only two string columns! And I still haven&rsquo;t tried to call my index.html.erb view file to render the web page.</p>
 <p>Let&rsquo;s repeat the same test using find_each, but I&rsquo;ll call &ldquo;break&rdquo; as soon as my block is called for the first time:</p>
@@ -170,7 +169,7 @@ ruby-1.8.7-p302 >     break
 ruby-1.8.7-p302 ?>  end
  => nil 
 ruby-1.8.7-p302 > GC.allocated_size
- => 2186329 </pre></div>
+ => 2186329</pre></div>
  </div><br></p>
 <p>Here I can see that only 2MB of memory is allocated. Of course as Rails iterates over all the user records more and more user objects will be created, but since the response proc streams the data out to the client each time the block is called, the Ruby garbage collector will free memory just as fast as it&rsquo;s allocated.</p>
 <p>Returning to the controller, I&rsquo;ll paste in the streaming code from above:
@@ -187,8 +186,7 @@ ruby-1.8.7-p302 > GC.allocated_size
       }
     <span class="r">end</span>
   <span class="r">end</span>
-<span class="r">end</span>
-</pre></div>
+<span class="r">end</span></pre></div>
 </div><br></p>
 <p>Now let&rsquo;s try using our new app:</p>
 <div class="CodeRay">
@@ -207,8 +205,7 @@ etc...</pre></div>
 <div class='container'>gem <span class="s"><span class="dl">'</span><span class="k">mongrel</span><span class="dl">'</span></span><span class='overlay'></span></div>
 <span class="c"># Bundle edge Rails instead:</span>
 <p><span class="c"># gem 'rails', :git =&gt; 'git://github.com/rails/rails.git'</span></p>
-<p>gem <span class="s"><span class="dl">'</span><span class="k">sqlite3-ruby</span><span class="dl">'</span></span>, <span class="sy">:require</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">sqlite3</span><span class="dl">'</span></span>
-</pre></div></p>
+<p>gem <span class="s"><span class="dl">'</span><span class="k">sqlite3-ruby</span><span class="dl">'</span></span>, <span class="sy">:require</span> =&gt; <span class="s"><span class="dl">'</span><span class="k">sqlite3</span><span class="dl">'</span></span></pre></div></p>
 </div><br></p>
 <p>And then use bundler to install it if necessary:
 <div class="CodeRay">
@@ -216,7 +213,7 @@ etc...</pre></div>
 Using rake (0.8.7) 
 Using abstract (1.0.0) 
 Using activesupport (3.0.0)
-etc... </pre></div>
+etc...</pre></div>
 </div><br></p>
 <p>And now finally I can start up my mongrel server
 <div class="CodeRay">

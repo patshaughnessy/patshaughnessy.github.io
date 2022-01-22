@@ -6,41 +6,31 @@
 </div>
 <p>How many times do you think Ruby allocates memory for the “Lorem ipsum...” string while running this code snippet?</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str</span></pre>
 
 <p>...or what about while running this snippet?</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(str)
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(str)</span></pre>
 
 <p>...and this one?</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str.dup
-</span><span style="color:#000000;">str2.upcase!
-</span></pre>
+</span><span style="color:#000000;">str2.upcase!</span></pre>
 
 <p>Or this one?</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str[</span><span style="color:#d08770;">1</span><span style="color:#4f5b66;">..-</span><span style="color:#d08770;">1</span><span style="color:#000000;">]
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str[</span><span style="color:#d08770;">1</span><span style="color:#4f5b66;">..-</span><span style="color:#d08770;">1</span><span style="color:#000000;">]</span></pre>
 
 <p>The answers are not what you expect! Both the 1.9 and 1.8 MRI Ruby interpreters use an optimization called “copy on write” to avoid unnecessarily copying large string values. Like I did two weeks ago when <a href="https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">I discussed how Ruby 1.9 runs faster with strings containing 23 bytes or less</a>, today I’m going to take a deep dive into Ruby internals to see how the copy on write optimization works. Read on to learn more... and to find out how many strings were allocated by the code snippets above!</p>
 <h2>Referring to one String object with two variables</h2>
 <p><a href="https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Two weeks ago</a> I used this example to illustrate how Ruby shares string values:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str</span></pre>
 
 <p>Here’s a diagram showing how this string value is shared by <span class="code">str</span> and <span class="code">str2</span>:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/1/18/one-rstring.png" alt="One RString" /></p>
@@ -48,8 +38,7 @@
 <p>To find out exactly what is contained in any RString structure, and to prove this is actually what is happening inside the Ruby interpreter, I wrote a simple C extension that will display the hexadecimal address of a given RString value, along with the hexadecimal value of <span class="code">ptr</span>, which is the RString member that points to the actual string data. See <a href="https://patshaughnessy.net/2012/1/4/never-create-ruby-strings-longer-than-23-characters">my last post</a> for more details on how RString works. I’ve included the C source code for this extension below in the “Appendix” if you’re interested in the details.</p>
 <p>To use my C extension, I just need to require it and create an instance of the <span class="code">Debug</span> class and use it by calling <span class="code">display_string</span> as follows:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">require_relative </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&#39;
+<span style="color:#795da3;">require_relative </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">debug </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Debug</span><span style="color:#000000;">.</span><span style="color:#795da3;">new
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
@@ -59,12 +48,10 @@
 </span><span style="color:#000000;">debug.display_string str
 </span><span style="color:#000000;">puts
 </span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">str2:</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">debug.display_string str2
-</span></pre>
+</span><span style="color:#000000;">debug.display_string str2</span></pre>
 
 <p>Running this code I get the following output:</p>
-<pre type="console">
-$ ruby test.rb
+<pre type="console">$ ruby test.rb
 str:
 DEBUG: RString = 0x7fd64a84f620
 DEBUG: ptr     = 0x7fd64a416fe0 -> "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
@@ -73,8 +60,7 @@ DEBUG: len     = 56
 str2:
 DEBUG: RString = 0x7fd64a84f620
 DEBUG: ptr     = 0x7fd64a416fe0 -> "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
-DEBUG: len     = 56
-</pre>
+DEBUG: len     = 56</pre>
 <p>No surprise: You can see there’s a single RString structure at hexadecimal address 0x7fd64a84f620, which both <span class="code">str</span> and <span class="code">str2</span> point to. And <span class="code">ptr</span>, the location of the actual string data for each variable, is also the same: 0x7fd64a416fe0. Obviously <span class="code">str</span> and <span class="code">str2</span> both refer to the same Ruby string object.</p>
 <h2>Sharing one string value between two String objects</h2>
 <div style="float: right; padding: 15px 0px 10px 30px">
@@ -85,17 +71,13 @@ DEBUG: len     = 56
 </div>
 <p>However, Ruby does actually share string values. In my last post I should have used the following code as an example instead:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str.dup
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str.dup</span></pre>
 
 <p>Now calling the <span class="code">Object.dup</span> method will create a second RString structure that shares the same string data, since a second String object is created. I could also have used <span class="code">String.new</span> like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(str)
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(str)</span></pre>
 
 <p>Here’s what we have now:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/1/18/shared-string.png" alt="Shared String" /></p>
@@ -107,8 +89,7 @@ DEBUG: len     = 56
 </ul>
 <p>To prove this is what’s happening with RString after calling <span class="code">Object.dup</span>, I’ll call my display_string code again as follows:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">require_relative </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&#39;
+<span style="color:#795da3;">require_relative </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">debug </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Debug</span><span style="color:#000000;">.</span><span style="color:#795da3;">new
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
@@ -118,12 +99,10 @@ DEBUG: len     = 56
 </span><span style="color:#000000;">debug.display_string str
 </span><span style="color:#000000;">puts
 </span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">str2:</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">debug.display_string str2
-</span></pre>
+</span><span style="color:#000000;">debug.display_string str2</span></pre>
 
 <p>Running this:</p>
-<pre type="console">
-$ ruby test.rb
+<pre type="console">$ ruby test.rb
 str:
 DEBUG: RString = 0x7fdd2904f4a8
 DEBUG: ptr     = 0x7fdd28d16fe0 -> "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
@@ -132,36 +111,29 @@ DEBUG: len     = 56
 str2:
 DEBUG: RString = 0x7fdd2904f430
 DEBUG: ptr     = 0x7fdd28d16fe0 -> "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
-DEBUG: len     = 56
-</pre>
+DEBUG: len     = 56</pre>
 <p>Here you can see there are now two different RString structures, just like the picture above, with these two addresses: 0x7fdd2904f4a8 and 0x7fdd2904f430. But the important detail to notice here is that the value of <span class="code">ptr</span>, the hexadecimal address of the actual string data (0x7fdd28d16fe0), is the same in both cases!</p>
 <p>Remember, the concept of a shared string is a purely internal optimization. As a Ruby developer you don’t need to know that there really is only one copy of the string data in memory, and that both objects are sharing it. Just think of them as two separate string values - most of the time you don’t need to think about this.</p>
 <p>Note: this optimization doesn’t actually happen if the string value is 23 bytes or less, using embedded strings, since in that case the string data is actually saved right inside each RString structure. But for short strings sharing wouldn’t have saved us much time or memory, and by saving the string data inside the RString structure Ruby can save even more time and memory. The shared string optimization helps you the most when you are working with very large string values that contain thousands or even millions of bytes, for example. In that scenario it’s nice to know that Ruby won’t copy around all that string data whenever you copy a string value from one Ruby String object to another.</p>
 <h2>Copy on write</h2>
 <p>Obviously there’s more to the story here. How can two separate String objects share the same value, when I’m free to change one or both of their values? For example, suppose again I have two separate strings:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str  </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str.dup
-</span></pre>
+<span style="color:#000000;">str  </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str.dup</span></pre>
 
 <p>What happens if I now modify the value of one of the two String objects, for example like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str  </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+<span style="color:#000000;">str  </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str.dup
-</span><span style="color:#000000;">str2.upcase!
-</span></pre>
+</span><span style="color:#000000;">str2.upcase!</span></pre>
 
 <p>Now the two values are different:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">puts str
+<span style="color:#000000;">puts str
 </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">puts str2
-</span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISICING ELIT</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+</span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISICING ELIT</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p>Obivously these two strings no longer share the same value. What happened? Well first at the moment that you call <span class="code">upcase!</span> the Ruby interpreter makes a new copy of the string heap data for <span class="code">str2</span> like this:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/1/18/copy-on-write.png" alt="Copy On Write" /></p>
@@ -170,8 +142,7 @@ DEBUG: len     = 56
 <p>As Simon Russell explained in a comment on my last post, this algorithm is referred to as “copy on write,” meaning that the two string objects actually share the same string value until the very last moment when this is possible, while the two values are still the same. Then just before one of them changes, Ruby make a separate copy of the string and applies the write operation (<span class="code">upcase!</span> in this example) to the new copy.</p>
 <p>Let’s take a look at the two RString values again using my display_string code:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">require_relative </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&#39;
+<span style="color:#795da3;">require_relative </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">debug </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Debug</span><span style="color:#000000;">.</span><span style="color:#795da3;">new
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
@@ -182,12 +153,10 @@ DEBUG: len     = 56
 </span><span style="color:#000000;">debug.display_string str
 </span><span style="color:#000000;">puts
 </span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">str2:</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">debug.display_string str2
-</span></pre>
+</span><span style="color:#000000;">debug.display_string str2</span></pre>
 
 <p>Running this I get:</p>
-<pre type="console">
-$ ruby test.rb
+<pre type="console">$ ruby test.rb
 str:
 DEBUG: RString = 0x7fa46b04ef90
 DEBUG: ptr     = 0x7fa46ac8b1d0 -> "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
@@ -196,40 +165,32 @@ DEBUG: len     = 56
 str2:
 DEBUG: RString = 0x7fa46b04ef68
 DEBUG: ptr     = 0x7fa46ac2e560 -> "LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISICING ELIT"
-DEBUG: len     = 56
-</pre>
+DEBUG: len     = 56</pre>
 <p>You can see that the two RString structure now have different values for the <span class="code">ptr</span> member - they are no longer shared strings. All of this happens transparently to the Ruby developer.</p>
 <h2>How copy on write works with String.slice</h2>
 <p>Following Robert Sanders’ suggestion in another comment on my last post, I decided to take a look at how the copy on write operation works with another Ruby String method: <span class="code">slice</span>. What I found was that most of the time a second copy of the string is made for the slice operation. For example:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str[</span><span style="color:#d08770;">1</span><span style="color:#4f5b66;">..</span><span style="color:#d08770;">25</span><span style="color:#000000;">]
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str[</span><span style="color:#d08770;">1</span><span style="color:#4f5b66;">..</span><span style="color:#d08770;">25</span><span style="color:#000000;">]</span></pre>
 
 <p><img src="https://patshaughnessy.net/assets/2012/1/18/slice-copy.png" alt="String.slice with a copy" /></p>
 <p>However, often the substring is a single character or just a few characters from the target string:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str[</span><span style="color:#d08770;">1</span><span style="color:#4f5b66;">..</span><span style="color:#d08770;">4</span><span style="color:#000000;">]
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str[</span><span style="color:#d08770;">1</span><span style="color:#4f5b66;">..</span><span style="color:#d08770;">4</span><span style="color:#000000;">]</span></pre>
 
 <p>In this case the new string is less than 24 characters long, so there’s no need to call malloc again to allocate more memory. The short substring is just saved into the new RString object:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/1/18/slice-embedded.png" alt="String.slice with embedded copy" /></p>
 <p>However, one interesting optimization I found in the MRI Ruby string implementation was that if you happen to take a substring that includes all of the remaining characters up to the end of the original string, like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str[</span><span style="color:#d08770;">1</span><span style="color:#4f5b66;">..-</span><span style="color:#d08770;">1</span><span style="color:#000000;">]
-</span></pre>
+<span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">str2 </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> str[</span><span style="color:#d08770;">1</span><span style="color:#4f5b66;">..-</span><span style="color:#d08770;">1</span><span style="color:#000000;">]</span></pre>
 
 <p>... then Ruby will continue to share the same string data! What it does is set the <span class="code">ptr</span> value of <span class="code">str2</span> to point at the same string data, but advanced forward in memory by the proper number of bytes to return the desired substring:</p>
 <p><img src="https://patshaughnessy.net/assets/2012/1/18/slice-shared.png" alt="String.slice shared string" /></p>
 <p>Let's test it out using the same debug code:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">require_relative </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&#39;
+<span style="color:#795da3;">require_relative </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">debug </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Debug</span><span style="color:#000000;">.</span><span style="color:#795da3;">new
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">str </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">Lorem ipsum dolor sit amet, consectetur adipisicing elit</span><span style="color:#4f5b66;">&quot;
@@ -239,12 +200,10 @@ DEBUG: len     = 56
 </span><span style="color:#000000;">debug.display_string str
 </span><span style="color:#000000;">puts
 </span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">str2:</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">debug.display_string str2
-</span></pre>
+</span><span style="color:#000000;">debug.display_string str2</span></pre>
 
 <p>Now I see that the value of <span class="code">ptr</span> for <span class="code">str2</span> is set to <span class="code">ptr+1</span> from <span class="code">str</span>!</p>
-<pre type="console">
-$ ruby test.rb
+<pre type="console">$ ruby test.rb
 str:
 DEBUG: RString = 0x7fb71b04efa0
 DEBUG: ptr     = 0x7fb71ad007a0 -> "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
@@ -253,8 +212,7 @@ DEBUG: len     = 56
 str2:
 DEBUG: RString = 0x7fb71b04ef78
 DEBUG: ptr     = 0x7fb71ad007a1 -> "orem ipsum dolor sit amet, consectetur adipisicing elit"
-DEBUG: len     = 55
-</pre>
+DEBUG: len     = 55</pre>
 <p>What this means for Ruby developers using <span class="code">str.slice</span> or the <span class="code">str[a..b]</span> variants is:</p>
 <ul>
   <li>Creating a substring 23 characters or less is fastest</li>
@@ -267,8 +225,7 @@ DEBUG: len     = 55
 <h2>Appendix: The “display_string” C extension</h2>
 <p>Here’s the C extension code I used above, in case anyone is interested:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">#include </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">ruby.h</span><span style="color:#4f5b66;">&quot;
+<span style="color:#a71d5d;">#include </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">ruby.h</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#000000;">
 </span><span style="color:#a71d5d;">static</span><span style="color:#000000;"> VALUE </span><span style="color:#795da3;">display_string</span><span style="color:#000000;">(VALUE self, VALUE str) {
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">char </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">ptr;
@@ -283,25 +240,18 @@ DEBUG: len     = 55
 </span><span style="color:#000000;">  VALUE klass;
 </span><span style="color:#000000;">  klass </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">rb_define_class</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Debug</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, rb_cObject);
 </span><span style="color:#000000;">  </span><span style="color:#795da3;">rb_define_method</span><span style="color:#000000;">(klass, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, display_string, </span><span style="color:#d08770;">1</span><span style="color:#000000;">);
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>What this C code does is create a new Ruby class called <span class="code">Debug</span> that contains a single method called <span class="code">display_string</span>. The method takes a single string argument and then displays the address of the RString structure, as well as the address of the actual string data, along with its length using <span class="code">printf</span> statements.</p>
 <p>To build and use this extension code, first paste the C code from above into a file called “display_string.c” and then create a file called “extconf.rb” in the same directory containing these two lines:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">mkmf</span><span style="color:#4f5b66;">&#39;
-</span><span style="color:#000000;">create_makefile(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">mkmf</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">create_makefile(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">display_string</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)</span></pre>
 
 <p>Then create a C Makefile using this command:</p>
-<pre type="console">
-$ ruby extconf.rb
-</pre>
+<pre type="console">$ ruby extconf.rb</pre>
 <p>And finally compile the C code like this:</p>
-<pre type="console">
-$ make
-</pre>
+<pre type="console">$ make</pre>
 <p>Now you can use the Ruby snippets from above if your Ruby code is located in the same directory.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2012/1/18/seeing-double-how-ruby-shares-string-values'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Seeing double: how Ruby shares string values';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;

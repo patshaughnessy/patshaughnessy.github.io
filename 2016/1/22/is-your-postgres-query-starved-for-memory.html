@@ -115,8 +115,7 @@ so the primary hash table actually has a bit less than 4MB available to it.
 <h2>Measuring Your SQL Statement’s Blood Pressure</h2>
 <p>If one of the SQL queries in your application is running slowly, use the
 <span class="code">EXPLAIN ANALYZE</span> to find out what’s going on:</p>
-<pre style="font-size: 10px">
-> explain analyze select title, company from publications, authors where author = name;
+<pre style="font-size: 10px">> explain analyze select title, company from publications, authors where author = name;
 
                                                           QUERY PLAN                                                           
 -------------------------------------------------------------------------------------------------------------------------------
@@ -128,8 +127,7 @@ so the primary hash table actually has a bit less than 4MB available to it.
          ->  Seq Scan on publications  (cost=0.00..1270.00 rows=50000 width=88) (actual time=0.010..14.211 rows=50000 loops=1)
  Planning time: 0.489 ms
  Execution time: 960.482 ms
-(8 rows)
-</pre>
+(8 rows)</pre>
 <p>Postgres’s <span class="code">EXPLAIN</span> command displays the query plan, a
 tree data structure containing instructions that Postgres follows when it
 executes the query. By using <span class="code">EXPLAIN ANALYZE</span> we ask
@@ -139,9 +137,7 @@ authors table and 50 thousand records in the publications table. At the bottom
 we see that the join operation took a total of 960ms to finish.</p>
 <p><span class="code">EXPLAIN ANALYZE</span> also tells us how many buckets and
 batches the hash table used:</p>
-<pre>
-Buckets: 4096  Batches: 2  Memory Usage: 2948kB
-</pre>
+<pre>Buckets: 4096  Batches: 2  Memory Usage: 2948kB</pre>
 <p>Like my diagram above, this query used 2 batches: Only half of the data fit
 into the 4MB working memory buffer! Postgres saved the other half of the data
 in the file buffer.</p>
@@ -149,21 +145,14 @@ in the file buffer.</p>
 <p>Now let’s increase the size of the working memory buffer by editing the <span
 class="code">postgresql.conf</span> file and restarting the Postgres server.</p>
 <p>First, I stop my Postgres server:</p>
-<pre>
-$ launchctl unload homebrew.mxcl.postgresql.plist
-</pre>
+<pre>$ launchctl unload homebrew.mxcl.postgresql.plist</pre>
 <p>Then I edit <span class="code">postgresql.conf</span>:</p>
-<pre>
-$ vim /usr/local/var/postgres/postgresql.conf
-</pre>
+<pre>$ vim /usr/local/var/postgres/postgresql.conf</pre>
 <p>…uncommenting and changing the setting:</p>
 <img src="https://patshaughnessy.net/assets/2016/1/22/work_mem2.png"/>
 <p>Finally I restart my server and repeat the test:</p>
-<pre>
-$ launchctl load homebrew.mxcl.postgresql.plist
-</pre>
-<pre style="font-size: 10px">
-> explain analyze select title, company from publications, authors where author = name;
+<pre>$ launchctl load homebrew.mxcl.postgresql.plist</pre>
+<pre style="font-size: 10px">> explain analyze select title, company from publications, authors where author = name;
                                                           QUERY PLAN                                                           
 -------------------------------------------------------------------------------------------------------------------------------
  Hash Join  (cost=1895.00..32705.00 rows=50000 width=72) (actual time=59.224..624.716 rows=21 loops=1)
@@ -174,13 +163,10 @@ $ launchctl load homebrew.mxcl.postgresql.plist
          ->  Seq Scan on publications  (cost=0.00..1270.00 rows=50000 width=88) (actual time=0.008..13.382 rows=50000 loops=1)
  Planning time: 0.481 ms
  Execution time: 625.796 ms
-(8 rows)
-</pre>
+(8 rows)</pre>
 <p>You can see the number of batches is now 1, and the memory usage increased to
 5.8MB:</p>
-<pre>
-Buckets: 8192  Batches: 1  Memory Usage: 5860kB
-</pre>
+<pre>Buckets: 8192  Batches: 1  Memory Usage: 5860kB</pre>
 <p>Postgres was able to use a working memory buffer size larger than 4MB. This
 allowed it to save the entire data set into a single, in memory hash table and
 avoid using temporary buffer files. </p>

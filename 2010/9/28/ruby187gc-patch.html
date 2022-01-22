@@ -9,8 +9,7 @@ Started
 LoadUsersTest#test_find (54 ms warmup)
         process_time: 398 ms
 <div class='container'>              memory: unsupported
-             objects: unsupported<span class='overlay'></span></div>
-</pre></div>
+             objects: unsupported<span class='overlay'></span></div></pre></div>
 </div><br>
 <p>To get these values you need to use a patched Ruby interpreter that supports measuring memory allocations, object creations, etc. In addition, if you want to run these tests on a Rails 3 app, you&rsquo;ll need to use Ruby 1.8.7 or higher.</p>
 <p>If you don&rsquo;t mind reinstalling Ruby, Rails and all of the gems your app uses, then the best way to do this might be to install <a href="http://www.rubyenterpriseedition.com/">Ruby Enterprise Edition</a>, based on Ruby 1.8.7. This version of Ruby contains the GC statistics code changes along with a variety of other code changes and improvements.</p>
@@ -209,8 +208,7 @@ ruby-1.8.7-p302 > GC.time
 ruby-1.8.7-p302 > GC.clear_stats
  => nil 
 ruby-1.8.7-p302 > ObjectSpace.allocated_objects
- => 37390 
-</pre></div>
+ => 37390</pre></div>
 </div><br>
 <p>GC.collections return the number of times garbage_collect() was called, and GC.time returns the total time spent performing garbage collection. Finally, ObjectSpace.allocated_objects returns the total number of objects created.</p>
 <p>When you run a Rails profile performance test with the ruby-prof gem, it calls these new methods added by the GC patch to display the &ldquo;memory&rdquo; and &ldquo;objects&rdquo; values.</p>

@@ -13,9 +13,7 @@
 </div>
 <p>Traditionally Rails gems and plugins have implemented this on the server using a SQL statement similar to this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">SELECT</span><span style="color:#000000;"> first_name </span><span style="color:#a71d5d;">FROM</span><span style="color:#000000;"> people </span><span style="color:#a71d5d;">WHERE </span><span style="color:#000000;">LOWER(name) </span><span style="color:#a71d5d;">LIKE </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">lau%</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+<span style="color:#a71d5d;">SELECT</span><span style="color:#000000;"> first_name </span><span style="color:#a71d5d;">FROM</span><span style="color:#000000;"> people </span><span style="color:#a71d5d;">WHERE </span><span style="color:#000000;">LOWER(name) </span><span style="color:#a71d5d;">LIKE </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">lau%</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p>This SQL statement asks the database server to look through all of the rows in the “people” table, and to find just the people whose first name starts with the given letters. While this works just fine, it can slow down significantly if you have thousands or millions of records since the database needs to perform a string comparison to find the proper rows. You would likely have to instruct the database server to build an index on the first_name field... and hope that it supports fast string search operations with that index.</p>
 <h2>Creating an autocomplete index using a Redis sorted set</h2>
@@ -40,19 +38,15 @@ talk<br/></p>
 <p>To learn more about Redis Sorted Sets and all of the available commands for them see <a href="http://redis.io/">redis.io</a>, which has a nicely implemented <a href="http://redis.io/commands">Redis command reference page</a>. The key concept behind sorted sets is that they do the sorting at insertion time - that is, the set is always sorted since each element is inserted into the proper location in the set.</p>
 <h2>Searching a sorted set for matching words</h2>
 <p>Now let’s suppose a user starts to type a few letters into a web form: “ta” for example. Antirez’s code would be able to find the matching words, “take” and “talk,” using the following simple Redis commands:</p>
-<pre type="console">
-redis 127.0.0.1:6379> ZRANK tasks ta
-(integer) 1
-</pre>
+<pre type="console">redis 127.0.0.1:6379> ZRANK tasks ta
+(integer) 1</pre>
 <p>The <a href="http://redis.io/commands/zrank">ZRANK command</a> searches the given set and returns the index of the given value. Here it would return 1, since “ta” is the second value and Redis uses 0-based indexes.</p>
-<pre type="console">
-redis 127.0.0.1:6379> ZRANGE tasks 1 50
+<pre type="console">redis 127.0.0.1:6379> ZRANGE tasks 1 50
 1) "ta"
 2) "tak"
 3) "take*"
 4) "tal"
-5) "talk*"
-</pre>
+5) "talk*"</pre>
 <p><a href="http://redis.io/commands/zrange">ZRANGE</a> returns the 50 prefixes following “ta”, including the two complete words “take” and “talk.”</p>
 <p>The code Antirez shows on his blog post then searches through the values returned by ZRANGE looking for the trailing asterisk, in order to find the complete words that match.  Since the set is sorted, his code returns the matching words in the proper order, sorted alphabetically. His code also makes additional ZRANGE calls if necessary to find the requested number of matching complete words.</p>
 <h2>Creating a search index using a Redis hash and multiple sorted sets</h2>
@@ -96,30 +90,24 @@ talk</p>
   <img src="https://patshaughnessy.net/assets/2011/11/29/set-elements-are-hash-keys.png"/>
 </div>
 <p>Now by calling the ZRANGE command to get all of the set’s elements (0 means start from the first element, and -1 means continue until the end)...</p>
-<pre type="console">
-redis 127.0.0.1:6379> ZRANGE soulmate-index:tasks:ta 0 -1
+<pre type="console">redis 127.0.0.1:6379> ZRANGE soulmate-index:tasks:ta 0 -1
 1) "1"
-2) "2"
-</pre>
+2) "2"</pre>
 <p>...Soulmate can get a list of ID values that are also keys into the phrase database hash. Finally Soulmate can load the matching phrases and return them, using the <a href="http://redis.io/commands/hmget">HMGET (hash multiple get) command</a>:</p>
-<pre type="console">
-redis 127.0.0.1:6379> HMGET soulmate-data:tasks 1 2
+<pre type="console">redis 127.0.0.1:6379> HMGET soulmate-data:tasks 1 2
 1) "{\"term\":\"Take out the trash\",\"id\":1}"
-2) "{\"term\":\"Talk to the school bus driver\",\"id\":2}"
-</pre>
+2) "{\"term\":\"Talk to the school bus driver\",\"id\":2}"</pre>
 <p>This all happens without a single SQL command, and all of the data values are fetched directly from memory and not from disk!</p>
 <p>But that’s not all; as I said above Soulmate also supports the ability to search for multiple prefixes at the same time. For example, suppose the user has typed in “ta bus” ... meaning she wants to match “Talk to the school bus driver” but not “Take out the trash.” How does this work? Well Soulmate will get two sorted sets, once for “ta” and one for “bus” like this:</p>
 <div class="diagram-frame">
   <img src="https://patshaughnessy.net/assets/2011/11/29/intersection.png"/>
 </div>
 <p>Here Soulmate uses Redis’s <a href="http://redis.io/commands/zinterstore">ZINTERSTORE command</a> to calculate the intersection between two sets:</p>
-<pre type="console">
-redis 127.0.0.1:6379> ZINTERSTORE soulmate-cache:tasks:bus|ta 2
+<pre type="console">redis 127.0.0.1:6379> ZINTERSTORE soulmate-cache:tasks:bus|ta 2
                                   soulmate-index:tasks:ta soulmate-index:tasks:bus
 (integer) 1
 redis 127.0.0.1:6379> ZRANGE soulmate-cache:tasks:bus|ta 0 -1
-1) "2"
-</pre>
+1) "2"</pre>
 <p>This creates a third set called “soulmate-cache:tasks:bus|ta” containing only the elements that appear in both of the first two sets. ZINTERSTORE will actually support intersecting as many sets as you would like. Now Soulmate has the id values of the phrases that match both “ta” and “bus” - in this case 2 but not 1. It uses the name “soulmate-cache:tasks:bus|ta” since the contents of this set reflect which phrases match “bus” and “ta.”</p>
 <h2>Caching and expiring values with Redis</h2>
 <p>The last bit of magic in Soulmate’s algorithm that I’ll cover today is caching. To speed things up even further, Soulmate saves the result of the ZINTERSTORE call - the third set created with the common ID elements - for future lookups in case the same user or a different user types exactly the same letters again. Here’s how that works:</p>
@@ -127,10 +115,8 @@ redis 127.0.0.1:6379> ZRANGE soulmate-cache:tasks:bus|ta 0 -1
   <img src="https://patshaughnessy.net/assets/2011/11/29/cached-set.png"/>
 </div>
 <p>The intersection set was actually saved above in the call to ZINTERSTORE, and now to indicate that it should expire after 10 minutes (600 seconds) we would use:</p>
-<pre type="console">
-redis 127.0.0.1:6379> EXPIRE soulmate-cache:tasks:bus|ta 600
-(integer) 1
-</pre>
+<pre type="console">redis 127.0.0.1:6379> EXPIRE soulmate-cache:tasks:bus|ta 600
+(integer) 1</pre>
 <p>There are two important Redis concepts to learn here:</p>
 <ul>
   <li>Note how the intersection result set is labelled with the name “soulmate-cache:tasks:ta|bus” - this is a common Redis pattern. Key names can be long and complex, are often can contain multiple values concatenated together. In this case the two prefixes the user was searching for are containing right in the key name, allowing Soulmate to look it up easily in subsequent calls.</li>

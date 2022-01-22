@@ -11,21 +11,17 @@ that use the default Capybara driver</i></small></td></tr>
 <p>But what you probably didn’t know is that indirectly Capybara uses a large, complex open source C library called <a href="http://xmlsoft.org">Libxml2</a> to parse the HTML returned by your site, and to run assertions against it. It’s interesting to me that each time I run a Cucumber BDD test on a Ruby on Rails web site, the HTML I’m trying to inspect and test is passed into a C library... in other words, that my Cucumber tests are actually implemented by C code I never even knew I had on my machine.</p>
 <h2>An example Rails BDD/integration test</h2>
 <p>Let’s start by taking a look at a typical Cucumber feature:</p>
-<pre type="console">
-{^rx:Scenario:^} Viewing the home page
+<pre type="console">{^rx:Scenario:^} Viewing the home page
     {^kw:Given^} I am on the home page
-     {^cl:Then^} I should see "This is a simple web page."
-</pre>
+     {^cl:Then^} I should see "This is a simple web page."</pre>
 <p>This tests one of the web pages in a Rails app, the “home page,” and checks whether the text “This is a simple web page.” appears on it. You could just as easily have written this by calling Capybara directly from RSpec:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">describe </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">the text on the home page</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
+<span style="color:#000000;">describe </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">the text on the home page</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  it </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">should explain what to do next</span><span style="color:#4f5b66;">&#39; </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">    visit </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#000000;">    page.should have_content(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">This is a simple web page.</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>In either case there are two steps to the test:</p>
 <ul>
@@ -41,13 +37,11 @@ that use the default Capybara driver</i></small></td></tr>
 <h2>Proving that Cucumber BDD tests use the Libxml2 C library</h2>
 <p>Next, let’s take a look at exactly how Nokogiri is calling Libxml2, and prove that this C library is being used in my example Cucumber test. Here’s the documentation for C Libxml2 API call used by Nokogiri to parse HTML (from: <a href="http://xmlsoft.org/html/libxml-HTMLparser.html#htmlReadMemory">http://xmlsoft.org/html/libxml-HTMLparser.html#htmlReadMemory</a>):</p>
 <p><b>Function: htmlReadMemory</b></p>
-<pre type="console">
-htmlDocPtr	htmlReadMemory (const char * buffer, 
+<pre type="console">htmlDocPtr	htmlReadMemory (const char * buffer, 
       int size, 
       const char * URL, 
       const char * encoding, 
-      int options)
-</pre>
+      int options)</pre>
 <p>parse an XML in-memory document and build a tree.<br/>
 <i>buffer</i>: a pointer to a char array<br/>
 <i>size</i>: the size of the array<br/>
@@ -58,8 +52,7 @@ htmlDocPtr	htmlReadMemory (const char * buffer,
 <p>This C function is what actually parses the HTML text, and is located inside the Libxml2 library. You can see its declaration inside the HTMLparser.h header file, which on my machine is located in /usr/include/libxml2/libxml/HTMLparser.h. Depending on how you installed Libxml2 (homebrew, macports, from source) this will be located in a different location.</p>
 <p>This is called from the Nokogiri Ruby gem’s C extension code, in the <a href="https://github.com/tenderlove/nokogiri/blob/master/ext/nokogiri/html_document.c#L98">ext/nokogiri/html_document.c</a> file:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;">/*
+<span style="color:#a7adba;">/*
 </span><span style="color:#a7adba;"> * call-seq:
 </span><span style="color:#a7adba;"> *  read_memory(string, url, encoding, options)
 </span><span style="color:#a7adba;"> *
@@ -108,20 +101,16 @@ htmlDocPtr	htmlReadMemory (const char * buffer,
 </span><span style="color:#000000;">  document </span><span style="color:#4f5b66;">= </span><span style="color:#795da3;">Nokogiri_wrap_xml_document</span><span style="color:#000000;">(klass, doc);
 </span><span style="color:#000000;">  </span><span style="color:#795da3;">rb_iv_set</span><span style="color:#000000;">(document, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">@errors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, error_list);
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">return</span><span style="color:#000000;"> document;
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>I added the three fprintf lines at the top of the C function which will print out the HTML that is passed in from Capybara to Nokogiri on its way to Libxml2. Now if we manually recompile the C extension code in Nokogiri:</p>
-<pre type="console">
-$ cd ~/.rvm/gems/ruby-1.8.7-p352/gems/nokogiri-1.5.0/ext/nokogiri
+<pre type="console">$ cd ~/.rvm/gems/ruby-1.8.7-p352/gems/nokogiri-1.5.0/ext/nokogiri
 $ make
 $ make install
 /usr/bin/install -c -m 0755 nokogiri.bundle
-/Users/pat/.rvm/gems/ruby-1.8.7-p352/gems/nokogiri-1.5.0/lib/nokogiri
-</pre>
+/Users/pat/.rvm/gems/ruby-1.8.7-p352/gems/nokogiri-1.5.0/lib/nokogiri</pre>
 <p>...and run the Cucumber test back in my Ruby app, we’ll see the HTML on it’s way to the Libxml2 library!</p>
-<pre type="console">
-$ bundle exec cucumber features/view_web_page.feature
+<pre type="console">$ bundle exec cucumber features/view_web_page.feature
 Using the default profile...
 Feature: View the home page
   As a web visitor
@@ -151,8 +140,7 @@ DEBUG: end.
 
 1 scenario ({^s:1 passed^})
 2 steps ({^s:2 passed^})
-0m0.217s
-</pre>
+0m0.217s</pre>
 <p>Who knew so much C code was required by just a simple, elementary Cucumber integration test? I suppose this is one of the reasons for the success of the Ruby platform: it takes advantage of lower level native C libraries when necessary, but allows most developers to enjoy the elegance and succinctness of the Ruby language most of the time, without worrying about the low level details.</p>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2011/10/1/the-technology-you-never-knew-you-were-using-to-test-your-rails-site'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'The technology you never knew you were using to test your Rails site';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Ruby</div><div class="links"><ul><li><a href="/2016/10/7/need-a-second-opinion-on-your-ruby-code-ask-crystal">Need a Second Opinion on Your Ruby Code? Ask Crystal</a></li><li><a href="/2016/4/2/two-dumb-ruby-mistakes">Two Dumb Ruby Mistakes</a></li><li><a href="/2015/6/18/dont-let-your-data-out-of-the-database">Don’t Let Your Data Out of the Database</a></li><li><a href="/2015/2/16/mark-methods-private-when-you-dont-test-them">Mark Methods Private When You Don’t Test Them</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;

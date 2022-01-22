@@ -33,8 +33,7 @@ with not “actually comparing each possible pair of rows?”</p>
 <p>As an example today let’s work with two tables: <em>publications</em>, which contains
 three ground breaking computer science journal articles I never read in
 college, and <em>authors</em>, which records where each author worked.</p>
-<pre>
-> select * from publications;
+<pre>> select * from publications;
 
                          title                          |   author   | year 
 --------------------------------------------------------+------------+------
@@ -49,19 +48,16 @@ college, and <em>authors</em>, which records where each author worked.</p>
 ------------+-------------------------
  Edgar Codd | IBM Research Laboratory
  Jim Gray   | Tandem Computers
-(2 rows)
-</pre>
+(2 rows)</pre>
 <p>Today’s goal is to understand exactly what happens when Postgres joins one table with the other:</p>
-<pre>
-> select title, company from publications, authors where author = name;
+<pre>> select title, company from publications, authors where author = name;
 
                          title                          |         company         
 --------------------------------------------------------+-------------------------
  Relational Completeness of Data Base Sublanguages      | IBM Research Laboratory
  A Relational Model of Data for Large Shared Data Banks | IBM Research Laboratory
  The Transaction Concept: Virtues and Limitations       | Tandem Computers
-(3 rows)
-</pre>
+(3 rows)</pre>
 <h2>A Conceptual Model for Joining Two Tables</h2>
 <p>Before we look at the algorithm Postgres actually uses, let’s review what join
 queries do conceptually. Above the documentation stated that Postgres
@@ -319,9 +315,7 @@ needs to do next, using a state machine.</p>
 the larger structure of Postgres’s architecture, is to imagine that we asked
 for one record at a time. For example, imagine that we select just a single
 record from the join:</p>
-<pre>
-select title, company from publications, authors where author = name limit 1
-</pre>
+<pre>select title, company from publications, authors where author = name limit 1</pre>
 <p>By appending <span class="code">limit 1</span> we tell Postgres to stop after 1
 record. For this query, to return just one record, <span class="code">ExecHashJoin</span> will use the
 following states in its state machine:</p>
@@ -343,9 +337,7 @@ looks for the matching inner relation records in the hash table (publications).<
 </li>
 </ul>
 <p>Now imagine that I ask Postgres for two records, by using limit 2:</p>
-<pre>
-select title, company from publications, authors where author = name limit 2
-</pre>
+<pre>select title, company from publications, authors where author = name limit 2</pre>
 <p>The second time Postgres calls <span class="code">ExecHashJoin</span>, it only
 executes <span class="code">HJ_NEED_NEW_OUTER</span> and <span
 class="code">HJ_SCAN_BUCKET</span> - it already created the hash table the

@@ -21,15 +21,13 @@ actually fun! For example, I wrote <a href="https://github.com/patshaughnessy/pa
 code</a>
 to generate the static HTML pages for this blog site:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> count </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> all_posts.len();
+<span style="color:#a71d5d;">let</span><span style="color:#000000;"> count </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> all_posts.len();
 </span><span style="color:#000000;">all_posts.sort_by_key(|p| Reverse(p.date));
 </span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> params </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> CompileParams {all_posts: all_posts, output_path: output_path, draft: draft};
 </span><span style="color:#000000;">Ok(params).and_then(compile_posts)
 </span><span style="color:#000000;">          .and_then(compile_home_page)
 </span><span style="color:#000000;">          .and_then(compile_rss_feed)
-</span><span style="color:#000000;">          .map(|_output| count)
-</span></pre>
+</span><span style="color:#000000;">          .map(|_output| count)</span></pre>
 
 <p>Ignoring the details about sorting and counting, my code:</p>
 <ul>
@@ -52,19 +50,13 @@ happy path and jumps to the end.</p>
 <p>To chain <span class="code">and_then</span> methods together like this, I used
 the same input and output types for each of the compile methods:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">compile_posts</span><span style="color:#000000;">(params: CompileParams) -&gt; Result&lt;CompileParams, InvalidPostError&gt;
-</span></pre>
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">compile_posts</span><span style="color:#000000;">(params: CompileParams) -&gt; Result&lt;CompileParams, InvalidPostError&gt;</span></pre>
 
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">compile_home_page</span><span style="color:#000000;">(params: CompileParams) -&gt; Result&lt;CompileParams, InvalidPostError&gt;
-</span></pre>
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">compile_home_page</span><span style="color:#000000;">(params: CompileParams) -&gt; Result&lt;CompileParams, InvalidPostError&gt;</span></pre>
 
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">compile_rss_feed</span><span style="color:#000000;">(params: CompileParams) -&gt; Result&lt;CompileParams, InvalidPostError&gt;
-</span></pre>
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">compile_rss_feed</span><span style="color:#000000;">(params: CompileParams) -&gt; Result&lt;CompileParams, InvalidPostError&gt;</span></pre>
 
 <p>Each method expects a <span class="code">CompileParams</span> struct, and
 returns one wrapped in <span class="code">Result</span>. Rust unwraps the <span
@@ -74,14 +66,12 @@ a consistent way to return errors. This was a bit of a challenge at first,
 until I realized it was easy to cast other types of errors into
 <span class="code">InvalidPostError</span> like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">impl </span><span style="color:#000000;">From&lt;std::io::Error&gt; </span><span style="color:#a71d5d;">for </span><span style="color:#000000;">InvalidPostError {
+<span style="color:#a71d5d;">impl </span><span style="color:#000000;">From&lt;std::io::Error&gt; </span><span style="color:#a71d5d;">for </span><span style="color:#000000;">InvalidPostError {
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">from</span><span style="color:#000000;">(e: std::io::Error) -&gt; InvalidPostError {
 </span><span style="color:#000000;">        </span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> message </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">format!(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#d08770;">{}</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, e);
 </span><span style="color:#000000;">        InvalidPostError::new(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">message)
 </span><span style="color:#000000;">    }
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>Now the Rust compiler knows how to map a <span class="code">std::io::Error</span> into an <span class="code">InvalidPostError</span>.</p>
 <h2>Error Handling the Old Fashioned Way</h2>
@@ -89,8 +79,7 @@ until I realized it was easy to cast other types of errors into
 PL that doesn't support <a href="https://medium.com/@huund/monadic-error-handling-1e2ce66e3810">monadic error
 handling</a>.)</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> compile_posts(params)
+<span style="color:#a71d5d;">if</span><span style="color:#000000;"> compile_posts(params)
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> compile_home_page(params)
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> compile_rss_feed(params)
 </span><span style="color:#000000;">      puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Success!</span><span style="color:#4f5b66;">&quot;
@@ -102,16 +91,14 @@ handling</a>.)</p>
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#a71d5d;">else
 </span><span style="color:#000000;">  puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Error compiling a blog post</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>I didn’t have to write a series of if/else blocks. This would have been tedious
 to write and tedious to read. And I probably would have forgotten (or have been
 too lazy) to check one of the return values.</p>
 <p>And I didn’t have to write this code either:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">compile_posts</span><span style="color:#000000;">(params)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">compile_posts</span><span style="color:#000000;">(params)
 </span><span style="color:#000000;">  </span><span style="color:#795da3;">raise </span><span style="color:#008080;">InvalidPostError</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Failed compiling the posts</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
 </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
@@ -130,8 +117,7 @@ too lazy) to check one of the return values.</p>
 </span><span style="color:#000000;">  puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Success</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#a71d5d;">rescue </span><span style="color:#000000;">InvalidPostError =&gt; e
 </span><span style="color:#000000;">  puts e.message
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Once again this is fragile: I might raise the wrong exception type or not raise
 one at all. Or I might rescue the wrong type. Worse, there’s no indication at
@@ -140,23 +126,19 @@ the call site what might happen.</p>
 script like this. If an exception happens someday while building my blog site,
 then I’ll deal with it then. I’d probably just write this code:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">compile_posts(params)
+<span style="color:#000000;">compile_posts(params)
 </span><span style="color:#000000;">compile_home_page(params)
 </span><span style="color:#000000;">compile_rss_feed(params)
-</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Success</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Success</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <h2>Rust Error Handling: Easy To Read, Hard To Write</h2>
 <p>Combining results together using <span class="code">and_then</span> and other
 <span class="code">Result</span> functions enables me to write error checking
 code in a natural, succinct way:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">Ok(params).and_then(compile_posts)
+<span style="color:#000000;">Ok(params).and_then(compile_posts)
 </span><span style="color:#000000;">          .and_then(compile_home_page)
-</span><span style="color:#000000;">          .and_then(compile_rss_feed)
-</span></pre>
+</span><span style="color:#000000;">          .and_then(compile_rss_feed)</span></pre>
 
 <p>This is just as simple to read as the Ruby version above that doesn’t check for
 any errors. While it’s harder to write, having the Rust compiler check my

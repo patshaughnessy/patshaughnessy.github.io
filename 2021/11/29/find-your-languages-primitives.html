@@ -22,10 +22,8 @@ Ruby, Crystal and x86 Assembly Language.</p>
 <h2>Retrieving an Array Element In Ruby</h2>
 <p>In Ruby I can create an array and later access an element like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">arr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">]
-</span><span style="color:#000000;">puts arr[</span><span style="color:#d08770;">1</span><span style="color:#000000;">]
-</span></pre>
+<span style="color:#000000;">arr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">]
+</span><span style="color:#000000;">puts arr[</span><span style="color:#d08770;">1</span><span style="color:#000000;">]</span></pre>
 
 <p>This code would be the same or almost the same in many other programming
 languages. It just means: “find the second element of the array and print it to
@@ -52,10 +50,8 @@ similar <span class="code">Array#[]</span> primitive.  But surprisingly, I was
 wrong!</p>
 <p>The same code from above also works in Crystal:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">arr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">]
-</span><span style="color:#000000;">puts arr[</span><span style="color:#d08770;">1</span><span style="color:#000000;">]
-</span></pre>
+<span style="color:#000000;">arr </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[</span><span style="color:#d08770;">12345</span><span style="color:#000000;">, </span><span style="color:#d08770;">67890</span><span style="color:#000000;">]
+</span><span style="color:#000000;">puts arr[</span><span style="color:#d08770;">1</span><span style="color:#000000;">]</span></pre>
 
 <p>In Crystal, arrays are not language primitives because the Crystal standard
 library implements arrays using Crystal itself. The <span
@@ -68,8 +64,7 @@ the Crystal team implemented it.</p>
 in the Crystal standard library, here’s the implementation of <span class="code">Indexable#[]</span>
 which the array class uses when I call <span class="code">arr[1]</span> above:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># Returns the element at the given *index*.
+<span style="color:#a7adba;"># Returns the element at the given *index*.
 </span><span style="color:#a7adba;">#
 </span><span style="color:#a7adba;"># Negative indices can be used to start counting from the end of the array.
 </span><span style="color:#a7adba;"># Raises `IndexError` if trying to access an element outside the array&#39;s range.
@@ -87,14 +82,12 @@ which the array class uses when I call <span class="code">arr[1]</span> above:</
 </span><span style="color:#000000;">@[AlwaysInline]
 </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">[]</span><span style="color:#000000;">(index : Int)
 </span><span style="color:#000000;">  fetch(index) { </span><span style="color:#795da3;">raise </span><span style="color:#008080;">IndexError</span><span style="color:#000000;">.</span><span style="color:#795da3;">new </span><span style="color:#000000;">}
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>The Crystal team implemented <span class="code">[]</span> using another method
 called <span class="code">fetch</span>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># Returns the element at the given *index*, if in bounds,
+<span style="color:#a7adba;"># Returns the element at the given *index*, if in bounds,
 </span><span style="color:#a7adba;"># otherwise executes the given block with the index and returns its value.
 </span><span style="color:#a7adba;">#
 </span><span style="color:#a7adba;"># ```
@@ -108,8 +101,7 @@ called <span class="code">fetch</span>:</p>
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">return yield </span><span style="color:#000000;">index
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">  unsafe_fetch(index)
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Neither the <span class="code">[]</span> operator nor the <span
 class="code">fetch</span> method are language primitives. To find a language
@@ -119,8 +111,7 @@ break up some material into smaller and smaller molecules until they are left
 with a set of atoms.</p>
 <p>Let’s continue by reading <span class="code">unsafe_fetch</span>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># Returns the element at the given *index*, without doing any bounds check.
+<span style="color:#a7adba;"># Returns the element at the given *index*, without doing any bounds check.
 </span><span style="color:#a7adba;">#
 </span><span style="color:#a7adba;"># `Indexable` makes sure to invoke this method with *index* in `0...size`,
 </span><span style="color:#a7adba;"># so converting negative indices to positive ones is not needed here.
@@ -131,20 +122,17 @@ with a set of atoms.</p>
 </span><span style="color:#a7adba;"># This method should only be directly invoked if you are absolutely
 </span><span style="color:#a7adba;"># sure the index is in bounds, to avoid a bounds check for a small boost
 </span><span style="color:#a7adba;"># of performance.
-</span><span style="color:#000000;">abstract </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">unsafe_fetch</span><span style="color:#000000;">(index : Int)
-</span></pre>
+</span><span style="color:#000000;">abstract </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">unsafe_fetch</span><span style="color:#000000;">(index : Int)</span></pre>
 
 <p>Since <span class="code">Indexable#unsafe_fetch</span> is an abstract method, I
 need to read how the <span class="code">Array</span> class implements it back
 in
 <a href="https://github.com/crystal-lang/crystal/blob/master/src/array.cr#L663">src/array.cr</a>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">@[AlwaysInline]
+<span style="color:#000000;">@[AlwaysInline]
 </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">unsafe_fetch</span><span style="color:#000000;">(index : Int) </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">T
 </span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">buffer[index]
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <div style="float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px">
   <img src="https://patshaughnessy.net/assets/2021/11/29/dig2.jpg"><br/>
@@ -157,49 +145,39 @@ in
 <p>To learn more, I need to scroll up and read the beginning of the Crystal <span
 class="code">Array</span> class definition:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># An `Array` is an ordered, integer-indexed collection of objects of type T.
+<span style="color:#a7adba;"># An `Array` is an ordered, integer-indexed collection of objects of type T.
 </span><span style="color:#a7adba;">#
 </span><span style="color:#a7adba;"># Array indexing starts at 0. A negative index is assumed to be
 </span><span style="color:#a7adba;"># relative to the end of the array: -1 indicates the last element,
-</span><span style="color:#a7adba;"># -2 is the next to last element, and so on.
-</span></pre>
+</span><span style="color:#a7adba;"># -2 is the next to last element, and so on.</span></pre>
 
 <p>etc...</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># An `Array` is implemented using an internal buffer of some capacity
+<span style="color:#a7adba;"># An `Array` is implemented using an internal buffer of some capacity
 </span><span style="color:#a7adba;"># and is reallocated when elements are pushed to it when more capacity
 </span><span style="color:#a7adba;"># is needed. This is normally known as a [dynamic array](http://en.wikipedia.org/wiki/Dynamic_array).
 </span><span style="color:#a7adba;">#
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Array</span><span style="color:#000000;">(T)
-</span></pre>
+</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Array</span><span style="color:#000000;">(T)</span></pre>
 
 <p>etc...</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">  </span><span style="color:#a7adba;"># The buffer where elements start.
-</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">buffer </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">Pointer(T)
-</span></pre>
+<span style="color:#a7adba;"># The buffer where elements start.
+</span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">buffer </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">Pointer(T)</span></pre>
 
 <p>I’ve deleted some of the comments and code for clarity. You can read the full,
 original version in <a href="https://github.com/crystal-lang/crystal/blob/master/src/array.cr">src/array.cr.</a></p>
 <p>Now I get a sense of how the <span class="code">unsafe_fetch</span> method
 above works. Let’s repeat that again:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">unsafe_fetch</span><span style="color:#000000;">(index : Int) </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">T
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">unsafe_fetch</span><span style="color:#000000;">(index : Int) </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">T
 </span><span style="color:#000000;">  </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">buffer[index]
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Crystal saves all of the elements in each array into a memory buffer called
 <span class="code">@buffer</span>. And when I access an element of the array
 like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">puts arr[</span><span style="color:#d08770;">1</span><span style="color:#000000;">]
-</span></pre>
+<span style="color:#000000;">puts arr[</span><span style="color:#d08770;">1</span><span style="color:#000000;">]</span></pre>
 
 <p>Crystal first checks that the array index (1 in this example) is valid, and
 then loads the array element I want from the buffer using: <span
@@ -212,16 +190,13 @@ type of object is <span class="code">@buffer</span>? What does it do?</p>
 <p>Reading the array class declaration again more carefully, I can see that
 <span class="code">@buffer</span> is an instance of the <span class="code">Pointer</span> class:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># The buffer where elements start.
-</span><span style="color:#4f5b66;">@</span><span style="color:#000000;">buffer </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">Pointer(T)
-</span></pre>
+<span style="color:#a7adba;"># The buffer where elements start.
+</span><span style="color:#4f5b66;">@</span><span style="color:#000000;">buffer </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">Pointer(T)</span></pre>
 
 <p>Let’s read how Crystal implements <span class="code">Pointer#[]</span> in
 <a href="https://github.com/crystal-lang/crystal/blob/master/src/pointer.cr#L107">src/pointer.cr:</a></p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># Gets the value pointed at this pointer&#39;s address plus `offset * sizeof(T)`.
+<span style="color:#a7adba;"># Gets the value pointed at this pointer&#39;s address plus `offset * sizeof(T)`.
 </span><span style="color:#a7adba;">#
 </span><span style="color:#a7adba;"># ```
 </span><span style="color:#a7adba;"># ptr = Pointer.malloc(4) { |i| i + 10 }
@@ -232,8 +207,7 @@ type of object is <span class="code">@buffer</span>? What does it do?</p>
 </span><span style="color:#a7adba;"># ```
 </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">[]</span><span style="color:#000000;">(offset)
 </span><span style="color:#000000;">  (self </span><span style="color:#4f5b66;">+</span><span style="color:#000000;"> offset).value
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Reading this, I discovered the Crystal team has written a class that represents
 pointers! Just like using a pointer in C, Crystal code can refer to and access
@@ -249,9 +223,7 @@ haven’t found a language primitive yet.</p>
 <p>We still haven’t discovered how arrays actually work - how pointers actually
 work. That is, reading this line of code above:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">(self </span><span style="color:#4f5b66;">+</span><span style="color:#000000;"> offset).value
-</span></pre>
+<span style="color:#000000;">(self </span><span style="color:#4f5b66;">+</span><span style="color:#000000;"> offset).value</span></pre>
 
 <p>…I understand the meaning and intent of pointer arithmetic, and how it’s used
 by Crystal arrays, but I still don’t see how or where Crystal actually obtains
@@ -260,8 +232,7 @@ the array element referenced by a given pointer.</p>
 to find out - this method’s implementation should tell me exactly how Crystal
 obtains the value:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a7adba;"># Gets the value pointed by this pointer.
+<span style="color:#a7adba;"># Gets the value pointed by this pointer.
 </span><span style="color:#a7adba;">#
 </span><span style="color:#a7adba;"># ```
 </span><span style="color:#a7adba;"># ptr = Pointer(Int32).malloc(4)
@@ -270,8 +241,7 @@ obtains the value:</p>
 </span><span style="color:#a7adba;"># ```
 </span><span style="color:#000000;">@[Primitive(</span><span style="color:#008080;">:pointer_get</span><span style="color:#000000;">)]
 </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">value</span><span style="color:#000000;"> : T
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>As you can see, this is a language primitive - it says “primitive” right there
 above the method definition!</p>
@@ -282,10 +252,8 @@ code but to assume this behavior is part of the language. In fact, there is no
 implementation for <span class="code">Pointer#value</span> here at all: the
 method is empty!</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">value</span><span style="color:#000000;"> : T
-</span><span style="color:#a71d5d;">end
-</span></pre>
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">value</span><span style="color:#000000;"> : T
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>The empty <span class="code">value</span> method above doesn’t tell us where
 the value actually comes from, or how Crystal obtains it. To learn that, we
@@ -302,23 +270,18 @@ not familiar with that, or with how the Crystal compiler works, I decided to
 jump down to the lowest level of abstraction available to me on my Intel Mac:
 x86 Assembly Language.</p>
 <p>Here’s my Crystal program again:</p>
-<pre type="console">
-$ cat array_example.cr
+<pre type="console">$ cat array_example.cr
 arr = [12345, 67890]
-puts arr[1]
-</pre>
+puts arr[1]</pre>
 <p>If I compile the program without running it, and then use the <span
 class="code">llvm-objdump</span> command, LLVM will give me a version of my
 code converted into Intel x86 Assembly Language:</p>
-<pre type="console">
-$ crystal build array_example.cr
-$ llvm-objdump -D array_example > array_example.a
-</pre>
+<pre type="console">$ crystal build array_example.cr
+$ llvm-objdump -D array_example > array_example.a</pre>
 <p>Now by reading the assembly produced by the Crystal compiler and LLVM, I can
 see how the <span class="code">Pointer#[]</span> and <span
 class="code">Pointer#value</span> methods actually work:</p>
-<pre type="console">
-0000000100089bb0 <_*Pointer(Int32)@Pointer(T)#[]<Int32>:Int32>:
+<pre type="console">0000000100089bb0 <_*Pointer(Int32)@Pointer(T)#[]<Int32>:Int32>:
 100089bb0: 50                           pushq %rax
 100089bb1: e8 0a 00 00 00               callq 0x100089bc0 <_*Pointer(Int32)@Pointer(T)#+<Int32>:Pointer(Int32)>
 100089bb6: 8b 00                        movl  (%rax), %eax
@@ -330,8 +293,7 @@ class="code">Pointer#value</span> methods actually work:</p>
 100089bc3: 48 c1 e0 02                  shlq  $2, %rax
 100089bc7: 48 01 c7                     addq  %rax, %rdi
 100089bca: 48 89 f8                     movq  %rdi, %rax
-100089bcd: c3                           retq
-</pre>
+100089bcd: c3                           retq</pre>
 <p>Assembly language is just another programming language like any other, but with
 a different set of primitives. The primitives in this language are hardware
 instructions that my laptop’s CPU can understand and execute directly:</p>
@@ -361,7 +323,7 @@ effort to read some code.</p>
 <p>Dive into details and find out what the language primitives are in your
 favorite programming language. You might be surprised and discover that your
 language is capable of much more than you thought it was.</p>
-</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2021/11/29/find-your-languages-primitives'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Find Your Language’s Primitives';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Crystal</div><div class="links"><ul><li><a href="/2021/12/22/reading-code-like-a-compiler">Reading Code Like a Compiler</a></li><li><a href="/2021/11/6/generic-types-adding-math-puzzles-to-your-code">Generic Types: Adding Math Puzzles To Your Code</a></li><li><a href="/2021/10/23/to-learn-a-new-language-read-its-standard-library">To Learn a New Language, Read Its Standard Library</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2021/11/29/find-your-languages-primitives'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Find Your Language’s Primitives';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Crystal</div><div class="links"><ul><li><a href="/2022/1/22/visiting-an-abstract-syntax-tree">Visiting an Abstract Syntax Tree</a></li><li><a href="/2021/12/22/reading-code-like-a-compiler">Reading Code Like a Compiler</a></li><li><a href="/2021/11/6/generic-types-adding-math-puzzles-to-your-code">Generic Types: Adding Math Puzzles To Your Code</a></li><li><a href="/2021/10/23/to-learn-a-new-language-read-its-standard-library">To Learn a New Language, Read Its Standard Library</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
         s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';

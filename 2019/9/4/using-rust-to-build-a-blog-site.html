@@ -33,19 +33,16 @@ into the surrounding web layout/design. Sounds like a lot of work, right?</p>
 <p>Wrong. Other Rust developers smarter than me had already implemented all of
 this. All I had to do was find the crates I needed and add them to my
 Cargo.toml file:</p>
-<pre type="console">
-[dependencies]
+<pre type="console">[dependencies]
 maud = "*"
 pulldown-cmark = "*"
-syntect = "3.0"
-</pre>
+syntect = "3.0"</pre>
 <p><a href="https://github.com/raphlinus/pulldown-cmark">Pulldown-cmark</a> is a markdown
 parser crate, <a href="https://github.com/trishume/syntect">Syntect</a> is a color syntax
 highlighting crate, and <a href="https://github.com/lfairy/maud">Maud</a> is an HTML
 template crate. Actually, to be honest I ended up adding a few other crates to
 get my script to work:</p>
-<pre type="console">
-[dependencies]
+<pre type="console">[dependencies]
 maud = "\*"
 pulldown-cmark = "\*"
 regex = "\*"
@@ -53,15 +50,13 @@ lazy_static = "\*"
 syntect = "3.0"
 chrono = "\*"
 clap = "\*"
-ordinal = "\*"
-</pre>
+ordinal = "\*"</pre>
 <p>I’m not sure why, but the Rust standard library is very minimal. Features that
 are included in other languages, like regular expressions or date/time parsing,
 are handled by crates (e.g. regex and chrono).</p>
 <p>In any case, all I had to do was build my project and Cargo downloaded
 everything I needed:</p>
-<pre type="console">
-$ cargo build --release
+<pre type="console">$ cargo build --release
     Updating crates.io index
   Downloaded chrono v0.4.7
   Downloaded clap v2.33.0
@@ -79,8 +74,7 @@ $ cargo build --release
 etc…
    Compiling syntect v3.0.2
    Compiling blogc v0.1.0 (/Users/pat/apps/patshaughnessy.github.io)
-    Finished release [optimized] target(s) in 2m 27s
-</pre>
+    Finished release [optimized] target(s) in 2m 27s</pre>
 <p>It couldn’t be easier! During the rest of this post, I’ll show you how I used
 these three crates: Pulldown-cmark, Syntect and Maud.</p>
 <h2>Pulldown-cmark</h2>
@@ -88,11 +82,9 @@ these three crates: Pulldown-cmark, Syntect and Maud.</p>
 matter of pasting in a few of lines of code from the <a href="https://docs.rs/pulldown-cmark/0.5.3/pulldown_cmark/html/fn.push_html.html">helpful example on
 docs.rs</a>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">let</span><span style="color:#000000;"> parser </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">Parser::new(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">markdown);
+<span style="color:#a71d5d;">let</span><span style="color:#000000;"> parser </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">Parser::new(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">markdown);
 </span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> html </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String::new();
-</span><span style="color:#000000;">html::push_html(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#a71d5d;">mut</span><span style="color:#000000;"> html, parser);
-</span></pre>
+</span><span style="color:#000000;">html::push_html(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#a71d5d;">mut</span><span style="color:#000000;"> html, parser);</span></pre>
 
 <p>The first line created a <span class="code">Parser</span> struct, passing in a
 reference to my markdown string. Then I created an empty, mutable target
@@ -104,22 +96,18 @@ have to do any work whatsoever.</p>
 the top of each post source file. For example, the
 <a href="https://raw.githubusercontent.com/patshaughnessy/patshaughnessy.github.io/master/posts/2017-12-15-looking-inside-postgres-at-a-gist-index.markdown">2017-12-15-looking-inside-postgres-at-a-gist-index.markdown</a>
 file starts with:</p>
-<pre type="console">
-title: "Looking Inside Postgres at a GiST Index"
+<pre type="console">title: "Looking Inside Postgres at a GiST Index"
 date: 2017/12/15
 tag: the Postgres LTREE Extension
 
-etc…
-</pre>
+etc…</pre>
 <p>Here the first three lines are metadata values about the post and not part of
 the post content. So before calling Pulldown-mark, my script parses and
 removes these header lines:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">other_lines</span><span style="color:#000000;">(lines: </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">Vec&lt;String&gt;) -&gt; Vec&lt;String&gt; {
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">other_lines</span><span style="color:#000000;">(lines: </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">Vec&lt;String&gt;) -&gt; Vec&lt;String&gt; {
 </span><span style="color:#000000;">  lines.iter().skip_while(|l| is_header(l)).map(|l| l.to_string()).collect()
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>Above the <span class="code">lines</span> parameter is an array of strings,
 each a single line of text in the markdown source file. (More precisely, it’s a
@@ -131,8 +119,7 @@ remaining lines into a second array which the function returns.</p>
 which calls <span class="code">other_lines</span>, joins them together into a
 single large string, and then passes that to Pulldown-mark:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">fn </span><span style="color:#795da3;">html_from_markdown</span><span style="color:#000000;">(lines: </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">Vec&lt;String&gt;) -&gt; Result&lt;String, InvalidPostError&gt; {
+<span style="color:#a71d5d;">fn </span><span style="color:#795da3;">html_from_markdown</span><span style="color:#000000;">(lines: </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">Vec&lt;String&gt;) -&gt; Result&lt;String, InvalidPostError&gt; {
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> markdown </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String::new();
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">for</span><span style="color:#000000;"> line </span><span style="color:#4f5b66;">in </span><span style="color:#000000;">other_lines(lines) {
 </span><span style="color:#000000;">    markdown.push_str(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">line);
@@ -142,8 +129,7 @@ single large string, and then passes that to Pulldown-mark:</p>
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">let mut</span><span style="color:#000000;"> html </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">String::new();
 </span><span style="color:#000000;">  html::push_html(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#a71d5d;">mut</span><span style="color:#000000;"> html, parser);
 </span><span style="color:#000000;">  Ok(with_delim_removed(with_highlighted_code_snippets(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">html)))
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <h2>Syntect</h2>
 <p>If you read the code above carefully, you’ll notice <span
@@ -153,11 +139,9 @@ for each post. This function performs color syntax highlighting.</p>
 <p>The code snippets in each of my blog posts appear inside of &lt;pre&gt;…&lt;/pre&gt;
 tags.  And I use a “type” attribute to indicate the programming language of the
 snippet. For example:</p>
-<pre type="console">
-&lt;pre type="ruby">
+<pre type="console">&lt;pre type="ruby">
 puts "This is Ruby code I’m writing about…"
-&lt;/pre>
-</pre>
+&lt;/pre></pre>
 <p>Like parsing markdown, syntax highlighting is a very complex task: The Syntect
 crate has to parse the given code snippet, determine the semantic meaning of
 each keyword in the snippet based on the provided programming language, and
@@ -165,8 +149,7 @@ then insert the proper color information. Thank goodness I didn’t have to writ
 that code!</p>
 <p>But using Syntect was easy:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">pub fn </span><span style="color:#795da3;">highlighted_html_for_language</span><span style="color:#000000;">(snippet: </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">String, attributes: String) -&gt; String {
+<span style="color:#a71d5d;">pub fn </span><span style="color:#795da3;">highlighted_html_for_language</span><span style="color:#000000;">(snippet: </span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">String, attributes: String) -&gt; String {
 </span><span style="color:#000000;">  lazy_static! {
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">static ref </span><span style="color:#d08770;">SYNTAX_SET</span><span style="color:#000000;">: SyntaxSet </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">SyntaxSet::load_from_folder(syntax_path()).unwrap();
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">static ref </span><span style="color:#d08770;">THEME</span><span style="color:#000000;">: Theme </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">ThemeSet::get_theme(theme_path().as_path()).unwrap();
@@ -183,8 +166,7 @@ that code!</p>
 </span><span style="color:#000000;">  } </span><span style="color:#a71d5d;">else if</span><span style="color:#000000;"> attributes.contains(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">rust</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">) {
 </span><span style="color:#000000;">    highlighted_html_for_string(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">snippet, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#d08770;">SYNTAX_SET</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#d08770;">RUST_SYNTAX</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#d08770;">THEME</span><span style="color:#000000;">)
 </span><span style="color:#000000;">
-</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
-</span></pre>
+</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...</span></pre>
 
 <p>First I used a <span class="code">lazy_static</span> block to initialize a few
 constant values.
@@ -214,14 +196,12 @@ checks which programming language my post displays, and calls <span
 class="code">syntect::html::highlighted_html_for_string</span> with the proper
 values:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> attributes.contains(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">ruby</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">) {
+<span style="color:#a71d5d;">if</span><span style="color:#000000;"> attributes.contains(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">ruby</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">) {
 </span><span style="color:#000000;">    highlighted_html_for_string(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">snippet, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#d08770;">SYNTAX_SET</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#d08770;">RUBY_SYNTAX</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#d08770;">THEME</span><span style="color:#000000;">)
 </span><span style="color:#000000;">  } </span><span style="color:#a71d5d;">else if</span><span style="color:#000000;"> attributes.contains(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">rust</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">) {
 </span><span style="color:#000000;">    highlighted_html_for_string(</span><span style="color:#4f5b66;">&amp;</span><span style="color:#000000;">snippet, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#d08770;">SYNTAX_SET</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#d08770;">RUST_SYNTAX</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&amp;</span><span style="color:#d08770;">THEME</span><span style="color:#000000;">)
 </span><span style="color:#000000;">
-</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...
-</span></pre>
+</span><span style="color:#000000;">etc</span><span style="color:#4f5b66;">...</span></pre>
 
 <p><span class="code">attributes</span> is the array of HTML attributes from the
 &lt;pre&gt; tag surrounding the code snippet in my post source. My app uses
@@ -237,8 +217,7 @@ HTML
 markup</a>
 using Maud <span class="code">@</span> directives, like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#4f5b66;">@</span><span style="color:#a71d5d;">if let </span><span style="color:#000000;">Some(</span><span style="color:#a71d5d;">ref</span><span style="color:#000000;"> t) </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> post.tag {
+<span style="color:#4f5b66;">@</span><span style="color:#a71d5d;">if let </span><span style="color:#000000;">Some(</span><span style="color:#a71d5d;">ref</span><span style="color:#000000;"> t) </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> post.tag {
 </span><span style="color:#000000;">  div class</span><span style="color:#4f5b66;">=&quot;</span><span style="color:#008080;">header</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">{
 </span><span style="color:#000000;">    </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">More on </span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">(t)
 </span><span style="color:#000000;">  }
@@ -253,8 +232,7 @@ using Maud <span class="code">@</span> directives, like this:</p>
 </span><span style="color:#000000;">      }
 </span><span style="color:#000000;">    }
 </span><span style="color:#000000;">  }
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>Maud doesn’t parse the layout code at runtime, like ERB does in Ruby. Instead,
 the <span class="code">@if</span> and <span class="code">@for</span> directives

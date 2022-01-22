@@ -10,22 +10,18 @@ Today I’m going to explain how Bundler’s “resolver” algorithm works usin
 <h2>Running Bundler with DEBUG_RESOLVER=1</h2>
 <p>To keep things simple, let’s suppose I have this small Gemfile in my Ruby app:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">source </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">http://rubygems.org</span><span style="color:#4f5b66;">&#39;
-</span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">uglifier</span><span style="color:#4f5b66;">&#39;
-</span></pre>
+<span style="color:#000000;">source </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">http://rubygems.org</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">uglifier</span><span style="color:#4f5b66;">&#39;</span></pre>
 
 <p>I chose uglifier as an example not only because of its cool name, but also because it has a fairly simple set of dependencies, which will make it easier to follow how Bundler’s resolver code is working. Now instead of just running <span class="code">bundle install</span> as usual, let’s first set an environment variable that will cause Bundler’s resolver code to write out some debugging information as it runs:</p>
-<pre type="console">
-$ export DEBUG_RESOLVER=1
+<pre type="console">$ export DEBUG_RESOLVER=1
 $ bundle install 2> output.txt
 Fetching source index for http://rubygems.org/
 Using multi_json (1.0.3) 
 Using execjs (1.2.8) 
 Using uglifier (1.0.3) 
 Using bundler (1.0.18) 
-Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
-</pre>
+Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.</pre>
 <p>If you run this you should now have a text file called “output.txt” which will contain some information about how Bundler resolved the gem dependencies.</p>
 <h2>Visualizing Bundler’s resolver algorithm using GraphViz</h2>
 <p>To make this debug text file easier to understand, I decided to write some Ruby code to parse it and then use <a href="http://www.graphviz.org/">GraphViz</a> to output a graphical representation of the information there. <a href="https://patshaughnessy.net/2011/9/17/bundlers-best-kept-secret">As I discussed last week</a>, GraphViz is the library that Bundler uses to implement the <span class="code">bundle viz</span> command, which displays a graphical chart showing your gem dependencies.</p>
@@ -45,8 +41,7 @@ Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem 
 <p><img src="https://patshaughnessy.net/assets/2011/9/24/simple6.png" alt="step 6" /></p>
 <p>Finally Bundler checks the latest requirement and finds that there is a gem that was activated that already matches this requirement: multi_json 1.0.3. So there’s no need to download a new version of multi_json - this requirement is already satisfied.</p>
 <p>Now Bundler is done - the list on the left becomes our “bundle,” and the list is written out to a file called Gemfile.lock, along with dependency information:</p>
-<pre type="console">
-$ cat Gemfile.lock
+<pre type="console">$ cat Gemfile.lock
 GEM
   remote: http://rubygems.org/
   specs:
@@ -61,39 +56,32 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  uglifier
-</pre>
+  uglifier</pre>
 <p>The information here is used by bundler when your app is deployed onto different servers or laptops to insure that Bundler activates the exact same list of gems.</p>
 <h2>But what if there’s a conflict?</h2>
 <p>The example above is the best case scenario: there was a very simple Gemfile with just a single gem and only a few dependencies that didn’t conflict. To make things more interesting, let’s add a new requirement to my example Gemfile:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">source </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">http://rubygems.org</span><span style="color:#4f5b66;">&#39;
+<span style="color:#000000;">source </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">http://rubygems.org</span><span style="color:#4f5b66;">&#39;
 </span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">multi_json</span><span style="color:#4f5b66;">&#39;</span><span style="color:#795da3;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">1.0.1</span><span style="color:#4f5b66;">&#39;
-</span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">uglifier</span><span style="color:#4f5b66;">&#39;
-</span></pre>
+</span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">uglifier</span><span style="color:#4f5b66;">&#39;</span></pre>
 
 <p>And now I’ll run <span class="code">bundle install</span> again:</p>
-<pre type="console">
-$ bundle install
+<pre type="console">$ bundle install
 Fetching source index for http://rubygems.org/
 You have requested:
   multi_json = 1.0.1
 
 The bundle currently has multi_json locked at 1.0.3.
-Try running `bundle update multi_json`
-</pre>
+Try running `bundle update multi_json`</pre>
 <p>Oops - what happened here was that my bundle was already locked, and used multi_json 1.0.3. That is to say, Bundler loaded the Gemfile.lock file I showed above and found that it contained a different version of multi_json than what I added to the Gemfile.</p>
 <p>Let’s try again, but this time use <span class="code">bundle update</span> instead, so that the Gemfile.lock is discarded and recreated after the resolver code is done:</p>
-<pre type="console">
-$ bundle update 2> output2.txt
+<pre type="console">$ bundle update 2> output2.txt
 Fetching source index for http://rubygems.org/
 Using multi_json (1.0.1) 
 Using execjs (1.2.8) 
 Using uglifier (0.5.2) 
 Using bundler (1.0.18) 
-Your bundle is updated! Use `bundle show [gemname]` to see where a bundled gem is installed.
-</pre>
+Your bundle is updated! Use `bundle show [gemname]` to see where a bundled gem is installed.</pre>
 <p>Here you can see that I got a different set of gems... Bundler was able to resolve the request for multi_json 1.0.1 by downloading and activating a different, older version of uglifier (0.5.2 vs. 1.0.3) - very cool! But how does this work? How does Bundler know to do this?</p>
 <p>Let’s repeat the same process again by starting with the same two columns, the activated gems on the left and the requirements on the right:</p>
 <p><img src="https://patshaughnessy.net/assets/2011/9/24/conflict1.png" alt="step 1" /></p>

@@ -22,14 +22,12 @@ dumb mistakes.</p>
 class="code">Person</span> objects, each with a first name, last name and an
 insult count:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">	Person </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Struct</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#008080;">:first_name</span><span style="color:#000000;">, </span><span style="color:#008080;">:last_name</span><span style="color:#000000;">, </span><span style="color:#008080;">:insults</span><span style="color:#000000;">)
+<span style="color:#000000;">Person </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">Struct</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#008080;">:first_name</span><span style="color:#000000;">, </span><span style="color:#008080;">:last_name</span><span style="color:#000000;">, </span><span style="color:#008080;">:insults</span><span style="color:#000000;">)
 </span><span style="color:#000000;">	candidates </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[ 
 </span><span style="color:#000000;">		</span><span style="color:#008080;">Person</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Ted</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Cruz</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#d08770;">432</span><span style="color:#000000;">),
 </span><span style="color:#000000;">		</span><span style="color:#008080;">Person</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Donald</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Trump</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#d08770;">892</span><span style="color:#000000;">),
 </span><span style="color:#000000;">		</span><span style="color:#008080;">Person</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Marco</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Rubio</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, </span><span style="color:#d08770;">321</span><span style="color:#000000;">)
-</span><span style="color:#000000;">	]
-</span></pre>
+</span><span style="color:#000000;">	]</span></pre>
 
 <p>A couple of weeks ago (using different data of course) I wrote this line of
 code to search for a specific element in the array:</p>
@@ -39,10 +37,8 @@ code to search for a specific element in the array:</p>
 ran the code what I got was the first element of the array, but with the first
 name set to “Marco:”</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">p marco
-</span><span style="color:#000000;">=&gt; </span><span style="color:#a7adba;">#&lt;struct Person first_name=&quot;Marco&quot;, last_name=&quot;Cruz&quot;, insults=432&gt;
-</span></pre>
+<span style="color:#000000;">p marco
+</span><span style="color:#000000;">=&gt; </span><span style="color:#a7adba;">#&lt;struct Person first_name=&quot;Marco&quot;, last_name=&quot;Cruz&quot;, insults=432&gt;</span></pre>
 
 <p>Of course, I should have known better. The proper line of code is:</p>
 <img src="https://patshaughnessy.net/assets/2016/4/2/correct1.png"/>
@@ -109,9 +105,7 @@ Twitter</a> that if you
 always put the variable on the right and the constant on the left, for example
 like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">marco </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> candidates.find { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person</span><span style="color:#4f5b66;">| &#39;</span><span style="color:#008080;">Marco</span><span style="color:#4f5b66;">&#39; =</span><span style="color:#000000;"> person.first_name }
-</span></pre>
+<span style="color:#000000;">marco </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> candidates.find { </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person</span><span style="color:#4f5b66;">| &#39;</span><span style="color:#008080;">Marco</span><span style="color:#4f5b66;">&#39; =</span><span style="color:#000000;"> person.first_name }</span></pre>
 
 <p>…then Ruby will immediately report a syntax error and tell you where the
 problem was if you ever confuse <span class="code">=</span> with <span
@@ -132,10 +126,8 @@ Easy, right? Here’s the line of code I wrote:</p>
 <img src="https://patshaughnessy.net/assets/2016/4/2/mistake2.png"/>
 <p>Can you spot the problem here? When I run that code I don’t get Donald Trump, who has the most insults. Instead, I get:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">p most_insulting
-</span><span style="color:#000000;">=&gt; </span><span style="color:#a7adba;">#&lt;struct Person first_name=&quot;Marco&quot;, last_name=&quot;Rubio&quot;, insults=321&gt;
-</span></pre>
+<span style="color:#000000;">p most_insulting
+</span><span style="color:#000000;">=&gt; </span><span style="color:#a7adba;">#&lt;struct Person first_name=&quot;Marco&quot;, last_name=&quot;Rubio&quot;, insults=321&gt;</span></pre>
 
 <p>Again a simple, dumb mistake. I should have called <span
 class="code">max_by</span>, instead of <span class="code">max</span>. Here’s
@@ -198,11 +190,9 @@ candidate using <span class="code">max</span> would be to compare the two
 values of <span class="code">Person#insults</span> using <span
 class="code">&lt;=&gt;:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">most_insulting </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> candidates.max{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person1, person2</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> person1.insults </span><span style="color:#4f5b66;">&lt;=&gt;</span><span style="color:#000000;"> person2.insults}
+<span style="color:#000000;">most_insulting </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> candidates.max{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person1, person2</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> person1.insults </span><span style="color:#4f5b66;">&lt;=&gt;</span><span style="color:#000000;"> person2.insults}
 </span><span style="color:#000000;">p most_insulting
-</span><span style="color:#000000;">=&gt; </span><span style="color:#a7adba;">#&lt;struct Person first_name=&quot;Donald&quot;, last_name=&quot;Trump&quot;, insults=892&gt;
-</span></pre>
+</span><span style="color:#000000;">=&gt; </span><span style="color:#a7adba;">#&lt;struct Person first_name=&quot;Donald&quot;, last_name=&quot;Trump&quot;, insults=892&gt;</span></pre>
 
 <h2>Why Didn’t Ruby Tell Me Something Was Wrong?</h2>
 <p>I knew all about the space ship operator and sort order blocks, but for
@@ -214,15 +204,11 @@ brain and make it to the keyboard.</p>
 that I should have accepted two parameters in my block. Why didn’t it tell me?</p>
 <p>That is, my block expected only one argument, not two. I wrote:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> etc…}
-</span></pre>
+<span style="color:#000000;">{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> etc…}</span></pre>
 
 <p>and not:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person1, person2</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> etc… }
-</span></pre>
+<span style="color:#000000;">{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person1, person2</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> etc… }</span></pre>
 
 <p>Why didn’t Ruby complain when it tried to pass two objects, but my block
 only accepted one? It turns out when you pass extra arguments to a block Ruby
@@ -242,9 +228,7 @@ like this. Ruby was so wrong!</p>
 <p>What happened next? Ruby continued to run my block, and things got really ugly.
 Take another look at the block’s code:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> person.insults}
-</span></pre>
+<span style="color:#000000;">{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">person</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> person.insults}</span></pre>
 
 <p>It returns the insult count for the given person - a number! Next Ruby
 interpreted the numerical value my block returned, 432, 892 or 321, as the sort

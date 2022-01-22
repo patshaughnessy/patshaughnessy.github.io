@@ -38,11 +38,9 @@ At a high level, here’s what this journey looks like:
 <p>… and that to do this suppose I use Bison to generate a C language parser from a grammar file. Using the Bison/Yacc grammar rule syntax - the “Backus–Naur” notation - I can write a simple grammar rule like this with the rule name on the left, and the matching tokens on the right:* (*footnote: This is actually a slightly modified version of BNF that Bison uses - the original BNF syntax would have used ‘::=’ instead of a simple ‘:’ character.)</p>
 <br/>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">SpanishPhrase </span><span style="color:#4f5b66;">:</span><span style="color:#000000;"> me gusta el ruby {
+<span style="color:#000000;">SpanishPhrase </span><span style="color:#4f5b66;">:</span><span style="color:#000000;"> me gusta el ruby {
 </span><span style="color:#000000;">  printf(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">I like Ruby</span><span style="color:#96b5b4;">\n</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">);
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>This grammar rule means: if the token stream is equal to “me”, “gusta,” “el” and “ruby” - in that order - then we have a match. If there’s a match the Bison generated parser will run the given C code, the “printf” statement (similar to “puts” in Ruby), which will print out the translated English phrase.</p>
 <p>How does this work? Here’s a conceptual picture of the parsing process in action:</p>
@@ -55,8 +53,7 @@ At a high level, here’s what this journey looks like:
 <p>...which means “She/He/It likes Ruby.” Here’s a more complex grammar file that can parse both Spanish phrases:* (*footnote: again this is a modified version of BNF used by Bison - the original syntax from the 1960s would use “&lt; &gt;” around the child rule names, like this for example: “VerbAndObject ::= &lt;SheLikes&gt; | &lt;ILike&gt;”)</p>
 <br/>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">SpanishPhrase</span><span style="color:#4f5b66;">:</span><span style="color:#000000;"> VerbAndObject el ruby {
+<span style="color:#000000;">SpanishPhrase</span><span style="color:#4f5b66;">:</span><span style="color:#000000;"> VerbAndObject el ruby {
 </span><span style="color:#000000;">  printf(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#d08770;">%s</span><span style="color:#008080;"> Ruby</span><span style="color:#96b5b4;">\n</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, $</span><span style="color:#d08770;">1</span><span style="color:#000000;">);
 </span><span style="color:#000000;">};
 </span><span style="color:#000000;">
@@ -70,8 +67,7 @@ At a high level, here’s what this journey looks like:
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">ILike</span><span style="color:#4f5b66;">:</span><span style="color:#000000;"> me gusta {
 </span><span style="color:#000000;">  $$ </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">I like</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">;
-</span><span style="color:#000000;">}
-</span></pre>
+</span><span style="color:#000000;">}</span></pre>
 
 <p>There’s a lot more going on here; you can see four grammar rules instead of just one, and also I’m using the Bison directive “$$” to return a value from a child grammar rule to a parent, and “$1” to refer to a child’s value from a parent. Also, the second rule for VerbAndObject includes an OR operator, the vertical bar character.</p>
 <p>Now things aren’t so obvious - the parser can’t immediately match any of the grammar rules like in the previous, trivial example:</p>
@@ -111,11 +107,9 @@ At a high level, here’s what this journey looks like:
 <p>Let’s take a quick look at some of the actual Ruby grammar rules from parse.y. Here’s my example Ruby script from the last section on tokenization:</p>
 <br/>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#d08770;">10</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">n</span><span style="color:#4f5b66;">|
+<span style="color:#d08770;">10</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">n</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  puts n
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>This is a very simple Ruby script, right? Since this is so short, it should’t be too difficult to trace the Ruby parser’s path through its grammar rules. Let’s take a look at how it works:</p>
 <img src="https://patshaughnessy.net/assets/2012/6/18/ruby-parse1.png"/>

@@ -104,13 +104,11 @@ end</pre>
   send_file user.avatar.path, :type =&gt; user.avatar_content_type
 end</pre>
 <p>Now we can test <a href="http://localhost:3000/users/1/avatars">http://localhost:3000/users/1/avatars</a> again to be sure that we haven&rsquo;t broken anything. If it&rsquo;s all working, lets&rsquo; proceed to clean up the hard coding in user.rb. It turns out that Paperclip uses the same interpolations idea that we saw above in routes.rb. So I can use symbols like :rails_root, :id, :style, etc., and they will be evaluated to the values I expect and need. Here&rsquo;s the finished code in my model:</p>
-<pre>
-has_attached_file :avatar,
+<pre>has_attached_file :avatar,
   :styles =&gt; { :thumb =&gt; &quot;75x75&gt;&quot;, :small =&gt; &quot;150x150&gt;&quot; },
   :path =&gt; 
     &#x27;:rails_root/non-public/system/:attachment/:id/:style/:basename.:extension&#x27;,
-  :url =&gt; &#x27;/:class/:id/:attachment&#x27;                    
-</pre>
+  :url =&gt; &#x27;/:class/:id/:attachment&#x27;</pre>
 <p>If we open up the console and take a look at our user object there, we can see that Paperclip is substituting the correct values for each of the symbols I&rsquo;ve provided:</p>
 <pre>$ ./script/console
 Loading development environment (Rails 2.3.2)
@@ -127,17 +125,13 @@ Loading development environment (Rails 2.3.2)
   <img src="https://patshaughnessy.net/assets/2009/5/15/mickey-index-large.png"></p>
 </p>
 <p>Oops&hellip; we see the large image again. It doesn&rsquo;t work! What happened? Well, it turns our that we forgot one detail in our new avatars method in UserController. Our code always returns the default, or &ldquo;original&rdquo; style of the file attachment, but in the users index view we actually display the thumbnail image using image_tag user.avatar.url(:thumb). So our controller code needs to be able to handle requests for other styles as well. To do this, we need to pass the requested style somehow. The simplest thing to do is just to add the style as a URL parameter to the download request, like this:</p>
-<pre>
-  http://localhost:3000/users/1/avatar?style=thumb
-</pre>
+<pre>http://localhost:3000/users/1/avatar?style=thumb</pre>
 <p>(We could also add the style to the URL's path, but that would require another change to routes.rb.) To make this work, first I need to tell Paperclip about how I want to handle the style value in the URL:</p>
-<pre>
-has_attached_file :avatar,
+<pre>has_attached_file :avatar,
   :styles =&gt; { :thumb =&gt; &quot;75x75&gt;&quot;, :small =&gt; &quot;150x150&gt;&quot; },
   :path =&gt; 
     &#x27;:rails_root/non-public/system/:attachment/:id/:style/:basename.:extension&#x27;,
-  :url =&gt; &#x27;/:class/:id/avatar<b>?style=:style</b>&#x27;
-</pre>
+  :url =&gt; &#x27;/:class/:id/avatar<b>?style=:style</b>&#x27;</pre>
 <p>And now I need to handle this new parameter in my controller:</p>
 <pre>def avatars
   user = User.find(params[:id])

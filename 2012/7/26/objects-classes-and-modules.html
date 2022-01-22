@@ -26,35 +26,27 @@
 <p>At first glance, this definition doesn’t seem that useful at all: it doesn’t help me understand the meaning or purpose behind objects, or how to use them in a Ruby program. Why does Ruby implement objects in this way? The answer is simple: Ruby saves this information in <span class="code">RObject</span> because it has to in order to support the basic features of the language.</p>
 <p>For example, suppose I have a simple Ruby class:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Mathematician
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Mathematician
 </span><span style="color:#343d46;">  </span><span style="color:#795da3;">attr_accessor </span><span style="color:#008080;">:first_name
 </span><span style="color:#000000;">  </span><span style="color:#795da3;">attr_accessor </span><span style="color:#008080;">:last_name
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Ruby needs to save the class pointer in <span class="code">RObject</span> because every object has to keep track of the class you used to create it:</p>
-<pre type="console">
-> euler = Mathematician.new
- => #&lt;Mathematician:0x007fbd738608c0>
-</pre>
+<pre type="console">> euler = Mathematician.new
+ => #&lt;Mathematician:0x007fbd738608c0></pre>
 <p>Here by displaying the class name, “#&lt;Mathematician…,” Ruby is displaying the value of the class pointer for the <span class="code">euler</span> object when I inspect it. The hex string that follows is actually the <span class="code">VALUE</span> pointer for the object. This will be different for every instance of <span class="code">Mathematician</span> .</p>
 <p>Ruby also has to keep track of any values you save in it - Ruby uses the instance variable array to do this:</p>
-<pre type="console">
-> euler.first_name = 'Leonhard'
+<pre type="console">> euler.first_name = 'Leonhard'
  => "Leonhard" 
 > euler.last_name  = 'Euler'
  => "Euler" 
 > euler
- => #&lt;Mathematician:0x007fbd738608c0 @first_name="Leonhard", @last_name="Euler"> 
-</pre>
+ => #&lt;Mathematician:0x007fbd738608c0 @first_name="Leonhard", @last_name="Euler"></pre>
 <p>Here you can see Ruby now also displays the instance variable array for <span class="code">euler</span> when I inspect it again. Ruby needs to save this array of values in each object since every object instance can have different values for the same instance variables - for example:</p>
-<pre type="console">
-> euclid = Mathematician.new
+<pre type="console">> euclid = Mathematician.new
 > euclid.first_name = 'Euclid'
 > euclid
- => #&lt;Mathematician:0x007fabdb850690 @first_name="Euclid">
-</pre>
+ => #&lt;Mathematician:0x007fabdb850690 @first_name="Euclid"></pre>
 <p>Now let’s take a look at Ruby’s C memory structures in a bit more detail - when you run this simple script, Ruby will create one <span class="code">RClass</span> structure and two <span class="code">RObject</span> structures:</p>
 <img src="https://patshaughnessy.net/assets/2012/7/26/script-and-objects.png"/>
 <p>I’ll cover how Ruby implements classes with the <span class="code">RClass</span> structure in the next section, but here is how Ruby saves the the mathematician information in the two <span class="code">RObject</span> structures in more detail:</p>
@@ -70,15 +62,13 @@
 <img src="https://patshaughnessy.net/assets/2012/7/26/value-pointer-with-flag.png"/>
 <p>Whenever the <span class="code">FIXNUM_FLAG</span> is set, Ruby knows this <span class="code">VALUE</span> is really a small integer, an instance of the <span class="code">Fixnum</span> class, and not a pointer to a value structure. There is also a similar bit flag to indicate if the <span class="code">VALUE</span> is a symbol, and values such as <span class="code">nil</span>, <span class="code">true</span> and <span class="code">false</span> also have special values.</p>
 <p>It’s easy to see that integers, strings and other generic values are all objects using IRB:</p>
-<pre type="console">
-$ irb
+<pre type="console">$ irb
 > "string".class
  => String 
 > 1.class
  => Fixnum
 > :symbol.class
- => Symbol 
-</pre>
+ => Symbol</pre>
 <p>Here we can see Ruby saves a class pointer or the equivalent bit flag for all of these values by calling the <span class="code">class</span> method on each of them. The <span class="code">class</span> method returns the class pointer… or at least the name of the class the <span class="code">klass</span> pointer refers to.</p>
 <p>Now let’s reread our definition of a Ruby object from above:</p>
 <blockquote>
@@ -86,8 +76,7 @@ $ irb
 </blockquote>
 <p>What about instance variables for generic objects? Do integers, strings and other generic data values have instance variables? That would seem a bit odd. But if integers and strings are objects, then this must be true! And if this is true, where does Ruby save these values, if it doesn’t use the <span class="code">RObject</span> structure?</p>
 <p>Using the <span class="code">instance_variables</span> method you can see that each of these basic values can also contain an array of instance variables, as strange as that might seem at first:</p>
-<pre type="console">
-$ irb
+<pre type="console">$ irb
 > str = "some string value"
  => "some string value" 
 > str.instance_variables
@@ -99,8 +88,7 @@ $ irb
 > str.instance_variable_set("@val2", "value two")
  => "value two" 
 > str.instance_variables
- => [:@val1, :@val2] 
-</pre>
+ => [:@val1, :@val2]</pre>
 <p>You can repeat the same exercise using symbols, arrays, or any Ruby value whatsoever. Every Ruby value is an object, and every object contains a class pointer and an array of instance variables.</p>
 <p>Internally, Ruby uses a bit of a hack to save instance variables for generic objects - that is, for objects that don’t use an <span class="code">RObject</span> structure. When you save an instance variable in a generic object, Ruby saves it in a special hash called the <span class="code">generic_iv_table</span>. This hash maintains a map between generic objects and pointers to other hashes that contain each object’s instance variables. For my <span class="code">str</span> string example above, this would look like this:</p>
 <img src="https://patshaughnessy.net/assets/2012/7/26/generic-iv-table.png"/>

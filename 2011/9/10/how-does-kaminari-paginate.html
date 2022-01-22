@@ -23,8 +23,7 @@
 <p>For <span class="code">Person.page(3).per(5)</span> Kaminari will set @limit_value to 5, the number of records per page, and the @offset_value to to 10, which is the zero-based index of the first record on the third page.</p>
 <p>The nice thing about scopes is that you can chain them together to create a more complex, refined query. For example, I can display a paginated list of legal drinking age people like this:</p>
 <div class="CodeRay"> 
-  <div class="code"><pre><span class="co">Person</span>.where(<span class="er">"</span>age &gt;= ?", <span class="i">21</span>).page(params[<span class="sy">:page</span>]).per(<span class="i">5</span>)
-</pre></div>
+  <div class="code"><pre><span class="co">Person</span>.where(<span class="er">"</span>age &gt;= ?", <span class="i">21</span>).page(params[<span class="sy">:page</span>]).per(<span class="i">5</span>)</pre></div>
 </div>
 <p>Here the <span class="code">where</span> method first returns a scope containing the age filter:</p>
 <p><img src="https://patshaughnessy.net/assets/2011/9/8/filter_scope.png" alt="filter scope" /></p>
@@ -36,19 +35,18 @@
   <div class="code"><pre>$ rails c
 Loading development environment (Rails 3.1.0)
 ruby-1.8.7-p302 :001 &gt; Person.page(3).per(5).to_sql
- =&gt; &quot;SELECT  `people`.* FROM `people`  LIMIT 5 OFFSET 10&quot; </pre></div> 
+ =&gt; &quot;SELECT  `people`.* FROM `people`  LIMIT 5 OFFSET 10&quot;</pre></div> 
 </div> 
 <p>Now you can see how the LIMIT and OFFSET values from the page scope are actually used in the SQL statement. Let’s try again but this time include the age filter</p>
 <div class="CodeRay"> 
   <div class="code"><pre>ruby-1.8.7-p302 :002 &gt; Person.where(&quot;age &gt; ?&quot;, 21).page(3).per(5).to_sql
- =&gt; &quot;SELECT  `people`.* FROM `people`  WHERE (age &gt; 21) LIMIT 5 OFFSET 10&quot; </pre></div> 
+ =&gt; &quot;SELECT  `people`.* FROM `people`  WHERE (age &gt; 21) LIMIT 5 OFFSET 10&quot;</pre></div> 
 </div> 
 <p>Here ActiveRecord has just combined the options from the two scopes together and produced a single SQL statement.</p>
 <h2>How does Kaminari create the page scope?</h2>
 <p>Finally, let’s take a quick look at how Akira Matsuda actually implemented this inside of Kaminari. You can find the code that implements the <span class="code">page</span> method for ActiveRecord models in the <a href="https://github.com/amatsuda/kaminari/blob/master/lib/kaminari/models/active_record_model_extension.rb">active_record_model_extension.rb</a> file inside of the Kaminari gem:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">require </span><span style="color:#008080;">File</span><span style="color:#795da3;">.join(</span><span style="color:#008080;">File</span><span style="color:#795da3;">.dirname(</span><span style="color:#000000;">__FILE__</span><span style="color:#795da3;">), </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">active_record_relation_methods</span><span style="color:#4f5b66;">&#39;</span><span style="color:#795da3;">)
+<span style="color:#795da3;">require </span><span style="color:#008080;">File</span><span style="color:#795da3;">.join(</span><span style="color:#008080;">File</span><span style="color:#795da3;">.dirname(</span><span style="color:#000000;">__FILE__</span><span style="color:#795da3;">), </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">active_record_relation_methods</span><span style="color:#4f5b66;">&#39;</span><span style="color:#795da3;">)
 </span><span style="color:#000000;"> 
 </span><span style="color:#a71d5d;">module </span><span style="color:#000000;">Kaminari 
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">module </span><span style="color:#000000;">ActiveRecordExtension 
@@ -72,8 +70,7 @@ ruby-1.8.7-p302 :001 &gt; Person.page(3).per(5).to_sql
 </span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end 
 </span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end 
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end 
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>There’s a lot of metaprogramming going on here, so let’s take it one step at a time. The first thing to learn is that the Kaminari::ActiveRecordExtension module uses ActiveRecord::Concern, which provides a standard way to add behavior to some target Ruby class. <a href="http://www.fakingfantastic.com/2010/09/20/concerning-yourself-with-active-support-concern">This well written article</a> does a nice job of explaining how ActiveSupport::Concern works in Rails 3. Elsewhere in the gem source code Kaminari::ActiveRecordExtension is included in ActiveRecord::Base, which becomes the target class in this case. The rest of the code reads something like this:</p>
 <ul>

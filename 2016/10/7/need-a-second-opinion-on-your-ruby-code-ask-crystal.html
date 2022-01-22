@@ -23,8 +23,7 @@ really work? To find out, let’s look at a simple example.</p>
 <p>Here’s a Ruby class that represents the lead singer of a rock band, and a
 couple of methods that use it:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
 </span><span style="color:#343d46;">
 </span><span style="color:#343d46;">  </span><span style="color:#795da3;">attr_reader </span><span style="color:#008080;">:band</span><span style="color:#000000;">, </span><span style="color:#008080;">:first_name</span><span style="color:#000000;">, </span><span style="color:#008080;">:last_name
 </span><span style="color:#000000;">
@@ -42,15 +41,13 @@ couple of methods that use it:</p>
 </span><span style="color:#000000;">
 </span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
 </span><span style="color:#000000;">  singers.map{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.last_name}.max_by{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">name</span><span style="color:#4f5b66;">| </span><span style="color:#000000;">name.size }
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>This is similar to Ruby code I write everyday: small classes containing a few
 instance variables, and short, simple methods. With some test data we can try
 out this code to see if it works:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">lead_singers </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[ 
+<span style="color:#000000;">lead_singers </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[ 
 </span><span style="color:#000000;">  </span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Rolling Stones</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Mick</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Jagger</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">),
 </span><span style="color:#000000;">  </span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Queen</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Freddie</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Mercury</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">),
 </span><span style="color:#000000;">  </span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Doors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Jim</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Morrison</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)
@@ -61,8 +58,7 @@ out this code to see if it works:</p>
 </span><span style="color:#a7adba;"># =&gt; Jim Morrison
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">puts longest_last_name(lead_singers)
-</span><span style="color:#a7adba;"># =&gt; Morrison
-</span></pre>
+</span><span style="color:#a7adba;"># =&gt; Morrison</span></pre>
 
 <p>Everything works well. On a real project I’d express this as a series of
 Minitest expectations, and seeing green I’d go ahead and check it into Git on a
@@ -80,20 +76,16 @@ can’t see.</p>
 checking it in. And right away I find a problem: I call <code>find</code> but never consider
 whether the return value could be <code>nil</code>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">lead_singer_for</span><span style="color:#000000;">(band, singers)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">lead_singer_for</span><span style="color:#000000;">(band, singers)
 </span><span style="color:#000000;">  singers.find{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.band </span><span style="color:#4f5b66;">==</span><span style="color:#000000;"> band}
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>In my test, I happened to pick a band name that existed in the test data set,
 but if I misspell it or look for a different band, I would get an error:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Doors</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, lead_singers)
+<span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">Doors</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">, lead_singers)
 </span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{singer.first_name} #{singer.last_name}</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#a7adba;"># =&gt; undefined method `first_name&#39; for nil:NilClass (NoMethodError)
-</span></pre>
+</span><span style="color:#a7adba;"># =&gt; undefined method `first_name&#39; for nil:NilClass (NoMethodError)</span></pre>
 
 <p>I make this sort of mistake quite often, actually. In fact, I do it so often
 that checking for <code>nil</code> after calling <code>find</code> is part of my mental checklist for
@@ -105,21 +97,17 @@ it is here in this example. What if there was a way to find code issues the
 Ruby interpreter doesn’t report? Imagine if this code review could happen before
 my code is ever deployed or used?</p>
 <p>There is; we just need to run my Ruby code through the Crystal compiler:</p>
-<pre class="console">
-$ cp lead_singers.rb lead_singers.cr
-$ crystal lead_singers.cr
-</pre>
+<pre class="console">$ cp lead_singers.rb lead_singers.cr
+$ crystal lead_singers.cr</pre>
 <p>What? Pat, this is nuts. Crystal, while superficially similar to Ruby, is a
 very different language. How in the world can I use a compiler written for one
 language on code written in another?</p>
 <p>Well, you’re right. I run into a syntax error immediately:</p>
-<pre class="console">
-$ crystal lead_singers.cr 
+<pre class="console">$ crystal lead_singers.cr 
 Syntax error in ./lead_singers.cr:27: unterminated char literal, use double quotes for strings
 
 singer = lead_singer_for('Doors', lead_singers)
-                         ^
-</pre>
+                         ^</pre>
 <p>The most common difference of all between Crystal and Ruby is that Crystal uses
 only double quotes for string literals, while Ruby allows either single or
 double quotes. (<a href="https://www.viget.com/articles/just-use-double-quoted-ruby-strings">Some people
@@ -127,24 +115,19 @@ think</a> Ruby
 should limit us to double quotes also.) A quick search and replace solves this
 problem:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Doors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, lead_singers)
-</span></pre>
+<span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Doors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, lead_singers)</span></pre>
 
 <p>Let’s compile again:</p>
-<pre class="console">
-$ crystal lead_singers.cr 
+<pre class="console">$ crystal lead_singers.cr 
 Error in ./lead_singers.cr:3: undefined method 'attr_reader'
 
   attr_reader :band, :first_name, :last_name
-  ^~~~~~~~~~~
-</pre>
+  ^~~~~~~~~~~</pre>
 <p>We’ve run into another difference: Crystal uses the <code>property</code> keyword
 (actually a macro) instead of <code>attr_reader</code>, <code>attr_writer</code> and <code>attr_accessor</code>.
 Easy enough to fix:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
 </span><span style="color:#343d46;">
 </span><span style="color:#343d46;">  </span><span style="color:#000000;">property </span><span style="color:#008080;">:band</span><span style="color:#000000;">, </span><span style="color:#008080;">:first_name</span><span style="color:#000000;">, </span><span style="color:#008080;">:last_name
 </span><span style="color:#000000;">
@@ -154,13 +137,11 @@ Easy enough to fix:</p>
 </span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">last_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> last_name
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end 
 </span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Now let’s try again. Compiling my Ruby code using Crystal for a third time, I
 get:</p>
-<pre class="console">
-$ crystal lead_singers.cr
+<pre class="console">$ crystal lead_singers.cr
 Error in ./lead_singers.cr:22: instantiating 'Singer:Class#new(String, String, String)'
 
   Singer.new("The Rolling Stones", "Mick", "Jagger"),
@@ -195,8 +176,7 @@ Other assignments have no effect on its type.
 Can't infer the type of instance variable '@band' of Singer
 
     @band = band
-    ^~~~~
-</pre>
+    ^~~~~</pre>
 <p>Oh my God, I’ve made a mistake so terrible the Crystal compiler has given me an
 error message an entire page long! This is never going to work.  As you might
 guess, I’ve fixed all of the superficial syntax issues. Now my Ruby code is
@@ -244,14 +224,11 @@ happened here. Take the time to read through the page-long error message; it’s
 quite helpful. It explains all of the patterns the Crystal compiler looked for
 in my code, <code>@band = 1</code>, <code>@band = Type.new</code> etc. But because my assignment <code>@band = band</code> didn’t fall into any of these categories, Crystal couldn’t figure out what
 type of value <code>@band</code> represents:</p>
-<pre class="console">
-in ./lead_singers.cr:6: Can't infer the type of instance variable '@band' of Singer
-</pre>
+<pre class="console">in ./lead_singers.cr:6: Can't infer the type of instance variable '@band' of Singer</pre>
 <p>To fix this, I’ll just declare the type of my <code>@band</code> variable right where I
 declare it, along with my two other instance variables:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
 </span><span style="color:#343d46;">
 </span><span style="color:#343d46;">  </span><span style="color:#000000;">property band </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
 </span><span style="color:#000000;">  property first_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
@@ -263,15 +240,13 @@ declare it, along with my two other instance variables:</p>
 </span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">last_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> last_name
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">end 
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Notice here I use <code>property</code> three times, specifying each variable’s
 name and type. My three variables, <code>band</code>, <code>first_name</code> and <code>last_name</code> are all
 strings, so I just need to tell Crystal this using a more verbose declaration.</p>
 <p>Now we should be good to go! Let's try compiling again:</p>
-<pre class="console">
-$ crystal lead_singers.cr         
+<pre class="console">$ crystal lead_singers.cr         
 Error in ./lead_singers.cr:30: undefined method 'first_name' for Nil (compile-time type
 is (Singer | Nil))
 
@@ -315,20 +290,17 @@ Nil trace:
   /Users/pat/bllvm/crystal/src/enumerable.cr:228
 
       def find(if_none = nil)
-                         ^
-</pre>
+                         ^</pre>
 <p>Ugh; more trouble. Another page-long error message. Maybe I should just forget
 all about Crystal and go back to writing Ruby.</p>
 <h2>Understanding a Crystal Nil Trace</h2>
 <p>Instead, I decide to take some time to understand what Crystal is telling me. I
 focus at the beginning of the Crystal error message:</p>
-<pre class="console">
-Error in ./lead_singers.cr:30: undefined method 'first_name' for Nil (compile-time type
+<pre class="console">Error in ./lead_singers.cr:30: undefined method 'first_name' for Nil (compile-time type
 is (Singer | Nil))
 
 puts "#{singer.first_name} #{singer.last_name}"
-               ^~~~~~~~~~
-</pre>
+               ^~~~~~~~~~</pre>
 <p>This looks unfamiliar to me, a Ruby developer, at first. The message is similar
 to the error I saw earlier in Ruby when I didn’t check the return value for
 <code>find</code>. Recall that was “undefined method `first_name' for nil:NilClass
@@ -343,20 +315,16 @@ time.</p>
 <p>But why does Crystal think there is a <code>Nil</code> class in my code? I just told it my
 three instance variables are strings:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">  property band </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
+<span style="color:#000000;">property band </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
 </span><span style="color:#000000;">  property first_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
-</span><span style="color:#000000;">  property last_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
-</span></pre>
+</span><span style="color:#000000;">  property last_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String</span></pre>
 
 <p>What the Crystal compiler did is quite interesting! While compiling my code, it
 saw that I use the <code>@band</code> instance variable in the <code>lead_singer_for</code> method:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">lead_singer_for</span><span style="color:#000000;">(band, singers)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">lead_singer_for</span><span style="color:#000000;">(band, singers)
 </span><span style="color:#000000;">  singers.find{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.band </span><span style="color:#4f5b66;">==</span><span style="color:#000000;"> band}
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Internally, the Crystal compiler now has to decide what type <code>lead_singer_for</code>
 returns. That’s obvious, isn’t it? It should return a <code>Singer</code>. The call to <code>find</code>
@@ -376,18 +344,14 @@ defined for every class in that union type: <code>Singer</code> and <code>Nil</c
 understand what is wrong, Crystal backtracks through the code starting from
 where the missing method was found to where the offending type was introduced.
 You can read the Nil trace above for yourself. It starts with:</p>
-<pre class="console">
- ./lead_singers.cr:29
+<pre class="console">./lead_singers.cr:29
 
     singer = lead_singer_for("Doors", lead_singers)
-    ^~~~~~
-</pre>
+    ^~~~~~</pre>
 <p>And reading down you can see where the <code>Nil</code> type was actually introduced:</p>
-<pre class="console">
-  /Users/pat/bllvm/crystal/src/enumerable.cr:228
+<pre class="console">/Users/pat/bllvm/crystal/src/enumerable.cr:228
 
-      def find(if_none = nil)
-</pre>
+      def find(if_none = nil)</pre>
 <p>As you can see, the <code>Nil</code> type is a default value passed to the <code>Enumerable#find</code>
 method, which I call in <code>lead_singer_for</code>. Crystal’s standard library is
 entirely implemented using Crystal. This means if I’m curious (and I am) I can
@@ -400,14 +364,12 @@ or C++? Read the Crystal source code.</p>
 <p>Now back to my example. I’m done, right? Recall in my Ruby code I added a check
 for the return value of <code>lead_singer_for</code>:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Doors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, lead_singers)
+<span style="color:#000000;">singer </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> lead_singer_for(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Doors</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, lead_singers)
 </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> singer
 </span><span style="color:#000000;">  puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{singer.first_name} #{singer.last_name}</span><span style="color:#4f5b66;">&quot;
 </span><span style="color:#a71d5d;">else
 </span><span style="color:#000000;">  puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Not found</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>The same fix will work for Crystal. The Crystal compiler is clever enough to
 know that inside the first branch of the if-statement the type of <code>singer</code> is
@@ -423,13 +385,10 @@ set?</p>
 <p>The answer is obvious: their singer objects would have a <code>nil</code> <code>last_name</code> value. I
 would create them like this:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Police</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Sting</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#d08770;">nil</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Police</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Sting</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#d08770;">nil</span><span style="color:#000000;">)</span></pre>
 
 <p>In Ruby, this would have worked just fine. But Crystal objects:</p>
-<pre class="console">
-$ crystal lead_singers.cr      
+<pre class="console">$ crystal lead_singers.cr      
 Error in ./lead_singers.cr:26: instantiating 'Singer:Class#new(String, String, Nil)'
 
   Singer.new("The Police", "Sting", nil),
@@ -440,15 +399,13 @@ instantiating 'Singer#initialize(String, String, Nil)'
 in ./lead_singers.cr:10: instance variable '@last_name' of Singer must be String, not Nil
 
     @last_name = last_name
-    ^~~~~~~~~~
-</pre>
+    ^~~~~~~~~~</pre>
 <p>What do I do now? How can I save a <code>nil</code> last name in my <code>Singer</code> class? The
 instance variables are strings and cannot hold <code>nil</code>.</p>
 <p>The answer is I picked the wrong type for <code>last_name</code>. To accommodate
 super-famous singers, I need to use the same union type we saw earlier:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">Singer
 </span><span style="color:#343d46;">
 </span><span style="color:#343d46;">  </span><span style="color:#000000;">property band </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
 </span><span style="color:#000000;">  property first_name </span><span style="color:#4f5b66;">: </span><span style="color:#000000;">String
@@ -460,18 +417,14 @@ super-famous singers, I need to use the same union type we saw earlier:</p>
 </span><span style="color:#000000;">    </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">last_name </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> last_name
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end 
 </span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Now I can create the Sting object no problem:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Police</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Sting</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#d08770;">nil</span><span style="color:#000000;">)
-</span></pre>
+<span style="color:#008080;">Singer</span><span style="color:#000000;">.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">The Police</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Sting</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#d08770;">nil</span><span style="color:#000000;">)</span></pre>
 
 <p>Finally, we’re ready to compile my Ruby and move on!</p>
-<pre class="console">
-$ crystal lead_singers.cr
+<pre class="console">$ crystal lead_singers.cr
 Error in ./lead_singers.cr:37: instantiating 'longest_last_name(Array(Singer))'
 
 puts longest_last_name(lead_singers)
@@ -489,8 +442,7 @@ Nil trace:
   ./lead_singers.cr:20
 
       singers.map{|s| s.last_name}.max_by{|name| name.size }
-                                           ^~~~
-</pre>
+                                           ^~~~</pre>
 <p>Once again the Crystal compiler has stopped me in my tracks. When will I ever
 get this right? Is this another Ruby vs. Crystal difference? Another subtlety
 of the Crystal type system I need to learn about?</p>
@@ -499,11 +451,9 @@ of the Crystal type system I need to learn about?</p>
 noticed. Because Sting doesn’t have a last name, the <code>longest_last_name</code> method
 runs into a problem:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
 </span><span style="color:#000000;">  singers.map{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.last_name}.max_by{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">name</span><span style="color:#4f5b66;">| </span><span style="color:#000000;">name.size }
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>The first call to <code>map</code> returns an array of last names, which now will contain
 <code>nil</code>. Then I pass that array into <code>max_by</code> which converts the names into
@@ -512,11 +462,9 @@ corresponding name lengths, and then returns the longest name.</p>
 <code>nil</code> to the second block for Sting’s missing last name, and the block will then
 try to call the <code>size</code> method on <code>nil</code>. Easy enough to fix:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
 </span><span style="color:#000000;">  singers.map{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.last_name}.compact.max_by{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">name</span><span style="color:#4f5b66;">| </span><span style="color:#000000;">name.size }
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Using <code>compact</code>, I remove the <code>nil</code> element from the array of names, meaning the
 <code>size</code> method will never be called on <code>nil</code>. Of course, now that I’m thinking about
@@ -524,8 +472,7 @@ try to call the <code>size</code> method on <code>nil</code>. Easy enough to fix
 singers are super-famous and have no last names, or possibly there were no
 singers to begin with. I tighten up my code even more:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">longest_last_name</span><span style="color:#000000;">(singers)
 </span><span style="color:#000000;">  singers_with_last_names </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> singers.map{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">s</span><span style="color:#4f5b66;">|</span><span style="color:#000000;"> s.last_name}.compact
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">unless</span><span style="color:#000000;"> singers_with_last_names.empty?
 </span><span style="color:#000000;">    singers_with_last_names.max_by{</span><span style="color:#4f5b66;">|</span><span style="color:#000000;">name</span><span style="color:#4f5b66;">| </span><span style="color:#000000;">name.size }
@@ -537,8 +484,7 @@ singers to begin with. I tighten up my code even more:</p>
 </span><span style="color:#000000;">  puts last_name
 </span><span style="color:#a71d5d;">else
 </span><span style="color:#000000;">  puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Not found</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Now everything works!</p>
 <p>One interesting footnote here: Ruby allows me to get away without checking for
@@ -552,11 +498,9 @@ brings that to my attention, but with a runtime exception not a compile error.
 Crystal reports runtime errors for other cases as well, for example looking for
 a value in a hash when the key doesn’t exist:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">hash </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">{ </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">a</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">=&gt; </span><span style="color:#d08770;">123 </span><span style="color:#000000;">} 
+<span style="color:#000000;">hash </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">{ </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">a</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">=&gt; </span><span style="color:#d08770;">123 </span><span style="color:#000000;">} 
 </span><span style="color:#000000;">puts hash[</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">b</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">]
-</span><span style="color:#a7adba;"># =&gt; Missing hash key: :b (KeyError)
-</span></pre>
+</span><span style="color:#a7adba;"># =&gt; Missing hash key: :b (KeyError)</span></pre>
 
 <p>The Crystal compiler expects a higher level of quality and thoroughness in my
 code than Ruby does, it seems to me.</p>

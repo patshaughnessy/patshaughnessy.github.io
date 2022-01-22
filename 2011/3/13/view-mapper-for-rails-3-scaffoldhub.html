@@ -25,9 +25,7 @@
 <p>To get things started, I just posted a single new scaffold on ScaffoldHub.org: the <a href="http://scaffoldhub.org/scaffolds/autocomplete">AutoComplete scaffold</a>. This scaffold looks the same as the standard Rails scaffolding code, except you can use type ahead/autocomplete on one of the text fields. I implemented it using the <a href="http://docs.jquery.com/Plugins/autocomplete">JQuery autocomplete plugin</a>.</p>
 <p>To run it, first just install the ScaffoldHub gem in your Rails 3 app by editing your Gemfile and adding this line:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">scaffoldhub</span><span style="color:#4f5b66;">&#39;
-</span></pre>
+<span style="color:#795da3;">gem </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">scaffoldhub</span><span style="color:#4f5b66;">&#39;</span></pre>
 
 <p>And of course then install it with bundler:</p>
 <pre>$ bundle install
@@ -41,8 +39,7 @@ Using railties (3.0.5)
 Using rails (3.0.5) 
 Using scaffoldhub (0.0.3)
 Using sqlite3 (1.3.3) 
-Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.
-</pre>
+Your bundle is complete! Use `bundle show [gemname]` to see where a bundled gem is installed.</pre>
 <p>Now with the gem installed you will have a new generator called “scaffoldhub” available that uses the same syntax as the standard Rails scaffold generator, except for one additional option which specifies which scaffold to use. For example, to create a person model with a name field, you would use:</p>
 <pre>rails generate scaffoldhub person name:string --scaffold autocomplete:name</pre>
 <p>Here the new --scaffold option indicates we want to use the autocomplete scaffold from scaffoldhub.org, and that we want the autocomplete behavior on the name field.</p>

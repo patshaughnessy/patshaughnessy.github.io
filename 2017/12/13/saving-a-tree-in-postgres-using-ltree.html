@@ -37,14 +37,12 @@ class="code">D</span> is:</p>
 tree, I’ll use the same table I did before, but instead of the <span
 class="code">parent_id</span> column I’ll use a <span class="code">path</span>
 column:</p>
-<pre>
-create table tree(
+<pre>create table tree(
     id serial primary key,
     letter char,
     path ltree
 );
-create index tree_path_idx on tree using gist (path);
-</pre>
+create index tree_path_idx on tree using gist (path);</pre>
 <p>I chose the name <span class="code">path</span>; I could have picked any name
 here. However, notice the <span class="code">path</span> column uses a Postgres
 data type called <span class="code">ltree</span> - the LTREE extension provides
@@ -60,15 +58,13 @@ statement:</p>
 <img src="https://patshaughnessy.net/assets/2017/12/13/insert2.png">
 <p>Following this pattern, I can save my entire tree using these insert
 statements, one for each node in my tree:</p>
-<pre>
-insert into tree (letter, path) values ('A', 'A');
+<pre>insert into tree (letter, path) values ('A', 'A');
 insert into tree (letter, path) values ('B', 'A.B');
 insert into tree (letter, path) values ('C', 'A.C');
 insert into tree (letter, path) values ('D', 'A.C.D');
 insert into tree (letter, path) values ('E', 'A.C.E');
 insert into tree (letter, path) values ('F', 'A.C.F');
-insert into tree (letter, path) values ('G', 'A.B.G');
-</pre>
+insert into tree (letter, path) values ('G', 'A.B.G');</pre>
 <p>The root node, <span class="code">A</span>, contains the simplest path <span
 class="code">A</span>. Its two child nodes, <span class="code">B</span> and
 <span class="code">C</span>, use paths <span class="code">A.B</span> and <span
@@ -87,45 +83,35 @@ recursively? That is, what if I needed to count its children, grandchildren,
 great-grandchildren, etc.? Earlier we saw that using a <span
 class="code">parent_id</span> column this would require an ever increasing
 number of SQL statements: </p>
-<pre>
-select count(*) from tree where parent_id = ID;
+<pre>select count(*) from tree where parent_id = ID;
 select count(*) from tree where parent_id in (CHILD IDs);
 select count(*) from tree where parent_id in (GRANDCHILD IDs);
 select count(*) from tree where parent_id in (GREAT-GRANDCHILD IDs);
 select count(*) from tree where parent_id in (GREAT_GREAT-GRANDCHILD IDs);
 
-etc.
-</pre>
+etc.</pre>
 <p><span class="code">@&gt;</span> solves this problem for us. I can now recursively
 count the total number of nodes under any given parent like this:</p>
-<pre>
-select count(*) from tree where PARENT-PATH @> path;
-</pre>
+<pre>select count(*) from tree where PARENT-PATH @> path;</pre>
 <p>In my example, this SQL would return the number of nodes, recursively, under
 the root node <span class="code">A</span>:</p>
-<pre>
-select count(*) from tree where 'A' @> path;
+<pre>select count(*) from tree where 'A' @> path;
 count 
 -------
 7
-(1 row)
-</pre>
+(1 row)</pre>
 <p>LTREE counts the parent node itself, so the total count is 7, not 6. That is,
 <span class="code">A @&gt; A</span> evaluates to true. Another example; this
 returns the count of tree nodes under and including <span class="code">C</span>:</p>
-<pre>
-select count(*) from tree where ‘A.C' @> path;
+<pre>select count(*) from tree where ‘A.C' @> path;
 count 
 -------
 4
-(1 row)
-</pre>
+(1 row)</pre>
 <p>Or I could have written these predicates in the opposite order using <span
 class="code">&lt;@</span>:</p>
-<pre>
-select count(*) from tree where path <@ 'A';
-select count(*) from tree where path <@ 'A.C';
-</pre>
+<pre>select count(*) from tree where path <@ 'A';
+select count(*) from tree where path <@ 'A.C';</pre>
 <p>As you can see, the <span class="code">&lt;@</span> and <span
 class="code">@&gt;</span> operators treat the <span class="code">path</span>
 column, the column I defined with the <span class="code">ltree</span> data
@@ -151,9 +137,7 @@ written SQL code to determine that A is an ancestor of A.C.D myself. I probably
 would have used one of Postgres’s <a href="https://www.postgresql.org/docs/current/static/functions-string.html">many string
 functions</a>
 to achieve this, maybe something like this:</p>
-<pre>
-select count(*) from tree where strpos(path::varchar, 'A') = 1
-</pre>
+<pre>select count(*) from tree where strpos(path::varchar, 'A') = 1</pre>
 <p>Postgres would calculate the answer for my 7-node example tree very quickly.
 But to calculate this count, internally Postgres would have to iterate over all
 the records in my table (this is called a <em>full table scan</em> or <em>sequence scan</em> in
@@ -167,9 +151,7 @@ this in a more technical way: The <span class="code">@&gt;</span> operator
 integrates with Postgres’s GiST index API to find and match descendant nodes.
 To take advantage of this technology, be sure to create a GiST index on your
 <span class="code">ltree</span> column, for example like this:</p>
-<pre>
-create index tree_path_idx on tree using gist (path);
-</pre>
+<pre>create index tree_path_idx on tree using gist (path);</pre>
 <p>What is a “GiST” index? How does it help LTREE find and count tree nodes
 efficiently? Read the <a href="https://patshaughnessy.net/2017/12/15/looking-inside-postgres-at-a-gist-index">last post in this
 series</a>

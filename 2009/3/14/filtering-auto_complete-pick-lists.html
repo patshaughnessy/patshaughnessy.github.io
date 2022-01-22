@@ -71,9 +71,7 @@ end</pre>
 <p>Filtered_auto_complete_for takes a block and evaluates it when the actual HTTP Ajax request is received from the auto complete Javascript. The block is provided with the find options hash and also the request parameters. This enables the controller&rsquo;s block to modify the find options in any way it would like, possibly using the HTTP request parameters provided. I&rsquo;ve also removed the options parameter since that&rsquo;s not necessary any more.</p>
 <p>As an example, here&rsquo;s my sample app&rsquo;s controller code:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">class </span><span style="color:#008080;">ProjectsController </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ApplicationController
+<span style="color:#a71d5d;">class </span><span style="color:#008080;">ProjectsController </span><span style="color:#343d46;">&lt; </span><span style="color:#008080;">ApplicationController
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  </span><span style="color:#a7adba;"># Handle auto complete for project names as usual:
 </span><span style="color:#000000;">  auto_complete_for </span><span style="color:#008080;">:project</span><span style="color:#000000;">, </span><span style="color:#008080;">:name

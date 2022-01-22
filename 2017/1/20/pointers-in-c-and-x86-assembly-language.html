@@ -32,23 +32,18 @@ language.</p>
 the constant value 42 into a local variable. After I compile it I’ll able able
 to look for the number 42 in the assembly language code:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(n)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(n)
 </span><span style="color:#000000;">  a </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">42
 </span><span style="color:#000000;">  n</span><span style="color:#4f5b66;">+</span><span style="color:#000000;">a 
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Once again I’ll use <a href="https://crystal-lang.org">Crystal</a> to compile my Ruby code:</p>
-<pre type="console">
-crystal build add_forty_two.rb --emit asm
-</pre>
+<pre type="console">crystal build add_forty_two.rb --emit asm</pre>
 <p>Searching through the generated <code>add_forty_two.s file</code>, I find the
 <code>add\_forty\_two</code> function, clean it up and paste its assembly language
 instructions back into my Ruby function:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(n)
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(n)
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">  pushq   </span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp  
 </span><span style="color:#000000;">  movq    </span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rsp, </span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp
@@ -59,8 +54,7 @@ instructions back into my Ruby function:</p>
 </span><span style="color:#000000;">  popq    </span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp  
 </span><span style="color:#000000;">  retq  
 </span><span style="color:#000000;">
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <h2>Assembly Language: The Script Your Computer Follows</h2>
 <p>This code is quite literally the script my computer follows: What happens when
@@ -75,9 +69,7 @@ trying to read an old Shakespearean manuscript</i>
 the words I do know are spelled differently. I can almost understand what this
 line of code means:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">movl    </span><span style="color:#4f5b66;">$</span><span style="color:#000000;">42, </span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">4</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp)
-</span></pre>
+<span style="color:#000000;">movl    </span><span style="color:#4f5b66;">$</span><span style="color:#000000;">42, </span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">4</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp)</span></pre>
 
 <p>…but not quite. I can guess by reading my original Ruby code it’s probably
 saving 42 in the local variable <code>a</code>. In my last post I learned that the “l”
@@ -116,8 +108,7 @@ with.</p>
 <p>In fact, a proper C program to add 42 would resemble the Ruby code I started
 with above:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">#include </span><span style="color:#4f5b66;">&lt;</span><span style="color:#008080;">stdio.h</span><span style="color:#4f5b66;">&gt;
+<span style="color:#a71d5d;">#include </span><span style="color:#4f5b66;">&lt;</span><span style="color:#008080;">stdio.h</span><span style="color:#4f5b66;">&gt;
 </span><span style="color:#000000;">
 </span><span style="color:#a71d5d;">unsigned int </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(n)
 </span><span style="color:#000000;">{
@@ -125,8 +116,7 @@ with above:</p>
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">return</span><span style="color:#000000;"> a</span><span style="color:#4f5b66;">+</span><span style="color:#000000;">n;
 </span><span style="color:#000000;">}
 </span><span style="color:#000000;">
-</span><span style="color:#795da3;">printf</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">50 + 42 is </span><span style="color:#d08770;">%d</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(</span><span style="color:#d08770;">50</span><span style="color:#000000;">));
-</span></pre>
+</span><span style="color:#795da3;">printf</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">50 + 42 is </span><span style="color:#d08770;">%d</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#795da3;">add_forty_two</span><span style="color:#000000;">(</span><span style="color:#d08770;">50</span><span style="color:#000000;">));</span></pre>
 
 <p>My point today is that C mixes high and low level language notation. The
 underlying features and capabilities of my x86 microprocessor leak through into
@@ -146,9 +136,7 @@ x86 and C pointer notation.</p>
 <p>Let’s start with the move instruction that copies 42 into a certain memory
 address. Here’s the C translation:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">rbp[</span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">1</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">42</span><span style="color:#000000;">;
-</span></pre>
+<span style="color:#000000;">rbp[</span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">1</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">42</span><span style="color:#000000;">;</span></pre>
 
 <p>This line of code looks simple enough, but actually there are a couple of very
 odd things about it. First, I wrote the C array <code>rbp</code> using the name of a
@@ -166,9 +154,7 @@ untruth</a>.</p>
 <img src="https://patshaughnessy.net/assets/2017/1/20/array2.png" width=800>
 <p>In x86 assembly language, the same move instruction appears this way:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">movl    </span><span style="color:#4f5b66;">$</span><span style="color:#000000;">42, </span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">4</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp)
-</span></pre>
+<span style="color:#000000;">movl    </span><span style="color:#4f5b66;">$</span><span style="color:#000000;">42, </span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">4</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp)</span></pre>
 
 <p>To me, the assembly language syntax is inside out: Instead of writing the array
 name followed by the index in brackets, I write the index first, followed by
@@ -198,10 +184,8 @@ language into C?</p>
 while C arrays use an element count index instead. To understand what I mean,
 let’s write a C declaration for this imaginary array before using it:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">unsigned int</span><span style="color:#000000;"> rbp[</span><span style="color:#d08770;">100</span><span style="color:#000000;">];
-</span><span style="color:#000000;">rbp[</span><span style="color:#d08770;">2</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">42</span><span style="color:#000000;">;
-</span></pre>
+<span style="color:#a71d5d;">unsigned int</span><span style="color:#000000;"> rbp[</span><span style="color:#d08770;">100</span><span style="color:#000000;">];
+</span><span style="color:#000000;">rbp[</span><span style="color:#d08770;">2</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">42</span><span style="color:#000000;">;</span></pre>
 
 <p>Because C is a statically typed language, I have to declare the type of the
 array elements when I declare the array. In this example, <code>unsigned int</code> is
@@ -227,34 +211,26 @@ element count index makes much more sense.</p>
 <p>In the backwards array from my example program, the <code>movl</code> instruction was
 written as:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">movl    </span><span style="color:#4f5b66;">$</span><span style="color:#000000;">42, </span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">4</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp)
-</span></pre>
+<span style="color:#000000;">movl    </span><span style="color:#4f5b66;">$</span><span style="color:#000000;">42, </span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">4</span><span style="color:#000000;">(</span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp)</span></pre>
 
 <p>This means “move the 4 byte long value 42 to a memory location 4 bytes before
 the address found in the <code>rbp</code> register.”</p>
 <p>But in C, I would write </p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">rbp[</span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">1</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">42</span><span style="color:#000000;">;
-</span></pre>
+<span style="color:#000000;">rbp[</span><span style="color:#4f5b66;">-</span><span style="color:#d08770;">1</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">42</span><span style="color:#000000;">;</span></pre>
 
 <p>This means “Set the -1st element of the array to 42” - much more
 straightforward (although still a bit weird).</p>
 <h2>Pushing a Value Onto The Stack</h2>
 <p>Next let’s take a look at the first x86 instruction in my program:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">pushq   </span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp  
-</span></pre>
+<span style="color:#000000;">pushq   </span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp</span></pre>
 
 <p>This instruction, <code>pushq</code>, pushes a new value onto the top of the stack. Think of
 the stack as just a special array of values in memory. Reading the equivalent C
 code makes this a bit easier to follow:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#4f5b66;">*--</span><span style="color:#000000;">rsp </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> rbp;
-</span></pre>
+<span style="color:#4f5b66;">*--</span><span style="color:#000000;">rsp </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> rbp;</span></pre>
 
 <p>Here I wrote the C assignment using explicit pointer syntax: The pointer is the
 <code>rsp</code> or <em>stack pointer</em> register. The asterisk prefix is C notation for
@@ -286,9 +262,7 @@ in this example are pointers, or 8 byte values. We’ll see why in a moment.</p>
 <p>What about the x86 notation? Pushing a value onto the stack is such a common
 operation x86 microprocessors have a special instruction for it: <code>push</code>.</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">pushq   </span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp  
-</span></pre>
+<span style="color:#000000;">pushq   </span><span style="color:#4f5b66;">%</span><span style="color:#000000;">rbp</span></pre>
 
 <p>Just like with <code>movl</code>, the “q” suffix indicates how large the operand is, the
 size of the value that <code>push</code> copies to the stack. In this case “q” indicates the
@@ -301,18 +275,14 @@ the operand size is a convenient feature of x86 microprocessors. And it’s also
 the origin of the C language <code>--</code> and <code>++</code> operators. To see what I mean, take a
 second look at the equivalent C assignment code:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#4f5b66;">*--</span><span style="color:#000000;">rsp </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> rbp;
-</span></pre>
+<span style="color:#4f5b66;">*--</span><span style="color:#000000;">rsp </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> rbp;</span></pre>
 
 <p>What does the <code>--</code> pre-decrement operator subtract from the pointer <code>rsp</code>? The
 answer is one element. If we imagine I declared <code>rsp</code> a pointer to an 8 byte long
 value:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">unsigned long </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">rsp;
-</span><span style="color:#4f5b66;">*--</span><span style="color:#000000;">rsp </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> rbp;
-</span></pre>
+<span style="color:#000000;">unsigned long </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">rsp;
+</span><span style="color:#4f5b66;">*--</span><span style="color:#000000;">rsp </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> rbp;</span></pre>
 
 <p>…then decrementing <code>rsp</code> will subtract 8 bytes, enough for one unsigned long
 value to fit. The <code>--</code> operator uses the size of the pointer’s referenced type to
@@ -325,17 +295,13 @@ capability of my computer’s microprocessor.</p>
 <h2>Popping a Value Off The Stack</h2>
 <p>Here’s the last instruction in my example program:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">retq  
-</span></pre>
+<span style="color:#000000;">retq</span></pre>
 
 <p>This instruction, &quot;return,&quot; means the microprocessor should return to the
 calling function and continue execution from there. How does it work? Once
 again, let’s refer to the equivalent C assignment function to learn more:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">rip </span><span style="color:#4f5b66;">= *</span><span style="color:#000000;">rsp</span><span style="color:#4f5b66;">++</span><span style="color:#000000;">;
-</span></pre>
+<span style="color:#000000;">rip </span><span style="color:#4f5b66;">= *</span><span style="color:#000000;">rsp</span><span style="color:#4f5b66;">++</span><span style="color:#000000;">;</span></pre>
 
 <p>Here the C code copies the value from the memory location referenced by the <code>rsp</code>
 pointer and saves it into the <code>rip</code> register.</p>
@@ -360,10 +326,8 @@ assembly language. Just as <code>retq</code> adds 8 bytes to <code>rsp</code>, t
 adds the size of 1 element to <code>rsp</code> based on the type of the pointer’s referenced
 type:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">unsigned long </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">rsp;
-</span><span style="color:#000000;">rip </span><span style="color:#4f5b66;">= *</span><span style="color:#000000;">rsp</span><span style="color:#4f5b66;">++</span><span style="color:#000000;">;
-</span></pre>
+<span style="color:#a71d5d;">unsigned long </span><span style="color:#4f5b66;">*</span><span style="color:#000000;">rsp;
+</span><span style="color:#000000;">rip </span><span style="color:#4f5b66;">= *</span><span style="color:#000000;">rsp</span><span style="color:#4f5b66;">++</span><span style="color:#000000;">;</span></pre>
 
 <h2>Next Time</h2>
 <p>When I have time I'd like to write one more post about x86 syntax. Now that

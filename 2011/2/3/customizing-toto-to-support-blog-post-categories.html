@@ -11,15 +11,13 @@
 <p>Toto comes with a fast, effective test suite written using <a href="https://github.com/thumblemonks/riot">Riot</a> and <a href="https://github.com/btakita/rr">RR</a>. If you plan to customize Toto, be sure to take advantage of Alexis Sellier’s existing tests to be sure you don’t break anything. Take a look at <a href="https://patshaughnessy.net/2011/1/23/4-tips-for-how-to-customize-a-toto-blog-site">my last post</a> for some tips on how to get the tests working for Ruby 1.8.7.</p>
 <p>I’ll start today by writing a few new Riot tests specifying exactly what behavior I mean by “blog post categories.”  I added this code to test/toto_test.rb in my local Toto gem folder:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">context </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">GET a tag page</span><span style="color:#4f5b66;">&quot; </span><span style="color:#a71d5d;">do
+<span style="color:#000000;">context </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">GET a tag page</span><span style="color:#4f5b66;">&quot; </span><span style="color:#a71d5d;">do
 </span><span style="color:#000000;">  setup { </span><span style="color:#4f5b66;">@</span><span style="color:#000000;">toto.get(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/tags/the-wizard-of-oz</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">) }
 </span><span style="color:#000000;">  asserts(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">returns a 200</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)                         { topic.status }.equals </span><span style="color:#d08770;">200
 </span><span style="color:#000000;">  asserts(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">body is not empty</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)                     { </span><span style="color:#4f5b66;">not</span><span style="color:#000000;"> topic.body.empty? }
 </span><span style="color:#000000;">  should(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">includes only the entries for that tag</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">) { topic.body }.includes_elements(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">li.entry</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">, </span><span style="color:#d08770;">2</span><span style="color:#000000;">)
 </span><span style="color:#000000;">  should(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">has access to @tag</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">)                     { topic.body }.includes_html(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">#tag</span><span style="color:#4f5b66;">&quot; </span><span style="color:#000000;">=&gt; </span><span style="color:#4f5b66;">/</span><span style="color:#96b5b4;">The Wizard of Oz</span><span style="color:#4f5b66;">/</span><span style="color:#000000;">)
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>The syntax might be a bit unfamiliar if you’re used to RSpec, but you can probably figure out that the behavior I’m looking for is:</p>
 <ul>
@@ -61,8 +59,7 @@ Toto GET a tag page
 <li>Each of the matching articles is listed in an &lt;li&gt; tag with class=“entry.”</li>
 </ul>
 <p>Of course, the tag.rhtml code I use on my actual blog site which you’re reading now is a bit more verbose:</p>
-<pre>
-&lt;table id="archive-table"> 
+<pre>&lt;table id="archive-table"> 
   &lt;% if archives.length > 0 %> 
     &lt;% last_month = nil %> 
     &lt;% for entry in archives %> 
@@ -81,8 +78,7 @@ Toto GET a tag page
       &lt;/tr> 
     &lt;% end %> 
   &lt;% end %> 
-&lt;/table> 
-</pre> 
+&lt;/table></pre> 
 <p>There’s just a bit of logic around displaying the month and year text, and also a couple of CSS cues for my blog’s stylesheet. But to get the tests to pass you just need the barebones tag.rhtml file I showed above.</p>
 <p>Let’s try the tests again:</p>
 <pre>$ rake
@@ -103,8 +99,7 @@ Toto GET a tag page
 <h2><a id="step3"></a>Step 3: Add a new route</h2>
 <p>Toto implements routing using the Toto::Site.go method. Here’s what that looks like:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">go </span><span style="color:#000000;">route, env = {}, type = </span><span style="color:#008080;">:html
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">go </span><span style="color:#000000;">route, env = {}, type = </span><span style="color:#008080;">:html
 </span><span style="color:#000000;">  route </span><span style="color:#4f5b66;">&lt;&lt; </span><span style="color:#000000;">self.</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> route.empty?
 </span><span style="color:#000000;">  type, path </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> type </span><span style="color:#4f5b66;">=~ /</span><span style="color:#96b5b4;">html|xml|json</span><span style="color:#4f5b66;">/ ?</span><span style="color:#000000;"> type.to_sym </span><span style="color:#4f5b66;">: </span><span style="color:#008080;">:html</span><span style="color:#000000;">, route.join(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
 </span><span style="color:#000000;">  context </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">lambda </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">data, page</span><span style="color:#4f5b66;">|
@@ -136,8 +131,7 @@ Toto GET a tag page
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">return </span><span style="color:#008080;">:body </span><span style="color:#000000;">=&gt; http(</span><span style="color:#d08770;">404</span><span style="color:#000000;">).first, </span><span style="color:#008080;">:type </span><span style="color:#000000;">=&gt; </span><span style="color:#008080;">:html</span><span style="color:#000000;">, </span><span style="color:#008080;">:status </span><span style="color:#000000;">=&gt; </span><span style="color:#d08770;">404
 </span><span style="color:#a71d5d;">else
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">return </span><span style="color:#008080;">:body </span><span style="color:#000000;">=&gt; body </span><span style="color:#4f5b66;">|| &quot;&quot;</span><span style="color:#000000;">, </span><span style="color:#008080;">:type </span><span style="color:#000000;">=&gt; type, </span><span style="color:#008080;">:status </span><span style="color:#000000;">=&gt; status </span><span style="color:#4f5b66;">|| </span><span style="color:#d08770;">200
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>Let’s take a few minutes to understand this method... this bit of code is really interesting. It plays the same role that routes.rb does in a Rails application. When Toto gets an HTTP request, it converts the path string into an array of strings and passes that into the “go” method as the first parameter: “route.” For example, if a user requests https://patshaughnessy.net/2011/1/23/4-tips-for-how-to-customize-a-toto-blog-site, then route will be set to:</p>
 <div class="CodeRay"> 
@@ -175,8 +169,7 @@ context[archives(route * <span class="s"><span class="dl">'</span><span class="k
 </div> 
 <p>Here’s how to do it - I’ll repeat the entire “go” method again:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#a71d5d;">def </span><span style="color:#795da3;">go </span><span style="color:#000000;">route, env = {}, type = </span><span style="color:#008080;">:html
+<span style="color:#a71d5d;">def </span><span style="color:#795da3;">go </span><span style="color:#000000;">route, env = {}, type = </span><span style="color:#008080;">:html
 </span><span style="color:#000000;">  route </span><span style="color:#4f5b66;">&lt;&lt; </span><span style="color:#000000;">self.</span><span style="color:#4f5b66;">/ </span><span style="color:#a71d5d;">if</span><span style="color:#000000;"> route.empty?
 </span><span style="color:#000000;">  type, path </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> type </span><span style="color:#4f5b66;">=~ /</span><span style="color:#96b5b4;">html|xml|json</span><span style="color:#4f5b66;">/ ?</span><span style="color:#000000;"> type.to_sym </span><span style="color:#4f5b66;">: </span><span style="color:#008080;">:html</span><span style="color:#000000;">, route.join(</span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">/</span><span style="color:#4f5b66;">&#39;</span><span style="color:#000000;">)
 </span><span style="color:#000000;">  context </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">lambda </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">data, page</span><span style="color:#4f5b66;">|
@@ -216,8 +209,7 @@ context[archives(route * <span class="s"><span class="dl">'</span><span class="k
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">return </span><span style="color:#008080;">:body </span><span style="color:#000000;">=&gt; http(</span><span style="color:#d08770;">404</span><span style="color:#000000;">).first, </span><span style="color:#008080;">:type </span><span style="color:#000000;">=&gt; </span><span style="color:#008080;">:html</span><span style="color:#000000;">, </span><span style="color:#008080;">:status </span><span style="color:#000000;">=&gt; </span><span style="color:#d08770;">404
 </span><span style="color:#a71d5d;">else
 </span><span style="color:#000000;">  </span><span style="color:#a71d5d;">return </span><span style="color:#008080;">:body </span><span style="color:#000000;">=&gt; body </span><span style="color:#4f5b66;">|| &quot;&quot;</span><span style="color:#000000;">, </span><span style="color:#008080;">:type </span><span style="color:#000000;">=&gt; type, </span><span style="color:#008080;">:status </span><span style="color:#000000;">=&gt; status </span><span style="color:#4f5b66;">|| </span><span style="color:#d08770;">200
-</span><span style="color:#a71d5d;">end
-</span></pre>
+</span><span style="color:#a71d5d;">end</span></pre>
 
 <p>You can see I match on routes.first == ‘tags’ and that there’s exactly one more level to the path; for example /tags/the-wizard-of-oz. Then I call the existing archives method, and pass in the tag from the URL as a parameter:</p>
 <div class="CodeRay"> 

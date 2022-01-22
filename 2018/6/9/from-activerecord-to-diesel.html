@@ -29,27 +29,23 @@ from this article if you want to skip the explanation and just try it.</p>
 <h2>Running a SQL Query Using Ruby and ActiveRecord</h2>
 <p>My actual data set looked different, but suppose as an example I had a Postgres
 table called <span class="code">users</span>:</p>
-<pre>
-create table users (
+<pre>create table users (
     id serial primary key,
     first_name varchar(40),
     last_name  varchar(40)
-);
-</pre>
+);</pre>
 <p>…and I needed to count the number of users with multiple last names. People
 from Spanish speaking countries, like my wife, often have two last names.
 Because I was in a rush and had to get an answer quickly, I turned to
 ActiveRecord. This simple Ruby script ran a SQL query and also a bit of Ruby
 post-processing to find the number of users with multiple last names:</p>
 <pre style="background-color:#ffffff;">
-<span style="color:#000000;">
-</span><span style="color:#000000;">user_groups </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">User</span><span style="color:#000000;">.all.partition </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">user</span><span style="color:#4f5b66;">|
+<span style="color:#000000;">user_groups </span><span style="color:#4f5b66;">= </span><span style="color:#008080;">User</span><span style="color:#000000;">.all.partition </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">user</span><span style="color:#4f5b66;">|
 </span><span style="color:#000000;">  user.last_name.split.size </span><span style="color:#4f5b66;">&gt; </span><span style="color:#d08770;">1
 </span><span style="color:#a71d5d;">end
 </span><span style="color:#000000;">
 </span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Found </span><span style="color:#000000;">#{user_groups.first.size}</span><span style="color:#008080;"> users with more than one last name.</span><span style="color:#4f5b66;">&quot;
-</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Found </span><span style="color:#000000;">#{user_groups.last.size}</span><span style="color:#008080;"> users with one last name.</span><span style="color:#4f5b66;">&quot;
-</span></pre>
+</span><span style="color:#000000;">puts </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">Found </span><span style="color:#000000;">#{user_groups.last.size}</span><span style="color:#008080;"> users with one last name.</span><span style="color:#4f5b66;">&quot;</span></pre>
 
 <p>Ruby and ActiveRecord worked brilliantly. I was done. Neither the language nor
 the tools got in my way and I had the quick answer I needed. After just five
@@ -77,16 +73,14 @@ it.</p>
 <h2>A New Rust Project</h2>
 <p>To get started, I created a new Rust project using
 <a href="https://doc.rust-lang.org/cargo/guide/">Cargo</a>:</p>
-<pre>
-$ cargo new last_names --bin
+<pre>$ cargo new last_names --bin
      Created binary (application) `last_names` project
 $ cd last_names
 $ cargo build
    Compiling last_names v0.1.0 (file:///Users/pat/path/to/last_names)
     Finished dev [unoptimized + debuginfo] target(s) in 7.68 secs
 $ target/debug/last_names
-Hello, world!
-</pre>
+Hello, world!</pre>
 <p>As you can see, Cargo got me started quickly, and I was able to print “Hello
 World” with just a few commands.</p>
 <p>Cargo placed the source code in a Rust file called src/main.rs, which looks
@@ -101,8 +95,7 @@ I added Diesel as a dependency to my Cargo.toml file:</p>
 The Cargo.toml file lists the Rust libraries, or “crates,” that my script will
 use. It plays the same role as the Gemfile does for Ruby projects.</p>
 <p>Then I installed Diesel by running “cargo build” again:</p>
-<pre>
-$ cargo build
+<pre>$ cargo build
     Updating registry `https://github.com/rust-lang/crates.io-index`
  Downloading diesel v1.3.0
  Downloading pq-sys v0.4.5
@@ -112,8 +105,7 @@ etc…
   Compiling diesel_derives v1.3.0
    Compiling diesel v1.3.0
    Compiling last_names v0.1.0 (file:///Users/pat/path/to/last_names)
-    Finished dev [unoptimized + debuginfo] target(s) in 47.30 secs
-</pre>
+    Finished dev [unoptimized + debuginfo] target(s) in 47.30 secs</pre>
 <h2>Connecting to Postgres</h2>
 <p>Ok now I’m ready to start working on my report code, back in main.rs. The first
 thing I need to do is open a connection to Postgres. After that, I can figure
@@ -137,13 +129,11 @@ class="code">Err</span>, <span class="code">expect</span> prints out the given
 error message.</p>
 <p>Assuming my Postgres server is up and running and contains a database called
 “names,” I can now compile, run my Rust script and connect to Postgres:</p>
-<pre>
-$ cargo build
+<pre>$ cargo build
    Compiling last_names v0.1.0 (file:///Users/pat/path/to/last_names)
     Finished dev [unoptimized + debuginfo] target(s) in 0.71 secs
 $ target/debug/last_names
-Connected!
-</pre>
+Connected!</pre>
 <p>Stepping back for a moment, the Ruby and Rust versions of this code are
 actually very similar. However, the Rust version is a bit more complex because
 I have to explicitly handle the possibility that <span
@@ -159,16 +149,14 @@ can also inspect my database columns automatically using the <span
 class="code">infer_schema!</span> macro, but as a beginner I find it easier to
 type this information in explicitly.)</p>
 <p>Fortunately, Diesel provides a command line tool that makes this easy:</p>
-<pre>
-$ diesel print-schema --database-url=postgres://pat@patshaughnessy.net:5432/names --whitelist users
+<pre>$ diesel print-schema --database-url=postgres://pat@patshaughnessy.net:5432/names --whitelist users
 table! {
     users (id) {
         id -> Int4,
         first_name -> Nullable&lt;Varchar>,
         last_name -> Nullable&lt;Varchar>,
     }
-}
-</pre>
+}</pre>
 <p>The diesel tool printed out a series of Rust macros that declare the name of my
 Postgres table, and the names and types of each of the table’s columns. Notice
 that I provided two command line parameters: the Postgres connection string and
@@ -223,8 +211,7 @@ the Rust version has to check for errors explicitly. And both Rust and Ruby use
 last name string contains multiple words or not, by calling <span
 class="code">split</span>.</p>
 <p>I was very excited to try this out, so I ran the Rust compiler:</p>
-<pre>
-$ cargo build
+<pre>$ cargo build
    Compiling last_names v0.1.0 (file:///Users/pat/path/to/last_names)
 
 error[E0277]: the trait bound `*const str:
@@ -251,8 +238,7 @@ error: aborting due to previous error
 
 error: Could not compile `last_names`.
 
-To learn more, run the command again with --verbose.
-</pre>
+To learn more, run the command again with --verbose.</pre>
 <p>Ugh - what happened? I started to realize how difficult error messages from the
 Rust compiler can be to understand, especially for beginners like me.</p>
 <p>And I certainly didn’t want to try the “—verbose” option the Rust compiler
@@ -260,9 +246,7 @@ suggested. This message was already verbose enough!</p>
 <h2>Rust’s Type System Keeps Me Out of Trouble</h2>
 <p>After a while, I realized what the problem was. Reading the error message again
 more carefully, I saw the line:</p>
-<pre>
-diesel::sql_types::Nullable<diesel::sql_types::Text> ...is not satisfied
-</pre>
+<pre>diesel::sql_types::Nullable<diesel::sql_types::Text> ...is not satisfied</pre>
 <p>Ah - the problem must have to do with the <span class="code">Nullable</span>
 macro the Diesel utility generated for me. That indicated that my underlying
 Postgres column allowed null values. At first, I thought maybe I should add
@@ -299,16 +283,13 @@ ownership model, see <a href="https://doc.rust-lang.org/book/second-edition/ch04
 4</a>
 of <em>The Rust Programming Language</em>.</p>
 <p>Finally, I compiled and ran my Rust code, and saw the results I expected:</p>
-<pre>
-$ target/debug/last_names
+<pre>$ target/debug/last_names
 Connected!
 Found 20 users with more than one last name.
-Found 80 users with one last name.
-</pre>
+Found 80 users with one last name.</pre>
 <p>As a test, I tried adding a user with no last name and got the expected results - the
 user with no last name was counted as if they had one:</p>
-<pre>
-$ psql names
+<pre>$ psql names
 psql (9.6.3)
 Type "help" for help.
 names=# INSERT INTO users (first_name, last_name) VALUES ('Bono', NULL);
@@ -318,14 +299,11 @@ names=# \q
 $ target/debug/last_names
 Connected!
 Found 20 users with more than one last name.
-Found 81 users with one last name.
-</pre>
+Found 81 users with one last name.</pre>
 <p>But when I reran my original Ruby code with a null last name, it crashed!</p>
-<pre>
-$ ruby main.rb
+<pre>$ ruby main.rb
 Connected.
-main.rb:18:in `block in \<main\>': undefined method `split' for nil:NilClass (NoMethodError)
-</pre>
+main.rb:18:in `block in \<main\>': undefined method `split' for nil:NilClass (NoMethodError)</pre>
 <img src="https://patshaughnessy.net/assets/2018/6/9/fix-ruby.png"/>
 <p>Rewriting my Ruby code in Rust revealed a bug I never knew I had. As shown
 above, I had to rework my Ruby code to check for a null last name inside the
