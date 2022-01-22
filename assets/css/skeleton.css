@@ -313,6 +313,15 @@ pre > code {
   padding: 1rem 1.5rem;
   white-space: pre; }
 
+span.code {
+  padding: .2rem .5rem;
+  margin: 0 .2rem;
+  font-size: 90%;
+  white-space: nowrap;
+  background: #F1F1F1;
+  border: 1px solid #E1E1E1;
+  border-radius: 4px; }
+
 
 /* Spacing
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -639,10 +648,22 @@ blockquote .content {
   margin-left: 1em;
 }
 
+section.content img.svg {
+  margin-bottom: 10px;
+}
+
+pre {
+  margin-top: 0px;
+}
+
 @media (max-width: 550px) {
   section.content div {
     width: 100%;
     margin-bottom: 20px;
+  }
+
+  section.content img {
+    max-width: 100%;
   }
 
   section.content div img {
