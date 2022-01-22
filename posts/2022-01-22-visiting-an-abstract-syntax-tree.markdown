@@ -3,7 +3,7 @@ date: 2022/01/22
 tag: Crystal
 
 <div style="float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px">
-  <img src="https://patshaughnesy.net/assets/2022/1/22/visit-tree.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2022/1/22/visit-tree.jpg"><br/>
   <i>Joshua Tree National Park
   <small>(via: <a href="https://commons.wikimedia.org/wiki/File:Backpacker_at_Sunset_(22849298523).jpg">Wikimedia Commons</a>)</small>
   </i>
@@ -44,12 +44,12 @@ structure without making a mess.
 The visitor pattern calls for two functions: `accept` and `visit`. First, a
 node in the data structure “accepts” a visitor:
 
-<img class="svg" width="400px" src="https://patshaughnesy.net/assets/2022/1/22/visitor1.svg">
+<img class="svg" width="400px" src="https://patshaughnessy.net/assets/2022/1/22/visitor1.svg">
 
 After accepting a visitor, the node turns around and calls the `visit` method on
 `Visitor`:
 
-<img class="svg" width="400px" src="https://patshaughnesy.net/assets/2022/1/22/visitor2.svg">
+<img class="svg" width="400px" src="https://patshaughnessy.net/assets/2022/1/22/visitor2.svg">
 
 The `visit` method implements whatever algorithm that visitor is interested in.
 
@@ -57,7 +57,7 @@ This seems kind of pointless… why use `accept` at all? We could just call
 `visit` directly. The key is that, after calling the visitor and passing
 itself, the node passes the visitor to each of its children, recursively:
 
-<img class="svg" width="400px" src="https://patshaughnesy.net/assets/2022/1/22/visitor3.svg">
+<img class="svg" width="400px" src="https://patshaughnessy.net/assets/2022/1/22/visitor3.svg">
 
 And then the visitor can visit each of the child nodes also. The `Visitor`
 class doesn’t necessarily need to know anything about how to navigate the node
@@ -72,7 +72,7 @@ certain syntax, records information about the types and objects my code uses or
 possibly even transforms my code into a different form.
 
 <div style="float: right; padding: 8px 0px 0px 30px; text-align: center; line-height:18px">
-  <img src="https://patshaughnesy.net/assets/2022/1/22/angel-oak.jpg"><br/>
+  <img src="https://patshaughnessy.net/assets/2022/1/22/angel-oak.jpg"><br/>
   <i>A photo I took in 2018 of <a href="https://en.wikipedia.org/wiki/Angel_Oak">Angel Oak</a>,<br/> a 400-500 year old tree in South Carolina.</i>
 </div>
 
@@ -107,7 +107,7 @@ arr = [12345, 67890]
 
 As I explained last month, the Crystal parser generates this AST tree fragment:
 
-<img class="svg" width="400px" src="https://patshaughnesy.net/assets/2022/1/22/ast1.svg">
+<img class="svg" width="400px" src="https://patshaughnessy.net/assets/2022/1/22/ast1.svg">
 
 Once the parser is finished and has created this small tree, the Crystal
 compiler steps through it a number of different times, looking for classes,
@@ -170,7 +170,7 @@ with `arr`?
 The `MainVisitor` class starts to process my code by visiting the root node of
 this branch of my AST, the `Assign` node:
 
-<img class="svg" width="375px" src="https://patshaughnesy.net/assets/2022/1/22/visit-assign1.svg">
+<img class="svg" width="375px" src="https://patshaughnessy.net/assets/2022/1/22/visit-assign1.svg">
 
 As you can see, earlier during the parsing phrase Crystal had saved the target
 variable and value of this assign statement in the child AST nodes. The target
@@ -180,7 +180,7 @@ variable, `arr`, appears in the `Var` node, and the value to assign is an
 any other lexical scopes, Crystal saves this variable in a table of variables
 for the top level program:
 
-<img class="svg" width="300px" src="https://patshaughnesy.net/assets/2022/1/22/table.svg">
+<img class="svg" width="300px" src="https://patshaughnessy.net/assets/2022/1/22/table.svg">
 
 Actually, to be more accurate, there will always be many other variables in
 this table along with `arr`. All Crystal programs automatically include the
@@ -197,12 +197,12 @@ Probably the most important function of `MainVisitor` is to assign a type to eac
 value in my program. The simplest example of this is when `MainVisitor` visits a
 `NumberLiteral` node:
 
-<img class="svg" width="300px" src="https://patshaughnesy.net/assets/2022/1/22/visit-number-literal.svg">
+<img class="svg" width="300px" src="https://patshaughnessy.net/assets/2022/1/22/visit-number-literal.svg">
 
 Looking at the size of the numeric value, Crystal determines the type should be
 `Int32`. Crystal then saves this type right inside of the `NumberLiteral` node:
 
-<img class="svg" width="114px" src="https://patshaughnesy.net/assets/2022/1/22/updated-number-literal.svg">
+<img class="svg" width="114px" src="https://patshaughnessy.net/assets/2022/1/22/updated-number-literal.svg">
 
 Strictly speaking, this violates the visitor pattern because the visitors
 shouldn’t be modifying the data structure they visit. But the type of each
@@ -241,24 +241,24 @@ versions of Java or C++ use type inference.
 The Crystal compiler implements type inference when the MainVisitor encounters
 an `Assign` AST node, what we saw above.
 
-<img class="svg" width="375px" src="https://patshaughnesy.net/assets/2022/1/22/visit-assign1.svg">
+<img class="svg" width="375px" src="https://patshaughnessy.net/assets/2022/1/22/visit-assign1.svg">
 
 After encountering the `Assign` node, Crystal recursively processes one of the
 two child nodes, the `ArrayLiteral` value, and its child nodes. When this process
 finishes, Crystal knows the type of the `ArrayLiteral` node is `Array(Int32)`:
 
-<img class="svg" width="425px" src="https://patshaughnesy.net/assets/2022/1/22/set-type.svg">
+<img class="svg" width="425px" src="https://patshaughnessy.net/assets/2022/1/22/set-type.svg">
 
 I’ll take a closer look at how Crystal processes the `ArrayLiteral` node next.
 But for now, once Crystal has the type of the `ArrayLiteral` node it copies that
 type over to the `Var` node and sets its type also:
 
-<img class="svg" width="425px" src="https://patshaughnesy.net/assets/2022/1/22/set-type2.svg">
+<img class="svg" width="425px" src="https://patshaughnessy.net/assets/2022/1/22/set-type2.svg">
 
 But Crystal does something else interesting here: It sets up a dependency
 between the two AST nodes: it “binds” the variable to the value:
 
-<img class="svg" width="325px" src="https://patshaughnesy.net/assets/2022/1/22/bind.svg">
+<img class="svg" width="325px" src="https://patshaughnessy.net/assets/2022/1/22/bind.svg">
 
 This binding dependency allows Crystal to later update the type of the `arr`
 variable whenever necessary. In this case the value `[12345, 67890]` will always
@@ -299,7 +299,7 @@ them.
 
 Crystal achieves this by replacing part of my program’s AST with a new branch:
 
-<img class="svg" width="375px" src="https://patshaughnesy.net/assets/2022/1/22/expanded-ast.svg">
+<img class="svg" width="375px" src="https://patshaughnessy.net/assets/2022/1/22/expanded-ast.svg">
 
 For clarity, I’m not drawing the AST nodes for the inner assign operations,
 only the first line:
@@ -314,12 +314,12 @@ With this new, updated AST we can see exactly how Crystal determines the type
 of my variable `arr`. Starting at the root of my AST, `MainVisitor` visits all of
 the AST nodes in this order in a series of recursive calls:
 
-<img class="svg" width="114px" src="https://patshaughnesy.net/assets/2022/1/22/call-recurse.svg">
+<img class="svg" width="114px" src="https://patshaughnessy.net/assets/2022/1/22/call-recurse.svg">
 
 And it determines the types of each of these nodes as it returns from the
 recursive calls:
 
-<img class="svg" width="240px" src="https://patshaughnesy.net/assets/2022/1/22/return-recurse.svg">
+<img class="svg" width="240px" src="https://patshaughnessy.net/assets/2022/1/22/return-recurse.svg">
 
 Some interesting details here that I don’t understand completely or have space
 to explain here:

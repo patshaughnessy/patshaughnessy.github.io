@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2022-01-22T16:07:34Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Visiting an Abstract Syntax Tree</title><link href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></link><id href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></id><published>2022-01-22T00:00:00Z</published><updated>2022-01-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnesy.net/assets/2022/1/22/visit-tree.jpg&quot;&gt;&lt;br/&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2022-01-22T16:22:57Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Visiting an Abstract Syntax Tree</title><link href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></link><id href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></id><published>2022-01-22T00:00:00Z</published><updated>2022-01-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2022/1/22/visit-tree.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Joshua Tree National Park
   &lt;small&gt;(via: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Backpacker_at_Sunset_(22849298523).jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;
   &lt;/i&gt;
 &lt;/div&gt;
-&lt;p&gt;In my &lt;a href=&quot;https://patshaughnessy.net/2021/12</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnesy.net/assets/2022/1/22/visit-tree.jpg&quot;&gt;&lt;br/&gt;
+&lt;p&gt;In my &lt;a href=&quot;https://patshaughnessy.net/2021/1</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2022/1/22/visit-tree.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Joshua Tree National Park
   &lt;small&gt;(via: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Backpacker_at_Sunset_(22849298523).jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;
   &lt;/i&gt;
@@ -37,15 +37,15 @@ compilers and other programs to run multiple algorithms on the same data
 structure without making a mess.&lt;/p&gt;
 &lt;p&gt;The visitor pattern calls for two functions: &lt;code&gt;accept&lt;/code&gt; and &lt;code&gt;visit&lt;/code&gt;. First, a
 node in the data structure “accepts” a visitor:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;400px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/visitor1.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;400px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/visitor1.svg&quot;&gt;
 &lt;p&gt;After accepting a visitor, the node turns around and calls the &lt;code&gt;visit&lt;/code&gt; method on
 &lt;code&gt;Visitor&lt;/code&gt;:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;400px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/visitor2.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;400px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/visitor2.svg&quot;&gt;
 &lt;p&gt;The &lt;code&gt;visit&lt;/code&gt; method implements whatever algorithm that visitor is interested in.&lt;/p&gt;
 &lt;p&gt;This seems kind of pointless… why use &lt;code&gt;accept&lt;/code&gt; at all? We could just call
 &lt;code&gt;visit&lt;/code&gt; directly. The key is that, after calling the visitor and passing
 itself, the node passes the visitor to each of its children, recursively:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;400px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/visitor3.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;400px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/visitor3.svg&quot;&gt;
 &lt;p&gt;And then the visitor can visit each of the child nodes also. The &lt;code&gt;Visitor&lt;/code&gt;
 class doesn’t necessarily need to know anything about how to navigate the node
 data structure. And more and more visitor classes can implement new algorithms
@@ -56,7 +56,7 @@ AST over and over again using different visitors. Each algorithm looks for
 certain syntax, records information about the types and objects my code uses or
 possibly even transforms my code into a different form.&lt;/p&gt;
 &lt;div style=&quot;float: right; padding: 8px 0px 0px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnesy.net/assets/2022/1/22/angel-oak.jpg&quot;&gt;&lt;br/&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2022/1/22/angel-oak.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;A photo I took in 2018 of &lt;a href=&quot;https://en.wikipedia.org/wiki/Angel_Oak&quot;&gt;Angel Oak&lt;/a&gt;,&lt;br/&gt; a 400-500 year old tree in South Carolina.&lt;/i&gt;
 &lt;/div&gt;
 &lt;p&gt;Crystal implements the basics of the visitor pattern in
@@ -83,7 +83,7 @@ at one line of code from my last post:&lt;/p&gt;
 &lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]&lt;/span&gt;&lt;/pre&gt;
 
 &lt;p&gt;As I explained last month, the Crystal parser generates this AST tree fragment:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;400px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/ast1.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;400px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/ast1.svg&quot;&gt;
 &lt;p&gt;Once the parser is finished and has created this small tree, the Crystal
 compiler steps through it a number of different times, looking for classes,
 variables, type declarations, etc. Each of these passes through the AST is
@@ -134,7 +134,7 @@ semantic analysis.&lt;/p&gt;
 with &lt;code&gt;arr&lt;/code&gt;?&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;MainVisitor&lt;/code&gt; class starts to process my code by visiting the root node of
 this branch of my AST, the &lt;code&gt;Assign&lt;/code&gt; node:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;375px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/visit-assign1.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;375px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/visit-assign1.svg&quot;&gt;
 &lt;p&gt;As you can see, earlier during the parsing phrase Crystal had saved the target
 variable and value of this assign statement in the child AST nodes. The target
 variable, &lt;code&gt;arr&lt;/code&gt;, appears in the &lt;code&gt;Var&lt;/code&gt; node, and the value to assign is an
@@ -142,7 +142,7 @@ variable, &lt;code&gt;arr&lt;/code&gt;, appears in the &lt;code&gt;Var&lt;/code&
 &lt;code&gt;arr&lt;/code&gt;, in the current lexical scope. Since my program has no classes, methods or
 any other lexical scopes, Crystal saves this variable in a table of variables
 for the top level program:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;300px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/table.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;300px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/table.svg&quot;&gt;
 &lt;p&gt;Actually, to be more accurate, there will always be many other variables in
 this table along with &lt;code&gt;arr&lt;/code&gt;. All Crystal programs automatically include the
 standard library, so Crystal also saves all of the top level variables from the
@@ -154,10 +154,10 @@ variable in the corresponding table.&lt;/p&gt;
 &lt;p&gt;Probably the most important function of &lt;code&gt;MainVisitor&lt;/code&gt; is to assign a type to each
 value in my program. The simplest example of this is when &lt;code&gt;MainVisitor&lt;/code&gt; visits a
 &lt;code&gt;NumberLiteral&lt;/code&gt; node:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;300px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/visit-number-literal.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;300px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/visit-number-literal.svg&quot;&gt;
 &lt;p&gt;Looking at the size of the numeric value, Crystal determines the type should be
 &lt;code&gt;Int32&lt;/code&gt;. Crystal then saves this type right inside of the &lt;code&gt;NumberLiteral&lt;/code&gt; node:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;114px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/updated-number-literal.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;114px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/updated-number-literal.svg&quot;&gt;
 &lt;p&gt;Strictly speaking, this violates the visitor pattern because the visitors
 shouldn’t be modifying the data structure they visit. But the type of each
 node, the type of each programming construct in my program, is really an
@@ -186,18 +186,18 @@ Julia, Kotlin, etc., use type inference in the same way as Crystal. Even newer
 versions of Java or C++ use type inference.&lt;/p&gt;
 &lt;p&gt;The Crystal compiler implements type inference when the MainVisitor encounters
 an &lt;code&gt;Assign&lt;/code&gt; AST node, what we saw above.&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;375px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/visit-assign1.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;375px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/visit-assign1.svg&quot;&gt;
 &lt;p&gt;After encountering the &lt;code&gt;Assign&lt;/code&gt; node, Crystal recursively processes one of the
 two child nodes, the &lt;code&gt;ArrayLiteral&lt;/code&gt; value, and its child nodes. When this process
 finishes, Crystal knows the type of the &lt;code&gt;ArrayLiteral&lt;/code&gt; node is &lt;code&gt;Array(Int32)&lt;/code&gt;:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;425px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/set-type.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;425px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/set-type.svg&quot;&gt;
 &lt;p&gt;I’ll take a closer look at how Crystal processes the &lt;code&gt;ArrayLiteral&lt;/code&gt; node next.
 But for now, once Crystal has the type of the &lt;code&gt;ArrayLiteral&lt;/code&gt; node it copies that
 type over to the &lt;code&gt;Var&lt;/code&gt; node and sets its type also:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;425px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/set-type2.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;425px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/set-type2.svg&quot;&gt;
 &lt;p&gt;But Crystal does something else interesting here: It sets up a dependency
 between the two AST nodes: it “binds” the variable to the value:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;325px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/bind.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;325px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/bind.svg&quot;&gt;
 &lt;p&gt;This binding dependency allows Crystal to later update the type of the &lt;code&gt;arr&lt;/code&gt;
 variable whenever necessary. In this case the value &lt;code&gt;[12345, 67890]&lt;/code&gt; will always
 have the same type, but I suspect that sometimes the Crystal compiler can
@@ -230,7 +230,7 @@ types inside a union type) found in the given set of values, in this case just
 &lt;code&gt;Int32&lt;/code&gt;. Later Crystal sets the two elements in the array just by assigning
 them.&lt;/p&gt;
 &lt;p&gt;Crystal achieves this by replacing part of my program’s AST with a new branch:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;375px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/expanded-ast.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;375px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/expanded-ast.svg&quot;&gt;
 &lt;p&gt;For clarity, I’m not drawing the AST nodes for the inner assign operations,
 only the first line:&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
@@ -240,10 +240,10 @@ only the first line:&lt;/p&gt;
 &lt;p&gt;With this new, updated AST we can see exactly how Crystal determines the type
 of my variable &lt;code&gt;arr&lt;/code&gt;. Starting at the root of my AST, &lt;code&gt;MainVisitor&lt;/code&gt; visits all of
 the AST nodes in this order in a series of recursive calls:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;114px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/call-recurse.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;114px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/call-recurse.svg&quot;&gt;
 &lt;p&gt;And it determines the types of each of these nodes as it returns from the
 recursive calls:&lt;/p&gt;
-&lt;img class=&quot;svg&quot; width=&quot;240px&quot; src=&quot;https://patshaughnesy.net/assets/2022/1/22/return-recurse.svg&quot;&gt;
+&lt;img class=&quot;svg&quot; width=&quot;240px&quot; src=&quot;https://patshaughnessy.net/assets/2022/1/22/return-recurse.svg&quot;&gt;
 &lt;p&gt;Some interesting details here that I don’t understand completely or have space
 to explain here:&lt;/p&gt;
 &lt;ul&gt;
