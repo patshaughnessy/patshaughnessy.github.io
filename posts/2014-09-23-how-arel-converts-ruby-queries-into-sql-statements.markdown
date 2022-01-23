@@ -7,14 +7,17 @@ tag: Ruby
   <i>In one of the climactic scenes in <a href="http://en.wikipedia.org/wiki/Twenty_Thousand_Leagues_Under_the_Sea">20,000 Leagues Under the<br/>Sea</a>, Captain Nemo and his crew battle a giant octopus.</i>
 </div>
 
+<p>
 <b>
-This is the second of a series of four posts based on a presentation I did at the
-[Barcelona Ruby Conference](http://www.baruco.org) called “20,000 Leagues Under
-ActiveRecord.” (posts:
-[one](https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
-[three](https://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals)
-[four](https://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes)
-and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).</b>
+This is the second of a series of four posts based on a presentation I did at
+the Barcelona Ruby Conference called “20,000 Leagues Under ActiveRecord.”
+(posts:
+<a href="https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">one</a>
+<a href="https://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals">three</a>
+<a href="https://patshaughnessy.net/2014/11/11/discovering-the-computer-science-behind-postgres-indexes">four</a> and 
+<a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4">video</a>).
+</b>
+</p>
 
 I took an innocent and unsuspecting audience on an adventure
 inside and underneath ActiveRecord to find out how Rails and PostgreSQL

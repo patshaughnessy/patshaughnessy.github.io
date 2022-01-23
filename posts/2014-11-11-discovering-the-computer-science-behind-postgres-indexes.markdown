@@ -7,13 +7,16 @@ tag: Postgres
   <i> Captain Nemo and Professor Aronnax discussing the<br/>engineering and science behind
   the Nautilus.</i> </div>
 
-<b> This is the last post in a series based on a
-  presentation I did at the [Barcelona Ruby Conference](http://www.baruco.org)
-  called “20,000 Leagues Under ActiveRecord.” (other posts:
-  [one](https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord)
-  [two](https://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements)
-  [three](https://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals)
-  and [video](https://www.youtube.com/watch?v=rnLnRPZZ1Q4)).  </b>
+<p>
+<b>
+This is the last post in a series based on a presentation I did at the
+Barcelona Ruby Conference called “20,000 Leagues Under ActiveRecord.” (posts:
+<a href="https://patshaughnessy.net/2014/9/17/20000-leagues-under-activerecord">one</a>
+<a href="https://patshaughnessy.net/2014/9/23/how-arel-converts-ruby-queries-into-sql-statements">two</a>
+<a href="https://patshaughnessy.net/2014/10/13/following-a-select-statement-through-postgres-internals">three</a> and
+<a href="https://www.youtube.com/watch?v=rnLnRPZZ1Q4">video</a>).
+</b>
+</p>
 
 We all know indexes are one of the most powerful and important features of
 relational database servers. How do you search for a value quickly? Create an
