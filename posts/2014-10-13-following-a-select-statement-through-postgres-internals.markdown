@@ -37,6 +37,8 @@ internally by following me on a journey deep inside a tool you use everyday.
 
 <div style="clear: left"></div>
 
+<p/>
+
 ## Finding Captain Nemo
 
 Here’s the example query from [the first half of my
