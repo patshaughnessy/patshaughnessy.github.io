@@ -271,7 +271,7 @@ Fortunately, my function’s assembly language code only uses a few registers. I
 don’t need to understand them all.
 
 <div style="padding: 30px 0px 30px 0px; text-align: center; line-height:16px">
-<img src="https://patshaughnessy.net/assets/2016/11/26/registers.svg"/>
+<img width="100%" src="https://patshaughnessy.net/assets/2016/11/26/registers.svg"/>
 <i>Registers available in the x86 instruction set<br/>
 	<small>(source: <a href="https://commons.wikimedia.org/wiki/File:Table_of_x86_Registers_svg.svg">Immae via Wikimedia Commons</a>)</small></i>
 </div>
