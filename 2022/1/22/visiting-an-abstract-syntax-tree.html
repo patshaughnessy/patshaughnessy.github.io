@@ -201,6 +201,10 @@ any dependent values. I also suspect Crystal uses these type dependency
 connections to produce error messages whenever you pass an incorrect type to
 some function, for example. These are just guesses, however; if anyone from the
 Crystal team knows exactly what these type bindings are used for let me know.</p>
+<p><b>Update:</b> Ary Borenszweig explained that sometimes the Crystal compiler
+updates the type of variables based on how they are used. He posted an
+interesting example on <a href="https://forum.crystal-lang.org/t/visiting-an-abstract-syntax-tree/4304">The Crystal Programming Language
+Forum</a>.</p>
 <h2>Expanding an Array Literal</h2>
 <p>So far we’ve seen Crystal set the type of the <code>NumberLiteral</code> node to <code>Int32</code>,
 and we’ve seen Crystal assign <code>arr</code> a type of <code>Array(Int32)</code>. But how did Crystal

@@ -270,6 +270,11 @@ connections to produce error messages whenever you pass an incorrect type to
 some function, for example. These are just guesses, however; if anyone from the
 Crystal team knows exactly what these type bindings are used for let me know.
 
+<b>Update:</b> Ary Borenszweig explained that sometimes the Crystal compiler
+updates the type of variables based on how they are used. He posted an
+interesting example on [The Crystal Programming Language
+Forum](https://forum.crystal-lang.org/t/visiting-an-abstract-syntax-tree/4304).
+
 ## Expanding an Array Literal
 
 So far we’ve seen Crystal set the type of the `NumberLiteral` node to `Int32`,

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2022-01-22T16:22:57Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Visiting an Abstract Syntax Tree</title><link href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></link><id href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></id><published>2022-01-22T00:00:00Z</published><updated>2022-01-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2022-01-26T01:03:06Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Visiting an Abstract Syntax Tree</title><link href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></link><id href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></id><published>2022-01-22T00:00:00Z</published><updated>2022-01-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;https://patshaughnessy.net/assets/2022/1/22/visit-tree.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Joshua Tree National Park
   &lt;small&gt;(via: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Backpacker_at_Sunset_(22849298523).jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;
@@ -207,6 +207,10 @@ any dependent values. I also suspect Crystal uses these type dependency
 connections to produce error messages whenever you pass an incorrect type to
 some function, for example. These are just guesses, however; if anyone from the
 Crystal team knows exactly what these type bindings are used for let me know.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;Update:&lt;/b&gt; Ary Borenszweig explained that sometimes the Crystal compiler
+updates the type of variables based on how they are used. He posted an
+interesting example on &lt;a href=&quot;https://forum.crystal-lang.org/t/visiting-an-abstract-syntax-tree/4304&quot;&gt;The Crystal Programming Language
+Forum&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Expanding an Array Literal&lt;/h2&gt;
 &lt;p&gt;So far we’ve seen Crystal set the type of the &lt;code&gt;NumberLiteral&lt;/code&gt; node to &lt;code&gt;Int32&lt;/code&gt;,
 and we’ve seen Crystal assign &lt;code&gt;arr&lt;/code&gt; a type of &lt;code&gt;Array(Int32)&lt;/code&gt;. But how did Crystal
