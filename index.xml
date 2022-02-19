@@ -1,4 +1,328 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2022-01-26T01:03:06Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Visiting an Abstract Syntax Tree</title><link href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></link><id href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></id><published>2022-01-22T00:00:00Z</published><updated>2022-01-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2022-02-19T18:22:06Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>LLVM IR: The Esperanto of Computer Languages</title><link href="https://patshaughnessy.net/2022/2/19/llvm-ir-the-esperanto-of-computer-languages" rel="alternate"></link><id href="https://patshaughnessy.net/2022/2/19/llvm-ir-the-esperanto-of-computer-languages" rel="alternate"></id><published>2022-02-19T00:00:00Z</published><updated>2022-02-19T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2022/2/19/esperanto.png&quot;&gt;&lt;br/&gt;
+  &lt;i&gt; Esperanto grammar is logical and self&lt;br/&gt;
+consistent, designed to be easy to learn. &lt;br/&gt;
+  &lt;small&gt; &lt;a title=&quot;Renatoeo, CC BY-SA 4.0 &amp;lt;https://creativecommons.org/licenses/by-sa/4.0&amp;gt;, via Wikimedia Commons&quot; href=&quot;https:/</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+  &lt;img src=&quot;https://patshaughnessy.net/assets/2022/2/19/esperanto.png&quot;&gt;&lt;br/&gt;
+  &lt;i&gt; Esperanto grammar is logical and self&lt;br/&gt;
+consistent, designed to be easy to learn. &lt;br/&gt;
+  &lt;small&gt; &lt;a title=&quot;Renatoeo, CC BY-SA 4.0 &amp;lt;https://creativecommons.org/licenses/by-sa/4.0&amp;gt;, via Wikimedia Commons&quot; href=&quot;https://commons.wikimedia.org/wiki/File:CARD_GRAM%C3%81TICA_ESPERANTO.png&quot;&gt;via Wikimedia Commons&lt;/a&gt;&lt;/small&gt; &lt;/i&gt;
+&lt;/div&gt;
+&lt;p&gt;I empathize for people who have to learn English as a foreign language. English
+grammar is inconsistent, arbitrary and hard to master. English spelling is even
+worse. I sometimes find myself apologizing for my language’s shortcomings. But
+learning any foreign language as an adult is very difficult.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Esperanto&quot;&gt;Esperanto&lt;/a&gt;, an “artificial language,”
+is different. Invented by Ludwik Zamenhof in 1873, Esperanto has a vocabulary
+and grammar that are logical and consistent, designed to be easier to learn.
+Zamenhof intended Esperanto to become the universal second language.&lt;/p&gt;
+&lt;p&gt;Computers have to learn foreign languages too. Every time you compile and run
+a program, your compiler translates your code into a foreign language: the
+native machine language that runs on your target platform. Compilers should
+have been called translators. And compilers struggle with the same things we
+do: inconsistent grammar and vocabulary, and other peculiarities of the target
+platform.&lt;/p&gt;
+&lt;p&gt;Recently, however, more and more compilers translate your code to an
+artificial machine language. They produce a simpler, more consistent, more
+powerful machine language that doesn’t actually run on any machine. This
+artificial machine language, LLVM IR, makes writing compilers simpler and
+reading the code compilers produce simpler too.&lt;/p&gt;
+&lt;p&gt;LLVM IR is becoming the universal second language for compilers.&lt;/p&gt;
+&lt;h2&gt;One Line of LLVM IR&lt;/h2&gt;
+&lt;p&gt;The &lt;a href=&quot;https://llvm.org&quot;&gt;Low Level Virtual Machine&lt;/a&gt; (LLVM) project had the novel
+idea of inventing a virtual machine that was easy for compiler engineers to use
+as a target platform. The LLVM team designed a special instruction set called
+&lt;a href=&quot;https://llvm.org/docs/LangRef.html&quot;&gt;intermediate representation&lt;/a&gt; (IR). New,
+modern languages such as Rust, Swift, Clang-based versions of C and many
+others, first translate your code to LLVM IR. Then they use the LLVM framework
+to convert the IR into actual machine language for any target platform LLVM
+supports:&lt;/p&gt;
+&lt;img style=&quot;width: 500px; margin-bottom: 20px&quot; src=&quot;https://patshaughnessy.net/assets/2022/2/19/platforms.svg&quot;&gt;
+&lt;p&gt;LLVM is great for compilers. Compiler engineers don’t have to worry about the
+detailed instruction set of each platform, and LLVM optimizes your code for
+whatever platform you choose automatically. And LLVM is also great for people
+like me who are interested in what machine language instructions look like and
+how CPUs execute them. LLVM instructions are much easier to follow than real
+machine instructions. Let’s take a look at one!&lt;/p&gt;
+&lt;p&gt;Here’s a line of LLVM IR I generated from a simple
+&lt;a href=&quot;https://crystal-lang.org&quot;&gt;Crystal&lt;/a&gt; program:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;%57 = call %&quot;Array(Int32)&quot;* @&quot;*Array(Int32)@Array(T)::unsafe_build&lt;Int32&gt;:Array(Int32)&quot;(i32 610, i32 2), !dbg !89&lt;/pre&gt;
+&lt;p&gt;Wait a minute! This isn’t simple or easy to follow at all! What am I talking
+about here? At first glance, this does look confusing. But as we’ll see, most
+of the confusing syntax is related to Crystal, not LLVM. Studying this line of
+code will reveal more about Crystal than it will about LLVM.&lt;/p&gt;
+&lt;p&gt;The rest of this article will unpack and explain what this line of code means.
+It looks complex, but is actually quite simple.&lt;/p&gt;
+&lt;h2&gt;The Call Instruction&lt;/h2&gt;
+&lt;p&gt;The instruction above is a function call in LLVM IR. To produce this code, I
+wrote a small Crystal program and then translated it using this command:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;$ crystal build array_example.cr --emit llvm-ir&lt;/pre&gt;
+&lt;p&gt;The &lt;code&gt;--emit&lt;/code&gt; option directed Crystal to generate a file called array_example.ll,
+which contains the line above along with thousands of other lines. We’ll get to
+the Crystal code in a minute. But for now, how do I get started understanding
+what the LLVM code means?&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;https://llvm.org/docs/LangRef.html&quot;&gt;LLVM Language Reference Manual&lt;/a&gt; has
+documentation for &lt;code&gt;call&lt;/code&gt; and all of the other LLVM IR instructions. Here’s the
+syntax for &lt;code&gt;call&lt;/code&gt;:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;&amp;lt;result&gt; = [tail | musttail | notail ] call [fast-math flags] [cconv] [ret attrs] [addrspace(&amp;lt;num&gt;)]
+         &amp;lt;ty&gt;|&amp;lt;fnty&gt; &amp;lt;fnptrval&gt;(&amp;lt;function args&gt;) [fn attrs] [ operand bundles ]&lt;/pre&gt;
+&lt;p&gt;My example &lt;code&gt;call&lt;/code&gt; instruction doesn’t use many of these options. Removing the
+unused options, I can see the actual, basic syntax of &lt;code&gt;call&lt;/code&gt;:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;&amp;lt;result&gt; = call &amp;lt;ty&gt; &amp;lt;fnptrval&gt;(&amp;lt;function args&gt;)&lt;/pre&gt;
+&lt;p&gt;In order from left to right, these values are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;&amp;lt;result&amp;gt;&lt;/code&gt; which register to save the result in&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;&amp;lt;ty&amp;gt;&lt;/code&gt; the type of the return value&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;&amp;lt;fnptrval&amp;gt;&lt;/code&gt; a pointer to the function to call&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;&amp;lt;function args&amp;gt;&lt;/code&gt; the arguments to pass to that function&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;What does all of this mean, exactly? Let’s find out!&lt;/p&gt;
+&lt;h2&gt;A CPU With Infinite Registers&lt;/h2&gt;
+&lt;p&gt;Starting on the left and moving right, let’s step through the &lt;code&gt;call&lt;/code&gt; instruction:&lt;/p&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2022/2/19/result.svg&quot;&gt;
+&lt;p&gt;The token &lt;code&gt;%57&lt;/code&gt; to the left of the equals sign tells LLVM where to save the
+return value of the function call that follows. This isn’t a normal variable;
+&lt;code&gt;%57&lt;/code&gt; is an LLVM “register.”&lt;/p&gt;
+&lt;p&gt;Registers are physical circuits located on microprocessor chips used to save
+intermediate values. Saving a value in a CPU register is much faster than
+saving a value in memory, since the register is located on the same chip as the
+rest of the microprocessor. Saving a value in RAM memory, on the other hand,
+requires transmitting that value from one chip to another and is much slower,
+relatively speaking. Unfortunately, each CPU has a limited number of registers
+available, and so compilers have to decide which values are used frequently
+enough to warrant saving in nearby registers, and which other values can be
+moved out to more distant memory.&lt;/p&gt;
+&lt;p&gt;Unlike the limited number of registers available on a real CPU, the imaginary
+LLVM microprocessor has an infinite number of them. Because of this, compilers
+that target LLVM can simply save values to a register whenever they would like.
+There’s no need to find an available register, or to move an existing value out
+of a register first before using it for something else. Busy work that normal
+machine language code can’t avoid.&lt;/p&gt;
+&lt;p&gt;In this program, the Crystal compiler had already saved 56 other values in
+“registers” and so for this line of LLVM IR, Crystal simply used the next
+register, number 57.&lt;/p&gt;
+&lt;h2&gt;LLVM Structure Types&lt;/h2&gt;
+&lt;p&gt;Moving left to right, LLVM &lt;code&gt;call&lt;/code&gt; instructions next indicate the type of the
+function call’s return value:&lt;/p&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2022/2/19/type.svg&quot;&gt;
+&lt;p&gt;This name of this type, &lt;code&gt;Array(Int32)&lt;/code&gt;, is generated by the Crystal compiler, not
+by LLVM. That is, this is a type from my Crystal program. It could have been
+anything, and indeed other compilers that target LLVM will generate completely
+different type names.&lt;/p&gt;
+&lt;p&gt;The example Crystal program I used to generate this LLVM code was:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;When I compiled this program, Crystal generated the &lt;code&gt;call&lt;/code&gt; instruction above,
+which returns a pointer to the new array, &lt;code&gt;arr&lt;/code&gt;. Since &lt;code&gt;arr&lt;/code&gt; is an array
+containing integers, Crystal uses a generic type &lt;code&gt;Array(Int32).&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Machine languages that target real machines only support hardware types that
+machine supports.  For example, Intel x86 assembly language allows you to save
+integers of different widths, 16, 32 or 64 bits for example, and an Intel x86
+CPU has registers designed to hold values of each of these sizes.&lt;/p&gt;
+&lt;p&gt;LLVM IR is more powerful. It supports “structure types,” similar to a C
+structure or an object in a language like Crystal or Swift. Here the &lt;code&gt;%&amp;quot;…&amp;quot;&lt;/code&gt;
+syntax indicates the name inside the quotes is the name of a structure type.
+And the asterisk which follows, like in C, indicates the type of the return
+value of my function call is a pointer to this structure.&lt;/p&gt;
+&lt;p&gt;My example LLVM program defines the type &lt;code&gt;Array(Int32)&lt;/code&gt; like this:&lt;/p&gt;
+&lt;pre type=&quot;console&quot;&gt;%&quot;Array(Int32)&quot; = type { i32, i32, i32, i32, i32* }&lt;/pre&gt;
+&lt;p&gt;Structure types allow LLVM IR programs to create pointers to structures or
+objects, and to access any of the values inside each object. That makes writing
+a compiler much easier. In my example, the call instruction returns a pointer
+to an object which contains 4 32-bit integer values, followed by a pointer to
+other 32 integer values. But what are all of these integer values? Above I said
+this function call was returning a new array - how can that be the case?&lt;/p&gt;
+&lt;p&gt;LLVM itself has no idea, and no opinion on the matter. To understand what these
+values are, and what they have to do with the array in my program, we need to
+learn more about the Crystal compiler that generated this LLVM IR code.&lt;/p&gt;
+&lt;p&gt;Reading the &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr#L48&quot;&gt;Crystal standard
+library&lt;/a&gt;,
+we can see Crystal implements arrays like this:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#a71d5d;&quot;&gt;class &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Array&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(T)
+&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;include &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Indexable&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;::Mutable(T)
+&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;include &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Comparable(Array)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Size of an Array that we consider small to do linear scans or other optimizations.
+&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;private &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;SMALL_ARRAY_SIZE &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;16 
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The size of this array.
+&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Int32
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The capacity of `@buffer`.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Note that, because `@buffer` moves on shift, the actual
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# capacity (the allocated memory) starts at `@buffer - @offset_to_buffer`.
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The actual capacity is also given by the `remaining_capacity` internal method.
+&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;capacity &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Int32
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Offset to the buffer that was originally allocated, and which needs to
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# be reallocated on resize. On shift this value gets increased, together with
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# `@buffer`. To reach the root buffer you have to do `@buffer - @offset_to_buffer`,
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# and this is also provided by the `root_buffer` internal method.
+&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;offset_to_buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Int32 &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The buffer where elements start.
+&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Pointer(T)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# In 64 bits the Array is composed then by:
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# - type_id            : Int32   # 4 bytes -|
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# - size               : Int32   # 4 bytes  |- packed as 8 bytes
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# - capacity           : Int32   # 4 bytes -|
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# - offset_to_buffer   : Int32   # 4 bytes  |- packed as 8 bytes
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# - buffer             : Pointer # 8 bytes  |- another 8 bytes&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;The comments above are very illustrative and complete - the Crystal team took
+the time to document their standard library and explain not only how to use
+each class, like &lt;code&gt;Array(T)&lt;/code&gt;, but how they are implemented internally.&lt;/p&gt;
+&lt;p&gt;In this case, we can see the four &lt;code&gt;i32&lt;/code&gt; values inside the &lt;code&gt;Array(Int32)&lt;/code&gt; LLVM
+structure type hold the size and capacity off the array, among other things.
+And the &lt;code&gt;i32*&lt;/code&gt; value is a pointer to the actual contents of the array.&lt;/p&gt;
+&lt;h2&gt;Functions&lt;/h2&gt;
+&lt;p&gt;The target of the call instruction appears next, after the return type:&lt;/p&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2022/2/19/function.svg&quot;&gt;
+&lt;p&gt;This is quite a mouthful! What sort of function is this?&lt;/p&gt;
+&lt;p&gt;There are two steps to understanding this: First, the &lt;code&gt;@&amp;quot;…&amp;quot;&lt;/code&gt; syntax. This is
+simply a global identifier in this LLVM program. So my &lt;code&gt;call&lt;/code&gt; instruction is just
+calling a global function. In LLVM programs, all functions are global; there is
+no concept of a class, module or similar groupings of code.&lt;/p&gt;
+&lt;p&gt;But what in the world does that crazy identifier mean?&lt;/p&gt;
+&lt;p&gt;LLVM ignores this complex name. For LLVM this is just a name like &lt;code&gt;foo&lt;/code&gt; or &lt;code&gt;bar&lt;/code&gt;.
+But for Crystal, the name has much more significance. Crystal encoded a lot of
+information into this one name. Crystal can do this because the LLVM code isn’t
+intended for anyone to read directly. Crystal has created a “mangled name,”
+meaning the original version of the function to call is there but it’s been
+mangled or rewritten in a confusing manner.&lt;/p&gt;
+&lt;p&gt;Crystal rewrites function names to ensure they are unique. In Crystal, like in
+many other statically typed languages, functions with different argument types
+or return value types are actually different functions. So in Crystal if I
+write:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;foo&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(a : Int32)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Int: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#{a}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;foo&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(a : String)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;String: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#{a}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;foo(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;123&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#=&amp;gt; Int: 123
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;foo(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;123&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#=&amp;gt; String: 123&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;…I have two separate, different functions both called &lt;code&gt;foo&lt;/code&gt;. The type of the
+parameter &lt;code&gt;a&lt;/code&gt; distinguishes one from the other.&lt;/p&gt;
+&lt;p&gt;Crystal generates unique function names by encoding the arguments, return value
+and type of the receiver into the into the function name string, making it
+quite complex. Let’s break it down:&lt;/p&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2022/2/19/mangled.svg&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Array(Int32)@Array(T)&lt;/code&gt; - this is the type of the receiver. That means the
+&lt;code&gt;unsafe_build&lt;/code&gt; function is actually a method on the &lt;code&gt;Array(T)&lt;/code&gt; generic class.
+And in this case, the receiver is an array holding 32 bit integers, the
+&lt;code&gt;Array(Int32)&lt;/code&gt; class. Crystal includes both names in the mangled function name.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;unsafe_build&lt;/code&gt; - this is the function Crystal is calling.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Int32&lt;/code&gt; - these are the function’s parameter types. In this case, Crystal is
+passing in a single integer, so we just see one &lt;code&gt;Int32&lt;/code&gt; type.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Array(Int32)&lt;/code&gt; - this is the return value type, a new array containing integers.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As I discussed in &lt;a href=&quot;https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree&quot;&gt;my last
+post&lt;/a&gt;,
+the Crystal compiler internally rewrites my array literal expression &lt;code&gt;[12345, 67890]&lt;/code&gt; into code that creates and initializes a new array object:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;__temp_621 &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;::Array(typeof(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)).unsafe_build(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;__temp_622 &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; __temp_621.to_unsafe
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;__temp_622[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;__temp_622[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;__temp_621&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;In this expanded code, Crystal calls &lt;code&gt;unsafe_build&lt;/code&gt; and passes in &lt;code&gt;2&lt;/code&gt;, the
+required capacity of the new array. And to distinguish this use of
+&lt;code&gt;unsafe_build&lt;/code&gt; from other &lt;code&gt;unsafe_build&lt;/code&gt; functions that might exist in my
+program, the compiler generated the mangled name we see above. &lt;/p&gt;
+&lt;h2&gt;Arguments&lt;/h2&gt;
+&lt;p&gt;Finally, after the function name the LLVM IR instruction shows the arguments
+for the function call:&lt;/p&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2022/2/19/args.svg&quot;&gt;
+&lt;p&gt;LLVM IR uses parentheses, like most languages, to enclose the arguments to a
+function call. And the types precede each value: &lt;code&gt;610&lt;/code&gt; is a 32-bit integer and
+&lt;code&gt;2&lt;/code&gt; is also a 32-bit integer.&lt;/p&gt;
+&lt;p&gt;But wait a minute! We saw just above the expanded Crystal code for generating
+the array literal passes a single value, &lt;code&gt;2&lt;/code&gt;, into the call to &lt;code&gt;unsafe_build&lt;/code&gt;.
+And looking at the mangled function name above, we also see there is a single
+&lt;code&gt;i32&lt;/code&gt; parameter to the function call.&lt;/p&gt;
+&lt;p&gt;But reading the LLVM IR code we can see a second value is also passed in:
+&lt;code&gt;610&lt;/code&gt;. What in the world does &lt;code&gt;610&lt;/code&gt; mean? I don’t have 610 elements in my new
+array, and 610 is not one of the array elements. So what is going on here?&lt;/p&gt;
+&lt;p&gt;Crystal is an object oriented language, meaning that each function is
+optionally associated with a class. In OOP parlance, we say that we are
+“sending a message” to a “receiver.” In this case, &lt;code&gt;unsafe_build&lt;/code&gt; is the message,
+and &lt;code&gt;::Array(typeof(12345, 67890))&lt;/code&gt; is the receiver. In fact, this function is
+really a class method. We are calling &lt;code&gt;unsafe_build&lt;/code&gt; on the &lt;code&gt;Array(Int32)&lt;/code&gt; class,
+not on an instance of one array.&lt;/p&gt;
+&lt;p&gt;Regardless, LLVM IR does’t support classes or instance methods or class
+methods. In LLVM IR, we only have simple, global functions. And indeed, the
+LLVM virtual machine doesn’t care what these arguments are or what they mean.
+LLVM doesn’t encode the meaning or purpose of each argument; it just does what
+the Crystal compiler tells it to do.&lt;/p&gt;
+&lt;p&gt;But Crystal, on the other hand, has to implement object oriented behavior
+somehow. Specifically, the &lt;code&gt;unsafe_build&lt;/code&gt; function needs to behave differently
+depending on which class it was called for, depending on what the receiver is.
+For example:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;::Array(typeof(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)).unsafe_build(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;… has to return an array of two integers. While:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;::Array(typeof(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;abc&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;def&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)).unsafe_build(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;…has to return an array of two strings. How does this work in the LLVM IR code?&lt;/p&gt;
+&lt;p&gt;To implement object oriented behavior, Crystal passes the receiver as a hidden,
+special argument to the function call:&lt;/p&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2022/2/19/args2.svg&quot;&gt;
+&lt;p&gt;This receiver argument is a reference or pointer to the receiver’s object, and
+is normally known as &lt;code&gt;self&lt;/code&gt;. Here &lt;code&gt;610&lt;/code&gt; is a reference or tag corresponding to
+the &lt;code&gt;Array(Int32)&lt;/code&gt; class, the receiver. And &lt;code&gt;2&lt;/code&gt; is the actual argument to the
+&lt;code&gt;unsafe_build&lt;/code&gt; method.&lt;/p&gt;
+&lt;p&gt;Reading the LLVM IR code, we’ve learned that Crystal secretly passes a hidden
+&lt;code&gt;self&lt;/code&gt; argument to every method call to an object. Then inside each method, the
+code has access to &lt;code&gt;self&lt;/code&gt;, to the object instance that code is running for. Some
+languages, like Rust, require us to pass &lt;code&gt;self&lt;/code&gt; explicitly in each method call;
+in Crystal this behavior is automatic and hidden.&lt;/p&gt;
+&lt;h2&gt;Learning How Compilers Work&lt;/h2&gt;
+&lt;p&gt;LLVM IR is a simple language designed for compiler engineers. I think of it
+like a blank slate for them to write on. Most LLVM instructions are quite
+simple and easy to understand; as we saw above, understanding the basic syntax
+of the call instruction wasn’t hard at all.&lt;/p&gt;
+&lt;p&gt;The hard part was understanding how the Crystal compiler, which targets LLVM
+IR, generates code. The LLVM syntax itself was easy to follow; it was the
+Crystal language’s implementation that was harder to understand.&lt;/p&gt;
+&lt;p&gt;And this is the real reason to learn about LLVM IR syntax. If you take the time
+to learn how LLVM instructions work, then you can start to read the code your
+favorite language’s compiler generates. And once you can do that, you can learn
+more about how your favorite compiler works, and what your programs actually do
+when you run them.&lt;/p&gt;
+</content></entry><entry><title>Visiting an Abstract Syntax Tree</title><link href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></link><id href="https://patshaughnessy.net/2022/1/22/visiting-an-abstract-syntax-tree" rel="alternate"></id><published>2022-01-22T00:00:00Z</published><updated>2022-01-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;https://patshaughnessy.net/assets/2022/1/22/visit-tree.jpg&quot;&gt;&lt;br/&gt;
   &lt;i&gt;Joshua Tree National Park
   &lt;small&gt;(via: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Backpacker_at_Sunset_(22849298523).jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;
@@ -2341,336 +2665,4 @@ without crates.io and Cargo. Using code from smarter, more seasoned Rust
 developers gave me a chance to build a useful app, even as a beginner. Cargo
 found, downloaded and compiled open source code from experts with just a few
 simple commands.&lt;/p&gt;
-</content></entry><entry><title>Summer School With The Rust Compiler</title><link href="https://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></link><id href="https://patshaughnessy.net/2018/10/24/summer-school-with-the-rust-compiler" rel="alternate"></id><published>2018-10-24T00:00:00Z</published><updated>2018-10-24T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
-&lt;i&gt; &lt;small&gt;(source: &lt;a href=&quot;https://twitter.com/steveklabnik/status/1022518806814617601&quot;&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;A few months ago, I saw this tweet from Steve. I'm not even sure what
-&amp;quot;derridea</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 40px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2018/10/24/steves-tweet.png&quot;&gt;&lt;br/&gt;
-&lt;i&gt; &lt;small&gt;(source: &lt;a href=&quot;https://twitter.com/steveklabnik/status/1022518806814617601&quot;&gt;Steve Klabnik via Twitter&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;A few months ago, I saw this tweet from Steve. I'm not even sure what
-&amp;quot;derridean&amp;quot; means, but now the image of an insane coach pops into my head every
-time I try to write Rust code.&lt;/p&gt;
-&lt;p&gt;Learning Rust is hard for everyone, but it’s even worse for me because I’ve
-been working with Ruby during past ten years. Switching to Rust from Ruby is
-leaving an anything-goes hippie commune to a summer school for delinquent
-programmers run by a sadistic and unforgiving teacher.&lt;/p&gt;
-&lt;p&gt;Why would anyone use a compiler like this? The answer is simple: to learn how
-to write better code. This past summer I had some free time and decided to
-convert a simple Ruby script into Rust. As you’ll see, the Rust compiler beat
-me up a few times; it wasn’t easy. But after some tough love I ended up
-learning something, not only about Rust but about Ruby too.&lt;/p&gt;
-&lt;div style=&quot;clear: both&quot;&gt;&lt;/div&gt;
-&lt;h2&gt;Iterating Over an Array in Ruby&lt;/h2&gt;
-&lt;p&gt;Here’s my example program. It’s so short and simple you can read and understand
-it in just a few seconds:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;array &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts i
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;When I ran it, the output was:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;$ ruby int-loop.rb
-1
-2
-3&lt;/pre&gt;
-&lt;div style=&quot;float: right; padding: 70px 0px 30px 30px; text-align: center;&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2018/10/24/garden-earthly-delights.png&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;&lt;small&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/The_Garden_of_Earthly_Delights&quot;&gt;The Garden of Earthly Delights&lt;/a&gt; (detail), by Hieronymus Bosch&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Ruby’s syntax and feature set are designed to make my life easier as a
-developer.  Writing Ruby for me is as natural as writing English; it’s like
-having a pleasant conversation with my computer. I’m living in the Garden of
-Earthly Delights. If I can imagine a code change, I can write it. Using Ruby,
-all of my dreams can come true.&lt;/p&gt;
-&lt;p&gt;Next I decided to increment the values before printing them out. I added just
-one line of code to my example, &lt;span class=&quot;code&quot;&gt;i = i+1&lt;/span&gt;:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;array &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts i
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;As I expected, Ruby printed out 2 through 4:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;$ ruby int-loop.rb
-2
-3
-4&lt;/pre&gt;
-&lt;p&gt;Of course, there are other ways to produce the same result. I could have used
-&lt;span class=&quot;code&quot;&gt;puts i+1&lt;/span&gt;, or mapped the original array to a new array
-&lt;span class=&quot;code&quot;&gt;[2, 3, 4]&lt;/span&gt;. But Ruby doesn’t care. Today I felt like
-writing &lt;span class=&quot;code&quot;&gt;i = i+1&lt;/span&gt;, and Ruby let me do it without
-comment. Ruby is the parent of an unruly teenager that gets away with anything.&lt;/p&gt;
-&lt;p&gt;As I found out later, using &lt;span class=&quot;code&quot;&gt;i = i+1&lt;/span&gt; might have broken
-a Computer Science rule or two, but I was blissfully unaware. What you don’t
-know can’t hurt you. Ruby didn’t tell me anything might be wrong… but as we’ll
-see Rust certainly did!&lt;/p&gt;
-&lt;h2&gt;Rust: Similar to Ruby At First Glance&lt;/h2&gt;
-&lt;p&gt;I was curious: What would the Rust compiler think of this example? I was able
-to rewrite it in only a few minutes:&lt;/p&gt;
-&lt;pre&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array.iter() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, i);&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    }&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-&lt;p&gt;I had to type semicolons after each line and use a &lt;span
-class=&quot;code&quot;&gt;main&lt;/span&gt; function. A bit more typing, but really this is
-exactly the same program. Running this, of course, produced the same result:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;$ rustc int-loop.rs &amp;&amp; ./int-loop
-1
-2
-3&lt;/pre&gt;
-&lt;p&gt;Then I decided to try using the same &lt;span class=&quot;code&quot;&gt;i = i+1&lt;/span&gt; line from above:&lt;/p&gt;
-&lt;pre&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array.iter() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, i);&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    }&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-&lt;h2&gt;Lesson One: Passing By Reference vs. Passing By Value&lt;/h2&gt;
-&lt;p&gt;Compiling this, the Rust compiler hit me over the head with Computer Science!&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;$ rustc int-loop.rs &amp;&amp; ./int-loop
-error[E0271]: type mismatch resolving `&lt;&amp;i32 as std::ops::Add&lt;i32&gt;&gt;::Output == &amp;i32`
-  --&gt; int-loop.rs:4:14
-   |
- 4 |         i = i+1;
-   |              ^ expected i32, found &amp;i32
-   |
-   = note: expected type `i32`
-              found type `&amp;i32`
-
-error: aborting due to previous error
-
-For more information about this error, try `rustc --explain E0271`.&lt;/pre&gt;
-&lt;p&gt;What in the world does this mean? I wrote a very simple line of code, and got a
-message straight out of type theory! The error &lt;span class=&quot;code&quot;&gt;type mismatch
-resolving `&amp;lt;&amp;amp;i32 as std::ops::Add&amp;gt;::Output == &amp;amp;i32`&lt;/span&gt; makes no sense to me at
-all.&lt;/p&gt;
-&lt;p&gt;I decided to take the compiler’s suggestion and run the explain command:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;$ rustc --explain E0271
-This is because of a type mismatch between the associated type of some
-trait (e.g. `T::Bar`, where `T` implements `trait Quux { type Bar; }`)
-and another type `U` that is required to be equal to `T::Bar`, but is not.
-Examples follow.&lt;/pre&gt;
-&lt;p&gt;The explain output continued for about two more pages, with examples that
-didn’t resemble my code at all. What is a trait? What is an associated type? I
-didn’t use any of these more advanced Rust concepts in my simple script. Maybe
-I needed a PhD. in Computer Science even to try to use Rust?&lt;/p&gt;
-&lt;p&gt;Eventually, I figured it out. The key lines from the error message were:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;4 |         i = i+1;
-   |              ^ expected i32, found &amp;i32&lt;/pre&gt;
-&lt;p&gt;Rust is telling me that &lt;span class=&quot;code&quot;&gt;iter()&lt;/span&gt; yielded references to
-integers, but my code expected an actual integer, not a reference to an
-integer. But what are references, exactly?&lt;/p&gt;
-&lt;p&gt;Running my code above, Ruby passed each integer from the array to my code as a
-simple value:&lt;/p&gt;
-&lt;img width=&quot;185&quot; src=&quot;https://patshaughnessy.net/assets/2018/10/24/ruby-passes-by-value.png&quot;/&gt;
-&lt;p&gt;But Rust passed each integer from the array as a reference, or in other words
-as a pointer to the value itself:&lt;/p&gt;
-&lt;img width=&quot;287&quot; src=&quot;https://patshaughnessy.net/assets/2018/10/24/rust-passes-by-reference.png&quot;/&gt;
-&lt;p&gt;In Ruby, of course, I didn’t have to worry about references, pointers or even
-types, so none of this came up. Or at least that’s what I thought at the time.&lt;/p&gt;
-&lt;h2&gt;Lesson Two: Borrowed Values&lt;/h2&gt;
-&lt;p&gt;Ah - according to the Rust compiler’s error message I just had to dereference
-the reference before using it. I changed &lt;span class=&quot;code&quot;&gt;i = i+1&lt;/span&gt; to
-&lt;span class=&quot;code&quot;&gt;*i = *i+1&lt;/span&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array.iter() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;*&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= *&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, i);&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    }&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-&lt;p&gt;Then Rust slapped me in the face again with more Computer Science:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;$ rustc int-loop.rs &amp;&amp; ./int-loop
-error[E0594]: cannot assign to immutable borrowed content `*i`
-  --&gt; int-loop.rs:26:9
-   |
-26 |         *i = *i+1;
-   |         ^^^^^^^^^ cannot borrow as mutable
-
-error: aborting due to previous error
-
-For more information about this error, try `rustc --explain E0594`.&lt;/pre&gt;
-&lt;p&gt;Ugh. I guess that was a bad idea. What in the world happened here? I thought I
-had the dereferencing syntax correct, &lt;span class=&quot;code&quot;&gt;*i&lt;/span&gt;, the same
-syntax I’m used to from C.  Actually Rust didn’t complain about types any more
-or about using a reference vs. a value. But what does “borrow as mutable” mean?
-And why doesn’t Rust let me do that?&lt;/p&gt;
-&lt;p&gt;Again, the problem here is that I don’t know enough Rust even to understand the
-compiler’s error messages. I need to take a few months off from my day job and
-read a book, or take a class. I need to understand Rust’s ownership model.&lt;/p&gt;
-&lt;p&gt;In Rust, every value is “owned” by the spot in my code where I allocate that
-value. In this example, the integers and the array that contains them are owned
-by the &lt;span class=&quot;code&quot;&gt;main&lt;/span&gt; function. When the &lt;span
-class=&quot;code&quot;&gt;main&lt;/span&gt; function goes out of scope, Rust frees the memory for
-that array automatically. In this diagram, the red arrow shows where Rust
-allocates the array (at the top), and where Rust frees it (at the bottom):&lt;/p&gt;
-&lt;img width=&quot;339&quot; src=&quot;https://patshaughnessy.net/assets/2018/10/24/rust-lifetime.png&quot;/&gt;
-&lt;p&gt;You can think of the red arrow as the “lifetime” of the array. When I pass a
-value from one spot to another, when I call a function or a closure, I can
-either “move” that value to the new function, or the function can ”borrow” it.
-In this example, the call to &lt;span class=&quot;code&quot;&gt;iter()&lt;/span&gt; borrowed the
-elements inside the array, passing a reference to each element into the
-closure. The blue array in this diagram indicates each element of the array,
-&lt;span class=&quot;code&quot;&gt;i&lt;/span&gt;, is a borrowed value inside the closure:&lt;/p&gt;
-&lt;img width=&quot;334&quot; src=&quot;https://patshaughnessy.net/assets/2018/10/24/rust-borrow.png&quot;/&gt;
-&lt;h2&gt;Lesson Three: Immutable vs. Mutable Values&lt;/h2&gt;
-&lt;p&gt;But using borrowed values isn’t the problem here. The problem is that my code
-tries to change them, or mutate them:&lt;/p&gt;
-&lt;pre&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;*&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= *&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;&lt;/span&gt;&lt;/pre&gt;
-&lt;p&gt;Because the value of &lt;span class=&quot;code&quot;&gt;i&lt;/span&gt; each time around the loop was
-an element of the array, and because &lt;span class=&quot;code&quot;&gt;iter()&lt;/span&gt; borrowed
-each element from the original array, the elements are marked as immutable,
-just as the array was. Or at least I that’s how I understood the previous error
-message.&lt;/p&gt;
-&lt;p&gt;Back in the &lt;span class=&quot;code&quot;&gt;main&lt;/span&gt; function when I typed:&lt;/p&gt;
-&lt;pre&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];&lt;/span&gt;&lt;/pre&gt;
-&lt;p&gt;…Rust created an immutable array of three integers. All variables in Rust are
-immutable by default. Because it was immutable, my code can’t change it.&lt;/p&gt;
-&lt;p&gt;Ah… so the fix is to mark my array as mutable:&lt;/p&gt;
-&lt;pre&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array.iter() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;*&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= *&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, i);&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    }&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-&lt;h2&gt;Lesson Four: Declaring Side Effects&lt;/h2&gt;
-&lt;p&gt;Running the Rust compiler again, I got the same error along with a new warning:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;$ rustc int-loop.rs &amp;&amp; ./int-loop
-error[E0594]: cannot assign to immutable borrowed content `*i`
-  --&gt; int-loop.rs:14:9
-   |
-14 |         *i = *i+1;
-   |         ^^^^^^^^^ cannot borrow as mutable
-
-warning: variable does not need to be mutable
-  --&gt; int-loop.rs:12:9
-   |
-12 |     let mut array = [1, 2, 3];
-   |         ----^^^^^
-   |         |
-   |         help: remove this `mut`
-   |&lt;/pre&gt;
-&lt;p&gt;Wait - so now Rust was telling me I shouldn’t add the &lt;span
-class=&quot;code&quot;&gt;mut&lt;/span&gt; keyword? That my last change was dead wrong? Why was it
-wrong? Probably I didn’t understand what “cannot borrow as mutable” really
-meant.&lt;/p&gt;
-&lt;p&gt;It took me a while to figure this out but eventually I ran into this &lt;a href=&quot;https://hermanradtke.com/2015/06/22/effectively-using-iterators-in-rust.html&quot;&gt;great
-article&lt;/a&gt;
-which explained what I was doing wrong and how to fix it. I needed to use
-&lt;span class=&quot;code&quot;&gt;iter_mut&lt;/span&gt; instead of &lt;span class=&quot;code&quot;&gt;iter&lt;/span&gt;. &lt;span
-class=&quot;code&quot;&gt;iter_mut&lt;/span&gt; yields mutable references to the closure, while
-&lt;span class=&quot;code&quot;&gt;iter&lt;/span&gt; yields normal, immutable references.&lt;/p&gt;
-&lt;p&gt;That is, by calling &lt;span class=&quot;code&quot;&gt;iter_mut&lt;/span&gt; I’m declaring that the
-code inside of the closure might mutate the elements of the array. This is
-knowns as a &lt;em&gt;side effect&lt;/em&gt;. As a side effect of the iteration, the code inside
-might also change the values of the collection it is iterating over. Rust
-forced me to declare that my code might change the array.&lt;/p&gt;
-&lt;p&gt;Finally, running my program with &lt;span class=&quot;code&quot;&gt;iter_mut&lt;/span&gt; finally worked!&lt;/p&gt;
-&lt;pre&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array.iter_mut() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;*&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= *&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, i);&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    }&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-&lt;pre class=&quot;console&quot;&gt;$ rustc int-loop.rs &amp;&amp; ./int-loop
-2
-3
-4&lt;/pre&gt;
-&lt;h2&gt;What Rust Taught Me&lt;/h2&gt;
-&lt;p&gt;My example today started out as a trivial, 4 line Ruby script. It was so
-simple, there really wasn’t anything that could possibly go wrong when I ran
-it. Then I added one simple line of code: i = i+1. When I added this to my Ruby
-script, it worked just fine.&lt;/p&gt;
-&lt;p&gt;As we saw, this line of code got the Rust compiler very angry. It slapped me in
-the face with four Computer Science lessons. I learned:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;about passing values vs. passing references.&lt;/li&gt;
-&lt;li&gt;about mutable vs. immutable values.&lt;/li&gt;
-&lt;li&gt;about value ownership, lifetimes and borrowing values.&lt;/li&gt;
-&lt;li&gt;about side effects, and declaring them.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;As you can see, the Rust compiler is an amazing tool you can use to learn more
-about Computer Science. The problem is that it’s hard to get along with.
-Compiling a Rust program will fail over and over again until you your code is
-100% correct. You need to have tremendous patience to use Rust, especially as a
-beginner.&lt;/p&gt;
-&lt;p&gt;Worse than that, the Rust compiler’s error messages are hard to understand, and
-easy to misinterpret. They can seem to be self-contradictory as we saw above. The
-Rust compiler assumes you already know what it is trying to teach you. Not only
-is Rust a violent teacher, it’s a bad one. If I knew that &lt;span
-class=&quot;code&quot;&gt;iter()&lt;/span&gt; borrowed immutable values, if I knew what
-“borrowing” and “immutable” even meant, then I likely wouldn’t have run into
-that compiler error in the first place.&lt;/p&gt;
-&lt;p&gt;And Rust’s confusing error message lead me in the wrong direction. In this
-example, I didn’t really want to mutate the array, I just wanted to print out
-the incremented values. I could have just incremented an intermediate value and
-left the original array alone. Instead, the complex error messages confused and
-mislead me, and I never discovered this simpler code:&lt;/p&gt;
-&lt;pre&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; i &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; array.iter() {&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;        println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, i&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;);&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;    }&lt;/span&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-&lt;p&gt;The Rust compiler is an amazing tool for learning; the problem is you need to
-have a deep understanding of the Rust language before you can use it
-effectively. Rust needs a --beginner option. Using this option on the
-command line would intstruct the compiler to produce error messages designed
-for Rust learners, rather than Rust experts.&lt;/p&gt;
-&lt;h2&gt;What Ruby Didn’t Tell Me&lt;/h2&gt;
-&lt;p&gt;I had the opposite experience using Ruby. No confusing compiler errors; in
-fact, no compiler at all. No types, no need to worry about immutability or
-whether I’m passing references or values. Everything just worked.&lt;/p&gt;
-&lt;p&gt;Or did it? Because Ruby passed integers by value, the array in my original
-example wasn’t modified:&lt;/p&gt;
-&lt;pre&gt;array = [1, 2, 3]
-for i in array
-  i = i+1
-  puts i
-end
-puts &quot;----&quot;
-p array&lt;/pre&gt;
-&lt;pre class=&quot;console&quot;&gt;$ ruby int-loop.rb
-2
-3
-4
-----
-[1, 2, 3]&lt;/pre&gt;
-&lt;p&gt;This is probably a good thing. Side effects like mutating a collection while
-iterating over it can easily lead to bugs. Maybe code later in my program
-needed the original, unchanged values in that array? Maybe another thread was
-trying to use that collection at the same time?&lt;/p&gt;
-&lt;p&gt;The problem with using Ruby is that you don’t know what Ruby isn’t telling you.
-Because Ruby didn’t display any warnings or error messages when I added &lt;span
-class=&quot;code&quot;&gt;i = i+1&lt;/span&gt; to my loop, I didn’t even think about any of these
-issues. Fortunately, Ruby didn't modify the array so it wasn't a problem.&lt;/p&gt;
-&lt;p&gt;But suppose my array contained strings and not integers:&lt;/p&gt;
-&lt;pre&gt;array = [&quot;one&quot;, &quot;two&quot;, &quot;three&quot;]
-for str in array
-    str = str &lt;&lt; &quot;-mutated&quot;
-    puts str
-end
-puts &quot;----&quot;
-p array&lt;/pre&gt;
-&lt;pre class=&quot;console&quot;&gt;$ ruby string-loop.rb
-one-mutated
-two-mutated
-three-mutated
-----
-[&quot;one-mutated&quot;, &quot;two-mutated&quot;, &quot;three-mutated&quot;]&lt;/pre&gt;
-&lt;p&gt;Now the array was mutated! It turns out Ruby passed integers to the closure by
-value, but strings by reference. Updating each string inside the loop also
-updated that string inside the array. Now my program will have bugs, unless the
-point of running that loop was to mutate the array, and not just to print it
-out.&lt;/p&gt;
 </content></entry></feed>
