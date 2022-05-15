@@ -3,17 +3,52 @@ date: 2008/09/03
 url: /2008/9/3/drupal-tdd-1
 tag: Drupal
 
-[Drupal](http://drupal.org) is a very popular Content Management System (CMS) developed using PHP. It’s a great way to get an interactive, community web site such as a blog or discussion forum up and running quickly without writing any code. But Drupal is a poor choice for general, complex web application development for a few simple reasons:
-1. It doesn’t use a standard, general software architecture such as Model-View-Controller (MVC) like Rails or Struts.
-2. Drupal doesn’t employ or support modern development best practices such as [Test Driven Development (TDD)](http://en.wikipedia.org/wiki/Test-driven_development) or automated testing more generally. (Exception: the [SimpleTest](http://drupal.org/project/simpletest) module can provide some automated integration testing using HTTP without opening a real browser.)
-3. While the module API does allow for some customization, it can be easy to get into trouble if your target application is outside of Drupal’s design center. Specifically, you may end up having to modify Drupal’s core code or database schema when Drupal doesn’t behave the way you would like.
+<b>Update:</b> The engineers at [SemaphoreCI](https://semaphoreci.com/) have
+written a [great introduction to
+TDD](https://semaphoreci.com/blog/test-driven-development), with information
+about its origins and a detailed example written in Java.
 
-A better choice for more general or complex web development would be Ruby on Rails.
+[Drupal](http://drupal.org) is a very popular Content Management System (CMS)
+developed using PHP. It’s a great way to get an interactive, community web site
+such as a blog or discussion forum up and running quickly without writing any
+code. But Drupal is a poor choice for general, complex web application
+development for a few simple reasons:
 
-If you do need to develop a custom web application using the Drupal framework, you can avoid problems #2 and #3 by using a test driven approach. Instead of simply implementing your custom logic by writing PHP code to the Drupal module API, try pulling your custom code out of Drupal entirely and running it independently of the framework. This will insure that your custom code could someday be run with another web framework and also help you avoid the temptation of modifying Drupal’s core code directly. Of course, you will also get all of the normal benefits of TDD: better design oriented around business requirements, live documentation through executable code, etc.
+1. It doesn’t use a standard, general software architecture such as
+   Model-View-Controller (MVC) like Rails or Struts.
+
+2. Drupal doesn’t employ or support modern development best practices such as
+   [Test Driven Development (TDD)](http://en.wikipedia.org/wiki/Test-driven_development) or automated
+   testing more generally. (Exception: the [SimpleTest](http://drupal.org/project/simpletest) module can provide some
+   automated integration testing using HTTP without opening a real browser.)
+
+3. While the module API does allow for some customization, it can be easy to
+   get into trouble if your target application is outside of Drupal’s design
+   center. Specifically, you may end up having to modify Drupal’s core code or
+   database schema when Drupal doesn’t behave the way you would like.
+
+A better choice for more general or complex web development would be Ruby on
+Rails.
+
+If you do need to develop a custom web application using the Drupal framework,
+you can avoid problems #2 and #3 by using a test driven approach. Instead of
+simply implementing your custom logic by writing PHP code to the Drupal module
+API, try pulling your custom code out of Drupal entirely and running it
+independently of the framework. This will insure that your custom code could
+someday be run with another web framework and also help you avoid the
+temptation of modifying Drupal’s core code directly. Of course, you will also
+get all of the normal benefits of TDD: better design oriented around business
+requirements, live documentation through executable code, etc.
 
 
-How to do this? Write tests first using PHPUnit (which fail), then get your tests to pass by implementing the desired behavior using PHP 5 objected oriented code. Lastly, write a “shell” module that calls out to your test driven object oriented PHP code from Drupal. This means your code will be run twice: once from the command line by PHPUnit during development and from your CI process, and again from Drupal to process end user requests in production.
+How to do this? Write tests first using PHPUnit (which fail), then get your
+tests to pass by implementing the desired behavior using PHP 5 objected
+oriented code. Lastly, write a “shell” module that calls out to your test
+driven object oriented PHP code from Drupal. This means your code will be run
+twice: once from the command line by PHPUnit during development and from your
+CI process, and again from Drupal to process end user requests in production.
 
 
-In a series of future posts I'll write a Drupal module using TDD, using a few tips and tricks along the way to get PHPUnit and Drupal to play together nicely.
+In a series of future posts I'll write a Drupal module using TDD, using a few
+tips and tricks along the way to get PHPUnit and Drupal to play together
+nicely.
