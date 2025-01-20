@@ -6,15 +6,23 @@ use std::path::PathBuf;
 use self::syntect::parsing::{SyntaxReference, SyntaxSet};
 use self::syntect::highlighting::{Theme, ThemeSet};
 use self::syntect::html::highlighted_html_for_string;
+use highlight::syntect::Error;
 
 pub fn highlighted_html_for(snippet: &String, lang: Option<String>) -> String {
+
     match lang {
-        Some(lang) => highlighted_html_for_language(&snippet, lang),
+        Some(lang) => {
+          let html_result = highlighted_html_for_language(&snippet, lang);
+          match html_result {
+            Ok(html) => html,
+            Err(error) => panic!("Problem highlighting html: {:?}", error),
+          }
+        }
         None => snippet.to_string()
     }
 }
 
-pub fn highlighted_html_for_language(snippet: &String, attributes: String) -> String {
+pub fn highlighted_html_for_language(snippet: &String, attributes: String) -> Result<String, Error> {
     lazy_static! {
         static ref SYNTAX_SET: SyntaxSet = SyntaxSet::load_from_folder(syntax_path()).unwrap();
         static ref THEME: Theme = ThemeSet::get_theme(theme_path().as_path()).unwrap();
@@ -35,7 +43,7 @@ pub fn highlighted_html_for_language(snippet: &String, attributes: String) -> St
     } else if attributes.contains("type=\"c\"") {
         highlighted_html_for_string(&snippet, &SYNTAX_SET, &C_SYNTAX, &THEME)
     } else {
-        format!("<pre{}>{}</pre>", attributes, snippet.to_string())
+        Ok(format!("<pre{}>{}</pre>", attributes, snippet.to_string()))
     }
 }
 
