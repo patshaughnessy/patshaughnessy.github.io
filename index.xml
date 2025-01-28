@@ -1,4 +1,194 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2022-02-19T18:22:06Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>LLVM IR: The Esperanto of Computer Languages</title><link href="https://patshaughnessy.net/2022/2/19/llvm-ir-the-esperanto-of-computer-languages" rel="alternate"></link><id href="https://patshaughnessy.net/2022/2/19/llvm-ir-the-esperanto-of-computer-languages" rel="alternate"></id><published>2022-02-19T00:00:00Z</published><updated>2022-02-19T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-01-28T16:00:25Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Updating Ruby Under a Microscope</title><link href="https://patshaughnessy.net/2025/1/28/updating-ruby-under-a-microscope" rel="alternate"></link><id href="https://patshaughnessy.net/2025/1/28/updating-ruby-under-a-microscope" rel="alternate"></id><published>2025-01-28T00:00:00Z</published><updated>2025-01-28T00:00:00Z</updated><category></category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img id=&quot;microscope&quot; src=&quot;https://patshaughnessy.net/assets/2014/12/17/microscope.png&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Ruby stores much of its own internal data in hash tables.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-unde</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img id=&quot;microscope&quot; src=&quot;https://patshaughnessy.net/assets/2014/12/17/microscope.png&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Ruby stores much of its own internal data in hash tables.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while to finish. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;In the meantime, here’s an excerpt from a rewrite of Chapter 7 about hash
+tables. Vladimir Makarov and the Ruby team redesigned Ruby’s hash table
+implementation back in 2015 to use open addressing, shortly after I published
+the first edition of RUM.  This seemed like a good place to start.&lt;/p&gt;
+&lt;div style=&quot;clear: left&quot;&gt;&lt;/div&gt;
+&lt;h2&gt;Chapter 7: The Hash Table: The Workhorse Of Ruby Internals&lt;/h2&gt;
+&lt;div style=&quot;font-size: small&quot;&gt;
+&lt;table id=&quot;toc&quot;&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Hash Tables in Ruby&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Saving a Value in a Hash Table&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Retrieving a Value from a Hash Table&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 7-1: Retrieving a Value from Hashes of Varying Sizes&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Hash Tables Expand to Accommodate More Values&lt;/td&gt;&lt;td&gt;9&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Hash Collisions and Open Addressing&lt;/td&gt;&lt;td&gt;9&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Searching For an Element Using Open Addressing&lt;/td&gt;&lt;td&gt;11&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Expanding a Hash Table&lt;/td&gt;&lt;td&gt;14&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Does Ruby Decide How Many Entries And Bins To Use?&lt;/td&gt;&lt;td&gt;15&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 7-2: Inserting One New Element into Hashes of Varying Sizes&lt;/td&gt;&lt;td&gt;17&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Optimization for Small Hashes&lt;/td&gt;&lt;td&gt;20&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Does Ruby Convert A Packed Hash Into A Hash Table?&lt;/td&gt;&lt;td&gt;22&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Ruby Implements Hash Functions&lt;/td&gt;&lt;td&gt;23&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 7-3: Using Objects as Keys in a Hash&lt;/td&gt;&lt;td&gt;25&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Summary&lt;/td&gt;&lt;td&gt;30&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;h2&gt;Hash Tables in Ruby&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;Hash tables&lt;/em&gt; are a commonly used, well-known, age-old concept in computer
+science. They organize values into groups, or &lt;em&gt;bins&lt;/em&gt;, based on an integer value
+calculated from each value — a &lt;em&gt;hash&lt;/em&gt;. When you need to find a value, you can
+figure out which bin it’s in by recalculating its hash value, thus speeding up
+the search. &lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2025/1/28/bins.png&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Every time you write a method, Ruby creates an entry in a hash table. 
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;div style=&quot;clear: right&quot;&gt;&lt;/div&gt;
+&lt;h2&gt;Saving a Value in a Hash Table&lt;/h2&gt;
+&lt;p&gt;Figure 7-1 shows a single hash object and its hash table.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-1.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 7-1: A Ruby hash object with an empty hash table 
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;On the left is the &lt;code&gt;RHash&lt;/code&gt; (short for &lt;em&gt;Ruby hash&lt;/em&gt;) structure. On the right, you see
+the hash table used by this hash, represented by the &lt;code&gt;st_table&lt;/code&gt; structure. This C
+structure contains the basic information about the hash table, including the
+number of entries saved in the table and pointers to the entries and bins. Each
+&lt;code&gt;RHash&lt;/code&gt; structure contains a pointer to a corresponding &lt;code&gt;st_table&lt;/code&gt; structure. For
+many hashes, Ruby initially creates 32 entries and 64 bins. (Hashes with 8 or
+fewer entries work somewhat differently; see “Optimization for Small Hashes” on
+page 20.) The best way to understand how a hash table works is by stepping
+through an example. Suppose I add a new key/value to a hash called &lt;code&gt;my_hash&lt;/code&gt;: &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;my_hash[:key] = &amp;quot;value&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;While executing this line of code, Ruby saves the key and value into the first
+entry, as shown in Figure 7-2.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-2.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 7-2: A Ruby hash object containing a single value
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Here you can see the new key/value pair inside the first entry slot, called an
+&lt;code&gt;st_table_entry&lt;/code&gt; in Ruby’s C source code. Ruby saves the keys and values in the
+entries array in the order you add them. This makes it easy for Ruby to return
+them back to you in the same order. Also see that Ruby saved an entry index of 0
+in the third bin, number 2. Ruby did this by taking the given key — in this
+example, the symbol &lt;code&gt;:key&lt;/code&gt; — and passing it to an internal hash function that
+returns a pseudorandom integer: &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;some_value = internal_hash_function(:key)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Next, Ruby takes the hash value — in this example, &lt;code&gt;some_value&lt;/code&gt; — and calculates the modulus by the number of bins, which is the remainder after dividing by the number of bins.&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;some_value % 64 = 2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div style=&quot;margin-bottom: 2.5rem; font-style: italic&quot;&gt;
+NOTE: In Figure 7-2, I assume that the actual hash value for &lt;span
+class=&quot;code&quot;&gt;:key&lt;/span&gt; divided by 64 leaves a remainder of 2. Later in this
+chapter, I’ll explore in more detail the hash functions that Ruby actually uses.
+We’ll see how using 64 bins (a power of 2) speeds up this calculation.  &lt;/div&gt;
+&lt;p&gt;Now let’s add a second element to the hash:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;my_hash[:key2] = &amp;quot;value2&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This time let’s imagine that the hash value of &lt;code&gt;:key2&lt;/code&gt; divided by 64 yields a
+remainder of 5. &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;internal_hash_function(:key2) % 64 = 5
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Figure 7-3 shows that Ruby fills in a second &lt;code&gt;st_table_entry&lt;/code&gt; structure in the
+entries array, and the entry index 1 in bin number 5, the sixth bin.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-3.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 7-3: A Ruby hash object containing two values
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;h2&gt;Retrieving a Value from a Hash Table&lt;/h2&gt;
+&lt;p&gt;The benefit of using a hash table becomes clear when you ask Ruby to retrieve
+the value for a given key. For example: &lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;p my_hash[:key]
+ =&amp;gt; &amp;quot;value&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If Ruby had saved all of the keys and values in an array or linked list, it
+would have to iterate over all the elements in that array or list, looking for
+:key. This might take a very long time, depending on the number of elements. But
+using a hash table, Ruby can jump straight to the key it needs to find by
+recalculating the hash value for that key.  To recalculate the hash value for a
+particular key, Ruby simply calls the hash function again: &lt;code&gt;some_value = internal_hash_function(:key)&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Then, it redivides the hash value by the number of bins to get the remainder, or
+the modulus. &lt;code&gt;some_value % 64 = 2&lt;/code&gt; At this point, Ruby knows to look in bin
+number 2 and finds the entry index 0, and in turn finds the entry with the key
+of &lt;code&gt;:key&lt;/code&gt; in entry number 0 or the first entry slot.  Ruby can later find the
+value for &lt;code&gt;:key2&lt;/code&gt; by repeating the same hash calculation
+&lt;code&gt;internal_hash_function(:key2) % 64 = 5&lt;/code&gt;.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-4.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 7-4: Finding Values in a Hash Table
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 7-4 explains how Ruby would find these two values in the hash table: On
+the left side, the first arrow starts from the third bin (bin index 2 =
+&lt;code&gt;internal_hash_function(:key) % 64&lt;/code&gt;) and points to the first key/value pair, at
+index 0. To the right, the second arrow starts from the sixth bin (bin index 5 =
+&lt;code&gt;internal_hash_function(:key2) % 64&lt;/code&gt;) and points to the second key/value pair, at
+index 1.&lt;/p&gt;
+&lt;span style=&quot;font-style: italic&quot;&gt;
+NOTE: The C library used by Ruby to implement hash tables was written in the
+1980s by Peter Moore from the University of California, Berkeley. Later in 2015
+Vladimir Makarov rewrote the hash table code, using a data structure which saves
+the entry and bin arrays in contiguous memory segments. By saving all the
+entries and bins nearby each other in memory, modern CPUs are able to cache all
+of the data in the hash table more efficiently, speeding up the overall process.
+You can find Makarov’s hash table code in the C code files st.c and
+include/ruby/st.h. All of the function and structure names in that code use the
+naming convention st_. The definition of the RHash structure that represents
+every Ruby Hash object is in the include/ruby/ruby.h file. Along with RHash,
+this file contains all of the other primary object structures used in the Ruby
+source code: RString, RArray, RValue, and so on. 
+&lt;/span&gt;
+</content></entry><entry><title>LLVM IR: The Esperanto of Computer Languages</title><link href="https://patshaughnessy.net/2022/2/19/llvm-ir-the-esperanto-of-computer-languages" rel="alternate"></link><id href="https://patshaughnessy.net/2022/2/19/llvm-ir-the-esperanto-of-computer-languages" rel="alternate"></id><published>2022-02-19T00:00:00Z</published><updated>2022-02-19T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
   &lt;img src=&quot;https://patshaughnessy.net/assets/2022/2/19/esperanto.png&quot;&gt;&lt;br/&gt;
   &lt;i&gt; Esperanto grammar is logical and self&lt;br/&gt;
 consistent, designed to be easy to learn. &lt;br/&gt;
@@ -2386,283 +2576,4 @@ the nature of the task I’m trying to accomplish. Rust programmers think about
 errors and what might go wrong from the very beginning, from when they start
 writing code. To be honest, I've often thought about errors and what might go
 wrong as an afterthought, after I've written and deployed my code.&lt;/p&gt;
-</content></entry><entry><title>Using Rust to Build a Blog Site</title><link href="https://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></link><id href="https://patshaughnessy.net/2019/9/4/using-rust-to-build-a-blog-site" rel="alternate"></id><published>2019-09-04T00:00:00Z</published><updated>2019-09-04T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/9/4/batteries.jpg&quot;&gt;&lt;br/&gt;
-&lt;i&gt; Rust comes with batteries included&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Color-w-batteries.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;After “Hello World,” blog sites </summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/9/4/batteries.jpg&quot;&gt;&lt;br/&gt;
-&lt;i&gt; Rust comes with batteries included&lt;br/&gt;
-    &lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Color-w-batteries.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;After “Hello World,” blog sites are the world’s second most unneeded
-application. If you want to write a blog, use Medium, Wordpress or just
-Twitter. The world doesn’t need another blog app.&lt;/p&gt;
-&lt;p&gt;However, like Hello World, building a static site generator is a great way to
-get your feet wet in a new programming language. Recently I rewrote &lt;a href=&quot;https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/src/lib.rs&quot;&gt;the script
-I use to generate this web
-site&lt;/a&gt;
-using Rust: I needed to update and fix my script, but really I was looking for
-an excuse to write Rust.  Despite its reputation as a difficult to learn,
-expert level language,  Rust turned out to be a great choice for the simple
-task of generating a few HTML files, quickly and reliably. Why? Not because of
-its sophisticated borrow checker or support for safe concurrency.&lt;/p&gt;
-&lt;p&gt;Rust was a great choice for me because I didn’t have to write most of the code.
-Rust’s dependency management and build tool,
-&lt;a href=&quot;https://doc.rust-lang.org/book/ch01-03-hello-cargo.html&quot;&gt;Cargo&lt;/a&gt;, allowed me to
-glue together open source Rust libraries called “crates” which do most of the
-work. The Rust community’s crate registry, &lt;a href=&quot;https://crates.io&quot;&gt;crates.io&lt;/a&gt;, has
-over 29,000 crates available.  Downloading, compiling and using them is dead
-simple. And writing a blog site using Rust turned out to be simple too.&lt;/p&gt;
-&lt;h2&gt;My Cargo.toml File&lt;/h2&gt;
-&lt;p&gt;I needed a few important features to generate this web site. I wanted my script
-to work like this for each blog post:&lt;/p&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2019/9/4/flowchart.png&quot;/&gt;
-&lt;p&gt;For each blog post, My new Rust script had to: parse the markdown source file
-and convert it to HTML markup, highlight the syntax of my code snippets using
-&amp;lt;style&amp;gt; tags and CSS, and use a template to insert the HTML for each post
-into the surrounding web layout/design. Sounds like a lot of work, right?&lt;/p&gt;
-&lt;p&gt;Wrong. Other Rust developers smarter than me had already implemented all of
-this. All I had to do was find the crates I needed and add them to my
-Cargo.toml file:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;[dependencies]
-maud = &quot;*&quot;
-pulldown-cmark = &quot;*&quot;
-syntect = &quot;3.0&quot;&lt;/pre&gt;
-&lt;p&gt;&lt;a href=&quot;https://github.com/raphlinus/pulldown-cmark&quot;&gt;Pulldown-cmark&lt;/a&gt; is a markdown
-parser crate, &lt;a href=&quot;https://github.com/trishume/syntect&quot;&gt;Syntect&lt;/a&gt; is a color syntax
-highlighting crate, and &lt;a href=&quot;https://github.com/lfairy/maud&quot;&gt;Maud&lt;/a&gt; is an HTML
-template crate. Actually, to be honest I ended up adding a few other crates to
-get my script to work:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;[dependencies]
-maud = &quot;\*&quot;
-pulldown-cmark = &quot;\*&quot;
-regex = &quot;\*&quot;
-lazy_static = &quot;\*&quot;
-syntect = &quot;3.0&quot;
-chrono = &quot;\*&quot;
-clap = &quot;\*&quot;
-ordinal = &quot;\*&quot;&lt;/pre&gt;
-&lt;p&gt;I’m not sure why, but the Rust standard library is very minimal. Features that
-are included in other languages, like regular expressions or date/time parsing,
-are handled by crates (e.g. regex and chrono).&lt;/p&gt;
-&lt;p&gt;In any case, all I had to do was build my project and Cargo downloaded
-everything I needed:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;$ cargo build --release
-    Updating crates.io index
-  Downloaded chrono v0.4.7
-  Downloaded clap v2.33.0
-  Downloaded maud v0.19.0
-  Downloaded lazy_static v1.2.0
-  Downloaded pulldown-cmark v0.2.0
-  Downloaded ordinal v0.2.2
-  Downloaded regex v1.1.0
-  Downloaded syntect v3.0.2
-  Downloaded libc v0.2.44
-  Downloaded num-integer v0.1.41
-  Downloaded num-traits v0.2.8
-  Downloaded time v0.1.42
-
-etc…
-   Compiling syntect v3.0.2
-   Compiling blogc v0.1.0 (/Users/pat/apps/patshaughnessy.github.io)
-    Finished release [optimized] target(s) in 2m 27s&lt;/pre&gt;
-&lt;p&gt;It couldn’t be easier! During the rest of this post, I’ll show you how I used
-these three crates: Pulldown-cmark, Syntect and Maud.&lt;/p&gt;
-&lt;h2&gt;Pulldown-cmark&lt;/h2&gt;
-&lt;p&gt;Now that my blog app included the Pulldown-mark crate, using it was just a
-matter of pasting in a few of lines of code from the &lt;a href=&quot;https://docs.rs/pulldown-cmark/0.5.3/pulldown_cmark/html/fn.push_html.html&quot;&gt;helpful example on
-docs.rs&lt;/a&gt;:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; parser &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Parser::new(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;markdown);
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; html &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;html::push_html(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; html, parser);&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;The first line created a &lt;span class=&quot;code&quot;&gt;Parser&lt;/span&gt; struct, passing in a
-reference to my markdown string. Then I created an empty, mutable target
-string, called &lt;span class=&quot;code&quot;&gt;html&lt;/span&gt;. Last, I called the &lt;span
-class=&quot;code&quot;&gt;push_html&lt;/span&gt; function which parsed the markdown source,
-converted it to HTML and saved it into &lt;span class=&quot;code&quot;&gt;html&lt;/span&gt;. I didn’t
-have to do any work whatsoever.&lt;/p&gt;
-&lt;p&gt;In fact, the only real work for me had to do with “header” strings present at
-the top of each post source file. For example, the
-&lt;a href=&quot;https://raw.githubusercontent.com/patshaughnessy/patshaughnessy.github.io/master/posts/2017-12-15-looking-inside-postgres-at-a-gist-index.markdown&quot;&gt;2017-12-15-looking-inside-postgres-at-a-gist-index.markdown&lt;/a&gt;
-file starts with:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;title: &quot;Looking Inside Postgres at a GiST Index&quot;
-date: 2017/12/15
-tag: the Postgres LTREE Extension
-
-etc…&lt;/pre&gt;
-&lt;p&gt;Here the first three lines are metadata values about the post and not part of
-the post content. So before calling Pulldown-mark, my script parses and
-removes these header lines:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;other_lines&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(lines: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Vec&amp;lt;String&amp;gt;) -&amp;gt; Vec&amp;lt;String&amp;gt; {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  lines.iter().skip_while(|l| is_header(l)).map(|l| l.to_string()).collect()
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Above the &lt;span class=&quot;code&quot;&gt;lines&lt;/span&gt; parameter is an array of strings,
-each a single line of text in the markdown source file. (More precisely, it’s a
-reference to a &lt;span class=&quot;code&quot;&gt;Vec&amp;lt;String&amp;gt;&lt;/span&gt;, not an array.) The code
-is fairly readable: &lt;span class=&quot;code&quot;&gt;other_lines&lt;/span&gt; creates an iterator
-over the lines, skips the first few header lines, and then collects the
-remaining lines into a second array which the function returns.&lt;/p&gt;
-&lt;p&gt;Here’s the complete &lt;span class=&quot;code&quot;&gt;html_from_markdown&lt;/span&gt; function,
-which calls &lt;span class=&quot;code&quot;&gt;other_lines&lt;/span&gt;, joins them together into a
-single large string, and then passes that to Pulldown-mark:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;html_from_markdown&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(lines: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Vec&amp;lt;String&amp;gt;) -&amp;gt; Result&amp;lt;String, InvalidPostError&amp;gt; {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; markdown &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; line &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;other_lines(lines) {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    markdown.push_str(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;line);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    markdown.push(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&quot;color:#96b5b4;&quot;&gt;\n&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; parser &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Parser::new(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;markdown);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; html &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  html::push_html(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; html, parser);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  Ok(with_delim_removed(with_highlighted_code_snippets(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;html)))
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-
-&lt;h2&gt;Syntect&lt;/h2&gt;
-&lt;p&gt;If you read the code above carefully, you’ll notice &lt;span
-class=&quot;code&quot;&gt;html_from_markdown&lt;/span&gt; calls &lt;span
-class=&quot;code&quot;&gt;with_highlighted_code_snippets&lt;/span&gt; before returning the HTML
-for each post. This function performs color syntax highlighting.&lt;/p&gt;
-&lt;p&gt;The code snippets in each of my blog posts appear inside of &amp;lt;pre&amp;gt;…&amp;lt;/pre&amp;gt;
-tags.  And I use a “type” attribute to indicate the programming language of the
-snippet. For example:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;&amp;lt;pre type=&quot;ruby&quot;&gt;
-puts &quot;This is Ruby code I’m writing about…&quot;
-&amp;lt;/pre&gt;&lt;/pre&gt;
-&lt;p&gt;Like parsing markdown, syntax highlighting is a very complex task: The Syntect
-crate has to parse the given code snippet, determine the semantic meaning of
-each keyword in the snippet based on the provided programming language, and
-then insert the proper color information. Thank goodness I didn’t have to write
-that code!&lt;/p&gt;
-&lt;p&gt;But using Syntect was easy:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;pub fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;highlighted_html_for_language&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(snippet: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String, attributes: String) -&amp;gt; String {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  lazy_static! {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;static ref &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: SyntaxSet &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;SyntaxSet::load_from_folder(syntax_path()).unwrap();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;static ref &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: Theme &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;ThemeSet::get_theme(theme_path().as_path()).unwrap();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;static ref &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUBY_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;#39;static&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; SyntaxReference &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.find_syntax_by_extension(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;rb&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;).unwrap();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;static ref &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUST_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;&amp;#39;static&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; SyntaxReference &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.find_syntax_by_extension(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;rs&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;).unwrap();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;etc&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;...
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; attributes.contains(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ruby&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    highlighted_html_for_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;snippet, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUBY_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  } &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; attributes.contains(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;rust&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    highlighted_html_for_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;snippet, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUST_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;etc&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;...&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;First I used a &lt;span class=&quot;code&quot;&gt;lazy_static&lt;/span&gt; block to initialize a few
-constant values.
-(&lt;a href=&quot;https://github.com/rust-lang-nursery/lazy-static.rs&quot;&gt;lazy_static&lt;/a&gt; is another
-crate I didn’t have to write!) Rust executes this block once the first time
-it’s encountered and then never again. The values are:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;span class=&quot;code&quot;&gt;SYNTAX_SET&lt;/span&gt;: These are the Sublime syntax files
-describing each programming language I need to colorize. vim is my editor,
-but I use Sublime for color syntax highlighting :) I just downloaded these
-files for the languages I needed and checked them into my app.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;span class=&quot;code&quot;&gt;THEME&lt;/span&gt;: These are the Sublime “theme” files, which
-select the colors to use for each type of code keyword. I found and adapted
-one of these files. They play the role of a CSS file, but use XML syntax.
-Weird, but not hard to figure out.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;span class=&quot;code&quot;&gt;RUBY_SYNTAX&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;RUST_SYNTAX&lt;/span&gt;,
-etc. The lazy block also looks up the syntax language file for each language.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Later my &lt;span class=&quot;code&quot;&gt;highlighted_html_for_language&lt;/span&gt; function
-checks which programming language my post displays, and calls &lt;span
-class=&quot;code&quot;&gt;syntect::html::highlighted_html_for_string&lt;/span&gt; with the proper
-values:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; attributes.contains(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ruby&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    highlighted_html_for_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;snippet, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUBY_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  } &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; attributes.contains(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;rust&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    highlighted_html_for_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;snippet, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;SYNTAX_SET&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;RUST_SYNTAX&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;THEME&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;etc&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;...&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;span class=&quot;code&quot;&gt;attributes&lt;/span&gt; is the array of HTML attributes from the
-&amp;lt;pre&amp;gt; tag surrounding the code snippet in my post source. My app uses
-regular expressions to find the &amp;lt;pre&amp;gt;…&amp;lt;/pre&amp;gt; HTML blocks, parses the
-attributes and provides them to &lt;span
-class=&quot;code&quot;&gt;highlighted_html_for_language&lt;/span&gt;.&lt;/p&gt;
-&lt;h2&gt;Maud&lt;/h2&gt;
-&lt;p&gt;Now my script has HTML for each blog post. All I have to do now is save it in a
-series of HTML files. But first I needed a template engine for Rust, like ERB
-for Ruby or Mustache for node.js.&lt;/p&gt;
-&lt;p&gt;This turned out to be one of the most fun parts of this project. I rewrote &lt;a href=&quot;https://github.com/patshaughnessy/patshaughnessy.github.io/tree/master/src/layout&quot;&gt;my
-HTML
-markup&lt;/a&gt;
-using Maud &lt;span class=&quot;code&quot;&gt;@&lt;/span&gt; directives, like this:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if let &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Some(&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;ref&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; t) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; post.tag {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  div class&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;header&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;More on &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(t)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  div class&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;links&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    ul {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(link_url, link_title) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; recent_links {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        li {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          a href&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{ &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;/&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(link_url) } {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            (link_title)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Maud doesn’t parse the layout code at runtime, like ERB does in Ruby. Instead,
-the &lt;span class=&quot;code&quot;&gt;@if&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;@for&lt;/span&gt; directives
-above are macros. In fact, all of the HTML elements that appear above, like
-&lt;span class=&quot;code&quot;&gt;div&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;ul&lt;/span&gt;, are macros
-also. This means my Maud layout code is actually Rust code!  And that means the
-Rust compiler will check it and make sure it’s valid before it ever runs.&lt;/p&gt;
-&lt;p&gt;Converting my old ERB templates into Rust macros was a bit tedious, but it was
-a great way to review and clean up my HTML. In fact, I found a number of
-mistakes and errors in my HTML code that had been there for 10 years or longer.
-It was like showing my dirty laundry to the Rust compiler. By the time the
-compiler was done and let me compile my layout, it was very clean!&lt;/p&gt;
-&lt;h2&gt;What It Worth It?&lt;/h2&gt;
-&lt;p&gt;It took me several months on a spare time basis - an hour here an hour there -
-to rewrite my blog in Rust. An experienced Rust developer working full time
-could have done it in a day or two probably.&lt;/p&gt;
-&lt;p&gt;What did I get for all this effort? Now I have a script that compiles all 146
-of my markdown posts very quickly. My old Ruby script took 7.7 seconds to do
-this, while the new Rust script only takes 0.28 seconds! That’s over 27 times
-faster! In fact, the Rust code is so fast at parsing and compiling the markdown
-files that I don’t check which files need to be recompiled by comparing
-timestamps, i.e. what a Makefile would do during a build process. And I don’t
-process the posts in parallel. Why bother? By the time I pressed ENTER and
-looked up Rust was almost done building all 146 files in sequence, one after
-the other.&lt;/p&gt;
-&lt;p&gt;But what else did I get? The biggest improvement to my blog script, actually,
-wasn’t the performance. It was the error handling I added. I didn’t mention
-this above, but using the Rust standard library required me to use the
-&lt;span class=&quot;code&quot;&gt;Result&amp;lt;T&amp;gt;&lt;/span&gt; generic type. This, in turn, forced me to
-think about what might go wrong and what to do when it did go wrong. I’ll cover
-this in my next article.  I ended up with a script that was much more reliable
-and resilient to silly mistakes in my source files, and that gave me helpful
-error messages… all the while running 27 times faster.&lt;/p&gt;
-&lt;p&gt;However, the biggest benefit to rewriting my blog in Rust was that I clawed my
-way up the Rust learning curve a bit. But that wouldn’t have been possible
-without crates.io and Cargo. Using code from smarter, more seasoned Rust
-developers gave me a chance to build a useful app, even as a beginner. Cargo
-found, downloaded and compiled open source code from experts with just a few
-simple commands.&lt;/p&gt;
 </content></entry></feed>

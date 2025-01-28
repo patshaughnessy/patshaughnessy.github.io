@@ -11,6 +11,17 @@ pub fn render(draft: bool) -> String {
         div class="container" {
           div class="row" {
             article class="book" {
+              p {
+                i {
+
+                  "I've started working on a new edition of Ruby Under a
+                  Microscope that covers Ruby 3.x. I'm working on this in my
+                  spare time, so it will take a while to finish. Leave a comment
+                  or "
+                  a href="mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update" { "drop me a line" }
+                  " and I'll email you when it's finished."
+                }
+              }
               header {
                 h1 { "Have You Ever Wondered How Ruby Works Internally?" }
               }

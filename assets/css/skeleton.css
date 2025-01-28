@@ -666,6 +666,11 @@ pre {
     max-width: 100%;
   }
 
+  section.content div img#microscope {
+    width: 118px;
+    height: 210px;
+  }
+
   section.content div img {
     width: 100%;
   }

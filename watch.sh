@@ -1,0 +1,1 @@
+fswatch -o posts | xargs -n1 -I{} ./target/debug/blogc -d posts .
