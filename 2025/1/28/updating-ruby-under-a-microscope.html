@@ -81,7 +81,7 @@ the search. </p>
 <h2>Saving a Value in a Hash Table</h2>
 <p>Figure 7-1 shows a single hash object and its hash table.</p>
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-1.svg"><br/>
+<img width="100%" src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-1.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 7-1: A Ruby hash object with an empty hash table 
 </span>
@@ -95,12 +95,13 @@ many hashes, Ruby initially creates 32 entries and 64 bins. (Hashes with 8 or
 fewer entries work somewhat differently; see “Optimization for Small Hashes” on
 page 20.) The best way to understand how a hash table works is by stepping
 through an example. Suppose I add a new key/value to a hash called <code>my_hash</code>: </p>
-<pre><code>my_hash[:key] = &quot;value&quot;
-</code></pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">my_hash[</span><span style="color:#008080;">:key</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">value</span><span style="color:#4f5b66;">&quot;</span></pre>
+
 <p>While executing this line of code, Ruby saves the key and value into the first
 entry, as shown in Figure 7-2.</p>
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-2.svg"><br/>
+<img width="100%" src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-2.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 7-2: A Ruby hash object containing a single value
 </span>
@@ -112,27 +113,31 @@ them back to you in the same order. Also see that Ruby saved an entry index of 0
 in the third bin, number 2. Ruby did this by taking the given key — in this
 example, the symbol <code>:key</code> — and passing it to an internal hash function that
 returns a pseudorandom integer: </p>
-<pre><code>some_value = internal_hash_function(:key)
-</code></pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">some_value </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> internal_hash_function(</span><span style="color:#008080;">:key</span><span style="color:#000000;">)</span></pre>
+
 <p>Next, Ruby takes the hash value — in this example, <code>some_value</code> — and calculates the modulus by the number of bins, which is the remainder after dividing by the number of bins.</p>
-<pre><code>some_value % 64 = 2
-</code></pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">some_value </span><span style="color:#4f5b66;">% </span><span style="color:#d08770;">64 </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">2</span></pre>
+
 <div style="margin-bottom: 2.5rem; font-style: italic">
 NOTE: In Figure 7-2, I assume that the actual hash value for <span
 class="code">:key</span> divided by 64 leaves a remainder of 2. Later in this
 chapter, I’ll explore in more detail the hash functions that Ruby actually uses.
 We’ll see how using 64 bins (a power of 2) speeds up this calculation.  </div>
 <p>Now let’s add a second element to the hash:</p>
-<pre><code>my_hash[:key2] = &quot;value2&quot;
-</code></pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">my_hash[</span><span style="color:#008080;">:key2</span><span style="color:#000000;">] </span><span style="color:#4f5b66;">= &quot;</span><span style="color:#008080;">value2</span><span style="color:#4f5b66;">&quot;</span></pre>
+
 <p>This time let’s imagine that the hash value of <code>:key2</code> divided by 64 yields a
 remainder of 5. </p>
-<pre><code>internal_hash_function(:key2) % 64 = 5
-</code></pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">internal_hash_function(</span><span style="color:#008080;">:key2</span><span style="color:#000000;">) </span><span style="color:#4f5b66;">% </span><span style="color:#d08770;">64 </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">5</span></pre>
+
 <p>Figure 7-3 shows that Ruby fills in a second <code>st_table_entry</code> structure in the
 entries array, and the entry index 1 in bin number 5, the sixth bin.</p>
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-3.svg"><br/>
+<img width="100%" src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-3.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 7-3: A Ruby hash object containing two values
 </span>
@@ -140,9 +145,10 @@ entries array, and the entry index 1 in bin number 5, the sixth bin.</p>
 <h2>Retrieving a Value from a Hash Table</h2>
 <p>The benefit of using a hash table becomes clear when you ask Ruby to retrieve
 the value for a given key. For example: </p>
-<pre><code>p my_hash[:key]
- =&gt; &quot;value&quot;
-</code></pre>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">p my_hash[</span><span style="color:#008080;">:key</span><span style="color:#000000;">]
+</span><span style="color:#000000;"> =&gt; </span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">value</span><span style="color:#4f5b66;">&quot;</span></pre>
+
 <p>If Ruby had saved all of the keys and values in an array or linked list, it
 would have to iterate over all the elements in that array or list, looking for
 :key. This might take a very long time, depending on the number of elements. But
@@ -156,7 +162,7 @@ of <code>:key</code> in entry number 0 or the first entry slot.  Ruby can later 
 value for <code>:key2</code> by repeating the same hash calculation
 <code>internal_hash_function(:key2) % 64 = 5</code>.</p>
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-4.svg"><br/>
+<img width="100%" src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-4.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 7-4: Finding Values in a Hash Table
 </span>

@@ -96,7 +96,7 @@ the search.
 Figure 7-1 shows a single hash object and its hash table.
 
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-1.svg"><br/>
+<img width="100%" src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-1.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 7-1: A Ruby hash object with an empty hash table 
 </span>
@@ -112,15 +112,15 @@ fewer entries work somewhat differently; see “Optimization for Small Hashes”
 page 20.) The best way to understand how a hash table works is by stepping
 through an example. Suppose I add a new key/value to a hash called `my_hash`: 
 
-```
+<pre type="ruby">
 my_hash[:key] = "value"
-```
+</pre>
 
 While executing this line of code, Ruby saves the key and value into the first
 entry, as shown in Figure 7-2.
 
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-2.svg"><br/>
+<img width="100%" src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-2.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 7-2: A Ruby hash object containing a single value
 </span>
@@ -134,15 +134,15 @@ in the third bin, number 2. Ruby did this by taking the given key — in this
 example, the symbol `:key` — and passing it to an internal hash function that
 returns a pseudorandom integer: 
 
-```
+<pre type="ruby">
 some_value = internal_hash_function(:key)
-```
+</pre>
 
 Next, Ruby takes the hash value — in this example, `some_value` — and calculates the modulus by the number of bins, which is the remainder after dividing by the number of bins.
 
-```
+<pre type="ruby">
 some_value % 64 = 2
-```
+</pre>
 
 <div style="margin-bottom: 2.5rem; font-style: italic">
 NOTE: In Figure 7-2, I assume that the actual hash value for <span
@@ -152,22 +152,22 @@ We’ll see how using 64 bins (a power of 2) speeds up this calculation.  </div>
 
 Now let’s add a second element to the hash:
 
-```
+<pre type="ruby">
 my_hash[:key2] = "value2"
-```
+</pre>
 
 This time let’s imagine that the hash value of `:key2` divided by 64 yields a
 remainder of 5. 
 
-```
+<pre type="ruby">
 internal_hash_function(:key2) % 64 = 5
-```
+</pre>
 
 Figure 7-3 shows that Ruby fills in a second `st_table_entry` structure in the
 entries array, and the entry index 1 in bin number 5, the sixth bin.
 
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-3.svg"><br/>
+<img width="100%" src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-3.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 7-3: A Ruby hash object containing two values
 </span>
@@ -178,10 +178,10 @@ entries array, and the entry index 1 in bin number 5, the sixth bin.
 The benefit of using a hash table becomes clear when you ask Ruby to retrieve
 the value for a given key. For example: 
 
-```
+<pre type="ruby">
 p my_hash[:key]
  => "value"
-```
+</pre>
 
 If Ruby had saved all of the keys and values in an array or linked list, it
 would have to iterate over all the elements in that array or list, looking for
@@ -199,7 +199,7 @@ value for `:key2` by repeating the same hash calculation
 `internal_hash_function(:key2) % 64 = 5`.
 
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-4.svg"><br/>
+<img width="100%" src="https://patshaughnessy.net/assets/2025/1/28/Figure-7-4.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 7-4: Finding Values in a Hash Table
 </span>
