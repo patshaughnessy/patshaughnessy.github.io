@@ -1,4 +1,169 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-01-28T16:00:25Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Updating Ruby Under a Microscope</title><link href="https://patshaughnessy.net/2025/1/28/updating-ruby-under-a-microscope" rel="alternate"></link><id href="https://patshaughnessy.net/2025/1/28/updating-ruby-under-a-microscope" rel="alternate"></id><published>2025-01-28T00:00:00Z</published><updated>2025-01-28T00:00:00Z</updated><category></category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-02T15:42:24Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished. In the meantime, here’s a</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished. In the meantime, here’s an
+excerpt from the updated book.  Experiment 7-2 is a fun way to see exactly when
+Ruby increases the number of bins in a hash table.  It was one of the first
+experiments I wrote back in 2013 that digs into the details of how Ruby works
+internally.&lt;/p&gt;
+&lt;h2&gt;Chapter 7: The Hash Table: The Workhorse Of Ruby Internals&lt;/h2&gt;
+&lt;div style=&quot;font-size: small&quot;&gt;
+&lt;table id=&quot;toc&quot;&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Hash Tables in Ruby&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Saving a Value in a Hash Table&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Retrieving a Value from a Hash Table&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 7-1: Retrieving a Value from Hashes of Varying Sizes&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Hash Tables Expand to Accommodate More Values&lt;/td&gt;&lt;td&gt;9&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Hash Collisions and Open Addressing&lt;/td&gt;&lt;td&gt;9&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Searching For an Element Using Open Addressing&lt;/td&gt;&lt;td&gt;11&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Expanding a Hash Table&lt;/td&gt;&lt;td&gt;14&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Does Ruby Decide How Many Entries And Bins To Use?&lt;/td&gt;&lt;td&gt;15&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 7-2: Inserting One New Element into Hashes of Varying Sizes&lt;/td&gt;&lt;td&gt;17&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Optimization for Small Hashes&lt;/td&gt;&lt;td&gt;20&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Does Ruby Convert A Packed Hash Into A Hash Table?&lt;/td&gt;&lt;td&gt;22&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Ruby Implements Hash Functions&lt;/td&gt;&lt;td&gt;23&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 7-3: Using Objects as Keys in a Hash&lt;/td&gt;&lt;td&gt;25&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Summary&lt;/td&gt;&lt;td&gt;30&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img id=&quot;microscope&quot; src=&quot;http://localhost/assets/2025/2/4/experiment.png&quot;&gt;&lt;br/&gt;
+&lt;/div&gt;
+&lt;h2&gt;Experiment 7-2: Inserting One New Element into Hashes of Varying Sizes&lt;/h2&gt;
+&lt;p&gt;One way to test whether this rehashing, or redistribution, of entries really
+occurs when Ruby expands a hash is to measure the amount of time Ruby takes to
+save one new element into existing hashes of different sizes. As we add more
+elements to the same hash, we should eventually see evidence that Ruby is taking
+extra time to rehash the elements. &lt;/p&gt;
+&lt;div style=&quot;clear: left&quot;&gt;&lt;/div&gt;
+&lt;p&gt;The code for this experiment is shown in Listing 7-3.&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#795da3;&quot;&gt;require &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;benchmark&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;100&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.times &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;size&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    hashes &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;10000&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.times &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      hash &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{}
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      (&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;..&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;size).each &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        hash[rand] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rand
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end 
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      hashes &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;&amp;lt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;hash
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end 
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;GC&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.disable
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Benchmark&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.bm &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;bench&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      bench.report(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;adding element number &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#{size&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;10000&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.times &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;| 
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)       hashes[n][size] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;rand
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end 
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end 
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end 
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;GC&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.enable
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
+
+&lt;div style=&quot;font-style: italic; margin: 0 0 20px 0&quot;&gt;
+  Listing 7-3: Adding one more element to hashes of different sizes  
+&lt;/div&gt;
+&lt;p&gt;At (1) the outer loop iterates over hash sizes from 0 to 100, and at (2) the
+inner loop creates 10,000 hashes of the given size. After disabling garbage
+collection, this experiment uses the benchmark library to measure how long it
+takes Ruby to insert a single new value at (3) into all 10,000 hashes of the given
+size. The results are surprising! Figure 7-13 shows the results for Ruby 3.4.1. &lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;http://localhost/assets/2025/2/4/Figure-7-3.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 7-13: Time to add 10,000 key/value pairs vs. hash size (Ruby 3.4.1) 
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Interpreting these data values from left to right, we see the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;It takes about 0.6 ms to insert the first element into an empty hash (10,000
+times). &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;As the hash size increases from 2 to 8, the amount of time required to insert
+a new element is about the same: 0.6ms more or less.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Inserting the 9th key/value pair takes much longer, about 2ms for 10,000
+hashes! &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Next, as the hash size increases from 10 up to 16, once again Ruby can insert
+new elements quickly, between 0.6ms and 0.7ms (10,000 times).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A huge spike! It takes almost 3.1ms to insert the 17th element.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;And then once again starting with the 18th element, the time to insert each
+element reduced to around 0.7ms-0.8.ms.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A 3rd spike appears when Ruby inserts the 33rd element: almost 5ms.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The graph once again flattens and returns to around 0.7-0.8ms per element (10,000
+times).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;And a 4th spike appears when Ruby inserts the 65th element: almost 6ms.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;What’s going on here? Well, Ruby spends the extra time required to insert that
+17th key/value pair expanding the hash table: reallocating the entries array from
+16 to 32 entries, and the bin array from 32 to 64 bins, and then reassigning
+the &lt;code&gt;st_table_entry&lt;/code&gt; structures to the new bin array. Ruby expands the entries and
+bins arrays a second time again after inserting the 33rd entry, this from from 32
+to 64 entries and 64 to 128 bins. (Recall the &lt;code&gt;st_features&lt;/code&gt; table, shown on page
+15, used powers of 2 to determine these array sizes.)&lt;/p&gt;
+&lt;p&gt;The smaller spike on the 9th insert in this figure is curious.  While not as
+pronounced as the spike at the 17th element, this smaller spike is nonetheless
+noticeable. As it turns out, Ruby contains another optimization that speeds up
+hash access even more for small hashes that contain less than 9 elements.&lt;/p&gt;
+</content></entry><entry><title>Updating Ruby Under a Microscope</title><link href="https://patshaughnessy.net/2025/1/28/updating-ruby-under-a-microscope" rel="alternate"></link><id href="https://patshaughnessy.net/2025/1/28/updating-ruby-under-a-microscope" rel="alternate"></id><published>2025-01-28T00:00:00Z</published><updated>2025-01-28T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
 &lt;img id=&quot;microscope&quot; src=&quot;https://patshaughnessy.net/assets/2014/12/17/microscope.png&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Ruby stores much of its own internal data in hash tables.
@@ -88,7 +253,7 @@ the search. &lt;/p&gt;
 &lt;h2&gt;Saving a Value in a Hash Table&lt;/h2&gt;
 &lt;p&gt;Figure 7-1 shows a single hash object and its hash table.&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-1.svg&quot;&gt;&lt;br/&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-1.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Figure 7-1: A Ruby hash object with an empty hash table 
 &lt;/span&gt;
@@ -102,12 +267,13 @@ many hashes, Ruby initially creates 32 entries and 64 bins. (Hashes with 8 or
 fewer entries work somewhat differently; see “Optimization for Small Hashes” on
 page 20.) The best way to understand how a hash table works is by stepping
 through an example. Suppose I add a new key/value to a hash called &lt;code&gt;my_hash&lt;/code&gt;: &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;my_hash[:key] = &amp;quot;value&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;my_hash[&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;:key&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;value&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/pre&gt;
+
 &lt;p&gt;While executing this line of code, Ruby saves the key and value into the first
 entry, as shown in Figure 7-2.&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-2.svg&quot;&gt;&lt;br/&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-2.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Figure 7-2: A Ruby hash object containing a single value
 &lt;/span&gt;
@@ -119,27 +285,31 @@ them back to you in the same order. Also see that Ruby saved an entry index of 0
 in the third bin, number 2. Ruby did this by taking the given key — in this
 example, the symbol &lt;code&gt;:key&lt;/code&gt; — and passing it to an internal hash function that
 returns a pseudorandom integer: &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;some_value = internal_hash_function(:key)
-&lt;/code&gt;&lt;/pre&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;some_value &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; internal_hash_function(&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;:key&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)&lt;/span&gt;&lt;/pre&gt;
+
 &lt;p&gt;Next, Ruby takes the hash value — in this example, &lt;code&gt;some_value&lt;/code&gt; — and calculates the modulus by the number of bins, which is the remainder after dividing by the number of bins.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;some_value % 64 = 2
-&lt;/code&gt;&lt;/pre&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;some_value &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;% &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;64 &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;/pre&gt;
+
 &lt;div style=&quot;margin-bottom: 2.5rem; font-style: italic&quot;&gt;
 NOTE: In Figure 7-2, I assume that the actual hash value for &lt;span
 class=&quot;code&quot;&gt;:key&lt;/span&gt; divided by 64 leaves a remainder of 2. Later in this
 chapter, I’ll explore in more detail the hash functions that Ruby actually uses.
 We’ll see how using 64 bins (a power of 2) speeds up this calculation.  &lt;/div&gt;
 &lt;p&gt;Now let’s add a second element to the hash:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;my_hash[:key2] = &amp;quot;value2&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;my_hash[&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;:key2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;value2&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/pre&gt;
+
 &lt;p&gt;This time let’s imagine that the hash value of &lt;code&gt;:key2&lt;/code&gt; divided by 64 yields a
 remainder of 5. &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;internal_hash_function(:key2) % 64 = 5
-&lt;/code&gt;&lt;/pre&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;internal_hash_function(&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;:key2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;% &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;64 &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;5&lt;/span&gt;&lt;/pre&gt;
+
 &lt;p&gt;Figure 7-3 shows that Ruby fills in a second &lt;code&gt;st_table_entry&lt;/code&gt; structure in the
 entries array, and the entry index 1 in bin number 5, the sixth bin.&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-3.svg&quot;&gt;&lt;br/&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-3.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Figure 7-3: A Ruby hash object containing two values
 &lt;/span&gt;
@@ -147,9 +317,10 @@ entries array, and the entry index 1 in bin number 5, the sixth bin.&lt;/p&gt;
 &lt;h2&gt;Retrieving a Value from a Hash Table&lt;/h2&gt;
 &lt;p&gt;The benefit of using a hash table becomes clear when you ask Ruby to retrieve
 the value for a given key. For example: &lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;p my_hash[:key]
- =&amp;gt; &amp;quot;value&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;p my_hash[&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;:key&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; =&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;value&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/pre&gt;
+
 &lt;p&gt;If Ruby had saved all of the keys and values in an array or linked list, it
 would have to iterate over all the elements in that array or list, looking for
 :key. This might take a very long time, depending on the number of elements. But
@@ -163,7 +334,7 @@ of &lt;code&gt;:key&lt;/code&gt; in entry number 0 or the first entry slot.  Rub
 value for &lt;code&gt;:key2&lt;/code&gt; by repeating the same hash calculation
 &lt;code&gt;internal_hash_function(:key2) % 64 = 5&lt;/code&gt;.&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-4.svg&quot;&gt;&lt;br/&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/1/28/Figure-7-4.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Figure 7-4: Finding Values in a Hash Table
 &lt;/span&gt;
@@ -2263,317 +2434,4 @@ any errors. While it’s harder to write, having the Rust compiler check my
 thought process as I piece together different code paths is a huge help.
 Learning to use and get along with the Rust compiler is worth it: You end up
 with code that is both readable and correct.&lt;/p&gt;
-</content></entry><entry><title>How Rust Makes Error Handling Part of the Language</title><link href="https://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></link><id href="https://patshaughnessy.net/2019/10/3/how-rust-makes-error-handling-part-of-the-language" rel="alternate"></id><published>2019-10-03T00:00:00Z</published><updated>2019-10-03T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/fingers-toes.png&quot;&gt;&lt;br/&gt;
-&lt;i&gt;In Spanish these are all “dedos,” while in English&lt;br/&gt;we can distinguish between fingers and toes. &lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Learning a foreign language can be an incredible experience, not only because
-you can talk to new people, </summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/fingers-toes.png&quot;&gt;&lt;br/&gt;
-&lt;i&gt;In Spanish these are all “dedos,” while in English&lt;br/&gt;we can distinguish between fingers and toes. &lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Learning a foreign language can be an incredible experience, not only because
-you can talk to new people, visit new countries, read new books, etc. When you
-learn the words someone from a different culture uses, you start to see things
-from their perspective. You understand the way they think a bit more.&lt;/p&gt;
-&lt;p&gt;The same is true for programming languages. Learning the syntax, keywords and
-patterns of a new programming language enables you to think about problems from
-a different perspective. You learn to solve problems in a different way.&lt;/p&gt;
-&lt;p&gt;I’ve been studying &lt;a href=&quot;https://www.rust-lang.org&quot;&gt;Rust&lt;/a&gt; recently, a new
-programming language for me. As a Ruby developer, I was curious to learn how
-Rust developers approach solving problems. What do Rust programs look like?
-What new words would I learn?&lt;/p&gt;
-&lt;h2&gt;Why Rust Was Difficult For Me&lt;/h2&gt;
-&lt;p&gt;I knew it would be a challenge to learn Rust. I had heard horror stories about
-how difficult the Rust compiler can be to use, or about how confusing the
-ownership memory model and the borrow checker can be. And I was right: Rust is
-a very difficult language to learn. But not because of move semantics or memory
-management.&lt;/p&gt;
-&lt;p&gt;For me, the most challenging syntax in Rust had to do with simple error
-handling. Let’s take an example: opening and reading a text file. In Ruby, this
-is a one-liner and error handling is completely optional:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;string &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;File&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.read(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;foo.txt&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;In Ruby, &lt;span class=&quot;code&quot;&gt;File.read&lt;/span&gt; returns a simple string. Will this
-ever return an error? Who knows. Maybe Ruby will raise an exception, maybe not.
-I don’t have to worry about that at the call site when I’m writing the code. I
-can focus on the happy path, but I end up with a program that can’t handle
-errors.&lt;/p&gt;
-&lt;p&gt;Golang, at least, returns an error value explicitly when I try to read a file:&lt;/p&gt;
-&lt;pre&gt;b, err := ioutil.ReadFile(&quot;foo.txt&quot;)
-if err != nil {
-    fmt.Print(err)
-} else {
-    str := string(b)
-}&lt;/pre&gt;
-&lt;p&gt;Here the Golang &lt;span class=&quot;code&quot;&gt;ioutil.ReadFile&lt;/span&gt; function returns two
-values: the string I want and also an error value. The Go compiler forces me to
-think about errors that might occur, at least for a moment. But error handling
-is still optional. I can simply choose to ignore the &lt;span
-class=&quot;code&quot;&gt;err&lt;/span&gt; value entirely. Most C programs work in a similar
-fashion, returning an error code in some manner.  And if I do choose to handle
-the error, I end up with verbose, messy code that checks for error codes over
-and over again.&lt;/p&gt;
-&lt;p&gt;In Rust error handling in mandatory. Let’s try to rewrite the same example
-using Rust:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;File::open(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;foo.txt&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;);
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; contents &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;file.read_to_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; contents);&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Right away I run into trouble when I try to compile this:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;error[E0599]: no method named `read_to_string` found for type
-`std::result::Result&amp;lt;std::fs::File, std::io::Error&gt;` in the current scope&lt;/pre&gt;
-&lt;p&gt;What? What is the Rust compiler talking about? I can see there’s a &lt;span
-class=&quot;code&quot;&gt;read_to_string&lt;/span&gt; method on the &lt;span class=&quot;code&quot;&gt;File&lt;/span&gt;
-struct &lt;a href=&quot;https://doc.rust-lang.org/std/io/trait.Read.html#method.read_to_string&quot;&gt;right in the
-documentation&lt;/a&gt;!
-(Actually the method is on the &lt;span class=&quot;code&quot;&gt;Read&lt;/span&gt; trait which &lt;span
-class=&quot;code&quot;&gt;File&lt;/span&gt; implements.) The problem is the &lt;span
-class=&quot;code&quot;&gt;File::open&lt;/span&gt; function doesn’t return a file at all. It
-returns a value of type &lt;span class=&quot;code&quot;&gt;io::Result&amp;lt;File&amp;gt;&lt;/span&gt;:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;pub fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;open&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;&amp;lt;P: AsRef&amp;lt;Path&amp;gt;&amp;gt;(path: P) -&amp;gt; io::Result&amp;lt;File&amp;gt;&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;How do I use this? What does &lt;span class=&quot;code&quot;&gt;io::Result&amp;lt;File&amp;gt;&lt;/span&gt; even
-mean? When I try to write Rust code the way I write Ruby or Go code, I get
-cryptic errors and it doesn’t work.&lt;/p&gt;
-&lt;p&gt;The problem is I’m trying to speak Rust the same way I speak in Ruby. Rust is a
-foreign language; I need to learn some vocabulary before I can try to talk to
-someone. This is why Rust is difficult to learn. It’s a foreign language that
-uses many words completely unfamiliar to most developers.&lt;/p&gt;
-&lt;h2&gt;Types Are the Vocabulary of Programming Languages&lt;/h2&gt;
-&lt;p&gt;My wife is Spanish, and lucky for me she’s had the patience and the endurance
-to teach me and our kids Spanish over the years. As a native English speaker,
-it always seemed curious and amusing to me that Spanish has only one word for
-fingers and toes, &lt;em&gt;dedos&lt;/em&gt;. Don’t people in Spain or Latin America ever need to
-talk about only fingers and not toes? Or vice-versa? And in Spain I invariably
-end up saying silly things like &lt;em&gt;dedos altos&lt;/em&gt; (“upper fingers”), or &lt;em&gt;dedos
-bajos&lt;/em&gt; (“lower fingers”). I always worry about which digits I’m talking about.
-Somehow, though, the Spanish never have any trouble with this; where the
-&lt;em&gt;dedos&lt;/em&gt; are located always seems obvious to them from the context.&lt;/p&gt;
-&lt;p&gt;But I wonder: Do Spanish speakers have trouble learning English when it comes
-to fingers vs. toes? Do they ever say finger when they mean toe? The problem is
-not just learning a new word. You have to learn the meaning behind the word.
-English has a concept, a distinction, that Spanish doesn’t.&lt;/p&gt;
-&lt;p&gt;Back to computer programming, the “words” we use in programming languages
-aren’t only syntax tokens like if, else, let, etc. They are the values that we
-pass around in our programs. And those values have types, even for loosely,
-dynamically typed languages like Ruby.&lt;/p&gt;
-&lt;p&gt;Aside from whatever formal definition Computer Science has for types, I simply
-think of a value’s type as it’s meaning or purpose. To understand what role a
-value plays in your program, you need to understand the concept behind its
-type. Just like the words finger and toe represent certain anatomical concepts
-in English, types like &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt; or &lt;span
-class=&quot;code&quot;&gt;Option&amp;lt;T&amp;gt;&lt;/span&gt; represent programming concepts in Rust - concepts
-that foreigners need to learn for the first time.&lt;/p&gt;
-&lt;p&gt;&lt;/p&gt;
-&lt;blockquote&gt;
-Language shapes the way we think, and determines what we can think about.&lt;br/&gt;
--- Benjamin Lee Whorf
-&lt;/blockquote&gt;
-&lt;p&gt;In fact, some linguists take this to the extreme: That a language’s words
-determine what people in that community are able to think and talk about, what
-concepts they can understand. (However, most modern linguists, &lt;a href=&quot;https://en.wikipedia.org/wiki/Linguistic_relativity&quot;&gt;according to
-Wikipedia&lt;/a&gt;, don’t believe
-this is actually true.)&lt;/p&gt;
-&lt;p&gt;Because Rust includes the &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; type, Rust
-programmers are empowered to talk about error handling in a very natural way.
-It’s part of their daily vocabulary. Of course, native Spanish speakers, I’m
-guessing, have no trouble understanding the distinction between fingers and
-toes. But I certainly have trouble understanding the concept behind &lt;span
-class=&quot;code&quot;&gt;Result&lt;/span&gt; in Rust.&lt;/p&gt;
-&lt;h2&gt;If Rust is Spanish, then Haskell is Latin&lt;/h2&gt;
-&lt;p&gt;So what does &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt; mean? What is a value of
-type &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt;?&lt;/p&gt;
-&lt;p&gt;Just as human language borrow words from other languages — many Spanish words
-are taken from Latin or Arabic while English borrowed many words from French and
-German — programming languages borrow words and concepts from other, older
-programming languages.&lt;/p&gt;
-&lt;p&gt;Rust borrowed the concept behind the &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt;
-type from Haskell, a strongly typed functional programming language. Haskell
-includes a type called &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt;:&lt;/p&gt;
-&lt;pre&gt;data Either a b = Left a | Right b&lt;/pre&gt;
-&lt;p&gt;This syntax seems bizarre at first glance but in fact it’s simple. Haskell
-makes it easy to create new types by combining other types together. This line
-of code means the &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; type is a combination of two
-other types: &lt;span class=&quot;code&quot;&gt;a&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;b&lt;/span&gt;.
-Drawing that type equation, this is how I visualize Haskell &lt;span
-class=&quot;code&quot;&gt;Either&lt;/span&gt; values:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/left-or-right.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;A single &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; value can only encapsulate &lt;em&gt;either&lt;/em&gt;
-a value of type &lt;span class=&quot;code&quot;&gt;a&lt;/span&gt; or a value of type &lt;span
-class=&quot;code&quot;&gt;b&lt;/span&gt;:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;If the &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; value is &lt;span
-  class=&quot;code&quot;&gt;Left&lt;/span&gt;, then it contains an inner value of type &lt;span
-  class=&quot;code&quot;&gt;a&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Left a&lt;/span&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;If the &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; value is &lt;span
-  class=&quot;code&quot;&gt;Right&lt;/span&gt;, then it contains an inner value of type &lt;span
-  class=&quot;code&quot;&gt;b&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Right b&lt;/span&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;The &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; type is also “monad,” because Haskell 
-provides certain functions that create and operate on &lt;span
-class=&quot;code&quot;&gt;Either&lt;/span&gt; values. I won’t cover this concept here today, but
-when I have time I'll discuss monads and how they can be applied to error
-handling in a future post.&lt;/p&gt;
-&lt;p&gt;In Haskell, the &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; type is completely general,
-and you can use it to represent any programming concept you would like.  Rust
-uses the concept behind &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; for a specific
-purpose: to implement error handling. If Haskell is Latin, then Rust is
-Spanish, a younger language that borrows some of the older languages’s
-vocabulary and grammar.&lt;/p&gt;
-&lt;h2&gt;Result&amp;lt;T, E&amp;gt; in Rust&lt;/h2&gt;
-&lt;p&gt;In Rust, the &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; type encapsulates two other types
-like &lt;span class=&quot;code&quot;&gt;Either.&lt;/span&gt; A single &lt;span
-class=&quot;code&quot;&gt;Result&lt;/span&gt; value has either one of those types or the other:&lt;/p&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/ok-or-err.png&quot;&gt;
-&lt;p&gt;Instead of &lt;span class=&quot;code&quot;&gt;Left a&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;Right
-b&lt;/span&gt; like in Haskell, Rust uses the words &lt;span class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;
-and &lt;span class=&quot;code&quot;&gt;Err(E)&lt;/span&gt;:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;If the &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; value is &lt;span
-  class=&quot;code&quot;&gt;Ok&lt;/span&gt;, then it contains an inner value of type &lt;span
-  class=&quot;code&quot;&gt;T&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;.
-&lt;span class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt; means some operation was successful, and the
-result of the operation is a value of type &lt;span class=&quot;code&quot;&gt;T&lt;/span&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;If the &lt;span class=&quot;code&quot;&gt;Either&lt;/span&gt; value is &lt;span
-  class=&quot;code&quot;&gt;Err,&lt;/span&gt; then it contains an inner value of type &lt;span
-  class=&quot;code&quot;&gt;E&lt;/span&gt;. This is written: &lt;span class=&quot;code&quot;&gt;Err(E)&lt;/span&gt;
-Similarly, this means the operation was a failure, and the result of the
-operation is an error of type &lt;span class=&quot;code&quot;&gt;E&lt;/span&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Back to my open file example, the proper way to open a file and read it using
-Rust is to check the &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; values returned by the
-Rust standard library functions:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;File::open(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;foo.txt&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        Ok(file) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;I have a file: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{:?}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, file),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        Err(e) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;There was an error: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, e)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;And If I want to actually read in the contents of that file, I would check that
-return value also:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;File::open(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;foo.txt&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        Ok(&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; contents &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file.read_to_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; contents) {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                Ok(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;The file&amp;#39;s contents are: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, contents),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                Err(e) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;There was an error: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, e)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        Err(e) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;There was an error: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, e)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-
-&lt;h2&gt;The ? Operator In Rust&lt;/h2&gt;
-&lt;p&gt;That last code snippet is quite a mouthful - error checking with Rust is even
-more tedious and verbose than it is using Go!&lt;/p&gt;
-&lt;p&gt;Fortunately, Rust includes an operator that allows Rust programmers to
-abbreviate all of this logic. By appending the &lt;span class=&quot;code&quot;&gt;?&lt;/span&gt;
-character to the call site of a function that returns a &lt;span
-class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt; value, Rust automatically generates code
-that checks the &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt; value, and returns
-underlying &lt;span class=&quot;code&quot;&gt;T&lt;/span&gt; value if the result is &lt;span
-class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;File::open(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;foo.txt&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; contents &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    file.read_to_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; contents)&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Here, the use of &lt;span class=&quot;code&quot;&gt;?&lt;/span&gt; after &lt;span
-class=&quot;code&quot;&gt;File::open(&amp;quot;foo.txt&amp;quot;)&lt;/span&gt; tells the Rust compiler to check the
-return value of &lt;span class=&quot;code&quot;&gt;File::open&lt;/span&gt; for me automatically:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/success-or-failure.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;If the return value of &lt;span class=&quot;code&quot;&gt;File::open&lt;/span&gt; is &lt;span
-class=&quot;code&quot;&gt;Ok(T)&lt;/span&gt;, then Rust assigns the inner &lt;span
-class=&quot;code&quot;&gt;T&lt;/span&gt; value to &lt;span class=&quot;code&quot;&gt;file&lt;/span&gt;. If &lt;span
-class=&quot;code&quot;&gt;File::open&lt;/span&gt; returns &lt;span class=&quot;code&quot;&gt;Err(E)&lt;/span&gt;, then
-Rust jumps to the end of the &lt;span class=&quot;code&quot;&gt;main&lt;/span&gt; function
-immediately and returns.&lt;/p&gt;
-&lt;p&gt;The program above is much more concise and easy to understand. The only problem
-is that it doesn’t work! When I try to compile this, I get:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;error[E0277]: the `?` operator can only be used in a function that returns `Result` or `Option`
-(or another type that implements `std::ops::Try`)
- --&gt; src/main.rs:5:20
-  |
-5 |     let mut file = File::open(&quot;foo.txt&quot;)?;
-  |                    ^^^^^^^^^^^^^^^^^^^^^^ cannot use the `?` operator in
-  a function that returns `()`
-  |
-  = help: the trait `std::ops::Try` is not implemented for `()`
-  = note: required by `std::ops::Try::from_error`&lt;/pre&gt;
-&lt;h2&gt;Rust Programs Revolve Around Error Handling&lt;/h2&gt;
-&lt;p&gt;As the error message says, the problem here is that the &lt;span
-class=&quot;code&quot;&gt;?&lt;/span&gt; operator generates code that will jump to the end of the
-main function and return the &lt;span class=&quot;code&quot;&gt;Err(E)&lt;/span&gt; value, where E is
-of type &lt;span class=&quot;code&quot;&gt;std::io::Error&lt;/span&gt;. The problem is that I haven’t
-declared a return value for &lt;span class=&quot;code&quot;&gt;main&lt;/span&gt;. Therefore the Rust
-compiler gives me an error:&lt;/p&gt;
-&lt;pre class=&quot;console&quot;&gt;the `?` operator can only be used in a function that returns `Result` or
-`Option` (or another type that implements `std::ops::Try`)&lt;/pre&gt;
-&lt;p&gt;The function containing the use of the &lt;span class=&quot;code&quot;&gt;?&lt;/span&gt; operator has
-to return a value of type &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt; with a
-matching &lt;span class=&quot;code&quot;&gt;E&lt;/span&gt; type in order for this to make sense. I
-have to extract my &lt;span class=&quot;code&quot;&gt;File&lt;/span&gt; calls into a separate
-function, like this:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;read&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() -&amp;gt; Result&amp;lt;String, std::io::Error&amp;gt; {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;File::open(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;foo.txt&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; contents &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;String::new();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    file.read_to_string(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; contents)&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    Ok(contents)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;read() {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        Ok(&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;str&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;str&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        Err(e) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{:?}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, e)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Note the new &lt;span class=&quot;code&quot;&gt;read()&lt;/span&gt; function above returns a value of
-type &lt;span class=&quot;code&quot;&gt;Result&amp;lt;String, std::io::Error&amp;gt;&lt;/span&gt;. This allows the
-use of the &lt;span class=&quot;code&quot;&gt;?&lt;/span&gt; operator to compile properly. For the
-happy path, if my code is able to find the “foo.txt” file and read it, then
-&lt;span class=&quot;code&quot;&gt;read()&lt;/span&gt; returns &lt;span
-class=&quot;code&quot;&gt;Ok(contents)&lt;/span&gt;. However, if there’s an error, &lt;span
-class=&quot;code&quot;&gt;read()&lt;/span&gt; will return &lt;span class=&quot;code&quot;&gt;Err(e)&lt;/span&gt;, where
-&lt;span class=&quot;code&quot;&gt;e&lt;/span&gt; is a value of type &lt;span
-class=&quot;code&quot;&gt;std::io::Error&lt;/span&gt;. Note &lt;span class=&quot;code&quot;&gt;open&lt;/span&gt; returns
-the same error type that &lt;span class=&quot;code&quot;&gt;read&lt;/span&gt; does:&lt;/p&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2019/10/3/error-types.png&quot;&gt;
-&lt;p&gt;This is where Rust shines. It allows for concise and readable error handling
-that is also thorough and correct. The Rust compiler checks for error handling
-completeness at &lt;em&gt;compile time&lt;/em&gt;, before I ever run my program.&lt;/p&gt;
-&lt;p&gt;Now that I’ve learned some vocabulary words, now that I can understand how
-native Rust speakers use the word &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt;, I
-can have a Rust conversation about error handling. I can begin to think like
-Rust developers think. I can start to see things from their perspective.&lt;/p&gt;
-&lt;p&gt;And I begin to realize that Rust programs tend to be designed with error
-handling in mind. Notice above how I had to extract a separate function that
-returned a value of type &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt;, just
-because of the &lt;span class=&quot;code&quot;&gt;?&lt;/span&gt; operator. The overall structure of
-my program is determined by error handling just as much as it’s determined by
-the nature of the task I’m trying to accomplish. Rust programmers think about
-errors and what might go wrong from the very beginning, from when they start
-writing code. To be honest, I've often thought about errors and what might go
-wrong as an afterthought, after I've written and deployed my code.&lt;/p&gt;
 </content></entry></feed>

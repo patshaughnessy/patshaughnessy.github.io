@@ -1,5 +1,6 @@
 title: "Updating Ruby Under a Microscope"
 date: 2025/01/28
+tag: Updating Ruby Under a Microscope
 
 <div style="float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
 <img id="microscope" src="https://patshaughnessy.net/assets/2014/12/17/microscope.png"><br/>

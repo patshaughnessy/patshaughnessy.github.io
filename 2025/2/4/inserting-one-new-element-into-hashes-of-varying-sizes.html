@@ -1,0 +1,166 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Inserting One New Element into Hashes of Varying Sizes - Pat Shaughnessy</title><meta name="description" content=""><meta name="author" content=""><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/css/normalize.css"><link rel="stylesheet" href="/assets/css/skeleton.css"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><link rel="icon" type="image/png" href="images/favicon.png"></head><body><div id="banner"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div><div style="margin-top: 35px"><div class="ten columns"><div class="container"><div class="row"><article class="post"><header><h1>Inserting One New Element into Hashes of Varying Sizes</h1><div class="metadata">February 4th 2025&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes">&nbsp; Comments and &nbsp; Reactions</a></div></header><section class="content"><p>I've started working on a new edition of <a
+href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
+Microscope</a> that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or <a
+href="mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update">drop
+me a line</a> and I'll email you when it's finished. In the meantime, here’s an
+excerpt from the updated book.  Experiment 7-2 is a fun way to see exactly when
+Ruby increases the number of bins in a hash table.  It was one of the first
+experiments I wrote back in 2013 that digs into the details of how Ruby works
+internally.</p>
+<h2>Chapter 7: The Hash Table: The Workhorse Of Ruby Internals</h2>
+<div style="font-size: small">
+<table id="toc">
+	<tr>
+		<td>Hash Tables in Ruby</td><td>3</td>
+	</tr>
+	<tr>
+		<td>Saving a Value in a Hash Table</td><td>3</td>
+	</tr>
+	<tr>
+		<td>Retrieving a Value from a Hash Table</td><td>5</td>
+	</tr>
+	<tr>
+		<td>Experiment 7-1: Retrieving a Value from Hashes of Varying Sizes</td><td>7</td>
+	</tr>
+	<tr>
+		<td>How Hash Tables Expand to Accommodate More Values</td><td>9</td>
+	</tr>
+	<tr>
+		<td>Hash Collisions and Open Addressing</td><td>9</td>
+	</tr>
+	<tr>
+		<td>Searching For an Element Using Open Addressing</td><td>11</td>
+	</tr>
+	<tr>
+		<td>Expanding a Hash Table</td><td>14</td>
+	</tr>
+	<tr>
+		<td>How Does Ruby Decide How Many Entries And Bins To Use?</td><td>15</td>
+	</tr>
+	<tr>
+		<td>Experiment 7-2: Inserting One New Element into Hashes of Varying Sizes</td><td>17</td>
+	</tr>
+	<tr>
+		<td>Optimization for Small Hashes</td><td>20</td>
+	</tr>
+	<tr>
+		<td>How Does Ruby Convert A Packed Hash Into A Hash Table?</td><td>22</td>
+	</tr>
+	<tr>
+		<td>How Ruby Implements Hash Functions</td><td>23</td>
+	</tr>
+	<tr>
+		<td>Experiment 7-3: Using Objects as Keys in a Hash</td><td>25</td>
+	</tr>
+	<tr>
+		<td>Summary</td><td>30</td>
+	</tr>
+</table>
+</div>
+<div style="float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
+<img id="microscope" src="http://localhost/assets/2025/2/4/experiment.png"><br/>
+</div>
+<h2>Experiment 7-2: Inserting One New Element into Hashes of Varying Sizes</h2>
+<p>One way to test whether this rehashing, or redistribution, of entries really
+occurs when Ruby expands a hash is to measure the amount of time Ruby takes to
+save one new element into existing hashes of different sizes. As we add more
+elements to the same hash, we should eventually see evidence that Ruby is taking
+extra time to rehash the elements. </p>
+<div style="clear: left"></div>
+<p>The code for this experiment is shown in Listing 7-3.</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">benchmark</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">(</span><span style="color:#d08770;">1</span><span style="color:#000000;">) </span><span style="color:#d08770;">100</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">size</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    hashes </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[]
+</span><span style="color:#000000;">(</span><span style="color:#d08770;">2</span><span style="color:#000000;">) </span><span style="color:#d08770;">10000</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">      hash </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">{}
+</span><span style="color:#000000;">      (</span><span style="color:#d08770;">1</span><span style="color:#4f5b66;">..</span><span style="color:#000000;">size).each </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">        hash[rand] </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">rand
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">      hashes </span><span style="color:#4f5b66;">&lt;&lt; </span><span style="color:#000000;">hash
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#008080;">GC</span><span style="color:#000000;">.disable
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#008080;">Benchmark</span><span style="color:#000000;">.bm </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">bench</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">      bench.report(</span><span style="color:#4f5b66;">&quot;</span><span style="color:#008080;">adding element number </span><span style="color:#000000;">#{size</span><span style="color:#4f5b66;">+</span><span style="color:#d08770;">1</span><span style="color:#000000;">}</span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">) </span><span style="color:#a71d5d;">do
+</span><span style="color:#000000;">        </span><span style="color:#d08770;">10000</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">n</span><span style="color:#4f5b66;">| 
+</span><span style="color:#000000;">(</span><span style="color:#d08770;">3</span><span style="color:#000000;">)       hashes[n][size] </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">rand
+</span><span style="color:#000000;">        </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end 
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#008080;">GC</span><span style="color:#000000;">.enable
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">  </span><span style="color:#a71d5d;">end</span></pre>
+
+<div style="font-style: italic; margin: 0 0 20px 0">
+  Listing 7-3: Adding one more element to hashes of different sizes  
+</div>
+<p>At (1) the outer loop iterates over hash sizes from 0 to 100, and at (2) the
+inner loop creates 10,000 hashes of the given size. After disabling garbage
+collection, this experiment uses the benchmark library to measure how long it
+takes Ruby to insert a single new value at (3) into all 10,000 hashes of the given
+size. The results are surprising! Figure 7-13 shows the results for Ruby 3.4.1. </p>
+<div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
+<img width="100%" src="http://localhost/assets/2025/2/4/Figure-7-3.svg"><br/>
+<span style="font-style: italic; font-size: small">
+  Figure 7-13: Time to add 10,000 key/value pairs vs. hash size (Ruby 3.4.1) 
+</span>
+</div>
+<p>Interpreting these data values from left to right, we see the following:</p>
+<ul>
+<li>
+<p>It takes about 0.6 ms to insert the first element into an empty hash (10,000
+times). </p>
+</li>
+<li>
+<p>As the hash size increases from 2 to 8, the amount of time required to insert
+a new element is about the same: 0.6ms more or less.</p>
+</li>
+<li>
+<p>Inserting the 9th key/value pair takes much longer, about 2ms for 10,000
+hashes! </p>
+</li>
+<li>
+<p>Next, as the hash size increases from 10 up to 16, once again Ruby can insert
+new elements quickly, between 0.6ms and 0.7ms (10,000 times).</p>
+</li>
+<li>
+<p>A huge spike! It takes almost 3.1ms to insert the 17th element.</p>
+</li>
+<li>
+<p>And then once again starting with the 18th element, the time to insert each
+element reduced to around 0.7ms-0.8.ms.</p>
+</li>
+<li>
+<p>A 3rd spike appears when Ruby inserts the 33rd element: almost 5ms.</p>
+</li>
+<li>
+<p>The graph once again flattens and returns to around 0.7-0.8ms per element (10,000
+times).</p>
+</li>
+<li>
+<p>And a 4th spike appears when Ruby inserts the 65th element: almost 6ms.</p>
+</li>
+</ul>
+<p>What’s going on here? Well, Ruby spends the extra time required to insert that
+17th key/value pair expanding the hash table: reallocating the entries array from
+16 to 32 entries, and the bin array from 32 to 64 bins, and then reassigning
+the <code>st_table_entry</code> structures to the new bin array. Ruby expands the entries and
+bins arrays a second time again after inserting the 33rd entry, this from from 32
+to 64 entries and 64 to 128 bins. (Recall the <code>st_features</code> table, shown on page
+15, used powers of 2 to determine these array sizes.)</p>
+<p>The smaller spike on the 9th insert in this figure is curious.  While not as
+pronounced as the spike at the 17th element, this smaller spike is nonetheless
+noticeable. As it turns out, Ruby contains another optimization that speeds up
+hash access even more for small hashes that contain less than 9 elements.</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Inserting One New Element into Hashes of Varying Sizes';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Updating Ruby Under a Microscope</div><div class="links"><ul><li><a href="/2025/1/28/updating-ruby-under-a-microscope">Updating Ruby Under a Microscope</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());</script></div><div id="footer" class="ten columns"><p>Content and UI design &copy; 2008-2025 Pat Shaughnessy</p></div></body></html>

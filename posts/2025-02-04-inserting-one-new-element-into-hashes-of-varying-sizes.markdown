@@ -1,5 +1,6 @@
 title: "Inserting One New Element into Hashes of Varying Sizes"
 date: 2025/02/04
+tag: Updating Ruby Under a Microscope
 
 I've started working on a new edition of <a
 href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
@@ -112,53 +113,54 @@ The code for this experiment is shown in Listing 7-3.
   Listing 7-3: Adding one more element to hashes of different sizes  
 </div>
 
-At 1 the outer loop iterates over hash sizes from 0 to 100, and at 2 the inner
-loop creates 10,000 hashes of the given size. After disabling garbage
+At (1) the outer loop iterates over hash sizes from 0 to 100, and at (2) the
+inner loop creates 10,000 hashes of the given size. After disabling garbage
 collection, this experiment uses the benchmark library to measure how long it
-takes Ruby to insert a single new value at 3 into all 10,000 hashes of the given
-size. The results are surprising! Figure 7-13 shows the results for Ruby 3.2. 
+takes Ruby to insert a single new value at (3) into all 10,000 hashes of the given
+size. The results are surprising! Figure 7-13 shows the results for Ruby 3.4.1. 
 
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
 <img width="100%" src="http://localhost/assets/2025/2/4/Figure-7-3.svg"><br/>
 <span style="font-style: italic; font-size: small">
-  Figure 7-13: Time to add 10,000 key/value pairs vs. hash size (Ruby 3.2) 
+  Figure 7-13: Time to add 10,000 key/value pairs vs. hash size (Ruby 3.4.1) 
 </span>
 </div>
 
 Interpreting these data values from left to right, we see the following:
 
-* It takes about 2.2 ms to insert the first element into an empty hash (10,000
+* It takes about 0.6 ms to insert the first element into an empty hash (10,000
 times). 
 
 * As the hash size increases from 2 to 8, the amount of time required to insert
-a new element is less: between 1.2ms and 1.5ms.
+a new element is about the same: 0.6ms more or less.
 
-* Inserting the 9th key/value pair takes much longer, almost 8ms for 10,000
+* Inserting the 9th key/value pair takes much longer, about 2ms for 10,000
 hashes! 
 
-* Next, as the hash size increases from 10 up to 33, once again Ruby can insert
-new elements into the quickly, between about 1.4ms and 2ms (10,000 times).
+* Next, as the hash size increases from 10 up to 16, once again Ruby can insert
+new elements quickly, between 0.6ms and 0.7ms (10,000 times).
 
-* A huge spike! It takes almost 19ms to insert the 33rd element.
+* A huge spike! It takes almost 3.1ms to insert the 17th element.
 
-* And then once again starting with the 34th element, the time to insert each
-element reduced to around 1.5ms-2.ms.
+* And then once again starting with the 18th element, the time to insert each
+element reduced to around 0.7ms-0.8.ms.
 
-* A 3rd spike appears when Ruby inserts the 65th element.
+* A 3rd spike appears when Ruby inserts the 33rd element: almost 5ms.
 
-* The graph once again flattens and returns to around 2ms per element (10,000
+* The graph once again flattens and returns to around 0.7-0.8ms per element (10,000
 times).
 
+* And a 4th spike appears when Ruby inserts the 65th element: almost 6ms.
+
 What’s going on here? Well, Ruby spends the extra time required to insert that
-33rd key/value pair expanding the hash table: reallocating an entries array from
-32 to 64 entries, and the bin array from 64 to 128 bins, and then reassigning
+17th key/value pair expanding the hash table: reallocating the entries array from
+16 to 32 entries, and the bin array from 32 to 64 bins, and then reassigning
 the `st_table_entry` structures to the new bin array. Ruby expands the entries and
-bins arrays a second time again after inserting the 65 entry, this from from 64
-to 128 entries and 128 to 256 bins. (Recall the `st_features` table, shown on page
+bins arrays a second time again after inserting the 33rd entry, this from from 32
+to 64 entries and 64 to 128 bins. (Recall the `st_features` table, shown on page
 15, used powers of 2 to determine these array sizes.)
 
-The two smaller spikes on the 1st and 9th insert in this figure are curious.
-While not as pronounced as the spike at the 33rd element, these smaller spikes
-are nonetheless noticeable. As it turns out, Ruby contains another optimization
-that speeds up hash access even more for small hashes that contain less than 9
-elements.
+The smaller spike on the 9th insert in this figure is curious.  While not as
+pronounced as the spike at the 17th element, this smaller spike is nonetheless
+noticeable. As it turns out, Ruby contains another optimization that speeds up
+hash access even more for small hashes that contain less than 9 elements.
