@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Using Different Size Pools - Pat Shaughnessy</title><meta name="description" content=""><meta name="author" content=""><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/css/normalize.css"><link rel="stylesheet" href="/assets/css/skeleton.css"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><link rel="icon" type="image/png" href="images/favicon.png"></head><body><div id="banner"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div><div style="margin-top: 35px"><div class="ten columns"><div class="container"><div class="row"><article class="post"><header><h1>Using Different Size Pools</h1><div class="metadata">February 11th 2025&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2025/2/11/using-different-size-pools">&nbsp; Comments and &nbsp; Reactions</a></div></header><section class="content"><i>
+<p>
+I've started working on a new edition of <a
+href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
+Microscope</a> that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or <a
+href="mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update">drop
+me a line</a> and I'll email you when it's finished.
+</p>
+<p>
+The Ruby team has done a tremendous amount of work over the past decade on
+Ruby's garbage collection (GC) implementation. In fact, Ruby's new GC is one of
+the key reasons Ruby 3 is so much faster than Ruby 2. To bring all of this work
+to light, I decided to rewrite Chapter 12 from scratch, covering garbage
+collection in Ruby more accurately and in more depth.  But then, after a few
+months, I realized I had gotten carried away and wrote too much material for one
+chapter. So the updated book will have two new chapters on garbage collection:
+one on garbage collection basics and a second new chapter on incremental and
+generational garbage collection. Here's a small excerpt.
+</p>
+</i>
+<h2>Chapter 12: Garbage Collection Basics</h2>
+<div style="font-size: small">
+<table id="toc">
+	<tr>
+		<td>Where Do Ruby Values Live?</td><td>4</td>
+	</tr>
+	<tr>
+		<td>The RVALUE Structure</td><td>7</td>
+	</tr>
+	<tr>
+		<td>RVALUE Written in C</td><td>8</td>
+	</tr>
+	<tr>
+		<td>The Free List</td><td>9</td>
+	</tr>
+	<tr>
+		<td>Embedded Values</td><td>10</td>
+	</tr>
+	<tr>
+		<td>Size Pools</td><td>12</td>
+	</tr>
+	<tr>
+		<td>Experiment 12-1: Using Different Size Pools</td><td>14</td>
+	</tr>
+	<tr>
+		<td>Cleaning Up Unused Values</td><td>19</td>
+	</tr>
+	<tr>
+		<td>Filling Up a Page</td><td>19</td>
+	</tr>
+	<tr>
+		<td>Marking</td><td>22</td>
+	</tr>
+	<tr>
+		<td>Sweeping</td><td>24</td>
+	</tr>
+	<tr>
+		<td>How Ruby Frees An Object</td><td>28</td>
+	</tr>
+	<tr>
+		<td>Experiment 12-2: When Does Ruby Collect Your Garbage?</td><td>29</td>
+	</tr>
+	<tr>
+		<td>Summary</td><td>25</td>
+	</tr>
+</table>
+</div>
+<div style="float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
+<img id="microscope" src="https://patshaughnessy.net/assets/2025/2/4/experiment.png"><br/>
+</div>
+<h2>Experiment 12-1: Using Different Size Pools</h2>
+<p>Ruby 3.2 and later provides a way to see statistics about size pools, the
+<span class="code">GC.stat_heap</span> class method. <span
+class="code">GC.stat_heap</span> returns a hash as shown in Listing 12-5.</p>
+<div style="clear: left"></div>
+<pre style="background-color:#ffffff;">
+<span style="color:#795da3;">require </span><span style="color:#4f5b66;">&#39;</span><span style="color:#008080;">pp</span><span style="color:#4f5b66;">&#39;
+</span><span style="color:#000000;">pp </span><span style="color:#008080;">GC</span><span style="color:#000000;">.stat_heap
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">{</span><span style="color:#d08770;">0 </span><span style="color:#000000;">=&gt;
+</span><span style="color:#000000;">  {</span><span style="color:#008080;">slot_size: </span><span style="color:#d08770;">40</span><span style="color:#000000;">,
+</span><span style="color:#000000;">   </span><span style="color:#008080;">heap_eden_pages: </span><span style="color:#d08770;">10</span><span style="color:#000000;">,
+</span><span style="color:#000000;">   </span><span style="color:#008080;">heap_eden_slots: </span><span style="color:#d08770;">16374</span><span style="color:#000000;">,
+</span><span style="color:#000000;">   </span><span style="color:#008080;">total_allocated_pages: </span><span style="color:#d08770;">10</span><span style="color:#000000;">,
+</span><span style="color:#000000;">   </span><span style="color:#008080;">force_major_gc_count: </span><span style="color:#d08770;">0</span><span style="color:#000000;">,
+</span><span style="color:#000000;">   </span><span style="color:#008080;">force_incremental_marking_finish_count: </span><span style="color:#d08770;">0</span><span style="color:#000000;">,
+</span><span style="color:#000000;">   </span><span style="color:#008080;">total_allocated_objects: </span><span style="color:#d08770;">26378</span><span style="color:#000000;">,
+</span><span style="color:#000000;">   </span><span style="color:#008080;">total_freed_objects: </span><span style="color:#d08770;">10231</span><span style="color:#000000;">},
+</span><span style="color:#000000;"> </span><span style="color:#d08770;">1 </span><span style="color:#000000;">=&gt;
+</span><span style="color:#000000;">  {</span><span style="color:#008080;">slot_size: </span><span style="color:#d08770;">80</span><span style="color:#000000;">,
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">Etc…</span></pre>
+
+<div style="font-style: italic; font-size: small; margin: -20px 0 20px 0">
+  Listing 12-5: Calling GC.stat_heap
+</div>
+<p>Listing 12-5 shows the output of <span class="code">GC.stat_heap</span> for Size
+Pool 0, which includes the slot size (<span class="code">:slot_size=&gt;40</span>),
+the number of pages Ruby has allocated so far for this size (<span
+class="code">:heap_eden_pages=&gt;10</span>) and the total number of slots
+allocated across all of these pages (<span
+class="code">:heap_eden_slots=&gt;16374</span>). The output of <span
+class="code">GC.stat_heap</span> continues on to show the same statistics for
+the other size pools.</p>
+<p>We can use <span class="code">GC.stat_heap</span> to investigate how Ruby uses
+size pools as we allocate more and more objects. Listing 12-6 shows a Ruby
+program that allocates arrays of varying sizes, and then records the output from
+<span class="code">GC.stat_heap.</span></p>
+<pre style="background-color:#ffffff;">
+<span style="color:#000000;">(</span><span style="color:#d08770;">1</span><span style="color:#000000;">) CAPACITY_ITER </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">100
+</span><span style="color:#000000;">    ALLOCATE_ITER </span><span style="color:#4f5b66;">= </span><span style="color:#d08770;">10000
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">(</span><span style="color:#d08770;">2</span><span style="color:#000000;">) all </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[]
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">(</span><span style="color:#d08770;">3</span><span style="color:#000000;">) </span><span style="color:#008080;">CAPACITY_ITER</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">capa</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">(</span><span style="color:#d08770;">4</span><span style="color:#000000;">)   </span><span style="color:#008080;">ALLOCATE_ITER</span><span style="color:#000000;">.times </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">i</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">        all </span><span style="color:#4f5b66;">&lt;&lt; </span><span style="color:#000000;">Array.</span><span style="color:#795da3;">new</span><span style="color:#000000;">(capa)
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">(</span><span style="color:#d08770;">5</span><span style="color:#000000;">)   total_slots_by_size_pool </span><span style="color:#4f5b66;">= </span><span style="color:#000000;">[]
+</span><span style="color:#000000;">      </span><span style="color:#008080;">GC</span><span style="color:#000000;">.stat_heap.each </span><span style="color:#a71d5d;">do </span><span style="color:#4f5b66;">|</span><span style="color:#000000;">size_pool, stats</span><span style="color:#4f5b66;">|
+</span><span style="color:#000000;">        total_slots_by_size_pool[size_pool] </span><span style="color:#4f5b66;">=</span><span style="color:#000000;"> stats[</span><span style="color:#008080;">:heap_eden_slots</span><span style="color:#000000;">]
+</span><span style="color:#000000;">      </span><span style="color:#a71d5d;">end
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">      print </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{capa}</span><span style="color:#008080;">, </span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">      print </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{total_slots_by_size_pool[</span><span style="color:#d08770;">0</span><span style="color:#000000;">]}</span><span style="color:#008080;">, </span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">      print </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{total_slots_by_size_pool[</span><span style="color:#d08770;">1</span><span style="color:#000000;">]}</span><span style="color:#008080;">, </span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">      print </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{total_slots_by_size_pool[</span><span style="color:#d08770;">2</span><span style="color:#000000;">]}</span><span style="color:#008080;">, </span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">      print </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{total_slots_by_size_pool[</span><span style="color:#d08770;">3</span><span style="color:#000000;">]}</span><span style="color:#008080;">, </span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">      puts  </span><span style="color:#4f5b66;">&quot;</span><span style="color:#000000;">#{total_slots_by_size_pool[</span><span style="color:#d08770;">4</span><span style="color:#000000;">]}</span><span style="color:#4f5b66;">&quot;
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">    </span><span style="color:#a71d5d;">end</span></pre>
+
+<div style="font-style: italic; font-size: small; margin: -20px 0 20px 0">
+  Listing 12-6: Detecting Which Size Pool Ruby Uses for Arrays of Varying Sizes
+</div>
+<p>This program contains an inner loop and an outer loop. The outer loop at (3) in
+Listing 12-6 iterates over arrays of different capacities, from 1 up to 100
+(<span class="code">CAPACITY_ITER</span>). For each array capacity, the program
+creates 10,000 (<span class="code">ALLOCATE_ITER</span>) array objects of that
+size using the inner loop (4). Note the program saves all of the new arrays into
+a single array called all, created at (2). This insures that Ruby doesn’t free
+all of our new arrays by running a garbage collection.</p>
+<p>After creating 10,000 arrays of the given capacity, the program saves the <span
+class="code">heap_eden_slots</span> value from the return value of <span
+class="code">GC.stat_heap</span> for all of the size pools at (5), and then
+prints out the results at (6).</p>
+<p>Running the code in Listing 12-6 produces this output:</p>
+<pre style="background-color:#ffffff;">
+<span style="color:#d08770;">0</span><span style="color:#000000;">, </span><span style="color:#d08770;">22923</span><span style="color:#000000;">, </span><span style="color:#d08770;">6548</span><span style="color:#000000;">, </span><span style="color:#d08770;">2861</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">1</span><span style="color:#000000;">, </span><span style="color:#d08770;">34385</span><span style="color:#000000;">, </span><span style="color:#d08770;">6548</span><span style="color:#000000;">, </span><span style="color:#d08770;">2861</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">2</span><span style="color:#000000;">, </span><span style="color:#d08770;">44209</span><span style="color:#000000;">, </span><span style="color:#d08770;">6548</span><span style="color:#000000;">, </span><span style="color:#d08770;">2861</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">3</span><span style="color:#000000;">, </span><span style="color:#d08770;">54033</span><span style="color:#000000;">, </span><span style="color:#d08770;">6548</span><span style="color:#000000;">, </span><span style="color:#d08770;">2861</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">4</span><span style="color:#000000;">, </span><span style="color:#d08770;">54033</span><span style="color:#000000;">, </span><span style="color:#d08770;">13914</span><span style="color:#000000;">, </span><span style="color:#d08770;">2861</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">5</span><span style="color:#000000;">, </span><span style="color:#d08770;">54033</span><span style="color:#000000;">, </span><span style="color:#d08770;">23735</span><span style="color:#000000;">, </span><span style="color:#d08770;">2861</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">6</span><span style="color:#000000;">, </span><span style="color:#d08770;">54033</span><span style="color:#000000;">, </span><span style="color:#d08770;">34374</span><span style="color:#000000;">, </span><span style="color:#d08770;">2861</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">7</span><span style="color:#000000;">, </span><span style="color:#d08770;">54033</span><span style="color:#000000;">, </span><span style="color:#d08770;">44195</span><span style="color:#000000;">, </span><span style="color:#d08770;">2861</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">8</span><span style="color:#000000;">, </span><span style="color:#d08770;">54033</span><span style="color:#000000;">, </span><span style="color:#d08770;">54016</span><span style="color:#000000;">, </span><span style="color:#d08770;">2861</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">9</span><span style="color:#000000;">, </span><span style="color:#d08770;">54033</span><span style="color:#000000;">, </span><span style="color:#d08770;">54016</span><span style="color:#000000;">, </span><span style="color:#d08770;">11446</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">10</span><span style="color:#000000;">, </span><span style="color:#d08770;">54033</span><span style="color:#000000;">, </span><span style="color:#d08770;">54016</span><span style="color:#000000;">, </span><span style="color:#d08770;">21257</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#d08770;">11</span><span style="color:#000000;">, </span><span style="color:#d08770;">54033</span><span style="color:#000000;">, </span><span style="color:#d08770;">54016</span><span style="color:#000000;">, </span><span style="color:#d08770;">31477</span><span style="color:#000000;">, </span><span style="color:#d08770;">611</span><span style="color:#000000;">, </span><span style="color:#d08770;">306
+</span><span style="color:#000000;">
+</span><span style="color:#000000;">Etc…</span></pre>
+
+<div style="font-style: italic; font-size: small; margin: -20px 0 20px 0">
+  Listing 12-7: The Output From Running the Program in Listing 12-6
+</div>
+<p>The output in Listing 12-7 shows how many slots Ruby has allocated in total
+after each iteration of the outer, array capacity loop. For example:</p>
+<pre>0, 22923, 6548, 2861, 611, 306</pre>
+<p>… shows that after allocating 10,000 empty arrays, Ruby has now uses a total of
+22923 slots for Size Pool 0, 6548 for Size Pool One, 2861 for Size Pool Two,
+etc. If you try running this, you will see slightly different values.</p>
+<p>Plotting these values, we can see which pool Ruby uses for the new arrays of
+various capacities:</p>
+<div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
+<img src="http://localhost/assets/2025/2/11/Figure-12-10.svg"><br/>
+<span style="font-style: italic; font-size: small">
+  Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2.
+</span>
+</div>
+<p>Each bar in Figure 12-10 represents values from a line of output from Listing
+12-7. For example, the first bar on the far left plots this output:</p>
+<pre>0, 22923, 6548, 2861, 611, 306</pre>
+<p>The first value, 0, is the position of each bar on the x-axis, while the bar’s
+color segments display the following three values: The dark grey bar at the
+bottom left corner represents Size Pool 0 (22923), the lighter bar above it
+shows Size Pool 1 (6548), and the lightest, top bar shows Size Pool 2 (286118).</p>
+<p>Moving to the right, each successive bar shows the values for different array
+capacities. Looking over the entire graph, we can see the following pattern in
+Figure 12-10:</p>
+<ul>
+<li>
+<p>The dark grey bars for Size Pool 0 at the bottom of Figure 12-10 increase in
+size from capacity 0 through capacity 3, and then remain the same height after
+that for capacities 4 and greater.</p>
+</li>
+<li>
+<p>The medium grey bars for Size Pool 1 have the same height from capacity 0
+through 3, but then increase from capacity 4 through 8. From capacity 9 and
+onward, the medium grey bars have the same height again.</p>
+</li>
+<li>
+<p>The light grey bars at the top for Size Pool 2 remain small for capacities 0
+through 8, and then increase in size steadily for capacities 9 through 18. Then
+the remain unchanged after that.</p>
+</li>
+</ul>
+<p>Figure 12-10 shows Ruby saves new arrays using the following size pools:</p>
+<pre>Capacity Range	Size Pool
+0-3			0
+4-8			1
+9-18			2</pre>
+<p>Plotting the entire output from Listing 12-7 up to capacity=100, we see the
+following:</p>
+<div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
+<img src="http://localhost/assets/2025/2/11/Figure-12-11.svg"><br/>
+<span style="font-style: italic; font-size: small">
+  Figure 12-11: Complete Output from Listing 12-7
+</span>
+</div>
+<p>Figure 12-11 shows an interesting pattern. Ruby uses size pools 0 through 4 to
+save arrays with capacities from 0 up to 78 in a similar way:</p>
+<pre>Capacity Range	Size Pool
+0-3			0
+4-8			1
+9-18			2
+19-38			3
+39-78			4</pre>
+<p>For each capacity range, the length of the corresponding bars grows steadily,
+and then stops growing.</p>
+<p>However, once we started to save large arrays with capacities of 79 or more
+elements, Ruby saved them in the original Size Pool Zero again. This indicates
+that Ruby stopped embedding the array elements in the size pool entirely, and
+instead allocated a new, separate memory segment to save the elements. For these
+large arrays, small 40 byte RVALUE slots in Size Pool Zero were sufficient,
+because they each contained a pointer to the array data, and not the embedded
+array data itself.</p>
+<div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
+<img src="http://localhost/assets/2025/2/11/Figure-12-12.svg"><br/>
+<span style="font-style: italic; font-size: small">
+  Figure 12-12: A Large Array Saving Its Elements In A Separate Memory Segment
+</span>
+</div>
+<p>Figure 12-12 shows how large arrays, arrays which contain 79 or more elements,
+do not save their elements inside of the RVALUE structure, but instead save a
+pointer (ptr) which contains the location of a separate memory segment that
+holds the array elements.</p>
+<p>One key detail of this experiment was in Listing 12-6 at (2): the all array. The
+inner loop just below in Listing 12-6 at (4) saved each new array into the all
+array. This meant all the new arrays were in fact still being used and Ruby’s
+garbage collector could not reclaim their memory. Without this line of code, we
+would not have seen the total number of slots continually increase, preventing
+us from discovering which slots Ruby saved the arrays into.</p>
+<p>But how did Ruby’s garbage collector know this, exactly? How does Ruby identify
+which values are used and unused by our programs? And how does it reclaim memory
+from the unused values? Let’s take a look at Ruby’s garbage collection process
+next.</p>
+</section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2025/2/11/using-different-size-pools'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Using Different Size Pools';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Updating Ruby Under a Microscope</div><div class="links"><ul><li><a href="/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes">Inserting One New Element into Hashes of Varying Sizes</a></li><li><a href="/2025/1/28/updating-ruby-under-a-microscope">Updating Ruby Under a Microscope</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());</script></div><div id="footer" class="ten columns"><p>Content and UI design &copy; 2008-2025 Pat Shaughnessy</p></div></body></html>
