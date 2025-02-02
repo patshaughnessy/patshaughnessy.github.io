@@ -1,4 +1,183 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-04T15:23:26Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-05T17:31:50Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 50px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img id=&quot;microscope&quot; src=&quot;https://patshaughnessy.net/assets/2014/12/17/microscope.png&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  The garbage collector is where Ruby&lt;br/&gt;objects are born and where they die.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaugh</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 50px 20px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img id=&quot;microscope&quot; src=&quot;https://patshaughnessy.net/assets/2014/12/17/microscope.png&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  The garbage collector is where Ruby&lt;br/&gt;objects are born and where they die.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished. In the meantime, here’s an excerpt from the updated book.&lt;/p&gt;
+&lt;p&gt;TODO&lt;/p&gt;
+&lt;h2&gt;Chapter 12: Garbage Collection Basics&lt;/h2&gt;
+&lt;div style=&quot;font-size: small&quot;&gt;
+&lt;table id=&quot;toc&quot;&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Where Do Ruby Values Live?&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;The RVALUE Structure&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;RVALUE Written in C&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;The Free List&lt;/td&gt;&lt;td&gt;9&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Embedded Values&lt;/td&gt;&lt;td&gt;10&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Size Pools&lt;/td&gt;&lt;td&gt;12&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 12-1: Using Different Size Pools&lt;/td&gt;&lt;td&gt;14&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Cleaning Up Unused Values&lt;/td&gt;&lt;td&gt;19&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Filling Up a Page&lt;/td&gt;&lt;td&gt;19&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Marking&lt;/td&gt;&lt;td&gt;22&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Sweeping&lt;/td&gt;&lt;td&gt;24&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Ruby Frees An Object&lt;/td&gt;&lt;td&gt;28&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 12-2: When Does Ruby Collect Your Garbage?&lt;/td&gt;&lt;td&gt;29&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Summary&lt;/td&gt;&lt;td&gt;25&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;h2&gt;Experiment 12-1: Using Different Size Pools&lt;/h2&gt;
+&lt;p&gt;TODO&lt;/p&gt;
+&lt;p&gt;Ruby saves most of the values you create in your programs in memory segments
+called pages. During startup, Ruby’s memory management system initially creates
+six pages. As your program runs, Ruby will allocate more and more pages to hold
+your program’s values. Ruby also saves values it creates internally in these
+pages. In fact, because Ruby’s parser and compiler also use pages, Ruby will
+often allocate 30 or more pages and fill them with values before your code even
+starts running.&lt;/p&gt;
+&lt;p&gt;The most common type of page can save 1638 40-byte values. Figure 12-1 shows a
+simplified view of a single page.&lt;/p&gt;
+&lt;div style=&quot;clear: left&quot;&gt;&lt;/div&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;50%&quot; src=&quot;http://localhost/assets/2025/2/11/Figure-12-1.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 12-1: A Simplified View of a Page Containing 40-Byte Slots
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;On the right, Figure 12-1 shows a &lt;span class=&quot;code&quot;&gt;heap_page_body&lt;/span&gt;
+structure divided up into slots. Each slot is a location in memory that can hold
+a single Ruby value. Most pages use 40-byte slots: multiplying the number of
+slots (1638 slots) by the size of each slot (40 bytes/slot) gives us the total
+size of a single page: 65520 or about 64k of memory.&lt;/p&gt;
+&lt;p&gt;On the left, Figure 12-1 shows a &lt;span class=&quot;code&quot;&gt;heap_page&lt;/span&gt; control structure, which among other
+things holds the total number of slots available in the body (&lt;span class=&quot;code&quot;&gt;total_slots&lt;/span&gt;), and
+a count of how many of these slots are free or available to hold new values
+(&lt;span class=&quot;code&quot;&gt;free_slots&lt;/span&gt;). This is a simplified view of the
+&lt;span class=&quot;code&quot;&gt;heap_page&lt;/span&gt; structure; Ruby also saves other values here which it uses during the
+garage collection process, as we’ll see later in this chapter.&lt;/p&gt;
+&lt;p&gt;How does Ruby save values in pages? Let’s take an example. Suppose I run the
+very simple one line program shown in Listing 12-1.&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;obj &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Object&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;/pre&gt;
+
+&lt;div style=&quot;font-style: italic; font-size: small; margin: -20px 0 20px 0&quot;&gt;
+  Listing 12-1: Creating A Single Ruby Object
+&lt;/div&gt;
+&lt;p&gt;When Ruby calls the &lt;span class=&quot;code&quot;&gt;Object.new&lt;/span&gt; method, it creates a new instance of the &lt;span class=&quot;code&quot;&gt;Object&lt;/span&gt;
+class. As we saw in Chapter 5, Ruby represents objects using the &lt;span class=&quot;code&quot;&gt;RObject&lt;/span&gt;
+structure. Since this structure uses only 16 bytes for a simple object like
+this, Ruby can save the object in one of the 40 byte slots from Figure 12-1.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;50%&quot; src=&quot;http://localhost/assets/2025/2/11/Figure-12-2.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 12-2: One Ruby Value in a 40-Byte Slot
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 12-2 repeats Figure 12-1, but also shows where Ruby saves my new object,
+at the end of the &lt;span class=&quot;code&quot;&gt;heap_page_body&lt;/span&gt; structure.&lt;/p&gt;
+&lt;p&gt;Now suppose I add a new line to my program and create a second value, an array.&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;obj &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Object&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new 
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Array.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;/pre&gt;
+
+&lt;div style=&quot;font-style: italic; font-size: small; margin: -20px 0 20px 0&quot;&gt;
+  Listing 12-2: Creating an Object And an Array
+&lt;/div&gt;
+&lt;p&gt;Listing 12-2 shows my new program which creates two values. When I run this
+longer program Ruby saves both values, the object and the array, into the same
+40-byte page.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;50%&quot; src=&quot;http://localhost/assets/2025/2/11/Figure-12-3.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 12-3: Two Values in Page
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 12-3 shows my two values, the object and the array, inside the &lt;span
+class=&quot;code&quot;&gt;heap_page_body&lt;/span&gt; structure. Internally Ruby represents my new
+array using an &lt;span class=&quot;code&quot;&gt;RArray&lt;/span&gt; structure, which by default for
+an empty array occupies 16 bytes. This means that, like my object value, Ruby is
+able to save the empty array value into a 40 byte slot.&lt;/p&gt;
+&lt;p&gt;Note that as your program creates new values, Ruby saves them starting at the
+end of the &lt;span class=&quot;code&quot;&gt;heap_page_body&lt;/span&gt; structure, and then works
+it’s way backwards saving each new value. We’ll learn why Ruby saves values
+backwards, and how it finds the next available slot in “The Free List” section
+on page 9.&lt;/p&gt;
+&lt;h2&gt;The RVALUE Structure&lt;/h2&gt;
+&lt;p&gt;To manage slots and values, Ruby uses an C structure called &lt;span
+class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;. &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;s can hold one of
+many different types of values. Figure 12-4 shows &lt;span
+class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;s for three of these types.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;http://localhost/assets/2025/2/11/Figure-12-4.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 12-4: Three Example RVALUEs
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;On the left, Figure 12-4 shows an &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; for a string
+value, in the center an &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; for an array, and on
+the right an &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; for an object. All of them occupy
+40 bytes or less, and so can fit into the 40 byte slots in pages.&lt;/p&gt;
+&lt;p&gt;One important detail to note about these &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;s: each
+of them starts with a small header segment called &lt;span
+class=&quot;code&quot;&gt;RBasic,&lt;/span&gt; containing two values: &lt;span
+class=&quot;code&quot;&gt;flags&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;klass&lt;/span&gt;. Ruby keeps track
+of each value’s class in &lt;span class=&quot;code&quot;&gt;klass&lt;/span&gt;, and saves some
+important attributes about the value in &lt;span class=&quot;code&quot;&gt;flags&lt;/span&gt;. As
+we’ll see later in this chapter, some of these flags are related to garbage
+collection and memory management.&lt;/p&gt;
+&lt;p&gt;Below the &lt;span class=&quot;code&quot;&gt;RBasic&lt;/span&gt; values (&lt;span
+class=&quot;code&quot;&gt;flags&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;klass&lt;/span&gt;), each of the
+three &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; structures contain information specific
+to each value’s type: &lt;span class=&quot;code&quot;&gt;RString&lt;/span&gt;, &lt;span
+class=&quot;code&quot;&gt;RArray&lt;/span&gt;, or &lt;span class=&quot;code&quot;&gt;RObject&lt;/span&gt;.  For example
+the &lt;span class=&quot;code&quot;&gt;len&lt;/span&gt; value holds the length of the string or array,
+and &lt;span class=&quot;code&quot;&gt;ivptr&lt;/span&gt; contains a pointer to an object’s instance
+variables.&lt;/p&gt;
+&lt;p&gt;Think of the &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; structure as an “OR” statement. It
+can contain one type of value OR another type OR another type, etc. This
+flexibility allows Ruby to refer to and manipulate many different types of Ruby
+values in a generic way, using the single &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;
+structure type.&lt;/p&gt;
+</content></entry><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
 &lt;p&gt;
 I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
@@ -2289,157 +2468,4 @@ performance: With just a few lines of code I was able to write an asynchronous
 I/O program that can scale as much as I would like. The &lt;span
 class=&quot;code&quot;&gt;async&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; keywords make
 this code easy to write and easy to read.&lt;/p&gt;
-</content></entry><entry><title>Using Result Combinator Functions in Rust</title><link href="https://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></link><id href="https://patshaughnessy.net/2019/11/19/using-result-combinator-functions-in-rust" rel="alternate"></id><published>2019-11-19T00:00:00Z</published><updated>2019-11-19T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
-  flow by checking for errors in a succinct, elegant way&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Using Rust for the first time, error handling was my biggest stumbling block.
-Was this </summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2019/11/19/train-yard.jpeg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;Rust’s Result type can help you control your program’s&lt;br/&gt;
-  flow by checking for errors in a succinct, elegant way&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Using Rust for the first time, error handling was my biggest stumbling block.
-Was this value a &lt;span class=&quot;code&quot;&gt;Result&amp;lt;T, E&amp;gt;&lt;/span&gt; or just a T?  And the
-right T? The right E? I couldn’t just write the code I wanted to write. It
-felt confusing and overly elaborate.&lt;/p&gt;
-&lt;p&gt;But after a while, I started to get a feel for the basics of using &lt;span
-class=&quot;code&quot;&gt;Result&lt;/span&gt;. I discovered that the combinator methods Result
-provides, like &lt;span class=&quot;code&quot;&gt;map&lt;/span&gt;, &lt;span class=&quot;code&quot;&gt;or_else&lt;/span&gt;
-and &lt;span class=&quot;code&quot;&gt;ok&lt;/span&gt;, made error handling fun. Well, maybe
-that's a bit of an overstatement. They made using &lt;span
-class=&quot;code&quot;&gt;Result&lt;/span&gt; a bit easier, at least.&lt;/p&gt;
-&lt;p&gt;So far my favorite &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; combinator method is
-&lt;a
-href=&quot;https://doc.rust-lang.org/std/result/enum.Result.html#method.and_then&quot;&gt;&lt;span
-class=&quot;code&quot;&gt;and_then&lt;/span&gt;&lt;/a&gt;. Using &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; &lt;em&gt;is&lt;/em&gt;
-actually fun! For example, I wrote &lt;a href=&quot;https://github.com/patshaughnessy/patshaughnessy.github.io/blob/master/src/lib.rs#L43&quot;&gt;this Rust
-code&lt;/a&gt;
-to generate the static HTML pages for this blog site:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; count &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; all_posts.len();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;all_posts.sort_by_key(|p| Reverse(p.date));
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; params &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; CompileParams {all_posts: all_posts, output_path: output_path, draft: draft};
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Ok(params).and_then(compile_posts)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .and_then(compile_home_page)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .and_then(compile_rss_feed)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .map(|_output| count)&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Ignoring the details about sorting and counting, my code:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;First creates a struct holding input parameters, and wraps it using &lt;span class=&quot;code&quot;&gt;Ok(params)&lt;/span&gt;&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;And then&lt;/em&gt; tries to compile all the posts in my blog, passing in the input parameters&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;And then&lt;/em&gt; if this was successful, it tries to compile the home page
-(index.html)&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;And then&lt;/em&gt; if this was successful, it tries to compile the RSS feed (index.xml)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;If there was an error at any time in this process, it short circuits and stops.
-Here’s a flowchart that illustrates this control flow:&lt;/p&gt;
-&lt;div style=&quot;margin-left: auto; margin-right: auto; width:235px&quot;&gt;
-&lt;br/&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2019/11/19/flowchart.png&quot;&gt;
-&lt;/div&gt;
-&lt;p&gt;The happy path is from top to bottom, along the left side. If any of the
-compile methods fail, &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; short circuits the
-happy path and jumps to the end.&lt;/p&gt;
-&lt;h2&gt;Matching Result Types&lt;/h2&gt;
-&lt;p&gt;To chain &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; methods together like this, I used
-the same input and output types for each of the compile methods:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_posts&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(params: CompileParams) -&amp;gt; Result&amp;lt;CompileParams, InvalidPostError&amp;gt;&lt;/span&gt;&lt;/pre&gt;
-
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_home_page&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(params: CompileParams) -&amp;gt; Result&amp;lt;CompileParams, InvalidPostError&amp;gt;&lt;/span&gt;&lt;/pre&gt;
-
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_rss_feed&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(params: CompileParams) -&amp;gt; Result&amp;lt;CompileParams, InvalidPostError&amp;gt;&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Each method expects a &lt;span class=&quot;code&quot;&gt;CompileParams&lt;/span&gt; struct, and
-returns one wrapped in &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt;. Rust unwraps the &lt;span
-class=&quot;code&quot;&gt;CompileParams&lt;/span&gt; from one call and passes it to the next.&lt;/p&gt;
-&lt;p&gt;I use &lt;span class=&quot;code&quot;&gt;InvalidPostError&lt;/span&gt; throughout my code to provide
-a consistent way to return errors. This was a bit of a challenge at first,
-until I realized it was easy to cast other types of errors into
-&lt;span class=&quot;code&quot;&gt;InvalidPostError&lt;/span&gt; like this:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;impl &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;From&amp;lt;std::io::Error&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;InvalidPostError {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;from&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(e: std::io::Error) -&amp;gt; InvalidPostError {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; message &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;format!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, e);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        InvalidPostError::new(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;message)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now the Rust compiler knows how to map a &lt;span class=&quot;code&quot;&gt;std::io::Error&lt;/span&gt; into an &lt;span class=&quot;code&quot;&gt;InvalidPostError&lt;/span&gt;.&lt;/p&gt;
-&lt;h2&gt;Error Handling the Old Fashioned Way&lt;/h2&gt;
-&lt;p&gt;Here’s the code I didn’t have to write: (This is Ruby; substitute your favorite
-PL that doesn't support &lt;a href=&quot;https://medium.com/@huund/monadic-error-handling-1e2ce66e3810&quot;&gt;monadic error
-handling&lt;/a&gt;.)&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; compile_posts(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; compile_home_page(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; compile_rss_feed(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Success!&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Error compiling RSS Feed&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Error compiling home page&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;else
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Error compiling a blog post&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;I didn’t have to write a series of if/else blocks. This would have been tedious
-to write and tedious to read. And I probably would have forgotten (or have been
-too lazy) to check one of the return values.&lt;/p&gt;
-&lt;p&gt;And I didn’t have to write this code either:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_posts&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;raise &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;InvalidPostError&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Failed compiling the posts&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_home_page&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;raise &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;InvalidPostError&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Failed compiling the home page&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;compile_rss_feed&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;raise &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;InvalidPostError&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Failed compiling the RSS feed&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;begin
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  compile_posts(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  compile_home_page(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  compile_rss_feed(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Success&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;rescue &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;InvalidPostError =&amp;gt; e
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts e.message
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Once again this is fragile: I might raise the wrong exception type or not raise
-one at all. Or I might rescue the wrong type. Worse, there’s no indication at
-the call site what might happen.&lt;/p&gt;
-&lt;p&gt;To be honest, I probably won’t bother handling errors at all for a simple Ruby
-script like this. If an exception happens someday while building my blog site,
-then I’ll deal with it then. I’d probably just write this code:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;compile_posts(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;compile_home_page(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;compile_rss_feed(params)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Success&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/pre&gt;
-
-&lt;h2&gt;Rust Error Handling: Easy To Read, Hard To Write&lt;/h2&gt;
-&lt;p&gt;Combining results together using &lt;span class=&quot;code&quot;&gt;and_then&lt;/span&gt; and other
-&lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt; functions enables me to write error checking
-code in a natural, succinct way:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;Ok(params).and_then(compile_posts)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .and_then(compile_home_page)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;          .and_then(compile_rss_feed)&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This is just as simple to read as the Ruby version above that doesn’t check for
-any errors. While it’s harder to write, having the Rust compiler check my
-thought process as I piece together different code paths is a huge help.
-Learning to use and get along with the Rust compiler is worth it: You end up
-with code that is both readable and correct.&lt;/p&gt;
 </content></entry></feed>
