@@ -1,18 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-02T15:42:24Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-04T15:20:01Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
+&lt;p&gt;
+I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
-me a line&lt;/a&gt; and I'll email you when it's finished. In the meantime, here’s a</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+me a line&lt;/a&gt; and I'll email you when it's finished.
+&lt;/p&gt;
+&lt;p&gt;
+&lt;p&gt;RUM includ</summary><content type="html">&lt;i&gt;
+&lt;p&gt;
+I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
-me a line&lt;/a&gt; and I'll email you when it's finished. In the meantime, here’s an
-excerpt from the updated book.  Experiment 7-2 is a fun way to see exactly when
-Ruby increases the number of bins in a hash table.  It was one of the first
-experiments I wrote back in 2013 that digs into the details of how Ruby works
-internally.&lt;/p&gt;
+me a line&lt;/a&gt; and I'll email you when it's finished.
+&lt;/p&gt;
+&lt;p&gt;
+&lt;p&gt;RUM includes a series of “experiments:” simple code snippets that show evidence the book’s explanations are accurate. One of the first experiments I wrote back in 2013, Experiment 7-2 is a fun way to see exactly when Ruby increases the number of bins in a hash table. The experiments in RUM are a great way to see for yourself how Ruby works. They also keep me honest; in fact, I ran this code again recently using Ruby 3.4.1 and saw different results than what I expected!&lt;/p&gt;
+&lt;/p&gt;
+&lt;/i&gt;
 &lt;h2&gt;Chapter 7: The Hash Table: The Workhorse Of Ruby Internals&lt;/h2&gt;
 &lt;div style=&quot;font-size: small&quot;&gt;
 &lt;table id=&quot;toc&quot;&gt;
