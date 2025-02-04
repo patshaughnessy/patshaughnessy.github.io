@@ -74,7 +74,7 @@ RUM includes a series of “experiments:” simple code snippets that show evide
 </div>
 
 <div style="float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img id="microscope" src="http://localhost/assets/2025/2/4/experiment.png"><br/>
+<img id="microscope" src="https://patshaughnessy.net/assets/2025/2/4/experiment.png"><br/>
 </div>
 
 ## Experiment 7-2: Inserting One New Element into Hashes of Varying Sizes
@@ -128,7 +128,7 @@ takes Ruby to insert a single new value at (3) into all 10,000 hashes of the giv
 size. The results are surprising! Figure 7-13 shows the results for Ruby 3.4.1. 
 
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img width="100%" src="http://localhost/assets/2025/2/4/Figure-7-3.svg"><br/>
+<img width="100%" src="https://patshaughnessy.net/assets/2025/2/4/Figure-7-3.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 7-13: Time to add 10,000 key/value pairs vs. hash size (Ruby 3.4.1) 
 </span>
