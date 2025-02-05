@@ -1,23 +1,34 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-05T17:31:50Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 50px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img id=&quot;microscope&quot; src=&quot;https://patshaughnessy.net/assets/2014/12/17/microscope.png&quot;&gt;&lt;br/&gt;
-&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
-  The garbage collector is where Ruby&lt;br/&gt;objects are born and where they die.
-&lt;/span&gt;
-&lt;/div&gt;
-&lt;p&gt;I've started working on a new edition of &lt;a
-href=&quot;http://patshaugh</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 50px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img id=&quot;microscope&quot; src=&quot;https://patshaughnessy.net/assets/2014/12/17/microscope.png&quot;&gt;&lt;br/&gt;
-&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
-  The garbage collector is where Ruby&lt;br/&gt;objects are born and where they die.
-&lt;/span&gt;
-&lt;/div&gt;
-&lt;p&gt;I've started working on a new edition of &lt;a
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-05T17:54:03Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
+&lt;p&gt;
+I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
-me a line&lt;/a&gt; and I'll email you when it's finished. In the meantime, here’s an excerpt from the updated book.&lt;/p&gt;
-&lt;p&gt;TODO&lt;/p&gt;
+me a line&lt;/a&gt; and I'll email you when it's finished.
+&lt;/p&gt;
+&lt;p&gt;
+The Ruby team</summary><content type="html">&lt;i&gt;
+&lt;p&gt;
+I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.
+&lt;/p&gt;
+&lt;p&gt;
+The Ruby team has done a tremendous amount of work over the past decade on
+Ruby's garbage collection (GC) implementation. In fact, Ruby's new GC is one of
+the key reasons Ruby 3 is so much faster than Ruby 2. To bring all of this work
+to light, I decided to rewrite Chapter 12 from scratch, covering garbage
+collection in Ruby more accurately and in more depth.  But then, after a few
+months, I realized I had gotten carried away and wrote too much material for one
+chapter. So the updated book will have two new chapters on garbage collection:
+one on garbage collection basics and a second new chapter on incremental and
+generational garbage collection. Here's a small excerpt.
+&lt;/p&gt;
+&lt;/i&gt;
 &lt;h2&gt;Chapter 12: Garbage Collection Basics&lt;/h2&gt;
 &lt;div style=&quot;font-size: small&quot;&gt;
 &lt;table id=&quot;toc&quot;&gt;
@@ -65,118 +76,198 @@ me a line&lt;/a&gt; and I'll email you when it's finished. In the meantime, here
 	&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/div&gt;
+&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img id=&quot;microscope&quot; src=&quot;https://patshaughnessy.net/assets/2025/2/4/experiment.png&quot;&gt;&lt;br/&gt;
+&lt;/div&gt;
 &lt;h2&gt;Experiment 12-1: Using Different Size Pools&lt;/h2&gt;
-&lt;p&gt;TODO&lt;/p&gt;
-&lt;p&gt;Ruby saves most of the values you create in your programs in memory segments
-called pages. During startup, Ruby’s memory management system initially creates
-six pages. As your program runs, Ruby will allocate more and more pages to hold
-your program’s values. Ruby also saves values it creates internally in these
-pages. In fact, because Ruby’s parser and compiler also use pages, Ruby will
-often allocate 30 or more pages and fill them with values before your code even
-starts running.&lt;/p&gt;
-&lt;p&gt;The most common type of page can save 1638 40-byte values. Figure 12-1 shows a
-simplified view of a single page.&lt;/p&gt;
+&lt;p&gt;Ruby 3.2 and later provides a way to see statistics about size pools, the
+&lt;span class=&quot;code&quot;&gt;GC.stat_heap&lt;/span&gt; class method. &lt;span
+class=&quot;code&quot;&gt;GC.stat_heap&lt;/span&gt; returns a hash as shown in Listing 12-5.&lt;/p&gt;
 &lt;div style=&quot;clear: left&quot;&gt;&lt;/div&gt;
-&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img width=&quot;50%&quot; src=&quot;http://localhost/assets/2025/2/11/Figure-12-1.svg&quot;&gt;&lt;br/&gt;
-&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
-  Figure 12-1: A Simplified View of a Page Containing 40-Byte Slots
-&lt;/span&gt;
-&lt;/div&gt;
-&lt;p&gt;On the right, Figure 12-1 shows a &lt;span class=&quot;code&quot;&gt;heap_page_body&lt;/span&gt;
-structure divided up into slots. Each slot is a location in memory that can hold
-a single Ruby value. Most pages use 40-byte slots: multiplying the number of
-slots (1638 slots) by the size of each slot (40 bytes/slot) gives us the total
-size of a single page: 65520 or about 64k of memory.&lt;/p&gt;
-&lt;p&gt;On the left, Figure 12-1 shows a &lt;span class=&quot;code&quot;&gt;heap_page&lt;/span&gt; control structure, which among other
-things holds the total number of slots available in the body (&lt;span class=&quot;code&quot;&gt;total_slots&lt;/span&gt;), and
-a count of how many of these slots are free or available to hold new values
-(&lt;span class=&quot;code&quot;&gt;free_slots&lt;/span&gt;). This is a simplified view of the
-&lt;span class=&quot;code&quot;&gt;heap_page&lt;/span&gt; structure; Ruby also saves other values here which it uses during the
-garage collection process, as we’ll see later in this chapter.&lt;/p&gt;
-&lt;p&gt;How does Ruby save values in pages? Let’s take an example. Suppose I run the
-very simple one line program shown in Listing 12-1.&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;obj &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Object&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;/pre&gt;
+&lt;span style=&quot;color:#795da3;&quot;&gt;require &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;pp&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;pp &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;GC&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.stat_heap
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;=&amp;gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  {&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;slot_size: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;40&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;,
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;heap_eden_pages: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;10&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;,
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;heap_eden_slots: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;16374&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;,
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;total_allocated_pages: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;10&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;,
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;force_major_gc_count: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;,
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;force_incremental_marking_finish_count: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;,
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;total_allocated_objects: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;26378&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;,
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;total_freed_objects: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;10231&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;},
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1 &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;=&amp;gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  {&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;slot_size: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;80&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;,
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Etc…&lt;/span&gt;&lt;/pre&gt;
 
 &lt;div style=&quot;font-style: italic; font-size: small; margin: -20px 0 20px 0&quot;&gt;
-  Listing 12-1: Creating A Single Ruby Object
+  Listing 12-5: Calling GC.stat_heap
 &lt;/div&gt;
-&lt;p&gt;When Ruby calls the &lt;span class=&quot;code&quot;&gt;Object.new&lt;/span&gt; method, it creates a new instance of the &lt;span class=&quot;code&quot;&gt;Object&lt;/span&gt;
-class. As we saw in Chapter 5, Ruby represents objects using the &lt;span class=&quot;code&quot;&gt;RObject&lt;/span&gt;
-structure. Since this structure uses only 16 bytes for a simple object like
-this, Ruby can save the object in one of the 40 byte slots from Figure 12-1.&lt;/p&gt;
-&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img width=&quot;50%&quot; src=&quot;http://localhost/assets/2025/2/11/Figure-12-2.svg&quot;&gt;&lt;br/&gt;
-&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
-  Figure 12-2: One Ruby Value in a 40-Byte Slot
-&lt;/span&gt;
-&lt;/div&gt;
-&lt;p&gt;Figure 12-2 repeats Figure 12-1, but also shows where Ruby saves my new object,
-at the end of the &lt;span class=&quot;code&quot;&gt;heap_page_body&lt;/span&gt; structure.&lt;/p&gt;
-&lt;p&gt;Now suppose I add a new line to my program and create a second value, an array.&lt;/p&gt;
+&lt;p&gt;Listing 12-5 shows the output of &lt;span class=&quot;code&quot;&gt;GC.stat_heap&lt;/span&gt; for Size
+Pool 0, which includes the slot size (&lt;span class=&quot;code&quot;&gt;:slot_size=&amp;gt;40&lt;/span&gt;),
+the number of pages Ruby has allocated so far for this size (&lt;span
+class=&quot;code&quot;&gt;:heap_eden_pages=&amp;gt;10&lt;/span&gt;) and the total number of slots
+allocated across all of these pages (&lt;span
+class=&quot;code&quot;&gt;:heap_eden_slots=&amp;gt;16374&lt;/span&gt;). The output of &lt;span
+class=&quot;code&quot;&gt;GC.stat_heap&lt;/span&gt; continues on to show the same statistics for
+the other size pools.&lt;/p&gt;
+&lt;p&gt;We can use &lt;span class=&quot;code&quot;&gt;GC.stat_heap&lt;/span&gt; to investigate how Ruby uses
+size pools as we allocate more and more objects. Listing 12-6 shows a Ruby
+program that allocates arrays of varying sizes, and then records the output from
+&lt;span class=&quot;code&quot;&gt;GC.stat_heap.&lt;/span&gt;&lt;/p&gt;
 &lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;obj &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Object&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new 
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Array.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;/pre&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) CAPACITY_ITER &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;100
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    ALLOCATE_ITER &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;10000
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) all &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;CAPACITY_ITER&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.times &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;capa&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;4&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)   &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ALLOCATE_ITER&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.times &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;i&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        all &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;&amp;lt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Array.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(capa)
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;5&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)   total_slots_by_size_pool &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;GC&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.stat_heap.each &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;size_pool, stats&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        total_slots_by_size_pool[size_pool] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; stats[&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;:heap_eden_slots&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      print &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#{capa}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      print &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#{total_slots_by_size_pool[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      print &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#{total_slots_by_size_pool[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      print &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#{total_slots_by_size_pool[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      print &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#{total_slots_by_size_pool[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      puts  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#{total_slots_by_size_pool[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;4&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
 
 &lt;div style=&quot;font-style: italic; font-size: small; margin: -20px 0 20px 0&quot;&gt;
-  Listing 12-2: Creating an Object And an Array
+  Listing 12-6: Detecting Which Size Pool Ruby Uses for Arrays of Varying Sizes
 &lt;/div&gt;
-&lt;p&gt;Listing 12-2 shows my new program which creates two values. When I run this
-longer program Ruby saves both values, the object and the array, into the same
-40-byte page.&lt;/p&gt;
+&lt;p&gt;This program contains an inner loop and an outer loop. The outer loop at (3) in
+Listing 12-6 iterates over arrays of different capacities, from 1 up to 100
+(&lt;span class=&quot;code&quot;&gt;CAPACITY_ITER&lt;/span&gt;). For each array capacity, the program
+creates 10,000 (&lt;span class=&quot;code&quot;&gt;ALLOCATE_ITER&lt;/span&gt;) array objects of that
+size using the inner loop (4). Note the program saves all of the new arrays into
+a single array called all, created at (2). This insures that Ruby doesn’t free
+all of our new arrays by running a garbage collection.&lt;/p&gt;
+&lt;p&gt;After creating 10,000 arrays of the given capacity, the program saves the &lt;span
+class=&quot;code&quot;&gt;heap_eden_slots&lt;/span&gt; value from the return value of &lt;span
+class=&quot;code&quot;&gt;GC.stat_heap&lt;/span&gt; for all of the size pools at (5), and then
+prints out the results at (6).&lt;/p&gt;
+&lt;p&gt;Running the code in Listing 12-6 produces this output:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#d08770;&quot;&gt;0&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;22923&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;6548&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2861&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;34385&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;6548&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2861&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;44209&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;6548&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2861&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54033&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;6548&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2861&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;4&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54033&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;13914&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2861&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;5&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54033&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;23735&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2861&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;6&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54033&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;34374&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2861&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;7&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54033&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;44195&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2861&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;8&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54033&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54016&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2861&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;9&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54033&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54016&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;11446&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;10&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54033&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54016&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;21257&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;11&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54033&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;54016&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;31477&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;611&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;306
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Etc…&lt;/span&gt;&lt;/pre&gt;
+
+&lt;div style=&quot;font-style: italic; font-size: small; margin: -20px 0 20px 0&quot;&gt;
+  Listing 12-7: The Output From Running the Program in Listing 12-6
+&lt;/div&gt;
+&lt;p&gt;The output in Listing 12-7 shows how many slots Ruby has allocated in total
+after each iteration of the outer, array capacity loop. For example:&lt;/p&gt;
+&lt;pre&gt;0, 22923, 6548, 2861, 611, 306&lt;/pre&gt;
+&lt;p&gt;… shows that after allocating 10,000 empty arrays, Ruby has now uses a total of
+22923 slots for Size Pool 0, 6548 for Size Pool One, 2861 for Size Pool Two,
+etc. If you try running this, you will see slightly different values.&lt;/p&gt;
+&lt;p&gt;Plotting these values, we can see which pool Ruby uses for the new arrays of
+various capacities:&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img width=&quot;50%&quot; src=&quot;http://localhost/assets/2025/2/11/Figure-12-3.svg&quot;&gt;&lt;br/&gt;
+&lt;img src=&quot;http://localhost/assets/2025/2/11/Figure-12-10.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
-  Figure 12-3: Two Values in Page
+  Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2.
 &lt;/span&gt;
 &lt;/div&gt;
-&lt;p&gt;Figure 12-3 shows my two values, the object and the array, inside the &lt;span
-class=&quot;code&quot;&gt;heap_page_body&lt;/span&gt; structure. Internally Ruby represents my new
-array using an &lt;span class=&quot;code&quot;&gt;RArray&lt;/span&gt; structure, which by default for
-an empty array occupies 16 bytes. This means that, like my object value, Ruby is
-able to save the empty array value into a 40 byte slot.&lt;/p&gt;
-&lt;p&gt;Note that as your program creates new values, Ruby saves them starting at the
-end of the &lt;span class=&quot;code&quot;&gt;heap_page_body&lt;/span&gt; structure, and then works
-it’s way backwards saving each new value. We’ll learn why Ruby saves values
-backwards, and how it finds the next available slot in “The Free List” section
-on page 9.&lt;/p&gt;
-&lt;h2&gt;The RVALUE Structure&lt;/h2&gt;
-&lt;p&gt;To manage slots and values, Ruby uses an C structure called &lt;span
-class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;. &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;s can hold one of
-many different types of values. Figure 12-4 shows &lt;span
-class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;s for three of these types.&lt;/p&gt;
+&lt;p&gt;Each bar in Figure 12-10 represents values from a line of output from Listing
+12-7. For example, the first bar on the far left plots this output:&lt;/p&gt;
+&lt;pre&gt;0, 22923, 6548, 2861, 611, 306&lt;/pre&gt;
+&lt;p&gt;The first value, 0, is the position of each bar on the x-axis, while the bar’s
+color segments display the following three values: The dark grey bar at the
+bottom left corner represents Size Pool 0 (22923), the lighter bar above it
+shows Size Pool 1 (6548), and the lightest, top bar shows Size Pool 2 (286118).&lt;/p&gt;
+&lt;p&gt;Moving to the right, each successive bar shows the values for different array
+capacities. Looking over the entire graph, we can see the following pattern in
+Figure 12-10:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;The dark grey bars for Size Pool 0 at the bottom of Figure 12-10 increase in
+size from capacity 0 through capacity 3, and then remain the same height after
+that for capacities 4 and greater.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The medium grey bars for Size Pool 1 have the same height from capacity 0
+through 3, but then increase from capacity 4 through 8. From capacity 9 and
+onward, the medium grey bars have the same height again.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The light grey bars at the top for Size Pool 2 remain small for capacities 0
+through 8, and then increase in size steadily for capacities 9 through 18. Then
+the remain unchanged after that.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Figure 12-10 shows Ruby saves new arrays using the following size pools:&lt;/p&gt;
+&lt;pre&gt;Capacity Range	Size Pool
+0-3			0
+4-8			1
+9-18			2&lt;/pre&gt;
+&lt;p&gt;Plotting the entire output from Listing 12-7 up to capacity=100, we see the
+following:&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img width=&quot;100%&quot; src=&quot;http://localhost/assets/2025/2/11/Figure-12-4.svg&quot;&gt;&lt;br/&gt;
+&lt;img src=&quot;http://localhost/assets/2025/2/11/Figure-12-11.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
-  Figure 12-4: Three Example RVALUEs
+  Figure 12-11: Complete Output from Listing 12-7
 &lt;/span&gt;
 &lt;/div&gt;
-&lt;p&gt;On the left, Figure 12-4 shows an &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; for a string
-value, in the center an &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; for an array, and on
-the right an &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; for an object. All of them occupy
-40 bytes or less, and so can fit into the 40 byte slots in pages.&lt;/p&gt;
-&lt;p&gt;One important detail to note about these &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;s: each
-of them starts with a small header segment called &lt;span
-class=&quot;code&quot;&gt;RBasic,&lt;/span&gt; containing two values: &lt;span
-class=&quot;code&quot;&gt;flags&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;klass&lt;/span&gt;. Ruby keeps track
-of each value’s class in &lt;span class=&quot;code&quot;&gt;klass&lt;/span&gt;, and saves some
-important attributes about the value in &lt;span class=&quot;code&quot;&gt;flags&lt;/span&gt;. As
-we’ll see later in this chapter, some of these flags are related to garbage
-collection and memory management.&lt;/p&gt;
-&lt;p&gt;Below the &lt;span class=&quot;code&quot;&gt;RBasic&lt;/span&gt; values (&lt;span
-class=&quot;code&quot;&gt;flags&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;klass&lt;/span&gt;), each of the
-three &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; structures contain information specific
-to each value’s type: &lt;span class=&quot;code&quot;&gt;RString&lt;/span&gt;, &lt;span
-class=&quot;code&quot;&gt;RArray&lt;/span&gt;, or &lt;span class=&quot;code&quot;&gt;RObject&lt;/span&gt;.  For example
-the &lt;span class=&quot;code&quot;&gt;len&lt;/span&gt; value holds the length of the string or array,
-and &lt;span class=&quot;code&quot;&gt;ivptr&lt;/span&gt; contains a pointer to an object’s instance
-variables.&lt;/p&gt;
-&lt;p&gt;Think of the &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; structure as an “OR” statement. It
-can contain one type of value OR another type OR another type, etc. This
-flexibility allows Ruby to refer to and manipulate many different types of Ruby
-values in a generic way, using the single &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt;
-structure type.&lt;/p&gt;
+&lt;p&gt;Figure 12-11 shows an interesting pattern. Ruby uses size pools 0 through 4 to
+save arrays with capacities from 0 up to 78 in a similar way:&lt;/p&gt;
+&lt;pre&gt;Capacity Range	Size Pool
+0-3			0
+4-8			1
+9-18			2
+19-38			3
+39-78			4&lt;/pre&gt;
+&lt;p&gt;For each capacity range, the length of the corresponding bars grows steadily,
+and then stops growing.&lt;/p&gt;
+&lt;p&gt;However, once we started to save large arrays with capacities of 79 or more
+elements, Ruby saved them in the original Size Pool Zero again. This indicates
+that Ruby stopped embedding the array elements in the size pool entirely, and
+instead allocated a new, separate memory segment to save the elements. For these
+large arrays, small 40 byte RVALUE slots in Size Pool Zero were sufficient,
+because they each contained a pointer to the array data, and not the embedded
+array data itself.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img src=&quot;http://localhost/assets/2025/2/11/Figure-12-12.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 12-12: A Large Array Saving Its Elements In A Separate Memory Segment
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 12-12 shows how large arrays, arrays which contain 79 or more elements,
+do not save their elements inside of the RVALUE structure, but instead save a
+pointer (ptr) which contains the location of a separate memory segment that
+holds the array elements.&lt;/p&gt;
+&lt;p&gt;One key detail of this experiment was in Listing 12-6 at (2): the all array. The
+inner loop just below in Listing 12-6 at (4) saved each new array into the all
+array. This meant all the new arrays were in fact still being used and Ruby’s
+garbage collector could not reclaim their memory. Without this line of code, we
+would not have seen the total number of slots continually increase, preventing
+us from discovering which slots Ruby saved the arrays into.&lt;/p&gt;
+&lt;p&gt;But how did Ruby’s garbage collector know this, exactly? How does Ruby identify
+which values are used and unused by our programs? And how does it reclaim memory
+from the unused values? Let’s take a look at Ruby’s garbage collection process
+next.&lt;/p&gt;
 </content></entry><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
 &lt;p&gt;
 I've started working on a new edition of &lt;a
