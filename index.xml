@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-06T15:35:46Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Write Barriers</title><link href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></id><published>2025-02-18T00:00:00Z</published><updated>2025-02-18T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-06T15:38:24Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Write Barriers</title><link href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></id><published>2025-02-18T00:00:00Z</published><updated>2025-02-18T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
 &lt;p&gt;
 I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
@@ -7,8 +7,9 @@ will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
 me a line&lt;/a&gt; and I'll email you when it's finished.
 &lt;/p&gt;
+&lt;/i&gt;
 &lt;p&gt;
-Ruby’s garb</summary><content type="html">&lt;i&gt;
+Ruby’s</summary><content type="html">&lt;i&gt;
 &lt;p&gt;
 I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
@@ -17,18 +18,18 @@ will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
 me a line&lt;/a&gt; and I'll email you when it's finished.
 &lt;/p&gt;
+&lt;/i&gt;
 &lt;p&gt;
 Ruby’s garbage collection implementation is complex and confusing - yet powerful
 and beautiful at the same time. Chapter 13 summarizes and explains some of these
 more advanced aspects of Ruby’s garbage collector. Writing it, I don’t shy away
-from advanced topics. I love both learning about the difficult bits myself, and
+from advanced topics. I both learning about the difficult bits myself, and
 then understanding them at a deep enough level to be able to explain them to all
 of you.
 &lt;p&gt;In RUM I show C code snippets in gray callouts. These sections are for readers
 who do understand C syntax, or who would like to learn it. These can give you
 sign posts in case you ever decide to read Ruby’s source code for yourself.&lt;/p&gt;
 &lt;/p&gt;
-&lt;/i&gt;
 &lt;h2&gt;Chapter 13: Incremental and Generational Garbage Collection&lt;/h2&gt;
 &lt;div style=&quot;font-size: small&quot;&gt;
 &lt;table id=&quot;toc&quot;&gt;
