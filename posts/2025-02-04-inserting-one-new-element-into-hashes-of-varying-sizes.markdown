@@ -2,23 +2,19 @@ title: "Inserting One New Element into Hashes of Varying Sizes"
 date: 2025/02/04
 tag: Updating Ruby Under a Microscope
 
-<i>
-<p>
 I've started working on a new edition of <a
 href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
 Microscope</a> that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or <a
 href="mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update">drop
 me a line</a> and I'll email you when it's finished.
-</p>
 
-<p>
-
-RUM includes a series of “experiments:” simple code snippets that show evidence the book’s explanations are accurate. One of the first experiments I wrote back in 2013, Experiment 7-2 is a fun way to see exactly when Ruby increases the number of bins in a hash table. The experiments in RUM are a great way to see for yourself how Ruby works. They also keep me honest; in fact, I ran this code again recently using Ruby 3.4.1 and saw different results than what I expected!
-
-
-</p>
-</i>
+RUM includes a series of “experiments:” simple code snippets that show evidence
+the book’s explanations are accurate. One of the first experiments I wrote back
+in 2013, Experiment 7-2 is a fun way to see exactly when Ruby increases the
+number of bins in a hash table. The experiments in RUM are a great way to see
+for yourself how Ruby works. They also keep me honest; in fact, I ran this code
+again recently using Ruby 3.4.1 and saw different results than what I expected!
 
 ## Chapter 7: The Hash Table: The Workhorse Of Ruby Internals
 
