@@ -1,35 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-06T15:38:24Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Write Barriers</title><link href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></id><published>2025-02-18T00:00:00Z</published><updated>2025-02-18T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
-&lt;p&gt;
-I've started working on a new edition of &lt;a
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-07T16:23:52Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Write Barriers</title><link href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></id><published>2025-02-18T00:00:00Z</published><updated>2025-02-18T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
-me a line&lt;/a&gt; and I'll email you when it's finished.
-&lt;/p&gt;
-&lt;/i&gt;
-&lt;p&gt;
-Ruby’s</summary><content type="html">&lt;i&gt;
-&lt;p&gt;
-I've started working on a new edition of &lt;a
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;Ruby’s garbage col</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
-me a line&lt;/a&gt; and I'll email you when it's finished.
-&lt;/p&gt;
-&lt;/i&gt;
-&lt;p&gt;
-Ruby’s garbage collection implementation is complex and confusing - yet powerful
-and beautiful at the same time. Chapter 13 summarizes and explains some of these
-more advanced aspects of Ruby’s garbage collector. Writing it, I don’t shy away
-from advanced topics. I both learning about the difficult bits myself, and
-then understanding them at a deep enough level to be able to explain them to all
-of you.
-&lt;p&gt;In RUM I show C code snippets in gray callouts. These sections are for readers
-who do understand C syntax, or who would like to learn it. These can give you
-sign posts in case you ever decide to read Ruby’s source code for yourself.&lt;/p&gt;
-&lt;/p&gt;
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;Ruby’s garbage collection implementation is complex and confusing - yet powerful
+and beautiful at the same time. Chapter 13 summarizes and explains advanced
+aspects of Ruby’s garbage collector. I love learning about the difficult bits at
+a deep enough level to be able to explain them to someone else. In RUM I often
+show snippets from Ruby's C source code in gray callouts. These sections are for
+readers who already understand C syntax, or who would like to learn it.  These
+can give you sign posts in case you ever decide to read Ruby’s source code for
+yourself.&lt;/p&gt;
 &lt;h2&gt;Chapter 13: Incremental and Generational Garbage Collection&lt;/h2&gt;
 &lt;div style=&quot;font-size: small&quot;&gt;
 &lt;table id=&quot;toc&quot;&gt;
@@ -92,20 +80,22 @@ sign posts in case you ever decide to read Ruby’s source code for yourself.&lt
 &lt;h2&gt;Write Barriers&lt;/h2&gt;
 &lt;p&gt;Write barriers warn Ruby’s garbage collection algorithm whenever your program
 creates a new object that might have to be marked. You can think of the
-“barriers” as small boxes that surround arrays, hashes and other data structures
+barriers as small boxes that surround arrays, hashes and other data structures
 you might have in your program. For example, in Listing 13-1 Ruby places a write
-barrier around arr, the array that contains all of the new objects:&lt;/p&gt;
+barrier around &lt;span class=&quot;code&quot;&gt;arr&lt;/span&gt;, the array that contains all of the
+new objects:&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;http://localhost/assets/2025/2/11/Figure-13-9.svg&quot;&gt;&lt;br/&gt;
+&lt;img width=&quot;50%&quot; src=&quot;http://localhost/assets/2025/2/18/Figure-13-9.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Figure 13-9: A Write Barrier
 &lt;/span&gt;
 &lt;/div&gt;
-&lt;p&gt;Figure 13-9 repeats Figure 13-6, which showed the array arr, just after Ruby
-removed it from the mark stack, along with all of the elements of arr, still on
-the stack. However, on the left the dotted rectangle represents a writer barrier
-around this array. (In reality, there’s nothing special about this array; Ruby
-uses write barriers for all arrays, hashes and other data structures.)&lt;/p&gt;
+&lt;p&gt;Figure 13-9 repeats Figure 13-6, which showed the array &lt;span
+class=&quot;code&quot;&gt;arr&lt;/span&gt;, just after Ruby removed it from the mark stack, along
+with all of the elements of &lt;span class=&quot;code&quot;&gt;arr&lt;/span&gt;, still on the stack.
+However, on the left the dotted rectangle represents a writer barrier around
+this array. (In reality, there’s nothing special about this array; Ruby uses
+write barriers for all arrays, hashes and other data structures.)&lt;/p&gt;
 &lt;p&gt;The write barrier, as the name implies, jumps into action whenever your program
 writes to the array inside. In this example, the barrier will be triggered when
 the program runs the line of code at (3) in Listing 13-1 inside the loop:&lt;/p&gt;
@@ -115,22 +105,67 @@ the program runs the line of code at (3) in Listing 13-1 inside the loop:&lt;/p&
 &lt;p&gt;If your program was running between incremental GC steps when Ruby added a new
 element to the array, Ruby would move the array back on to the mark stack:&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;http://localhost/assets/2025/2/11/Figure-13-10.svg&quot;&gt;&lt;br/&gt;
+&lt;img width=&quot;50%&quot; src=&quot;http://localhost/assets/2025/2/18/Figure-13-10.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Figure 13-10: Triggering a Write Barrier Pushes the Array Back on the Mark Stack
 &lt;/span&gt;
 &lt;/div&gt;
-&lt;p&gt;Figure 13-10 shows the array arr on the left, inside of a write barrier. The
-line of code just above, &lt;span class=&quot;code&quot;&gt;arr.push&lt;/span&gt; triggers the write
-barrier because it writes to or modifies the array’s contents. This triggers the
-write barrier, which moves the array arr back on to the mark stack, shown on the
-right. Now during the next GC step, Ruby will process the array’s children
-again, even if it had processed them earlier. This allows Ruby to find and mark
-the new object just added to the array.&lt;/p&gt;
+&lt;p&gt;Figure 13-10 shows the array &lt;span class=&quot;code&quot;&gt;arr&lt;/span&gt; on the left, inside
+of a write barrier. The line of code just above, &lt;span
+class=&quot;code&quot;&gt;arr.push&lt;/span&gt;, triggers the write barrier because it writes to
+the array’s contents. This triggers the write barrier, which moves the array
+&lt;span class=&quot;code&quot;&gt;arr&lt;/span&gt; back on to the mark stack, shown on the right. Now
+during the next GC step, Ruby will process the array’s children again, even if
+it had processed them earlier. This allows Ruby to find and mark the new object
+just added to the array.&lt;/p&gt;
 &lt;p&gt;The mark stack is how Ruby remembers its place inside of the GC algorithm,
 between one incremental GC and the next. Whenever an incremental GC step starts,
 Ruby continues to mark the objects present on the mark stack that were pending
 from last time &lt;em&gt;or that were modified in the meantime&lt;/em&gt;.&lt;/p&gt;
+&lt;div class=&quot;c-code&quot;&gt;
+&lt;h2&gt;A Write Barrier in Action&lt;/h2&gt;
+&lt;p&gt;Whenever your program modifies an array, hash or other value protected by write
+barriers, Ruby calls this C code internally. &lt;code&gt;rb_gc_impl_writebarrier_remember&lt;/code&gt; at
+(1) in Listing 13-2 pushes a modified object back on to the mark stack, as shown
+above in Figure 13-10:&lt;/p&gt;
+&lt;pre&gt;(1) void rb_gc_impl_writebarrier_remember(void *objspace_ptr, VALUE obj)
+    {
+        rb_objspace_t *objspace = objspace_ptr;
+    
+        gc_report(1, objspace, &quot;rb_gc_writebarrier_remember: %s\n&quot;, rb_obj_info(obj));
+    
+(2)     if (is_incremental_marking(objspace)) {
+(3)         if (RVALUE_BLACK_P(objspace, obj)) {
+(4)             gc_grey(objspace, obj);
+            }
+        }
+        else {
+(5)         if (RVALUE_OLD_P(objspace, obj)) {
+                rgengc_remember(objspace, obj);
+            }
+        }
+    }&lt;/pre&gt;
+&lt;div style=&quot;font-style: italic; margin: 0 0 20px 0&quot;&gt;
+  Listing 13-2: The rb_gc_writebarrier_remember function
+&lt;/div&gt;
+&lt;p&gt;Ruby first checks at (2) whether it is currently in the midst of an incremental
+garbage collection. If it is, Ruby continues to the line at (3), and checks
+whether the given object was already completely processed: whether Ruby marked
+it and all of its children. (Recall the non-inclusive term “black” from the
+tricolor GC algorithm.) For example, in Figure 13-9 the &lt;code&gt;arr&lt;/code&gt; value was
+completed processed, since Ruby marked it and also moved all of its children on
+to the mark stack, removing &lt;code&gt;arr&lt;/code&gt; from the mark stack. &lt;/p&gt;
+&lt;p&gt;If Ruby did already mark the value, and if Ruby already pushed the value’s
+children on to the mark stack, then Ruby knows it needs to process the value
+again - since your program modified it. In this case, Ruby continues on to the
+line at (4) and calls &lt;code&gt;gc_grey&lt;/code&gt;, which pushes the value back on to the mark
+stack.  Later Ruby will iterate over its children again, pushing each of them
+back on to the mark stack.&lt;/p&gt;
+&lt;p&gt;Looking ahead to the next section, Generational GC on page 22, write barriers
+use the code in the else clause at (5) to handle “old” values. We’ll cover
+Generational GC next. But first, Experiment 13-1 will take a look at incremental
+GC in action.&lt;/p&gt;
+&lt;/div&gt;
 </content></entry><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
 &lt;p&gt;
 I've started working on a new edition of &lt;a
@@ -401,29 +436,24 @@ us from discovering which slots Ruby saved the arrays into.&lt;/p&gt;
 which values are used and unused by our programs? And how does it reclaim memory
 from the unused values? Let’s take a look at Ruby’s garbage collection process
 next.&lt;/p&gt;
-</content></entry><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
-&lt;p&gt;
-I've started working on a new edition of &lt;a
+</content></entry><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
-me a line&lt;/a&gt; and I'll email you when it's finished.
-&lt;/p&gt;
-&lt;p&gt;
-&lt;p&gt;RUM includ</summary><content type="html">&lt;i&gt;
-&lt;p&gt;
-I've started working on a new edition of &lt;a
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;RUM includes a serie</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
-me a line&lt;/a&gt; and I'll email you when it's finished.
-&lt;/p&gt;
-&lt;p&gt;
-&lt;p&gt;RUM includes a series of “experiments:” simple code snippets that show evidence the book’s explanations are accurate. One of the first experiments I wrote back in 2013, Experiment 7-2 is a fun way to see exactly when Ruby increases the number of bins in a hash table. The experiments in RUM are a great way to see for yourself how Ruby works. They also keep me honest; in fact, I ran this code again recently using Ruby 3.4.1 and saw different results than what I expected!&lt;/p&gt;
-&lt;/p&gt;
-&lt;/i&gt;
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;RUM includes a series of “experiments:” simple code snippets that show evidence
+the book’s explanations are accurate. One of the first experiments I wrote back
+in 2013, Experiment 7-2 is a fun way to see exactly when Ruby increases the
+number of bins in a hash table. The experiments in RUM are a great way to see
+for yourself how Ruby works. They also keep me honest; in fact, I ran this code
+again recently using Ruby 3.4.1 and saw different results than what I expected!&lt;/p&gt;
 &lt;h2&gt;Chapter 7: The Hash Table: The Workhorse Of Ruby Internals&lt;/h2&gt;
 &lt;div style=&quot;font-size: small&quot;&gt;
 &lt;table id=&quot;toc&quot;&gt;

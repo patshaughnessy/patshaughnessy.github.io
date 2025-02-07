@@ -1,24 +1,17 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Write Barriers - Pat Shaughnessy</title><meta name="description" content=""><meta name="author" content=""><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/css/normalize.css"><link rel="stylesheet" href="/assets/css/skeleton.css"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><link rel="icon" type="image/png" href="images/favicon.png"></head><body><div id="banner"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div><div style="margin-top: 35px"><div class="ten columns"><div class="container"><div class="row"><article class="post"><header><h1>Write Barriers</h1><div class="metadata">February 18th 2025&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2025/2/18/write-barriers">&nbsp; Comments and &nbsp; Reactions</a></div></header><section class="content"><i>
-<p>
-I've started working on a new edition of <a
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Write Barriers - Pat Shaughnessy</title><meta name="description" content=""><meta name="author" content=""><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/css/normalize.css"><link rel="stylesheet" href="/assets/css/skeleton.css"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><link rel="icon" type="image/png" href="images/favicon.png"></head><body><div id="banner"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div><div style="margin-top: 35px"><div class="ten columns"><div class="container"><div class="row"><article class="post"><header><h1>Write Barriers</h1><div class="metadata">February 18th 2025&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2025/2/18/write-barriers">&nbsp; Comments and &nbsp; Reactions</a></div></header><section class="content"><p>I've started working on a new edition of <a
 href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
 Microscope</a> that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or <a
 href="mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update">drop
-me a line</a> and I'll email you when it's finished.
-</p>
-</i>
-<p>
-Ruby’s garbage collection implementation is complex and confusing - yet powerful
-and beautiful at the same time. Chapter 13 summarizes and explains some of these
-more advanced aspects of Ruby’s garbage collector. Writing it, I don’t shy away
-from advanced topics. I both learning about the difficult bits myself, and
-then understanding them at a deep enough level to be able to explain them to all
-of you.
-<p>In RUM I show C code snippets in gray callouts. These sections are for readers
-who do understand C syntax, or who would like to learn it. These can give you
-sign posts in case you ever decide to read Ruby’s source code for yourself.</p>
-</p>
+me a line</a> and I'll email you when it's finished.</p>
+<p>Ruby’s garbage collection implementation is complex and confusing - yet powerful
+and beautiful at the same time. Chapter 13 summarizes and explains advanced
+aspects of Ruby’s garbage collector. I love learning about the difficult bits at
+a deep enough level to be able to explain them to someone else. In RUM I often
+show snippets from Ruby's C source code in gray callouts. These sections are for
+readers who already understand C syntax, or who would like to learn it.  These
+can give you sign posts in case you ever decide to read Ruby’s source code for
+yourself.</p>
 <h2>Chapter 13: Incremental and Generational Garbage Collection</h2>
 <div style="font-size: small">
 <table id="toc">
@@ -81,20 +74,22 @@ sign posts in case you ever decide to read Ruby’s source code for yourself.</p
 <h2>Write Barriers</h2>
 <p>Write barriers warn Ruby’s garbage collection algorithm whenever your program
 creates a new object that might have to be marked. You can think of the
-“barriers” as small boxes that surround arrays, hashes and other data structures
+barriers as small boxes that surround arrays, hashes and other data structures
 you might have in your program. For example, in Listing 13-1 Ruby places a write
-barrier around arr, the array that contains all of the new objects:</p>
+barrier around <span class="code">arr</span>, the array that contains all of the
+new objects:</p>
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="http://localhost/assets/2025/2/11/Figure-13-9.svg"><br/>
+<img width="50%" src="http://localhost/assets/2025/2/18/Figure-13-9.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 13-9: A Write Barrier
 </span>
 </div>
-<p>Figure 13-9 repeats Figure 13-6, which showed the array arr, just after Ruby
-removed it from the mark stack, along with all of the elements of arr, still on
-the stack. However, on the left the dotted rectangle represents a writer barrier
-around this array. (In reality, there’s nothing special about this array; Ruby
-uses write barriers for all arrays, hashes and other data structures.)</p>
+<p>Figure 13-9 repeats Figure 13-6, which showed the array <span
+class="code">arr</span>, just after Ruby removed it from the mark stack, along
+with all of the elements of <span class="code">arr</span>, still on the stack.
+However, on the left the dotted rectangle represents a writer barrier around
+this array. (In reality, there’s nothing special about this array; Ruby uses
+write barriers for all arrays, hashes and other data structures.)</p>
 <p>The write barrier, as the name implies, jumps into action whenever your program
 writes to the array inside. In this example, the barrier will be triggered when
 the program runs the line of code at (3) in Listing 13-1 inside the loop:</p>
@@ -104,22 +99,67 @@ the program runs the line of code at (3) in Listing 13-1 inside the loop:</p>
 <p>If your program was running between incremental GC steps when Ruby added a new
 element to the array, Ruby would move the array back on to the mark stack:</p>
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="http://localhost/assets/2025/2/11/Figure-13-10.svg"><br/>
+<img width="50%" src="http://localhost/assets/2025/2/18/Figure-13-10.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 13-10: Triggering a Write Barrier Pushes the Array Back on the Mark Stack
 </span>
 </div>
-<p>Figure 13-10 shows the array arr on the left, inside of a write barrier. The
-line of code just above, <span class="code">arr.push</span> triggers the write
-barrier because it writes to or modifies the array’s contents. This triggers the
-write barrier, which moves the array arr back on to the mark stack, shown on the
-right. Now during the next GC step, Ruby will process the array’s children
-again, even if it had processed them earlier. This allows Ruby to find and mark
-the new object just added to the array.</p>
+<p>Figure 13-10 shows the array <span class="code">arr</span> on the left, inside
+of a write barrier. The line of code just above, <span
+class="code">arr.push</span>, triggers the write barrier because it writes to
+the array’s contents. This triggers the write barrier, which moves the array
+<span class="code">arr</span> back on to the mark stack, shown on the right. Now
+during the next GC step, Ruby will process the array’s children again, even if
+it had processed them earlier. This allows Ruby to find and mark the new object
+just added to the array.</p>
 <p>The mark stack is how Ruby remembers its place inside of the GC algorithm,
 between one incremental GC and the next. Whenever an incremental GC step starts,
 Ruby continues to mark the objects present on the mark stack that were pending
 from last time <em>or that were modified in the meantime</em>.</p>
+<div class="c-code">
+<h2>A Write Barrier in Action</h2>
+<p>Whenever your program modifies an array, hash or other value protected by write
+barriers, Ruby calls this C code internally. <code>rb_gc_impl_writebarrier_remember</code> at
+(1) in Listing 13-2 pushes a modified object back on to the mark stack, as shown
+above in Figure 13-10:</p>
+<pre>(1) void rb_gc_impl_writebarrier_remember(void *objspace_ptr, VALUE obj)
+    {
+        rb_objspace_t *objspace = objspace_ptr;
+    
+        gc_report(1, objspace, "rb_gc_writebarrier_remember: %s\n", rb_obj_info(obj));
+    
+(2)     if (is_incremental_marking(objspace)) {
+(3)         if (RVALUE_BLACK_P(objspace, obj)) {
+(4)             gc_grey(objspace, obj);
+            }
+        }
+        else {
+(5)         if (RVALUE_OLD_P(objspace, obj)) {
+                rgengc_remember(objspace, obj);
+            }
+        }
+    }</pre>
+<div style="font-style: italic; margin: 0 0 20px 0">
+  Listing 13-2: The rb_gc_writebarrier_remember function
+</div>
+<p>Ruby first checks at (2) whether it is currently in the midst of an incremental
+garbage collection. If it is, Ruby continues to the line at (3), and checks
+whether the given object was already completely processed: whether Ruby marked
+it and all of its children. (Recall the non-inclusive term “black” from the
+tricolor GC algorithm.) For example, in Figure 13-9 the <code>arr</code> value was
+completed processed, since Ruby marked it and also moved all of its children on
+to the mark stack, removing <code>arr</code> from the mark stack. </p>
+<p>If Ruby did already mark the value, and if Ruby already pushed the value’s
+children on to the mark stack, then Ruby knows it needs to process the value
+again - since your program modified it. In this case, Ruby continues on to the
+line at (4) and calls <code>gc_grey</code>, which pushes the value back on to the mark
+stack.  Later Ruby will iterate over its children again, pushing each of them
+back on to the mark stack.</p>
+<p>Looking ahead to the next section, Generational GC on page 22, write barriers
+use the code in the else clause at (5) to handle “old” values. We’ll cover
+Generational GC next. But first, Experiment 13-1 will take a look at incremental
+GC in action.</p>
+</div>
 </section><section class="comments"><div id="disqus_thread"><script type="text/javascript">var disqus_identifier = 'https://patshaughnessy.net/2025/2/18/write-barriers'; var disqus_shortname = 'patshaughnessy'; var disqus_title = 'Write Barriers';</script></div><script type="text/javascript" src="https://disqus.com/forums/patshaughnessy/embed.js"></script><noscript><a href="https://patshaughnessy.disqus.com/?url=ref">View the discussion thread.</a></noscript></section></article></div></div></div><div class="two columns"><div id="sidebar"><img src="/assets/images/pat.jpg"></img><div class="header">Subscribe</div><div class="links"><ul><li><a id="feed" href="http://feeds.feedburner.com/patshaughnessy"><img src="/assets/images/feed-icon16x16B.png"></img></a><a href="http://twitter.com/pat_shaughnessy"><img width="20" height="20" src="/assets/images/twitter.svg"></img></a></li></ul></div><div class="header">Buy My Book</div><div class="links"><ul><li><a href="/ruby-under-a-microscope"><img src="/assets/images/book-cover.png"></img></a></li><li id="eBook"><a href="/ruby-under-a-microscope">Ruby Under a Microscope</a></li></ul></div><div class="header">More on Updating Ruby Under a Microscope</div><div class="links"><ul><li><a href="/2025/2/11/using-different-size-pools">Using Different Size Pools</a></li><li><a href="/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes">Inserting One New Element into Hashes of Varying Sizes</a></li><li><a href="/2025/1/28/updating-ruby-under-a-microscope">Updating Ruby Under a Microscope</a></li></ul></div><div class="header">Popular</div><div class="links"><ul><li><a href="/2016/11/26/learning-to-read-x86-assembly-language">Learning to Read x86 Assembly Language</a></li><li><a href="/2012/1/4/never-create-ruby-strings-longer-than-23-characters">Never create Ruby strings longer than 23 characters</a></li><li><a href="/2012/3/23/why-you-should-be-excited-about-garbage-collection-in-ruby-2-0">Why You Should Be Excited About Garbage Collection in Ruby 2.0</a></li><li><a href="/2013/4/3/ruby-2-0-works-hard-so-you-can-be-lazy">Ruby 2.0 Works Hard So You Can Be Lazy</a></li></ul></div><div class="header"><a href="/">More...</a></div></div></div><script type="text/javascript">(function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
