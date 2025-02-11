@@ -2,7 +2,6 @@ title: "Using Different Size Pools"
 date: 2025/02/11
 tag: Updating Ruby Under a Microscope
 
-<i>
 <p>
 I've started working on a new edition of <a
 href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
@@ -10,9 +9,7 @@ Microscope</a> that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or <a
 href="mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update">drop
 me a line</a> and I'll email you when it's finished.
-</p>
 
-<p>
 The Ruby team has done a tremendous amount of work over the past decade on
 Ruby's garbage collection (GC) implementation. In fact, Ruby's new GC is one of
 the key reasons Ruby 3 is so much faster than Ruby 2. To bring all of this work
@@ -22,8 +19,6 @@ months, I realized I had gotten carried away and wrote too much material for one
 chapter. So the updated book will have two new chapters on garbage collection:
 one on garbage collection basics and a second new chapter on incremental and
 generational garbage collection. Here's a small excerpt.
-</p>
-</i>
 
 ## Chapter 12: Garbage Collection Basics 
 
@@ -205,7 +200,7 @@ various capacities:
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
 <img src="https://patshaughnessy.net/assets/2025/2/11/Figure-12-10.svg"><br/>
 <span style="font-style: italic; font-size: small">
-  Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2.
+  Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2, Ruby 3.4.1
 </span>
 </div>
 
@@ -252,7 +247,9 @@ following:
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
 <img src="https://patshaughnessy.net/assets/2025/2/11/Figure-12-11.svg"><br/>
 <span style="font-style: italic; font-size: small">
-  Figure 12-11: Complete Output from Listing 12-7
+  Figure 12-11: Complete Output from Listing 12-7, Ruby 3.4.1
+</p>
+</i>
 </span>
 </div>
 

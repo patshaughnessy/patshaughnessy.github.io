@@ -1,14 +1,11 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Using Different Size Pools - Pat Shaughnessy</title><meta name="description" content=""><meta name="author" content=""><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/css/normalize.css"><link rel="stylesheet" href="/assets/css/skeleton.css"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><link rel="icon" type="image/png" href="images/favicon.png"></head><body><div id="banner"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div><div style="margin-top: 35px"><div class="ten columns"><div class="container"><div class="row"><article class="post"><header><h1>Using Different Size Pools</h1><div class="metadata">February 11th 2025&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2025/2/11/using-different-size-pools">&nbsp; Comments and &nbsp; Reactions</a></div></header><section class="content"><i>
-<p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Using Different Size Pools - Pat Shaughnessy</title><meta name="description" content=""><meta name="author" content=""><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/assets/css/normalize.css"><link rel="stylesheet" href="/assets/css/skeleton.css"><link rel="alternate" type="application/atom+xml" title="Pat Shaughnessy - Feed" href="http://feeds2.feedburner.com/patshaughnessy"><link rel="icon" type="image/png" href="images/favicon.png"></head><body><div id="banner"><a href="/"><span id="title">Pat Shaughnessy</span><span id="tagline"> blogger, rubyist, aspiring author</span></a></div><div style="margin-top: 35px"><div class="ten columns"><div class="container"><div class="row"><article class="post"><header><h1>Using Different Size Pools</h1><div class="metadata">February 11th 2025&nbsp;&mdash;&nbsp;<a href="#disqus_thread" data-disqus-identifier="https://patshaughnessy.net/2025/2/11/using-different-size-pools">&nbsp; Comments and &nbsp; Reactions</a></div></header><section class="content"><p>
 I've started working on a new edition of <a
 href="http://patshaughnessy.net/ruby-under-a-microscope">Ruby Under a
 Microscope</a> that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or <a
 href="mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update">drop
 me a line</a> and I'll email you when it's finished.
-</p>
-<p>
-The Ruby team has done a tremendous amount of work over the past decade on
+<p>The Ruby team has done a tremendous amount of work over the past decade on
 Ruby's garbage collection (GC) implementation. In fact, Ruby's new GC is one of
 the key reasons Ruby 3 is so much faster than Ruby 2. To bring all of this work
 to light, I decided to rewrite Chapter 12 from scratch, covering garbage
@@ -16,9 +13,7 @@ collection in Ruby more accurately and in more depth.  But then, after a few
 months, I realized I had gotten carried away and wrote too much material for one
 chapter. So the updated book will have two new chapters on garbage collection:
 one on garbage collection basics and a second new chapter on incremental and
-generational garbage collection. Here's a small excerpt.
-</p>
-</i>
+generational garbage collection. Here's a small excerpt.</p>
 <h2>Chapter 12: Garbage Collection Basics</h2>
 <div style="font-size: small">
 <table id="toc">
@@ -179,7 +174,7 @@ various capacities:</p>
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
 <img src="https://patshaughnessy.net/assets/2025/2/11/Figure-12-10.svg"><br/>
 <span style="font-style: italic; font-size: small">
-  Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2.
+  Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2, Ruby 3.4.1
 </span>
 </div>
 <p>Each bar in Figure 12-10 represents values from a line of output from Listing
@@ -219,7 +214,9 @@ following:</p>
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
 <img src="https://patshaughnessy.net/assets/2025/2/11/Figure-12-11.svg"><br/>
 <span style="font-style: italic; font-size: small">
-  Figure 12-11: Complete Output from Listing 12-7
+  Figure 12-11: Complete Output from Listing 12-7, Ruby 3.4.1
+</p>
+</i>
 </span>
 </div>
 <p>Figure 12-11 shows an interesting pattern. Ruby uses size pools 0 through 4 to

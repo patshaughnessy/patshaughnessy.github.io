@@ -1,24 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-11T16:08:44Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
-&lt;p&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-11T16:40:21Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;
 I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
 me a line&lt;/a&gt; and I'll email you when it's finished.
-&lt;/p&gt;
-&lt;p&gt;
-The Ruby team</summary><content type="html">&lt;i&gt;
-&lt;p&gt;
+&lt;p&gt;The Ruby team has done </summary><content type="html">&lt;p&gt;
 I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
 me a line&lt;/a&gt; and I'll email you when it's finished.
-&lt;/p&gt;
-&lt;p&gt;
-The Ruby team has done a tremendous amount of work over the past decade on
+&lt;p&gt;The Ruby team has done a tremendous amount of work over the past decade on
 Ruby's garbage collection (GC) implementation. In fact, Ruby's new GC is one of
 the key reasons Ruby 3 is so much faster than Ruby 2. To bring all of this work
 to light, I decided to rewrite Chapter 12 from scratch, covering garbage
@@ -26,9 +20,7 @@ collection in Ruby more accurately and in more depth.  But then, after a few
 months, I realized I had gotten carried away and wrote too much material for one
 chapter. So the updated book will have two new chapters on garbage collection:
 one on garbage collection basics and a second new chapter on incremental and
-generational garbage collection. Here's a small excerpt.
-&lt;/p&gt;
-&lt;/i&gt;
+generational garbage collection. Here's a small excerpt.&lt;/p&gt;
 &lt;h2&gt;Chapter 12: Garbage Collection Basics&lt;/h2&gt;
 &lt;div style=&quot;font-size: small&quot;&gt;
 &lt;table id=&quot;toc&quot;&gt;
@@ -189,7 +181,7 @@ various capacities:&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
 &lt;img src=&quot;https://patshaughnessy.net/assets/2025/2/11/Figure-12-10.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
-  Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2.
+  Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2, Ruby 3.4.1
 &lt;/span&gt;
 &lt;/div&gt;
 &lt;p&gt;Each bar in Figure 12-10 represents values from a line of output from Listing
@@ -229,7 +221,9 @@ following:&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
 &lt;img src=&quot;https://patshaughnessy.net/assets/2025/2/11/Figure-12-11.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
-  Figure 12-11: Complete Output from Listing 12-7
+  Figure 12-11: Complete Output from Listing 12-7, Ruby 3.4.1
+&lt;/p&gt;
+&lt;/i&gt;
 &lt;/span&gt;
 &lt;/div&gt;
 &lt;p&gt;Figure 12-11 shows an interesting pattern. Ruby uses size pools 0 through 4 to
