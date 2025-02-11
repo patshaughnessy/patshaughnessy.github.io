@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-05T17:54:03Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-11T16:08:44Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
 &lt;p&gt;
 I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
@@ -151,8 +151,9 @@ Listing 12-6 iterates over arrays of different capacities, from 1 up to 100
 (&lt;span class=&quot;code&quot;&gt;CAPACITY_ITER&lt;/span&gt;). For each array capacity, the program
 creates 10,000 (&lt;span class=&quot;code&quot;&gt;ALLOCATE_ITER&lt;/span&gt;) array objects of that
 size using the inner loop (4). Note the program saves all of the new arrays into
-a single array called all, created at (2). This insures that Ruby doesn’t free
-all of our new arrays by running a garbage collection.&lt;/p&gt;
+a single array called &lt;span class=&quot;code&quot;&gt;all&lt;/span&gt;, created at (2). This
+insures that Ruby doesn’t free all of our new arrays by running a garbage
+collection.&lt;/p&gt;
 &lt;p&gt;After creating 10,000 arrays of the given capacity, the program saves the &lt;span
 class=&quot;code&quot;&gt;heap_eden_slots&lt;/span&gt; value from the return value of &lt;span
 class=&quot;code&quot;&gt;GC.stat_heap&lt;/span&gt; for all of the size pools at (5), and then
@@ -186,7 +187,7 @@ etc. If you try running this, you will see slightly different values.&lt;/p&gt;
 &lt;p&gt;Plotting these values, we can see which pool Ruby uses for the new arrays of
 various capacities:&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;http://localhost/assets/2025/2/11/Figure-12-10.svg&quot;&gt;&lt;br/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2025/2/11/Figure-12-10.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2.
 &lt;/span&gt;
@@ -197,7 +198,7 @@ various capacities:&lt;/p&gt;
 &lt;p&gt;The first value, 0, is the position of each bar on the x-axis, while the bar’s
 color segments display the following three values: The dark grey bar at the
 bottom left corner represents Size Pool 0 (22923), the lighter bar above it
-shows Size Pool 1 (6548), and the lightest, top bar shows Size Pool 2 (286118).&lt;/p&gt;
+shows Size Pool 1 (6548), and the lightest, top bar shows Size Pool 2 (2861).&lt;/p&gt;
 &lt;p&gt;Moving to the right, each successive bar shows the values for different array
 capacities. Looking over the entire graph, we can see the following pattern in
 Figure 12-10:&lt;/p&gt;
@@ -226,7 +227,7 @@ the remain unchanged after that.&lt;/p&gt;
 &lt;p&gt;Plotting the entire output from Listing 12-7 up to capacity=100, we see the
 following:&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;http://localhost/assets/2025/2/11/Figure-12-11.svg&quot;&gt;&lt;br/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2025/2/11/Figure-12-11.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Figure 12-11: Complete Output from Listing 12-7
 &lt;/span&gt;
@@ -245,52 +246,48 @@ and then stops growing.&lt;/p&gt;
 elements, Ruby saved them in the original Size Pool Zero again. This indicates
 that Ruby stopped embedding the array elements in the size pool entirely, and
 instead allocated a new, separate memory segment to save the elements. For these
-large arrays, small 40 byte RVALUE slots in Size Pool Zero were sufficient,
-because they each contained a pointer to the array data, and not the embedded
-array data itself.&lt;/p&gt;
+large arrays, small 40 byte &lt;span class=&quot;code&quot;&gt;RVALUE&lt;/span&gt; slots in Size Pool
+Zero were sufficient, because they each contained a pointer to the array data,
+and not the embedded array data itself.&lt;/p&gt;
 &lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-&lt;img src=&quot;http://localhost/assets/2025/2/11/Figure-12-12.svg&quot;&gt;&lt;br/&gt;
+&lt;img src=&quot;https://patshaughnessy.net/assets/2025/2/11/Figure-12-12.svg&quot;&gt;&lt;br/&gt;
 &lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
   Figure 12-12: A Large Array Saving Its Elements In A Separate Memory Segment
 &lt;/span&gt;
 &lt;/div&gt;
 &lt;p&gt;Figure 12-12 shows how large arrays, arrays which contain 79 or more elements,
-do not save their elements inside of the RVALUE structure, but instead save a
-pointer (ptr) which contains the location of a separate memory segment that
-holds the array elements.&lt;/p&gt;
-&lt;p&gt;One key detail of this experiment was in Listing 12-6 at (2): the all array. The
-inner loop just below in Listing 12-6 at (4) saved each new array into the all
-array. This meant all the new arrays were in fact still being used and Ruby’s
-garbage collector could not reclaim their memory. Without this line of code, we
-would not have seen the total number of slots continually increase, preventing
-us from discovering which slots Ruby saved the arrays into.&lt;/p&gt;
+do not save their elements inside of the &lt;span class=&quot;code&quot;&gt;Array&lt;/span&gt;
+structure, but instead save a pointer (ptr) which contains the location of a
+separate memory segment that holds the array elements.&lt;/p&gt;
+&lt;p&gt;One key detail of this experiment was in Listing 12-6 at (2): the &lt;span
+class=&quot;code&quot;&gt;all&lt;/span&gt; array. The inner loop just below in Listing 12-6 at (4)
+saved each new array into the &lt;span class=&quot;code&quot;&gt;all&lt;/span&gt; array. This meant
+all the new arrays were in fact still being used and Ruby’s garbage collector
+could not reclaim their memory. Without this line of code, we would not have
+seen the total number of slots continually increase, preventing us from
+discovering which slots Ruby saved the arrays into.&lt;/p&gt;
 &lt;p&gt;But how did Ruby’s garbage collector know this, exactly? How does Ruby identify
 which values are used and unused by our programs? And how does it reclaim memory
 from the unused values? Let’s take a look at Ruby’s garbage collection process
 next.&lt;/p&gt;
-</content></entry><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;i&gt;
-&lt;p&gt;
-I've started working on a new edition of &lt;a
+</content></entry><entry><title>Inserting One New Element into Hashes of Varying Sizes</title><link href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/4/inserting-one-new-element-into-hashes-of-varying-sizes" rel="alternate"></id><published>2025-02-04T00:00:00Z</published><updated>2025-02-04T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
-me a line&lt;/a&gt; and I'll email you when it's finished.
-&lt;/p&gt;
-&lt;p&gt;
-&lt;p&gt;RUM includ</summary><content type="html">&lt;i&gt;
-&lt;p&gt;
-I've started working on a new edition of &lt;a
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;RUM includes a serie</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
 href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
-me a line&lt;/a&gt; and I'll email you when it's finished.
-&lt;/p&gt;
-&lt;p&gt;
-&lt;p&gt;RUM includes a series of “experiments:” simple code snippets that show evidence the book’s explanations are accurate. One of the first experiments I wrote back in 2013, Experiment 7-2 is a fun way to see exactly when Ruby increases the number of bins in a hash table. The experiments in RUM are a great way to see for yourself how Ruby works. They also keep me honest; in fact, I ran this code again recently using Ruby 3.4.1 and saw different results than what I expected!&lt;/p&gt;
-&lt;/p&gt;
-&lt;/i&gt;
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;RUM includes a series of “experiments:” simple code snippets that show evidence
+the book’s explanations are accurate. One of the first experiments I wrote back
+in 2013, Experiment 7-2 is a fun way to see exactly when Ruby increases the
+number of bins in a hash table. The experiments in RUM are a great way to see
+for yourself how Ruby works. They also keep me honest; in fact, I ran this code
+again recently using Ruby 3.4.1 and saw different results than what I expected!&lt;/p&gt;
 &lt;h2&gt;Chapter 7: The Hash Table: The Workhorse Of Ruby Internals&lt;/h2&gt;
 &lt;div style=&quot;font-size: small&quot;&gt;
 &lt;table id=&quot;toc&quot;&gt;

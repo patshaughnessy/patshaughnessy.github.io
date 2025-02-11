@@ -25,7 +25,6 @@ generational garbage collection. Here's a small excerpt.
 </p>
 </i>
 
-
 ## Chapter 12: Garbage Collection Basics 
 
 <div style="font-size: small">
@@ -158,8 +157,9 @@ Listing 12-6 iterates over arrays of different capacities, from 1 up to 100
 (<span class="code">CAPACITY_ITER</span>). For each array capacity, the program
 creates 10,000 (<span class="code">ALLOCATE_ITER</span>) array objects of that
 size using the inner loop (4). Note the program saves all of the new arrays into
-a single array called all, created at (2). This insures that Ruby doesn’t free
-all of our new arrays by running a garbage collection.
+a single array called <span class="code">all</span>, created at (2). This
+insures that Ruby doesn’t free all of our new arrays by running a garbage
+collection.
 
 After creating 10,000 arrays of the given capacity, the program saves the <span
 class="code">heap_eden_slots</span> value from the return value of <span
@@ -203,7 +203,7 @@ Plotting these values, we can see which pool Ruby uses for the new arrays of
 various capacities:
 
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="http://localhost/assets/2025/2/11/Figure-12-10.svg"><br/>
+<img src="https://patshaughnessy.net/assets/2025/2/11/Figure-12-10.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 12-10: Allocating Slots for Arrays of Various Sizes - Size Pools 0, 1 and 2.
 </span>
@@ -219,7 +219,7 @@ Each bar in Figure 12-10 represents values from a line of output from Listing
 The first value, 0, is the position of each bar on the x-axis, while the bar’s
 color segments display the following three values: The dark grey bar at the
 bottom left corner represents Size Pool 0 (22923), the lighter bar above it
-shows Size Pool 1 (6548), and the lightest, top bar shows Size Pool 2 (286118).
+shows Size Pool 1 (6548), and the lightest, top bar shows Size Pool 2 (2861).
 
 Moving to the right, each successive bar shows the values for different array
 capacities. Looking over the entire graph, we can see the following pattern in
@@ -250,7 +250,7 @@ Plotting the entire output from Listing 12-7 up to capacity=100, we see the
 following:
 
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="http://localhost/assets/2025/2/11/Figure-12-11.svg"><br/>
+<img src="https://patshaughnessy.net/assets/2025/2/11/Figure-12-11.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 12-11: Complete Output from Listing 12-7
 </span>
@@ -275,28 +275,29 @@ However, once we started to save large arrays with capacities of 79 or more
 elements, Ruby saved them in the original Size Pool Zero again. This indicates
 that Ruby stopped embedding the array elements in the size pool entirely, and
 instead allocated a new, separate memory segment to save the elements. For these
-large arrays, small 40 byte RVALUE slots in Size Pool Zero were sufficient,
-because they each contained a pointer to the array data, and not the embedded
-array data itself.
+large arrays, small 40 byte <span class="code">RVALUE</span> slots in Size Pool
+Zero were sufficient, because they each contained a pointer to the array data,
+and not the embedded array data itself.
 
 <div style="padding: 8px 30px 30px 0px; text-align: center; line-height:18px">
-<img src="http://localhost/assets/2025/2/11/Figure-12-12.svg"><br/>
+<img src="https://patshaughnessy.net/assets/2025/2/11/Figure-12-12.svg"><br/>
 <span style="font-style: italic; font-size: small">
   Figure 12-12: A Large Array Saving Its Elements In A Separate Memory Segment
 </span>
 </div>
 
 Figure 12-12 shows how large arrays, arrays which contain 79 or more elements,
-do not save their elements inside of the RVALUE structure, but instead save a
-pointer (ptr) which contains the location of a separate memory segment that
-holds the array elements.
+do not save their elements inside of the <span class="code">Array</span>
+structure, but instead save a pointer (ptr) which contains the location of a
+separate memory segment that holds the array elements.
 
-One key detail of this experiment was in Listing 12-6 at (2): the all array. The
-inner loop just below in Listing 12-6 at (4) saved each new array into the all
-array. This meant all the new arrays were in fact still being used and Ruby’s
-garbage collector could not reclaim their memory. Without this line of code, we
-would not have seen the total number of slots continually increase, preventing
-us from discovering which slots Ruby saved the arrays into.
+One key detail of this experiment was in Listing 12-6 at (2): the <span
+class="code">all</span> array. The inner loop just below in Listing 12-6 at (4)
+saved each new array into the <span class="code">all</span> array. This meant
+all the new arrays were in fact still being used and Ruby’s garbage collector
+could not reclaim their memory. Without this line of code, we would not have
+seen the total number of slots continually increase, preventing us from
+discovering which slots Ruby saved the arrays into.
 
 But how did Ruby’s garbage collector know this, exactly? How does Ruby identify
 which values are used and unused by our programs? And how does it reclaim memory
