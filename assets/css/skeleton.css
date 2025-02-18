@@ -721,3 +721,16 @@ pre {
     display: none;
   }
 }
+
+div.c-code {
+  background: #DEE0E1;
+  border-radius: 4px;
+}
+
+div.c-code code {
+  background: #DEE0E1;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}

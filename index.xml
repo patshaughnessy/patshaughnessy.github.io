@@ -1,4 +1,172 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-11T16:40:21Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-18T15:41:42Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Write Barriers</title><link href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></id><published>2025-02-18T00:00:00Z</published><updated>2025-02-18T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;Ruby’s garbage col</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;Ruby’s garbage collection implementation is complex and confusing - yet powerful
+and beautiful at the same time. Chapter 13 summarizes and explains advanced
+aspects of Ruby’s garbage collector. I love learning about the difficult bits at
+a deep enough level to be able to explain them to someone else. In RUM I often
+show snippets from Ruby's C source code in gray callouts. These sections are for
+readers who already understand C syntax, or who would like to learn it.  These
+can give you sign posts in case you ever decide to read Ruby’s source code for
+yourself.&lt;/p&gt;
+&lt;h2&gt;Chapter 13: Incremental and Generational Garbage Collection&lt;/h2&gt;
+&lt;div style=&quot;font-size: small&quot;&gt;
+&lt;table id=&quot;toc&quot;&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Incremental GC&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Marking in More Detail&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Stop The World Garbage Collection&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Incremental Garbage Collection&lt;/td&gt;&lt;td&gt;10&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Ruby Implements Incremental GC&lt;/td&gt;&lt;td&gt;11&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Write Barriers&lt;/td&gt;&lt;td&gt;12&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;A Write Barrier in Action&lt;/td&gt;&lt;td&gt;14&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 13-1: What happens if GC can’t free enough slots?&lt;/td&gt;&lt;td&gt;15&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Generational GC&lt;/td&gt;&lt;td&gt;22&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Keeping Track of an Object’s Age&lt;/td&gt;&lt;td&gt;23&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Marking and Sweeping Work Together&lt;/td&gt;&lt;td&gt;24&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Seeing Generational GC In Action&lt;/td&gt;&lt;td&gt;26&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Write Barriers Again&lt;/td&gt;&lt;td&gt;29&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;The Remember Set and Unprotected Values&lt;/td&gt;&lt;td&gt;30&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Garbage Collection Bitmaps&lt;/td&gt;&lt;td&gt;31&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Major and Minor GCs&lt;/td&gt;&lt;td&gt;34&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 13-2: Major and Minor GCs&lt;/td&gt;&lt;td&gt;35&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Summary&lt;/td&gt;&lt;td&gt;40&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;h2&gt;Write Barriers&lt;/h2&gt;
+&lt;p&gt;Write barriers warn Ruby’s garbage collection algorithm whenever your program
+creates a new object that might have to be marked. You can think of the
+barriers as small boxes that surround arrays, hashes and other data structures
+you might have in your program. For example, in Listing 13-1 Ruby places a write
+barrier around &lt;span class=&quot;code&quot;&gt;arr&lt;/span&gt;, the array that contains all of the
+new objects:&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;50%&quot; src=&quot;https://patshaughnessy.net/assets/2025/2/18/Figure-13-9.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 13-9: A Write Barrier
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 13-9 repeats Figure 13-6, which showed the array &lt;span
+class=&quot;code&quot;&gt;arr&lt;/span&gt;, just after Ruby removed it from the mark stack, along
+with all of the elements of &lt;span class=&quot;code&quot;&gt;arr&lt;/span&gt;, still on the stack.
+However, on the left the dotted rectangle represents a writer barrier around
+this array. (In reality, there’s nothing special about this array; Ruby uses
+write barriers for all arrays, hashes and other data structures.)&lt;/p&gt;
+&lt;p&gt;The write barrier, as the name implies, jumps into action whenever your program
+writes to the array inside. In this example, the barrier will be triggered when
+the program runs the line of code at (3) in Listing 13-1 inside the loop:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) arr.push(&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Object&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;If your program was running between incremental GC steps when Ruby added a new
+element to the array, Ruby would move the array back on to the mark stack:&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;50%&quot; src=&quot;https://patshaughnessy.net/assets/2025/2/18/Figure-13-10.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 13-10: Triggering a Write Barrier Pushes the Array Back on the Mark Stack
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 13-10 shows the array &lt;span class=&quot;code&quot;&gt;arr&lt;/span&gt; on the left, inside
+of a write barrier. The line of code just above, &lt;span
+class=&quot;code&quot;&gt;arr.push&lt;/span&gt;, triggers the write barrier because it writes to
+the array’s contents. This triggers the write barrier, which moves the array
+&lt;span class=&quot;code&quot;&gt;arr&lt;/span&gt; back on to the mark stack, shown on the right. Now
+during the next GC step, Ruby will process the array’s children again, even if
+it had processed them earlier. This allows Ruby to find and mark the new object
+just added to the array.&lt;/p&gt;
+&lt;p&gt;The mark stack is how Ruby remembers its place inside of the GC algorithm,
+between one incremental GC and the next. Whenever an incremental GC step starts,
+Ruby continues to mark the objects present on the mark stack that were pending
+from last time &lt;em&gt;or that were modified in the meantime&lt;/em&gt;.&lt;/p&gt;
+&lt;div class=&quot;c-code&quot;&gt;
+&lt;h2&gt;A Write Barrier in Action&lt;/h2&gt;
+&lt;p&gt;Whenever your program modifies an array, hash or other value protected by write
+barriers, Ruby calls this C code internally. &lt;code&gt;rb_gc_impl_writebarrier_remember&lt;/code&gt; at
+(1) in Listing 13-2 pushes a modified object back on to the mark stack, as shown
+above in Figure 13-10:&lt;/p&gt;
+&lt;pre&gt;(1) void rb_gc_impl_writebarrier_remember(void *objspace_ptr, VALUE obj)
+    {
+        rb_objspace_t *objspace = objspace_ptr;
+    
+        gc_report(1, objspace, &quot;rb_gc_writebarrier_remember: %s\n&quot;, rb_obj_info(obj));
+    
+(2)     if (is_incremental_marking(objspace)) {
+(3)         if (RVALUE_BLACK_P(objspace, obj)) {
+(4)             gc_grey(objspace, obj);
+            }
+        }
+        else {
+(5)         if (RVALUE_OLD_P(objspace, obj)) {
+                rgengc_remember(objspace, obj);
+            }
+        }
+    }&lt;/pre&gt;
+&lt;div style=&quot;font-style: italic; margin: 0 0 20px 0&quot;&gt;
+  Listing 13-2: The rb_gc_writebarrier_remember function
+&lt;/div&gt;
+&lt;p&gt;Ruby first checks at (2) whether it is currently in the midst of an incremental
+garbage collection. If it is, Ruby continues to the line at (3), and checks
+whether the given object was already completely processed: whether Ruby marked
+it and all of its children. (Recall the non-inclusive term “black” from the
+tricolor GC algorithm.) For example, in Figure 13-9 the &lt;code&gt;arr&lt;/code&gt; value was
+completed processed, since Ruby marked it and also moved all of its children on
+to the mark stack, removing &lt;code&gt;arr&lt;/code&gt; from the mark stack. &lt;/p&gt;
+&lt;p&gt;If Ruby did already mark the value, and if Ruby already pushed the value’s
+children on to the mark stack, then Ruby knows it needs to process the value
+again - since your program modified it. In this case, Ruby continues on to the
+line at (4) and calls &lt;code&gt;gc_grey&lt;/code&gt;, which pushes the value back on to the mark
+stack.  Later Ruby will iterate over its children again, pushing each of them
+back on to the mark stack.&lt;/p&gt;
+&lt;p&gt;Looking ahead to the next section, Generational GC on page 22, write barriers
+use the code in the else clause at (5) to handle “old” values. We’ll cover
+Generational GC next. But first, Experiment 13-1 will take a look at incremental
+GC in action.&lt;/p&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Using Different Size Pools</title><link href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/11/using-different-size-pools" rel="alternate"></id><published>2025-02-11T00:00:00Z</published><updated>2025-02-11T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;
 I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
@@ -2270,284 +2438,4 @@ also get to learn how Crystal works internally.&lt;/p&gt;
 &lt;p&gt;But what happens for longer arrays, with 100s or 1000s of elements? How does
 Crystal remove duplicates from longer arrays efficiently? I'll take a look at
 how that works in my next post.&lt;/p&gt;
-</content></entry><entry><title>Downloading 100,000 Files Using Async Rust</title><link href="https://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></link><id href="https://patshaughnessy.net/2020/1/20/downloading-100000-files-using-async-rust" rel="alternate"></id><published>2020-01-20T00:00:00Z</published><updated>2020-01-20T00:00:00Z</updated><category>Rust</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
-easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
-  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/traffic-light.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;Rust's new async/await feature makes it &lt;br/&gt;
-easy to stop and start asynchronous tasks&lt;/i&gt;&lt;br/&gt;
-  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Red_and_green_traffic_signals,_Stamford_Road,_Singapore_-_20111210.jpg&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
-&lt;/div&gt;
-&lt;p&gt;Imagine if you had a text file containing thousands of URLs:&lt;/p&gt;
-&lt;pre&gt;$ cat urls.txt
-https://example.com/1.html
-https://example.com/2.html
-https://example.com/3.html
-
-etc...
-
-https://example.com/99999.html
-https://example.com/100000.html&lt;/pre&gt;
-&lt;p&gt;…and you needed to download all of those HTML pages efficiently. How would you
-do it? Maybe a shell script using &lt;span class=&quot;code&quot;&gt;xargs&lt;/span&gt; and &lt;span
-class=&quot;code&quot;&gt;curl&lt;/span&gt;? Maybe a simple Golang program? Go’s powerful
-concurrency features would work well for this.&lt;/p&gt;
-&lt;div style=&quot;clear: both&quot;&gt;&lt;/div&gt;
-&lt;p&gt;Instead, I decided to try to use Rust. I’ve read a lot about safe concurrency
-in Rust, but I’ve never tried it. I also wanted to learn what Rust’s new
-“async/await” feature was all about. This seemed like the perfect task for
-asynchronous Rust code.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;TL/DR&lt;/em&gt;: &lt;a href=&quot;https://gist.github.com/patshaughnessy/27b1611e2c912346b929df97998d488d&quot;&gt;Here’s the
-code&lt;/a&gt;.
-The rest of this post will explain how it works.&lt;/p&gt;
-&lt;h2&gt;Getting Started With Reqwest&lt;/h2&gt;
-&lt;p&gt;There are many different Rust HTTP clients to choose from, and &lt;a href=&quot;https://medium.com/@shnatsel/smoke-testing-rust-http-clients-b8f2ee5db4e6&quot;&gt;apparently some
-controversy&lt;/a&gt;
-about which works best. Because I’m a Rust newbie, I decided simply to pick the most
-popular: &lt;a href=&quot;https://github.com/seanmonstar/reqwest&quot;&gt;reqwest&lt;/a&gt;. Request is a high
-level, easy to use HTTP client, written by &lt;a href=&quot;https://seanmonstar.com/&quot;&gt;Sean
-McArthur&lt;/a&gt;. He just updated it to work with Tokio,
-Rust’s new async/await engine, so this is the perfect time to try using it.
-Here’s the example from the readme:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;use &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;std::collections::HashMap;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#[tokio::main]
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;async &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() -&amp;gt; Result&amp;lt;(), Box&amp;lt;dyn std::error::Error&amp;gt;&amp;gt; {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; resp &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;reqwest::get(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://httpbin.org/ip&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        .await&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        .json::&amp;lt;HashMap&amp;lt;String, String&amp;gt;&amp;gt;()
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        .await&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{:#?}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, resp);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    Ok(())
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This version downloads some JSON and parses it. Notice the new &lt;span
-class=&quot;code&quot;&gt;async&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; keywords. The
-main function is &lt;span class=&quot;code&quot;&gt;async&lt;/span&gt; - this means that the function
-becomes part of a large state machine run by Tokio. When you mark a function
-asynchronous, you can then call &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; inside it,
-which will pause that function temporarily, allowing other asynchronous
-functions to run on the same thread.&lt;/p&gt;
-&lt;p&gt;I decided to modify this to print out the number of bytes downloaded instead; you could
-easily change it to save the data to a file or do whatever you want.&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; path &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://httpbin.org/ip&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;reqwest::get(path).await {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    Ok(resp) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; resp.text().await {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            Ok(text) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;RESPONSE: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt; bytes from &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, text.len(), path);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR reading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR downloading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Ok(())&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This is a two step process:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;First I call &lt;span class=&quot;code&quot;&gt;get(path)&lt;/span&gt; to send the HTTP GET request. Then I use &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; to wait for
-the request to finish and return a result.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Second, if the request was successful, I call &lt;span
-  class=&quot;code&quot;&gt;resp.text()&lt;/span&gt; to get the contents of the response body. And
-I wait again while that is loaded.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;I handle the errors explicitly and always return a unit result &lt;span
-class=&quot;code&quot;&gt;Ok(())&lt;/span&gt; because that makes the code below simpler
-when I start downloading more than one page concurrently.&lt;/p&gt;
-&lt;p&gt;Visually, I can draw the &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and &lt;span
-class=&quot;code&quot;&gt;text&lt;/span&gt; calls like this:&lt;/p&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/get-and-text.png&quot;&gt;
-&lt;p&gt;First I call &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and wait, then I call &lt;span
-class=&quot;code&quot;&gt;text&lt;/span&gt; and wait.&lt;/p&gt;
-&lt;p&gt;But what is asynchronous about this? This reads like normal, single threaded
-code. I do one thing, then I do another.&lt;/p&gt;
-&lt;h2&gt;Sending 3 Concurrent Requests&lt;/h2&gt;
-&lt;p&gt;The magic happens when I have more than one request I want to make in parallel. Let’s use three hard coded path strings:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; paths &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;vec![
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://example.com/1.html&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.to_string(),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://example.com/2.html&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.to_string(),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;https://example.com/3.html&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.to_string(),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;];&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;To download the 3 HTML files in parallel, I spawn three Tokio “tasks” and wait
-for them all to complete. (This requires adding the futures crate to
-Cargo.toml, which implements &lt;span class=&quot;code&quot;&gt;join_all&lt;/span&gt;.)&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;// Iterate over the paths.
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let mut&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; tasks: Vec&amp;lt;JoinHandle&amp;lt;Result&amp;lt;(), ()&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;vec![];
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;for&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; path &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;in&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; paths {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;// Copy each path into a new string
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;// that can be consumed/captured by the task closure
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; path &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; path.clone();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;// Create a Tokio task for each path
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    tasks.push(tokio::spawn(async &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;move &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;reqwest::get(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;path).await {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            Ok(resp) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; resp.text().await {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    Ok(text) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                        println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;RESPONSE: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt; bytes from &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, text.len(), path);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR reading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR downloading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        Ok(())
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    }));
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;// Wait for them all to finish
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Started &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt; tasks. Waiting...&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, tasks.len());
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;join_all(tasks).await;&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Each Tokio task is a closure passed to the &lt;span
-class=&quot;code&quot;&gt;tokio::spawn&lt;/span&gt; function, marked &lt;span class=&quot;code&quot;&gt;async
-move&lt;/span&gt;. I create a copy of each path, using &lt;span
-class=&quot;code&quot;&gt;path.clone()&lt;/span&gt;, so the closure has its own copy of the path
-string with its own lifetime.&lt;/p&gt;
-&lt;p&gt;The complex type annotation on the &lt;span class=&quot;code&quot;&gt;tasks&lt;/span&gt; array
-indicates what each call to &lt;span class=&quot;code&quot;&gt;spawn&lt;/span&gt; returns: a &lt;span
-class=&quot;code&quot;&gt;JoinHandle&lt;/span&gt; enclosing a &lt;span class=&quot;code&quot;&gt;Result&lt;/span&gt;. To
-keep things simple, I handle all errors in the closure and just return &lt;span
-class=&quot;code&quot;&gt;Ok(())&lt;/span&gt;.  This means each &lt;span
-class=&quot;code&quot;&gt;JoinHandle&lt;/span&gt; contains a trivial result: &lt;span
-class=&quot;code&quot;&gt;Result&amp;lt;(), ()&amp;gt;&lt;/span&gt;. I could have written the closure to return
-some value and/or some error value instead.&lt;/p&gt;
-&lt;p&gt;After the loop is finished and all three tasks have been spawned, I call &lt;span
-class=&quot;code&quot;&gt;join_all(tasks).await&lt;/span&gt; to wait for them all to finish.&lt;/p&gt;
-&lt;h2&gt;Asynchronous vs Multithreaded&lt;/h2&gt;
-&lt;div style=&quot;float: right; padding: 8px 0px 20px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/traffic-light2.jpg&quot;&gt;&lt;br/&gt;
-  &lt;small&gt;(from: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Traffic_lights,_Zl%C3%ADn.JPG&quot;&gt;Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt; 
-&lt;/div&gt;
-&lt;p&gt;At first glance, it looks like this code is spawning three different threads. I
-even call a spawn function. A multithreaded download might look like this:&lt;/p&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/multithreaded.png&quot;&gt;
-&lt;p&gt;We have 3 paths, so we have 3 threads. Each thread calls &lt;span class=&quot;code&quot;&gt;get&lt;/span&gt; and waits, and
-then calls &lt;span class=&quot;code&quot;&gt;text&lt;/span&gt; and waits.&lt;/p&gt;
-&lt;p&gt;However, Rust’s Tokio engine doesn’t work that way. Instead of launching an
-entirely new thread for each task, it runs all three tasks on the same thread.&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Update&lt;/em&gt;: Wesley Moore &lt;a href=&quot;https://twitter.com/wezm/status/1219734031857635329&quot;&gt;pointed out on
-Twitter&lt;/a&gt; that: &amp;quot;Tokio
-multiplexes m tasks into a pool of n threads so it’s able to use all available
-cores. (M:N threading).&amp;quot; It looks like Tokio supports both a Basic (single
-threaded) and Threaded (thread pool) Scheduler; see &lt;a href=&quot;https://docs.rs/tokio/0.2.10/tokio/runtime/index.html#threaded-scheduler&quot;&gt;the
-docs&lt;/a&gt;
-for more information.&lt;/p&gt;
-&lt;p&gt;I imagine three tasks running on one thread like this:&lt;/p&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/one-thread.png&quot;&gt;
-&lt;p&gt;Each time I call &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt;, Rust stops one task and
-starts another using the same thread. In fact, depending on how long it takes
-for each task to complete, they might be run in a different order:&lt;/p&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/different-order.png&quot;&gt;
-&lt;p&gt;There’s no way to predict ahead of time what order the tasks will run it.
-That’s why I needed to copy each path string above; each task needs it own copy
-of the string with its own independent lifetime because it might be run at any
-time.&lt;/p&gt;
-&lt;p&gt;The only guarantee I have is that the &lt;span class=&quot;code&quot;&gt;join_all&lt;/span&gt; call
-at the bottom will block until all of the tasks have finished; that is, until
-all of the futures I pushed onto the tasks array have completed.&lt;/p&gt;
-&lt;h2&gt;Sending 100,000 Concurrent Requests&lt;/h2&gt;
-&lt;p&gt;I can scale this up to 100,000 requests by reading the URLs in from a file instead:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;read_lines&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(path: &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;str&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) -&amp;gt; Result&amp;lt;Vec&amp;lt;String&amp;gt;, Box&amp;lt;dyn Error&amp;gt;&amp;gt; {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; file &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;File::open(path)&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; reader &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;BufReader::new(file);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    Ok(
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        reader.lines().filter_map(Result::ok).collect()
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    )
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;#[tokio::main]
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;async &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;fn &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;main&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;() -&amp;gt; Result&amp;lt;(), Box&amp;lt;dyn Error&amp;gt;&amp;gt; {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;	&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; paths: Vec&amp;lt;String&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;read_lines(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;urls.txt&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;etc&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;...&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;When I tried this out for the first time I was excited: How long would it take
-to download 100,000 HTML pages simultaneously like this? Would it be 100,000x
-faster than downloading one file? I typed &lt;span class=&quot;code&quot;&gt;cargo run
---release&lt;/span&gt; to build my code in release mode and get the best possible
-performance out of Rust. Asynchronous code, zero cost abstractions, no garbage
-collector, this was going to be great!&lt;/p&gt;
-&lt;p&gt;Of course, it didn’t work.&lt;/p&gt;
-&lt;p&gt;What happened? The problem is the web server can't handle so many concurrent network
-connections. Using my thread/task diagram, launching all 100,000 tasks might
-look like this:&lt;/p&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/simultaneous.png&quot;&gt;
-&lt;p&gt;I spawn 100,000 tasks all on to the same thread, and Tokio starts executing
-them all. Each time my code above calls &lt;span
-class=&quot;code&quot;&gt;get(&amp;amp;path).await&lt;/span&gt;, Tokio pauses that task and starts
-another, which calls &lt;span class=&quot;code&quot;&gt;get(&amp;amp;path).await&lt;/span&gt; again, opening
-yet another HTTP request. My laptop quickly runs out of network resources and
-these tasks start to fail.&lt;/p&gt;
-&lt;h2&gt;Sending a Buffered, Concurrent Stream of 100,000 Requests&lt;/h2&gt;
-&lt;p&gt;Instead, I need to limit the number of concurrent Tokio tasks - the number of
-concurrent HTTP requests. I need the diagram to look something like this:&lt;/p&gt;
-&lt;img src=&quot;https://patshaughnessy.net/assets/2020/1/20/buffered.png&quot;&gt;
-&lt;p&gt;After the first 8 tasks are started, the first 8 blue boxes on the left, Tokio
-waits for at least one of them to complete before starting a 9th task. I
-indicate this with the “max concurrency” arrow.&lt;/p&gt;
-&lt;p&gt;Once one of the first 8 calls to &lt;span class=&quot;code&quot;&gt;reqwest::get&lt;/span&gt;
-completes, Tokio is free to run a 9th task. The first &amp;quot;pop from buffer&amp;quot; arrow.
-And once that 9th task or any other task completes, Tokio starts a 10th task,
-etc., in this manner processing all 100,000 tasks 8 at a time.&lt;/p&gt;
-&lt;p&gt;To achieve this, I can use &lt;span class=&quot;code&quot;&gt;StreamExt&lt;/span&gt; trait’s &lt;a
-href=&quot;https://rust-lang-nursery.github.io/futures-api-docs/0.3.0-alpha.5/futures/stream/trait.StreamExt.html#method.buffer_unordered&quot;&gt;&lt;span
-class=&quot;code&quot;&gt;buffer_unordered&lt;/span&gt;&lt;/a&gt; function:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;let&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; fetches &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;futures::stream::iter(
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    paths.into_iter().map(|path| {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        async &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;move &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;reqwest::get(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;path).await {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                Ok(resp) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;match&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; resp.text().await {
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                        Ok(text) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;{
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                            println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;RESPONSE: &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt; bytes from &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, text.len(), path);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                        }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                        Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR reading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                    }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;                Err(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;_&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;ERROR downloading &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;{}&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, path),
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;            }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;})
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;).buffer_unordered(&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;8&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;).collect::&amp;lt;Vec&amp;lt;()&amp;gt;&amp;gt;();
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;println!(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Waiting...&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;);
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;fetches.await;&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;First I create an iterator which maps all of the paths to my closures, and passes
-them to &lt;span class=&quot;code&quot;&gt;futures::stream::iter&lt;/span&gt;.
-This will create a list of futures, each one executing my closure.&lt;/p&gt;
-&lt;p&gt;At the bottom I call &lt;span class=&quot;code&quot;&gt;buffer_unordered&lt;/span&gt; and pass in 8.  The
-code in &lt;span class=&quot;code&quot;&gt;buffer_unordered&lt;/span&gt; will execute up to 8 futures
-from the stream concurrently, and then start to buffer the remaining futures.
-As each task completes, each HTTP request in my example, &lt;span
-class=&quot;code&quot;&gt;buffer_unordered&lt;/span&gt; will pull another task out of its buffer
-and execute it.&lt;/p&gt;
-&lt;p&gt;This code will slowly but steadily iterate over the 100,000 URLs, downloading
-them in parallel. Experimenting with this, it doesn’t seem to matter very much
-exactly what level of concurrency I pick. I found the best performance when I
-picked a concurrency of 50. Using 50 concurrent Tokio tasks, it took about 30
-minutes to download all one hundred thousand HTML files.&lt;/p&gt;
-&lt;p&gt;However, none of that matters. I’m not measuring the performance of Rust, Tokio
-or Reqwest. These numbers have more to do with the web server and network
-connection I’m using. The real performance here was my own developer
-performance: With just a few lines of code I was able to write an asynchronous
-I/O program that can scale as much as I would like. The &lt;span
-class=&quot;code&quot;&gt;async&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;await&lt;/span&gt; keywords make
-this code easy to write and easy to read.&lt;/p&gt;
 </content></entry></feed>
