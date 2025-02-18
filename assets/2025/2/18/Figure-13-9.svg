@@ -4,9 +4,9 @@
 <svg
    version="1.1"
    id="svg1"
-   width="544"
-   height="541.33331"
-   viewBox="0 0 544 541.33331"
+   width="632"
+   height="454.66666"
+   viewBox="0 0 632 454.66666"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
@@ -21,178 +21,162 @@
      id="g1">
     <path
        id="path1"
-       d="M 495,10 H 2475 V 1520 H 495 Z"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:80, 50;stroke-dashoffset:0;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
-    <text
-       id="text1"
-       xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,7.5703067,271.11067)"><tspan
-         id="tspan1"
-         style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         x="0"
-         y="0">Write Barrier</tspan></text>
+       d="m 3580,885 h 1120 c 16.57,0 30,-13.43 30,-30 V 555 c 0,-16.57 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <path
        id="path2"
-       d="m 755.164,1936.67 269.876,-339.2"
+       d="m 3580,885 h 1120 c 16.57,0 30,-13.434 30,-30 V 555 c 0,-16.566 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.434 -30,30 v 300 c 0,16.566 13.43,30 30,30 z"
        style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
+    <text
+       id="text2"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,491.79467,367.33333)"><tspan
+         id="tspan2"
+         style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">Object.new</tspan></text>
     <path
        id="path3"
-       d="m 1074.84,1534.87 -26.33,81.28 -46.95,-37.36 z"
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       d="m 3580,1245 h 1120 c 16.57,0 30,-13.43 30,-30 V 915 c 0,-16.57 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <path
        id="path4"
-       d="m 2921.29,1172.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       d="m 3580,1245 h 1120 c 16.57,0 30,-13.43 30,-30 V 915 c 0,-16.566 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.434 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
+    <text
+       id="text4"
+       xml:space="preserve"
+       transform="matrix(1.3333333,0,0,1.3333333,491.79467,319.33333)"><tspan
+         id="tspan4"
+         style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         x="0"
+         y="0">Object.new</tspan></text>
     <path
        id="path5"
-       d="m 2921.29,1172.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.566 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.434 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
-       style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       d="m 3580,1605 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <text
        id="text5"
        xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,403.96667,415.66667)"><tspan
+       transform="matrix(1.3333333,0,0,1.3333333,491.79467,271.33333)"><tspan
          id="tspan5"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
          y="0">Object.new</tspan></text>
     <path
        id="path6"
-       d="m 2921.29,1532.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       d="m 3580,1965 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <text
        id="text6"
        xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,403.96667,367.66667)"><tspan
+       transform="matrix(1.3333333,0,0,1.3333333,491.79467,223.33333)"><tspan
          id="tspan6"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         y="0">Object.new</tspan></text>
-    <path
-       id="path7"
-       d="m 2921.29,1892.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
-    <text
-       id="text7"
-       xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,403.96667,319.66667)"><tspan
+         y="0">Object.new</tspan><tspan
          id="tspan7"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         y="0">Object.new</tspan></text>
+         y="164">Mark Stack</tspan></text>
+    <path
+       id="path7"
+       d="m 770.418,830 h 1980 v 1190 h -1980 z"
+       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:80, 50;stroke-dashoffset:0;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <path
        id="path8"
-       d="m 2921.29,2252.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       d="m 1200.42,1605 h 1120 c 16.56,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.44,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <text
        id="text8"
        xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,403.96667,271.66667)"><tspan
+       transform="matrix(1.3333333,0,0,1.3333333,216.66133,271.33333)"><tspan
          id="tspan8"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         y="0">Object.new</tspan></text>
+         y="0">arr</tspan></text>
     <path
        id="path9"
-       d="m 2921.29,2612.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       d="m 3580,2325 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <text
        id="text9"
        xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,403.96667,223.66667)"><tspan
+       transform="matrix(1.3333333,0,0,1.3333333,491.79467,175.33333)"><tspan
          id="tspan9"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
          y="0">Object.new</tspan></text>
     <path
        id="path10"
-       d="m 2921.29,2972.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       d="m 3580,2685 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <text
        id="text10"
        xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,403.96667,175.66667)"><tspan
+       transform="matrix(1.3333333,0,0,1.3333333,491.79467,127.33333)"><tspan
          id="tspan10"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
          y="0">Object.new</tspan></text>
     <path
        id="path11"
-       d="m 2921.29,3332.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       d="m 3580,3045 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <text
        id="text11"
        xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,403.96667,127.66667)"><tspan
+       transform="matrix(1.3333333,0,0,1.3333333,491.79467,79.333333)"><tspan
          id="tspan11"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
          y="0">Object.new</tspan></text>
     <path
        id="path12"
-       d="m 2921.29,3692.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
+       d="m 3580,3405 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 H 3580 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <text
        id="text12"
        xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,403.96667,79.666667)"><tspan
+       transform="matrix(1.3333333,0,0,1.3333333,491.79467,31.333333)"><tspan
          id="tspan12"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         y="0">Object.new</tspan></text>
-    <path
-       id="path13"
-       d="m 2921.29,4052.5 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 h -1120 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
-    <text
-       id="text13"
-       xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,403.96667,31.666667)"><tspan
+         y="0">Object.new</tspan><tspan
          id="tspan13"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         x="0"
-         y="0">Object.new</tspan><tspan
+         x="-265.04999"
+         y="308">Popped off Stack</tspan><tspan
          id="tspan14"
          style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         x="0"
-         y="343.75">Mark Stack</tspan><tspan
-         id="tspan15"
-         style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         x="-203.03101"
-         y="327.125">Popped off</tspan><tspan
-         id="tspan16"
-         style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         x="-180.45399"
-         y="345.125">Stack</tspan></text>
+         x="-363.8457"
+         y="65.333">Write Barrier</tspan></text>
+    <path
+       id="path14"
+       d="m 748.387,2431.67 269.873,-339.2"
+       style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
+    <path
+       id="path15"
+       d="m 1068.07,2029.87 -26.34,81.28 -46.945,-37.36 z"
+       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
     <path
        id="path16"
-       d="m 925,1248.75 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.57 -13.43,-30 -30,-30 H 925 c -16.57,0 -30,13.43 -30,30 v 300 c 0,16.57 13.43,30 30,30 z"
-       style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
-    <path
-       id="path17"
-       d="m 925,1248.75 h 1120 c 16.57,0 30,-13.43 30,-30 v -300 c 0,-16.566 -13.43,-30 -30,-30 H 925 c -16.566,0 -30,13.434 -30,30 v 300 c 0,16.57 13.434,30 30,30 z"
-       style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.13333333,0,0,-0.13333333,0,541.33333)" />
-    <text
-       id="text17"
-       xml:space="preserve"
-       transform="matrix(1.3333333,0,0,1.3333333,179.93867,405.5)"><tspan
-         id="tspan17"
-         style="font-variant:normal;font-weight:normal;font-size:15px;font-family:Menlo;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         x="0"
-         y="0">arr</tspan></text>
+       d="m 1068.07,2029.87 -26.33,81.28 -46.955,-37.36 z"
+       style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       transform="matrix(0.13333333,0,0,-0.13333333,0,454.66667)" />
   </g>
 </svg>
