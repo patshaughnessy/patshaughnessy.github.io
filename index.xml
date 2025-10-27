@@ -1,4 +1,240 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-02-18T15:41:42Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Write Barriers</title><link href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></id><published>2025-02-18T00:00:00Z</published><updated>2025-02-18T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-10-27T18:39:28Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Parsing: How Ruby Understands Your Code</title><link href="https://patshaughnessy.net/2025/10/27/parsing-how-ruby-understands-your-code" rel="alternate"></link><id href="https://patshaughnessy.net/2025/10/27/parsing-how-ruby-understands-your-code" rel="alternate"></id><published>2025-10-27T00:00:00Z</published><updated>2025-10-27T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update&lt;/stro</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: I’ve made a lot of progress so far this year. I had time to
+completely rewrite Chapters 1 and 2, which cover Ruby’s new Prism parser and the Ruby
+compiler which now handles the Prism AST. I also updated Chapter 3 about YARV
+and right now I’m working on rewriting Chapter 4 which will cover YJIT and
+possibly other Ruby JIT compilers.&lt;/p&gt;
+&lt;p&gt;Here’s an excerpt from the new version of Chapter 1. Many thanks to Kevin
+Newton, who reviewed the content about Prism and had a number of corrections and
+great suggestions. Also thanks to Douglas Eichelberger who had some great
+feedback as well.&lt;/p&gt;
+&lt;p&gt;I’ll post more excerpts from Chapters 2, 3 and 4 in the coming weeks. Thanks for
+everyone’s interest in Ruby Under a Microscope! &lt;/p&gt;
+&lt;h2&gt;Chapter 1: Tokenization And Parsing&lt;/h2&gt;
+&lt;div style=&quot;font-size: small&quot;&gt;
+&lt;table id=&quot;toc&quot;&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Tokens: The Words That Make Up the Ruby Language&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Which Words Are Reserved Words?&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 1-1: Using Prism to Tokenize Different Ruby Scripts&lt;/td&gt;&lt;td&gt;10&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Parsing: How Ruby Understands Your Code&lt;/td&gt;&lt;td&gt;13&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Identifying Tokens&lt;/td&gt;&lt;td&gt;14&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Parsing Subexpressions Recursively&lt;/td&gt;&lt;td&gt;16&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Comparing Tokens&lt;/td&gt;&lt;td&gt;17&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Operator Precedence&lt;/td&gt;&lt;td&gt;19&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Left and Right Associative Operators&lt;/td&gt;&lt;td&gt;24&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Binding Powers&lt;/td&gt;&lt;td&gt;28&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 1-2: Using Prism to Parse Different Ruby Scripts&lt;/td&gt;&lt;td&gt;30&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Summary&lt;/td&gt;&lt;td&gt;33&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;h2&gt;Parsing: How Ruby Understands Your Code&lt;/h2&gt;
+&lt;p&gt;Once Ruby converts your code into a series of tokens, what does it do next? How
+does it actually understand and run your program? Does Ruby simply step through
+the tokens and execute each one in order?&lt;/p&gt;
+&lt;p&gt;No. Your code still has a long way to go before Ruby can run it. The next step
+on its journey through Ruby is called &lt;em&gt;parsing&lt;/em&gt;, where words or tokens are grouped
+into sentences or phrases that make sense to Ruby. When parsing, Ruby takes into
+account the order of operations, methods, blocks, and other larger code
+structures.&lt;/p&gt;
+&lt;p&gt;Ruby’s parsing engine defines Ruby’s syntax rules. Reading in tokens, Ruby
+matches the token types and the order the tokens appear with a large series of
+patterns. These patterns, indeed, are the heart and soul of the Ruby language.
+How we write a function call, how we define a method using the &lt;span
+class=&quot;code&quot;&gt;def&lt;/span&gt; keyword, how we write classes and modules - the patterns
+Ruby looks for define the language.&lt;/p&gt;
+&lt;p&gt;Ruby’s parse algorithm has three high level steps:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Identify&lt;/strong&gt;: First, Ruby identifies what the next token represents. Ruby does
+this by comparing the token’s type - and possibly the types of the following
+tokens - with a large series of patterns. If one pattern matches, Ruby
+understands what your code means. If not, Ruby emits a syntax error.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Recurse&lt;/strong&gt;: Secondly, Ruby calls itself. Each value in one of the syntax
+patterns can itself be a subexpression - a smaller program that Ruby needs to
+parse. To do this, Ruby calls itself recursively.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Compare&lt;/strong&gt;: Third, Ruby compares the current token with the next token to
+determine which has a higher precedence. This comparison leads Ruby down a
+specific path, processing the tokens in a certain order.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let’s break down these ideas further, by following Ruby through the “Hello
+World” program. Afterwards, we’ll look at a second, slightly more complicated
+example.&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;puts &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Hello World&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;quot;&lt;/span&gt;&lt;/pre&gt;
+
+&lt;div style=&quot;font-style: italic; font-size: small; margin: -20px 0 20px 0&quot;&gt;
+  Listing 1-11: Hello World in Ruby
+&lt;/div&gt;
+&lt;p&gt;As we saw in the previous section, Ruby first converts the text in this code
+file into tokens. For Hello World, Ruby’s tokenizer produces these five tokens:&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;75%&quot; src=&quot;https://patshaughnessy.net/assets/2025/10/27/Figure-1-14.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 1-14: Hello World Tokenized
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;To make the following diagrams simpler, let’s redraw these tokens in a more
+compact format:&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;40%&quot; src=&quot;https://patshaughnessy.net/assets/2025/10/27/Figure-1-15.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 1-15: Hello World tokens in a more compact format
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Using a single gray line of text, Figure 1-15 shows the five tokens from Figure
+1-14 in a more compact format. First, &lt;span
+class=&quot;code&quot;&gt;PM_TOKEN_IDENTIFIER&lt;/span&gt; represents the word “puts” from the
+beginning of the program. Next, three tokens make up the string literal value:
+&lt;span class=&quot;code&quot;&gt;PM_TOKEN_STRING_BEGIN&lt;/span&gt; for the first double quote,
+followed by &lt;span class=&quot;code&quot;&gt;PM_TOKEN_STRING_VALUE&lt;/span&gt; for the words Hello
+and World, and &lt;span class=&quot;code&quot;&gt;PM_TOKEN_STRING_END&lt;/span&gt; represents the
+second quote. Finally, the program ends with &lt;span
+class=&quot;code&quot;&gt;PM_TOKEN_EOF&lt;/span&gt; to mark the end of the source code file.&lt;/p&gt;
+&lt;p&gt;Now let’s follow Ruby as it processes the Hello World example using the three
+steps: identify, recurse and compare.&lt;/p&gt;
+&lt;h2&gt;Identifying Tokens&lt;/h2&gt;
+&lt;p&gt;First, &lt;em&gt;identify&lt;/em&gt;. How does Ruby understand what the first token,
+&lt;span class=&quot;code&quot;&gt;PM_TOKEN_IDENTIFIER&lt;/span&gt;, means?&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;40%&quot; src=&quot;https://patshaughnessy.net/assets/2025/10/27/Figure-1-16.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 1-16: Parsing the first token
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 1-16 represents the state of Ruby’s parser when it starts to parse this
+code. At this moment, Ruby is just getting started by inspecting the &lt;span
+class=&quot;code&quot;&gt;puts&lt;/span&gt; identifier. One of the patterns Ruby looks for matches
+the identifier; but what does this identifier mean? Ruby knows &lt;span class=&quot;code&quot;&gt;puts&lt;/span&gt; could be a
+local variable, or it could be the name of a function to call. Since there are
+no local variables defined in this program, Ruby determines that the &lt;span class=&quot;code&quot;&gt;puts&lt;/span&gt;
+identifier represents a function the program is calling. (It’s also possible
+that the program is about to create a new local variable like this: &lt;span class=&quot;code&quot;&gt;puts =
+&amp;quot;Hello World&amp;quot;&lt;/span&gt;. If that were the case, Ruby would see the assignment operator
+next and parse things differently.)&lt;/p&gt;
+&lt;p&gt;What happens next? After matching the token to the function call pattern, Ruby
+records this match in a data structure called an abstract syntax tree (AST).
+Ruby and most other programming languages use ASTs to record the results of
+parsing tokens like this. As we’ll see, the AST’s tree structure is well suited
+for holding the nested, recursive structure of computer programs.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;25%&quot; src=&quot;https://patshaughnessy.net/assets/2025/10/27/Figure-1-17.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 1-17: The first AST node
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 1-17 shows the first node Ruby saves in the AST tree. In a moment, Ruby
+will begin to add more nodes to the AST.&lt;/p&gt;
+&lt;p&gt;Before proceeding to the next token, let’s imagine the syntax pattern for a
+function call:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;function&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;name ( argument1, argument2, argument3, etc. )&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;Although in Ruby the parentheses are optional, so this pattern also applies:&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;function&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;name argument1, argument2, argument3, etc.&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt;&lt;br/&gt;
+&lt;i&gt;
+The original version of the Ruby parser used patterns or grammar rules like this
+directly with a tool called a parser generator. However, starting with Ruby 3.3,
+Ruby uses a new parser called Prism, which detects these patterns directly using
+hand written C code.
+&lt;/i&gt;&lt;/p&gt;
+&lt;p&gt;After parsing the first token, Ruby inspects the second token. According to the
+function call pattern, Ruby knows the second token might represent the first
+argument to the function call. But, how many arguments are there? And what is
+each argument? The program in Listing 1-11 is very simple, but it could have
+instead printed a very complex expression - the arguments to &lt;span
+class=&quot;code&quot;&gt;puts&lt;/span&gt; could have run on for many lines and used hundreds of
+tokens.&lt;/p&gt;
+&lt;h2&gt;Parsing Subexpressions&lt;/h2&gt;
+&lt;p&gt;Second, &lt;em&gt;recurse&lt;/em&gt;. To parse each of the arguments to puts, Ruby has to call itself.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;40%&quot; src=&quot;https://patshaughnessy.net/assets/2025/10/27/Figure-1-18.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 1-18: Parsing the second token
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 1-18 shows two levels of the Ruby parser’s call stack; the top line shows
+Ruby parsing the puts identifier token, and matching the function call pattern.
+The second line shows how Ruby called itself to parse the second token,
+&lt;span class=&quot;code&quot;&gt;PM_TOKEN_STRING_BEGIN&lt;/span&gt;, the leading quote of the string
+literal. Think of these lines as the backtrace of the Ruby parser.&lt;/p&gt;
+&lt;p&gt;Figure 1-18 also shows a value 14 on the right side. While calling itself
+recursively, Ruby passes in a numeric value called the &lt;em&gt;binding power&lt;/em&gt;. We’ll
+return to this later.&lt;/p&gt;
+&lt;p&gt;Now that Ruby has called itself, Ruby starts the 3-step process all over again:
+identify, recurse and compare. This time, Ruby has to identify what the &lt;span
+class=&quot;code&quot;&gt;PM_TOKEN_STRING_BEGIN&lt;/span&gt; token means. This token always
+indicates the start of a string value. In this example &lt;span
+class=&quot;code&quot;&gt;PM_TOKEN_STRING_BEGIN&lt;/span&gt; represents the double quote that
+appears after &lt;span class=&quot;code&quot;&gt;puts&lt;/span&gt;. But the same token might represent
+a single quote or one of the other ways you can write a string in Ruby, for
+example using &lt;span class=&quot;code&quot;&gt;%Q&lt;/span&gt; or &lt;span class=&quot;code&quot;&gt;%q&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Ruby’s new parser, Prism, next parses the string contents directly by processing
+the following two tokens:&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;40%&quot; src=&quot;https://patshaughnessy.net/assets/2025/10/27/Figure-1-19.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 1-19: Parsing the third and fourth tokens
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;In this example, Ruby’s parser is done after finding the &lt;span
+class=&quot;code&quot;&gt;PM_TOKEN_STRING_END&lt;/span&gt; token and can continue to the next step.
+More complex strings - strings that contain interpolated values using &lt;span
+class=&quot;code&quot;&gt;#{}&lt;/span&gt; for example - might have required Ruby to call itself
+yet again to process more nested expressions. But for the simple &lt;span
+class=&quot;code&quot;&gt;&amp;quot;Hello World&amp;quot;&lt;/span&gt; string Ruby is done.&lt;/p&gt;
+&lt;p&gt;To record the string value, Ruby creates a new AST node called &lt;span
+class=&quot;code&quot;&gt;PM_STRING_NODE&lt;/span&gt;.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;60%&quot; src=&quot;https://patshaughnessy.net/assets/2025/10/27/Figure-1-20.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+  Figure 1-20: Two AST nodes
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 1-20 shows two AST nodes Ruby has created so far: the call node created
+earlier, and now a new string node.&lt;/p&gt;
+&lt;p&gt;Ruby’s parser is a &lt;em&gt;recursive descent parser&lt;/em&gt;. This Computer Science term
+describes parsers that resemble the grammar or syntax rules of the programs they
+parse, and call themselves recursively in a top-down manner as they process
+nested structures. Many modern programming languages today use this general
+approach.&lt;/p&gt;
+</content></entry><entry><title>Write Barriers</title><link href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></link><id href="https://patshaughnessy.net/2025/2/18/write-barriers" rel="alternate"></id><published>2025-02-18T00:00:00Z</published><updated>2025-02-18T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
@@ -2256,186 +2492,4 @@ compiler that my code is consistent and mathematically correct at a type level.&
 what code you are writing, how fast it needs to run, how many times and for how
 long that code will be used - and most importantly, how much time you have to
 solve math problems.&lt;/p&gt;
-</content></entry><entry><title>To Learn a New Language, Read Its Standard Library</title><link href="https://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></link><id href="https://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library" rel="alternate"></id><published>2021-10-23T00:00:00Z</published><updated>2021-10-23T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;If I was learning to read English as a foreign language,&lt;br/&gt; I would need something simple to get started.&lt;br/&gt;
-  &lt;small&gt;(from The Remarkable Story of Chicken Little, 1840)&lt;/small&gt;&lt;/i&gt; 
-&lt;/div&gt;
-&lt;p&gt;The best way to learn a</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 20px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/10/23/chicken-little.png&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;If I was learning to read English as a foreign language,&lt;br/&gt; I would need something simple to get started.&lt;br/&gt;
-  &lt;small&gt;(from The Remarkable Story of Chicken Little, 1840)&lt;/small&gt;&lt;/i&gt; 
-&lt;/div&gt;
-&lt;p&gt;The best way to learn a new programming language, just like a human language,
-is from example. To learn how to write code you first need to read someone
-else’s code. But who is the best person to learn from? Which code should we
-read? Where should we look to find it?&lt;/p&gt;
-&lt;p&gt;This year in my spare time I was learning about
-&lt;a href=&quot;https://crystal-lang.org&quot;&gt;Crystal&lt;/a&gt;. I had played around with some simple
-scripts, but I wanted to learn more. Then I stumbled on to Crystal’s &lt;a href=&quot;https://github.com/crystal-lang/crystal/tree/master/src&quot;&gt;standard
-library&lt;/a&gt;. I was
-relieved to see that Crystal’s core classes are implemented using Crystal
-itself!&lt;/p&gt;
-&lt;p&gt;Crystal’s standard library is clear, simple, concise and well documented.
-Reading Crystal’s internal implementation of Array or Hash is like reading
-a fairy tale in a children’s book. Anyone can understand it, even people
-without a Ph.D. in Computer Science or systems programming experience.&lt;/p&gt;
-&lt;div style=&quot;clear: left&quot;&gt;&lt;/div&gt;
-&lt;p&gt;&lt;b&gt;Update:&lt;/b&gt; There was a &lt;a href=&quot;https://news.ycombinator.com/item?id=28975453&quot;&gt;long discussion on Hacker
-News&lt;/a&gt; about whether reading the
-standard library really is a good idea for various different languages.&lt;/p&gt;
-&lt;h2&gt;At First Glance, Crystal Is Ruby&lt;/h2&gt;
-&lt;p&gt;At first glance, when I read Crystal’s &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr&quot;&gt;Array
-implementation&lt;/a&gt;,
-I thought I was reading a Ruby program:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;class &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Array&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(T)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;include &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Indexable&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;::Mutable(T)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;include &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Comparable(Array)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Size of an Array that we consider small to do linear scans or other optimizations.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;private &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;SMALL_ARRAY_SIZE &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;16
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The size of this array.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Int32
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The capacity of `@buffer`.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Note that, because `@buffer` moves on shift, the actual
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# capacity (the allocated memory) starts at `@buffer - @offset_to_buffer`.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The actual capacity is also given by the `remaining_capacity` internal method.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;capacity &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Int32
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Offset to the buffer that was originally allocated, and which needs to
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# be reallocated on resize. On shift this value gets increased, together with
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# `@buffer`. To reach the root buffer you have to do `@buffer - @offset_to_buffer`,
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# and this is also provided by the `root_buffer` internal method.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;offset_to_buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Int32 &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;0
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# The buffer where elements start.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Pointer(T)&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;There are lots of familiar keywords, like &lt;code&gt;class&lt;/code&gt;, &lt;code&gt;include&lt;/code&gt; and &lt;code&gt;private&lt;/code&gt;. I also
-see Ruby’s &lt;code&gt;@&lt;/code&gt; character indicating an instance variable. This code is about 100x
-easier to read vs. &lt;a href=&quot;https://github.com/ruby/ruby/blob/master/array.c&quot;&gt;Ruby’s own C implementation of
-Array&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Along with the familiar Ruby-like syntax, notice the helpful comments. Even
-though I’ve just started reading I can already make an educated guess at how
-Crystal arrays function internally. I can see there’s a pointer to memory which
-holds the array elements, and that the code keeps track of the capacity of this
-memory along with the actual size of the array. Finally, reading the comment for
-&lt;code&gt;offset_to_buffer&lt;/code&gt; I can imagine there are some optimizations related to adding
-and removing elements. The comment is both helpful and intriguing.&lt;/p&gt;
-&lt;p&gt;But I’m not reading Ruby code. There are important differences here: generic
-type syntax and most importantly each of the instance variables is declared
-with a static type known at compile time. How do I use static types in Crystal?
-What types are available? What about the generic type parameter &lt;code&gt;T&lt;/code&gt;? Should I
-use that in my own Crystal code? What other syntax differences vs. Ruby are
-there?&lt;/p&gt;
-&lt;p&gt;The best way to learn how to write Crystal code is simply to scroll down and
-read one of the Array methods.&lt;/p&gt;
-&lt;h2&gt;Array#uniq&lt;/h2&gt;
-&lt;p&gt;Here’s how Crystal finds the unique elements of an array:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;uniq
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;dup
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Heuristic: for a small array it&amp;#39;s faster to do a linear scan
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# than creating a Hash to find out duplicates.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;SMALL_ARRAY_SIZE
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Array(T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    each &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary.includes?(elem)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Convert the Array into a Hash and then ask for its values
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  to_lookup_hash.values
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;The first three lines handle the trivial case of when an array is empty or
-contains only one element:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;= &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;dup
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Obviously in this case, there are no duplicate elements and &lt;code&gt;Array#uniq&lt;/code&gt; should
-simply return the original array. One important detail: Crystal uses &lt;code&gt;dup&lt;/code&gt; to
-return a copy of the array. This reminds me that in Ruby &lt;code&gt;uniq&lt;/code&gt; returns a copy
-of the receiver, while &lt;code&gt;uniq!&lt;/code&gt; mutates the receiver. My guess is that Crystal
-implements Array methods in the same way…&lt;/p&gt;
-&lt;p&gt;The second passage is an optimization:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# Heuristic: for a small array it&amp;#39;s faster to do a linear scan
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# than creating a Hash to find out duplicates.
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;if&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; size &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;SMALL_ARRAY_SIZE
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Array(T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  each &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary.includes?(elem)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;For small arrays (16 or fewer elements) Crystal iterates over them and removes
-duplicates using a simple algorithm. I’ll take a look at how that works in a
-moment.&lt;/p&gt;
-&lt;p&gt;The final line of code handles arrays with 17 or more elements:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# Convert the Array into a Hash and then ask for its values
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;to_lookup_hash.values&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;As you might guess, Crystal removes duplicate values from larger arrays using a
-hash. I'll dive into the details about how this works in my next post.&lt;/p&gt;
-&lt;h2&gt;Arrays With 16 Or Fewer Elements&lt;/h2&gt;
-&lt;p&gt;But first, let’s take a closer look at case #2 from above, when the array
-contains 16 or fewer elements. First, Crystal creates a new, empty array called
-ary:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Array(T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Note the generic type syntax &lt;code&gt;Array(T).new&lt;/code&gt;. This tells the Crystal compiler
-that the new array, what will become the return value from &lt;code&gt;Array#uniq&lt;/code&gt;, will
-only contain elements of the same type as the original array.&lt;/p&gt;
-&lt;p&gt;Ruby developers will find the rest of this code easy to follow…&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;each &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  ary &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; ary.includes?(elem)
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Crystal calls &lt;code&gt;each&lt;/code&gt; to iterate over all the elements in the receiver, the
-array we are calling &lt;code&gt;uniq&lt;/code&gt; on. Then using &lt;code&gt;&amp;lt;&amp;lt;&lt;/code&gt;, Crystal appends each of the
-original array’s elements to the new array, unless the new array already
-contains a given element.&lt;/p&gt;
-&lt;p&gt;Like Ruby, Crystal implements the &lt;code&gt;includes?&lt;/code&gt; method inside the &lt;code&gt;Enumerable&lt;/code&gt;
-module. Crystal arrays are enumerable because of the &lt;code&gt;include Indexable::Mutable(T)&lt;/code&gt; statement we read above. (&lt;code&gt;Indexable::Mutable&lt;/code&gt; includes
-&lt;code&gt;Indexable&lt;/code&gt; which includes &lt;code&gt;Enumerable&lt;/code&gt;). You can find Crystal’s implementation
-of &lt;code&gt;includes?&lt;/code&gt; (not &lt;code&gt;include?&lt;/code&gt; as in Ruby) in
-&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/enumerable.cr&quot;&gt;enumerable.cr&lt;/a&gt;:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;includes?&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(obj) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Bool
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  any? { &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;e&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; e &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;==&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; obj }
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Here the &lt;code&gt;any?&lt;/code&gt; method calls the given block once for each element in the
-array, and returns true if the block returns true for any of the elements. In
-other words, this code searches the array in a linear fashion, one element at a
-time. Crystal’s development team has decided that it’s faster to filter out
-repeated elements from small arrays by repeatedly searching the array using
-linear scans. Since there are never more than 16 elements, those scans won’t
-take too much time.&lt;/p&gt;
-&lt;h2&gt;Simple and Concise&lt;/h2&gt;
-&lt;p&gt;You might be thinking: This is an incredibly simple algorithm; anyone could have
-written this code! Why bother writing a blog post about this?&lt;/p&gt;
-&lt;p&gt;That’s exactly my point: This is simple and concise code. I could have written
-it - you could have also. There’s nothing superfluous, not an extra word here.
-Just enough code to get the job done. And there’s no noise… no macros, no odd C
-memory tricks, no weird bitwise mask operations. This is the kind of code I
-need to read now when I’m learning how to use Crystal. As a side benefit, I
-also get to learn how Crystal works internally.&lt;/p&gt;
-&lt;p&gt;But what happens for longer arrays, with 100s or 1000s of elements? How does
-Crystal remove duplicates from longer arrays efficiently? I'll take a look at
-how that works in my next post.&lt;/p&gt;
 </content></entry></feed>
