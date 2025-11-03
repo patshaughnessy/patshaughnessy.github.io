@@ -1,4 +1,169 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-10-27T18:39:28Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Parsing: How Ruby Understands Your Code</title><link href="https://patshaughnessy.net/2025/10/27/parsing-how-ruby-understands-your-code" rel="alternate"></link><id href="https://patshaughnessy.net/2025/10/27/parsing-how-ruby-understands-your-code" rel="alternate"></id><published>2025-10-27T00:00:00Z</published><updated>2025-10-27T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-11-03T16:55:38Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Compiling a Call to a Block</title><link href="https://patshaughnessy.net/2025/11/3/compiling-a-call-to-a-block" rel="alternate"></link><id href="https://patshaughnessy.net/2025/11/3/compiling-a-call-to-a-block" rel="alternate"></id><published>2025-11-03T00:00:00Z</published><updated>2025-11-03T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;https://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;This week's excerpt</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;https://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;This week's excerpt is from Chapter 2, about Ruby's compiler. Whenever I think
+about it, I'm always suprised that Ruby has a compiler like C, Java or any other
+programming language. The only difference is that we don't normally interact
+with Ruby's compiler directly.&lt;/p&gt;
+&lt;p&gt;The developers who contributed Ruby's new parser, Prism, also had to rewrite
+the Ruby compiler because Prism now produces a completely different, redesigned
+abstract syntax tree (AST). Chapter 2's outline is more or less the same as it
+was in 2014, but I redrew all of the diagrams and updated much of the text to
+match the new AST nodes and other changes for Prism.&lt;/p&gt;
+&lt;h2&gt;Chapter 2: Compilation&lt;/h2&gt;
+&lt;div style=&quot;font-size: small&quot;&gt;
+&lt;table id=&quot;toc&quot;&gt;
+	&lt;tr&gt;
+		&lt;td&gt;The Ruby Compiler&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Ruby 3.2 Introduces a Just-In-Time (JIT) Compiler &lt;/td&gt;&lt;td&gt;5&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Ruby Compiles a Simple Script&lt;/td&gt;&lt;td&gt;6&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Scope AST Nodes&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Compiling a Simple AST&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Compiling a Call to a Block&lt;/td&gt;&lt;td&gt;12&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Ruby Iterates Through the AST&lt;/td&gt;&lt;td&gt;16&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 2-1: Displaying YARV Instructions&lt;/td&gt;&lt;td&gt;19&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;The Local Table&lt;/td&gt;&lt;td&gt;21&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Compiling Optional Arguments&lt;/td&gt;&lt;td&gt;23&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Compiling Keyword Arguments&lt;/td&gt;&lt;td&gt;24&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Unnamed Local Variables&lt;/td&gt;&lt;td&gt;25&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 2-2: Displaying the Local Table&lt;/td&gt;&lt;td&gt;28&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Summary&lt;/td&gt;&lt;td&gt;30&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;h2&gt;Compiling a Call to a Block&lt;/h2&gt;
+&lt;p&gt;Next, let’s compile my &lt;span class=&quot;code&quot;&gt;10.times&lt;/span&gt; do example from
+Listing 1-1 in Chapter 1 (see Listing 2-2).&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#d08770;&quot;&gt;10&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.times &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  puts n
+&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
+
+&lt;div style=&quot;font-style: italic; font-size: small; margin: -20px 0 20px 0&quot;&gt;
+ Listing 2-2: A simple script that calls a block (repeated from Listing 1-1)
+&lt;/div&gt;
+&lt;p&gt;Notice that this example contains a block parameter to the &lt;span
+class=&quot;code&quot;&gt;times&lt;/span&gt; method. This is interesting because it will give us a
+chance to see how the Ruby compiler handles blocks. Figure 2-13 shows the AST
+for the &lt;span class=&quot;code&quot;&gt;10.times do&lt;/span&gt; example again.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/3/Figure-2-13.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 2-13: A simplified view of the AST for the call to 10.times, passing a block
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;The left side of Figure 2-13 shows the AST for the &lt;span
+class=&quot;code&quot;&gt;10.times&lt;/span&gt; function call: the call node and the receiver 10,
+represented by integer node. On the right, Figure 2-13 shows the beginning of
+the AST for the block: &lt;span class=&quot;code&quot;&gt;do |n| puts n end&lt;/span&gt;, represented
+by the block node. You can see Ruby has added a scope node on both sides, since
+there are two lexical scopes in Listing 2-2: the top level and the block.  Let’s
+break down how Ruby compiles the main portion of the script shown on the left of
+Figure 2-13. As before, Ruby starts with the first &lt;span
+class=&quot;code&quot;&gt;PM_NODE_SCOPE&lt;/span&gt; and creates a new snippet of YARV instructions,
+as shown in Figure 2-14.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;75%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/3/Figure-2-14.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 2-14: Each PM_SCOPE_NODE is compiled into a new snippet of YARV instructions.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Next, Ruby steps down the AST nodes to &lt;span class=&quot;code&quot;&gt;PM_CALL_NODE,&lt;/span&gt;
+as shown in Figure 2-15.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;75%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/3/Figure-2-15.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 2-15: Ruby stepping through an AST
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;At this point, there is still no code generated, but notice in Figure 2-13 that
+two arrows lead from &lt;span class=&quot;code&quot;&gt;PM_CALL_NODE&lt;/span&gt;: one to &lt;span
+class=&quot;code&quot;&gt;PM_INTEGER_NODE&lt;/span&gt;, which represents the 10 in the &lt;span
+class=&quot;code&quot;&gt;10.times&lt;/span&gt; call, and another to the inner block. Ruby will
+first continue down the AST to the integer node and compile the &lt;span
+class=&quot;code&quot;&gt;10.times&lt;/span&gt; method call.  The resulting YARV code, following
+the same receiver-arguments-message pattern we saw in Figures 2-7 through 2-11,
+is shown in Figure 2-16.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;75%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/3/Figure-2-16.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 2-16: Ruby compiles the 10.times method call.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Notice that the new YARV instructions shown in Figure 2-16 push the receiver
+(the integer object 10) onto the stack first, after which Ruby generates an
+instruction to execute the &lt;span class=&quot;code&quot;&gt;times&lt;/span&gt; method call. But
+notice, too, the &lt;span class=&quot;code&quot;&gt;block in &amp;lt;main&amp;gt;&lt;/span&gt; argument in the
+&lt;span class=&quot;code&quot;&gt;send&lt;/span&gt; instruction. This indicates that the method call
+also contains a block argument: &lt;span class=&quot;code&quot;&gt;do |n| puts n end&lt;/span&gt;. In
+this example, the arrow from &lt;span class=&quot;code&quot;&gt;PM_CALL_NODE&lt;/span&gt; to the
+second &lt;span class=&quot;code&quot;&gt;PM_SCOPE_NODE&lt;/span&gt; has caused the Ruby compiler to
+include this block argument.  Ruby continues by compiling the inner block,
+beginning with the second &lt;span class=&quot;code&quot;&gt;PM_CALL_NODE&lt;/span&gt; shown at right
+in Figure 2-13.  Figure 2-17 shows what the AST for that inner block looks like.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/3/Figure-2-17.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 2-17: The branch of the AST for the contents of the block
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Notice Ruby inserted a scope node at the top of this branch of the AST also.
+Figure 2-17 shows the scope node contains two values: &lt;span
+class=&quot;code&quot;&gt;argc=1&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;locals: [n]&lt;/span&gt;.  These
+values were empty in the parent scope node, but Ruby set them here to indicate
+the presence of the block parameter &lt;span class=&quot;code&quot;&gt;n&lt;/span&gt;.  From a
+relatively high level, Figure 2-18 shows how Ruby compiles the inner block.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;75%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/3/Figure-2-18.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 2-18: How Ruby compiles a call to a block
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;You can see the parent &lt;span class=&quot;code&quot;&gt;PM_NODE_SCOPE&lt;/span&gt; at the top, along
+with the YARV code from Figure 2-16. And below that Figure 2-18 shows the the
+inner scope node for the block, along with the YARV instructions for the block’s
+call to &lt;span class=&quot;code&quot;&gt;puts n&lt;/span&gt;. Later in this chapter we’ll learn how
+Ruby handles parameters and local variables, like &lt;span class=&quot;code&quot;&gt;n&lt;/span&gt; in
+this example; why Ruby generates these instructions for &lt;span class=&quot;code&quot;&gt;puts
+n&lt;/span&gt;.  The key point for now is that Ruby compiles each distinct scope in
+your Ruby program—methods, blocks, classes, or modules, for example—into a
+separate snippet of YARV instructions.&lt;/p&gt;
+</content></entry><entry><title>Parsing: How Ruby Understands Your Code</title><link href="https://patshaughnessy.net/2025/10/27/parsing-how-ruby-understands-your-code" rel="alternate"></link><id href="https://patshaughnessy.net/2025/10/27/parsing-how-ruby-understands-your-code" rel="alternate"></id><published>2025-10-27T00:00:00Z</published><updated>2025-10-27T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;http://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
@@ -2247,249 +2412,4 @@ effort to read some code.&lt;/p&gt;
 &lt;p&gt;Dive into details and find out what the language primitives are in your
 favorite programming language. You might be surprised and discover that your
 language is capable of much more than you thought it was.&lt;/p&gt;
-</content></entry><entry><title>Generic Types: Adding Math Puzzles To Your Code</title><link href="https://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></link><id href="https://patshaughnessy.net/2021/11/6/generic-types-adding-math-puzzles-to-your-code" rel="alternate"></id><published>2021-11-06T00:00:00Z</published><updated>2021-11-06T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Most modern, statically typed languages allow us to use generic types. We write
-a function once with generic type syntax, and </summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/6/formula.png&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;In this formula, x is the bound variable, a is&lt;br/&gt;the free variable and e is constant.&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Most modern, statically typed languages allow us to use generic types. We write
-a function once with generic type syntax, and then the compiler can apply the
-same code over and over again to different actual, concrete types. Hence the
-name &lt;em&gt;generic&lt;/em&gt;.&lt;/p&gt;
-&lt;p&gt;This is a powerful language feature, but generic code is often confusing and
-hard to read. For me, generic code resembles something from my high school
-algebra textbook. I see small math puzzles sprinkled around my computer
-program. Why do this? Why add math problems to your code? Computer programming
-is already hard enough; why make it even more complicated?&lt;/p&gt;
-&lt;p&gt;Generic types allow us to get the best of both words: the safety and
-performance of static types, with the flexibility and simplicity of a dynamic,
-typeless language.&lt;/p&gt;
-&lt;p&gt;But this comes at a steep price: Using generic types force you to write two
-programs, in a sense. Your normal code for runtime, and a second, parallel
-type-specific program that runs at compile time. To see what I mean, let’s take
-an example from the &lt;a href=&quot;https://github.com/crystal-lang/crystal/tree/master/src&quot;&gt;Crystal standard
-library&lt;/a&gt; and explore
-how the Crystal team used generic type syntax to implement their array class.&lt;/p&gt;
-&lt;h2&gt;Array#uniq in Crystal&lt;/h2&gt;
-&lt;p&gt;&lt;a href=&quot;https://patshaughnessy.net/2021/10/23/to-learn-a-new-language-read-its-standard-library&quot;&gt;Last
-time&lt;/a&gt;
-I looked at the Crystal standard library, specifically at how Crystal removes
-duplicate elements from an array in
-&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr#L1843&quot;&gt;Array#uniq&lt;/a&gt;.
-I discussed a couple of optimizations the Crystal team used to implement &lt;code&gt;uniq&lt;/code&gt;
-for small or empty arrays.&lt;/p&gt;
-&lt;p&gt;But what about the general case? How does Crystal remove duplicate elements
-from large arrays? If I remove the small array optimizations, the Crystal
-implementation of &lt;code&gt;Array#uniq&lt;/code&gt; reads like this:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;class &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Array&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(T)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;uniq
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Convert the Array into a Hash and then ask for its values
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    to_lookup_hash.values
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;protected &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;to_lookup_hash
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    to_lookup_hash { &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem }
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;protected &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;to_lookup_hash&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: T &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;U) forall U
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    each_with_object(Hash(U, T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;o, h&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;        h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;      &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This is &lt;em&gt;almost&lt;/em&gt; easy to read. Admittedly, I’m a Ruby developer, so the Ruby-like
-syntax makes perfect sense to me. However, most developers will be able to
-figure this out without much effort.&lt;/p&gt;
-&lt;p&gt;Crystal identifies the unique elements of the array by converting it into a
-“lookup hash:”&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;650&quot; src=&quot;https://patshaughnessy.net/assets/2021/11/6/lookup-hash.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;As you know, hash keys are unique. By converting the array into a hash, Crystal
-has quickly identified the unique elements of that array.&lt;/p&gt;
-&lt;h2&gt;Converting An Array To A Hash At Runtime&lt;/h2&gt;
-&lt;p&gt;But if you read carefully, you’ll see that Crystal converts the array to a hash
-twice: once at compile time and then later again at runtime. Let’s look at the
-second, runtime program first, working our way from the inside out.&lt;/p&gt;
-&lt;p&gt;First, the &lt;code&gt;unless&lt;/code&gt; clause inside the loop checks whether the hash already
-contains a given element. If the element isn’t already in the hash, Crystal
-adds it:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This is the crux of the unique algorithm. Crystal won’t insert a given key
-value twice. (Although the &lt;code&gt;unless&lt;/code&gt; clause is technically unnecessary; saving a
-repeated value would be harmless, overwriting the previous copy in the hash.)&lt;/p&gt;
-&lt;p&gt;Looking up one line, we can see the &lt;code&gt;to_lookup_hash&lt;/code&gt; function accepts a block,
-and calls it to calculate the a key value for each array element:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;And reading farther up, we can see another definition of &lt;code&gt;to_lookup_hash&lt;/code&gt; passes
-in such a block:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#795da3;&quot;&gt;protected &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;to_lookup_hash
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  to_lookup_hash { &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem }
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Since the block &lt;code&gt;{ |elem| elem }&lt;/code&gt; just returns whatever was passed into it, the
-keys and values of the lookup hash will be the same:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;275&quot; src=&quot;https://patshaughnessy.net/assets/2021/11/6/keys-and-values.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;This block adds a bit of flexibility to the code. The Crystal team might want
-to reuse this function someday with a different block and set of keys.&lt;/p&gt;
-&lt;p&gt;Finally, let’s look at how Crystal iterates over the array:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;each_with_object(Hash(U, T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;o, h&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Crystal calls &lt;code&gt;each_with_object&lt;/code&gt; on the array and provides a single argument:
-&lt;code&gt;Hash(U, T).new&lt;/code&gt;. Here’s our first example of generic type syntax. I’ll come
-back to that in a moment. For now, I can guess that &lt;code&gt;Hash(U, T).new&lt;/code&gt; creates a
-new, empty hash.&lt;/p&gt;
-&lt;p&gt;Next, &lt;code&gt;each_with_object&lt;/code&gt; loops over the receiver (the array), and calls the block
-&lt;code&gt;do |o, h| … end&lt;/code&gt; for each element. It sets &lt;code&gt;o&lt;/code&gt; to each element’s value as it
-iterates, and &lt;code&gt;h&lt;/code&gt; to the hash created with &lt;code&gt;Hash(U, T).new&lt;/code&gt;. As we saw above, the
-block inserts each value &lt;code&gt;o&lt;/code&gt; into the hash &lt;code&gt;h&lt;/code&gt;, skipping duplicates.&lt;/p&gt;
-&lt;p&gt;Finally, after the iteration completes, Crystal returns the values from the new
-hash, a new array containing only the unique elements from the original array:`&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;to_lookup_hash.values&lt;/span&gt;&lt;/pre&gt;
-
-&lt;h2&gt;Converting An Array To A Hash At Compile Time&lt;/h2&gt;
-&lt;p&gt;But there’s more to this program than meets the eye. Crystal actually runs part
-of this code, the generic type syntax, earlier at compile time. And, curiously,
-that code also converts the array into a hash but in a different way. When the
-Crystal team wrote &lt;code&gt;Array#uniq&lt;/code&gt;, they had to write two programs, not one!&lt;/p&gt;
-&lt;p&gt;What exactly do I mean by “converting an array to a hash at compile time?”
-How and why does this happen? And what’s the second program here?&lt;/p&gt;
-&lt;p&gt;The answer has to do with the &lt;code&gt;Hash(U, T).new&lt;/code&gt; expression we read above. Crystal
-needs to convert the type &lt;code&gt;Array(T)&lt;/code&gt; into the type &lt;code&gt;Hash(U, T)&lt;/code&gt;. Let’s step through
-the second, type-level mirror program to find out how this works.&lt;/p&gt;
-&lt;p&gt;You can imagine the Crystal compiler processing the generic type code like
-this:&lt;/p&gt;
-&lt;p&gt;&lt;img width=&quot;550&quot; src=&quot;https://patshaughnessy.net/assets/2021/11/6/solved-puzzle.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;The first line is actually the most important:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;class &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Array&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(T)&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This line means the Crystal team is not implementing a simple array of
-elements. Instead, they are implementing an array that must contain elements of
-the same type. And here on this line they name that type in a generic way: the
-type variable &lt;code&gt;T&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Specifying an array element type provides two important benefits: First, it is
-a nice safety net for us, the developers using Crystal arrays. Crystal’s
-compiler will prevent us from accidentally inserting elements from a different
-or unexpected type into the array. And the best part is that Crystal will tell
-us about our mistake at compile time, before our code ever runs and does any
-harm with real data. It’s annoying and difficult to write a second compile-time
-program using types, but the compiler might - and probably will - find some of
-our mistakes and tell us before the program even runs.&lt;/p&gt;
-&lt;p&gt;Second, because Crystal knows that all of the elements of the array have the
-same type, it can emit more efficient code that takes advantage of this
-knowledge. The machine language code the compiler produces can save and copy
-array elements faster because it knows how much memory each element occupies.&lt;/p&gt;
-&lt;p&gt;And by using generic type syntax to write &lt;code&gt;Array#uniq&lt;/code&gt;, the Crystal team gives us
-these benefits regardless of what kind of elements we add to our arrays. The
-Crystal compiler automatically maps the type we happen to choose in our code to
-the variable &lt;code&gt;T&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Next, take a look at the &lt;code&gt;to_lookup_hash&lt;/code&gt; function declaration:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#795da3;&quot;&gt;protected &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;to_lookup_hash&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;: T &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;U) forall U&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;What in the world does this mean? What is &lt;code&gt;forall U&lt;/code&gt; referring to?&lt;/p&gt;
-&lt;p&gt;The first thing to note here is Crystal’s block parameter syntax: &lt;code&gt;&amp;amp; : T -&amp;gt; U&lt;/code&gt;.
-Crystal has borrowed the &lt;code&gt;&amp;amp;&lt;/code&gt; character from Ruby to indicate the following
-value is a block or closure, not a simple value. But in Crystal, the block
-parameters and the block’s return value all must have types. And here in this
-code those types are generic types: &lt;code&gt;T&lt;/code&gt; and &lt;code&gt;U&lt;/code&gt;. The arrow syntax tells us that the
-block takes a single parameter of type &lt;code&gt;T&lt;/code&gt;, and returns a single value of type &lt;code&gt;U&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;But what do &lt;code&gt;T&lt;/code&gt; and &lt;code&gt;U&lt;/code&gt; mean? Where are they defined?&lt;/p&gt;
-&lt;p&gt;This is our math puzzle for the day. Just like in a limit, integral or infinite
-series from Calculus, this formula contains &lt;em&gt;bound and free variables&lt;/em&gt;:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;amp; : &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;T &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&amp;gt; &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;U forall U&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Since the enclosing class statement above declared the class to be &lt;code&gt;Array(T)&lt;/code&gt;,
-Crystal binds the &lt;code&gt;T&lt;/code&gt; type variable here to be the same type as above. In order
-words, the type of values passed into this block must be the same as the type
-of the elements in the array.&lt;/p&gt;
-&lt;p&gt;But what about &lt;code&gt;U&lt;/code&gt;? What type is that?&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;forall U&lt;/code&gt; clause declares the U type to be a &lt;em&gt;free variable&lt;/em&gt;. That means
-that &lt;code&gt;U&lt;/code&gt;, unlike the type &lt;code&gt;T&lt;/code&gt;, is not bound to any known type value. &lt;code&gt;forall&lt;/code&gt;
-tells the Crystal compiler that the following code should apply equally well to
-any type &lt;code&gt;U&lt;/code&gt;, “for all” possible types &lt;code&gt;U&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;The Crystal compiler solves this math puzzle using the &lt;code&gt;yield&lt;/code&gt; statement we saw
-above:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Here Crystal knows the value &lt;code&gt;o&lt;/code&gt; has a type of &lt;code&gt;T&lt;/code&gt;. How? Because Crystal knows
-that all of the elements of the array have a type &lt;code&gt;T&lt;/code&gt;, (this is the &lt;code&gt;Array(T)&lt;/code&gt;
-class) and Crystal knows the variable &lt;code&gt;o&lt;/code&gt; was set earlier to an array element
-by &lt;code&gt;each_with_object&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Next, the Crystal compiler can determine that &lt;code&gt;U == T&lt;/code&gt;, that both types are the
-same. How? When Crystal compiles the block’s code above:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;to_lookup_hash { &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;elem&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; elem }&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;…Crystal notices that the return value of the block is the same as the value
-passed into the block, that &lt;code&gt;elem == elem&lt;/code&gt;. Then, the Crystal compiler maps
-this return value to the block declaration: &lt;code&gt;&amp;amp; : T -&amp;gt; U&lt;/code&gt;. Because Crystal knows
-&lt;code&gt;elem == elem&lt;/code&gt; in the block code, it deduces that the types of these values are
-also the same, that &lt;code&gt;U == T&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Finally, let’s return to the line above that iterates over the array:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;each_with_object(Hash(U, T).&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;) &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;o, h&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;|&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now the Crystal compiler can use the knowledge that types &lt;code&gt;U == T&lt;/code&gt; when it
-creates the lookup hash. In Crystal when you create a hash, just as when you
-create an array, you have to provide a type parameter for all the values. And
-for hashes you also need to provide a type for the keys. &lt;code&gt;Hash(U, T).new&lt;/code&gt;
-means: Create a new hash which has keys of type &lt;code&gt;U&lt;/code&gt; and values of type &lt;code&gt;T&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Armed with the knowledge that the keys of the lookup hash all have type &lt;code&gt;U&lt;/code&gt;, and
-that &lt;code&gt;U == T&lt;/code&gt;, the Crystal compiler can emit the correct, optimized code for
-finding and inserting hash values when it produces machine language
-instructions for this passage:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;key &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;yield&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;unless&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; h.has_key?(key)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  h[key] &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; o
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Crystal knows that both &lt;code&gt;o&lt;/code&gt; and &lt;code&gt;key&lt;/code&gt; have the same type &lt;code&gt;T&lt;/code&gt;, which allows the
-&lt;code&gt;has_key?&lt;/code&gt; and &lt;code&gt;[]=&lt;/code&gt; methods to run quickly and correctly.&lt;/p&gt;
-&lt;h2&gt;Are Generic Types Worth It?&lt;/h2&gt;
-&lt;p&gt;It’s a good thing the Crystal compiler is good at solving math puzzles!
-Crystal, like many other modern languages (Haskell, Swift, Rust, etc.) is able
-to determine the actual, concrete types for variables like &lt;code&gt;T&lt;/code&gt; and &lt;code&gt;U&lt;/code&gt;, and for
-all values in your code, using &lt;em&gt;type inference&lt;/em&gt;. The Crystal compiler can
-deduce what the type of each variable is based on the usage of that variable
-and the context of the surrounding code.&lt;/p&gt;
-&lt;p&gt;But the problem is that I, a user of the Crystal language, have to be good at
-math puzzles also. As we’ve just seen, in order to write code using Crystal or
-any language with a modern type system, I have to write my code twice: once to
-solve the problem I actually want to solve, and a second time to prove to the
-compiler that my code is consistent and mathematically correct at a type level.&lt;/p&gt;
-&lt;p&gt;Are the added performance and added safety worth it? That depends entirely on
-what code you are writing, how fast it needs to run, how many times and for how
-long that code will be used - and most importantly, how much time you have to
-solve math problems.&lt;/p&gt;
 </content></entry></feed>
