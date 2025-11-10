@@ -1,4 +1,213 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-11-03T16:55:38Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Compiling a Call to a Block</title><link href="https://patshaughnessy.net/2025/11/3/compiling-a-call-to-a-block" rel="alternate"></link><id href="https://patshaughnessy.net/2025/11/3/compiling-a-call-to-a-block" rel="alternate"></id><published>2025-11-03T00:00:00Z</published><updated>2025-11-03T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-11-10T16:50:15Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>YARV’s Internal Stack and Your Ruby Stack</title><link href="https://patshaughnessy.net/2025/11/10/yarvs-internal-stack-and-your-ruby-stack" rel="alternate"></link><id href="https://patshaughnessy.net/2025/11/10/yarvs-internal-stack-and-your-ruby-stack" rel="alternate"></id><published>2025-11-10T00:00:00Z</published><updated>2025-11-10T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;https://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;The content of Chap</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;https://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;The content of Chapter 3, about the YARV virtual machine, hasn't changed much
+since 2014.  However, I did update all of the diagrams to account for some new
+values YARV now saves inside of each stack frame. And some of the common YARV
+instructions were renamed as well. I also moved some content that was previously
+part of Chapter 4 here into Chapter 3. Right now I'm rewriting Chapter 4 from
+scratch, describing Ruby's new JIT compilers.&lt;/p&gt;
+&lt;h2&gt;Chapter 3: How Ruby Executes Your Code&lt;/h2&gt;
+&lt;div style=&quot;font-size: small&quot;&gt;
+&lt;table id=&quot;toc&quot;&gt;
+	&lt;tr&gt;
+		&lt;td&gt;YARV’s Internal Stack and Your Ruby Stack&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Stepping Through How Ruby Executes a Simple Script&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Executing a Call to a Block&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Taking a Close Look at a YARV Instruction&lt;/td&gt;&lt;td&gt;10&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Local and Dynamic Access of Ruby Variables&lt;/td&gt;&lt;td&gt;12&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Local Variable Access&lt;/td&gt;&lt;td&gt;12&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Method Arguments Are Treated Like Local Variables&lt;/td&gt;&lt;td&gt;15&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Dynamic Variable Access&lt;/td&gt;&lt;td&gt;16&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Climbing The Environment Pointer Ladder In C&lt;/td&gt;&lt;td&gt;22&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 3-1: Exploring Special Variables&lt;/td&gt;&lt;td&gt;23&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Controlling the Flow of Execution&lt;/td&gt;&lt;td&gt;27&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How Ruby Executes an if Statement&lt;/td&gt;&lt;td&gt;27&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Jumping from One Scope to Another&lt;/td&gt;&lt;td&gt;29&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Catch Tables&lt;/td&gt;&lt;td&gt;30&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Other Uses for Catch Tables&lt;/td&gt;&lt;td&gt;33&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 3-2: Testing How Ruby Implements
+For Loops Internally&lt;/td&gt;&lt;td&gt;34&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Summary&lt;/td&gt;&lt;td&gt;35&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;h2&gt;YARV’s Internal Stack and Your Ruby Stack&lt;/h2&gt;
+&lt;p&gt;As we’ll see in a moment, YARV uses a stack internally to track intermediate values, arguments, and return values. YARV is a stack-oriented virtual machine.&lt;/p&gt;
+&lt;p&gt;In addition to its own internal stack, YARV keeps track of your Ruby program’s
+&lt;em&gt;call stack&lt;/em&gt;, recording which methods call which other methods, functions, blocks,
+lambdas, and so on. In fact, YARV is not just a stack machine—it’s a
+double-stack machine! It has to track the arguments and return values not only
+for its own internal instructions but also for your Ruby program.&lt;/p&gt;
+&lt;p&gt;Figure 3-1 shows YARV’s basic registers and internal stack.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/10/Figure-3-1.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 3-1: Some of YARV’s internal registers, including the program counter and stack pointer
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;YARV’s internal stack is on the left. The SP label is the stack pointer, or the
+location of the top of the stack. On the right are the instructions that YARV is
+executing. PC is the program counter, or the location of the current
+instruction. &lt;/p&gt;
+&lt;p&gt;You can see the YARV instructions that Ruby compiled from the &lt;span
+class=&quot;code&quot;&gt;puts 2+2&lt;/span&gt; example on the right side of Figure 3-1. YARV
+stores both the SP and PC registers in a C structure called &lt;span
+class=&quot;code&quot;&gt;rb_control_frame_t&lt;/span&gt;, along with the current value of Ruby’s
+&lt;span class=&quot;code&quot;&gt;self&lt;/span&gt; variable and some other values not shown here. &lt;/p&gt;
+&lt;p&gt;At the same time, YARV maintains another stack of these &lt;span
+class=&quot;code&quot;&gt;rb_control_frame_t&lt;/span&gt; structures, as shown in Figure 3-2.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;40%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/10/Figure-3-2.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 3-2: YARV keeps track of your Ruby call stack using a series of rb_control_frame_t structures.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;This second stack of &lt;span class=&quot;code&quot;&gt;rb_control_frame_t&lt;/span&gt; structures
+represents the path that YARV has taken through your Ruby program, and YARV’s
+current location. In other words, this is your Ruby call stack—what you would
+see if you ran &lt;span class=&quot;code&quot;&gt;puts caller&lt;/span&gt;. &lt;/p&gt;
+&lt;p&gt;The CFP pointer indicates the current frame pointer. Each stack frame in your
+Ruby program stack contains, in turn, a different value for the self, PC, and SP
+registers, as shown in Figure 3-1. Ruby also keeps track of type of code running
+at each level in your Ruby call stack, indicated by the “[BLOCK]”, “[METHOD]”
+notation in Figure 3-2.&lt;/p&gt;
+&lt;h2&gt;Stepping Through How Ruby Executes a Simple Script&lt;/h2&gt;
+&lt;p&gt;In order to help you understand this a bit better, here are a couple of
+examples. I’ll begin with the simple 2+2 example from Chapters 1 and 2, shown
+again in Listing 3-1.&lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;puts &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;2&lt;/span&gt;&lt;/pre&gt;
+
+&lt;div style=&quot;font-style: italic; font-size: small; margin: -20px 0 20px 0&quot;&gt;
+ Listing 3-1: A one-line Ruby program that we’ll execute as an example
+&lt;/div&gt;
+&lt;p&gt;This one-line Ruby script doesn’t have a Ruby call stack, so I’ll focus on the
+internal YARV stack for now. Figure 3-3 shows how YARV will execute this script,
+beginning with the first instruction, &lt;span class=&quot;code&quot;&gt;putself&lt;/span&gt;.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/10/Figure-3-3.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 3-3: On the left is YARV’s internal stack, and on the right is the compiled version of my puts 2+2 program.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;As you can see in Figure 3-3, YARV starts the program counter (PC) at the first
+instruction, and initially the stack is empty. Now YARV executes the &lt;span
+class=&quot;code&quot;&gt;putself&lt;/span&gt; instruction, and pushes the current value of self
+onto the stack, as shown in Figure 3-4.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/10/Figure-3-4.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 3-4: putself pushes the top self value onto the stack
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Because this simple script contains no Ruby objects or classes, the self pointer
+is set to the default top self object. This is an instance of the &lt;span
+class=&quot;code&quot;&gt;Object&lt;/span&gt; class that Ruby automatically creates when YARV
+starts. It serves as the receiver for method calls and the container for
+instance variables in the top-level scope.  The top self object contains a
+single, predefined &lt;span class=&quot;code&quot;&gt;to_s&lt;/span&gt; method, which returns the
+string “main.” You can call this method by running the following command in the
+console: &lt;/p&gt;
+&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
+&lt;span style=&quot;color:#000000;&quot;&gt;$ ruby &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;e &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;puts self&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;&amp;#39;
+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;=&amp;gt; main&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;YARV will use this self value on the stack when it executes the
+&lt;span class=&quot;code&quot;&gt;opt_send_without_block&lt;/span&gt; instruction: self is the
+receiver of the &lt;span class=&quot;code&quot;&gt;puts&lt;/span&gt; method because I didn’t specify a
+receiver for this method call. &lt;/p&gt;
+&lt;p&gt;Next, YARV executes &lt;span class=&quot;code&quot;&gt;putobject 2&lt;/span&gt;. It pushes the numeric
+value 2 onto the stack and increments the PC again, as shown in Figure 3-5.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/10/Figure-3-5.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 3-5: Ruby pushes the value 2 onto the stack, the receiver of the + method.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;This is the first step of the receiver (arguments) operation pattern described
+in “How Ruby Compiles a Simple Script” on page 34. First, Ruby pushes the
+receiver onto the internal YARV stack. In this example, the &lt;span
+class=&quot;code&quot;&gt;Fixnum&lt;/span&gt; object 2 is the receiver of the message/method &lt;span
+class=&quot;code&quot;&gt;+&lt;/span&gt;, which takes a single argument, also a 2.  Next, Ruby
+pushes the argument 2, as shown in Figure 3-6.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/10/Figure-3-6.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 3-6: Ruby pushes another value 2 onto the stack, the argument of the + method.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Finally, Ruby executes the + operation. In this case, &lt;span
+class=&quot;code&quot;&gt;opt_plus&lt;/span&gt; is an optimized instruction that will add two
+values: the receiver and the argument, as shown in Figure 3-7.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/10/Figure-3-7.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 3-7: Figure 3-7: The opt_plus instruction calculates 2 + 2 = 4.
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;As you can see in Figure 3-7, the &lt;span class=&quot;code&quot;&gt;opt_plus&lt;/span&gt; instruction
+leaves the result, 4, at the top of the stack. Now Ruby is perfectly positioned
+to execute the &lt;span class=&quot;code&quot;&gt;puts&lt;/span&gt; function call: The receiver &lt;span
+class=&quot;code&quot;&gt;self&lt;/span&gt; is first on the stack, and the single argument, 4, is
+at the top of the stack.  (I’ll describe how method lookup works in Chapter 6.) &lt;/p&gt;
+&lt;p&gt;Next, Figure 3-8 shows what happens when Ruby executes the &lt;span
+class=&quot;code&quot;&gt;puts&lt;/span&gt; method call. As you can see, the &lt;span
+class=&quot;code&quot;&gt;opt_send_without_block&lt;/span&gt; instruction leaves the return value,
+&lt;span class=&quot;code&quot;&gt;nil&lt;/span&gt;, at the top of the stack. Finally, Ruby executes
+the last instruction, &lt;span class=&quot;code&quot;&gt;leave&lt;/span&gt;, which finishes the
+execution of our simple, one-line Ruby program. Of course, when Ruby executes
+the &lt;span class=&quot;code&quot;&gt;puts&lt;/span&gt; call, the C code implementing the &lt;span
+class=&quot;code&quot;&gt;puts&lt;/span&gt; function will actually display the value 4 in the
+console output. &lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;100%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/10/Figure-3-8.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 3-8: Ruby calls the puts method on the top self object.
+&lt;/span&gt;
+&lt;/div&gt;
+</content></entry><entry><title>Compiling a Call to a Block</title><link href="https://patshaughnessy.net/2025/11/3/compiling-a-call-to-a-block" rel="alternate"></link><id href="https://patshaughnessy.net/2025/11/3/compiling-a-call-to-a-block" rel="alternate"></id><published>2025-11-03T00:00:00Z</published><updated>2025-11-03T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;https://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
@@ -2082,334 +2291,4 @@ to process my code and transform it in different ways.&lt;/p&gt;
 &lt;p&gt;When I have time, I plan to write a few more posts about more of the inner
 workings of the Crystal compiler and the LLVM framework, which Crystal later
 uses to generate my x86 executable program.&lt;/p&gt;
-</content></entry><entry><title>Find Your Language’s Primitives</title><link href="https://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></link><id href="https://patshaughnessy.net/2021/11/29/find-your-languages-primitives" rel="alternate"></id><published>2021-11-29T00:00:00Z</published><updated>2021-11-29T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;If you dig into your programming language's syntax, you might &lt;br/&gt;discover that it is capable of much more than you thought it was.
-  &lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Wikipedia defines “Language Primitive” &lt;a href=&quot;https://en.wikipedia.org/wi</summary><content type="html">&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/dig1.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;If you dig into your programming language's syntax, you might &lt;br/&gt;discover that it is capable of much more than you thought it was.
-  &lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;Wikipedia defines “Language Primitive” &lt;a href=&quot;https://en.wikipedia.org/wiki/Language_primitive&quot;&gt;this
-way&lt;/a&gt;:&lt;/p&gt;
-&lt;blockquote&gt;
-In computing, language primitives are the simplest elements available in a
-programming language. A primitive is the smallest 'unit of processing'
-available to a programmer of a given machine, or can be an atomic element of an
-expression in a language.
-&lt;/blockquote&gt;
-&lt;p&gt;By looking at a language’s primitives, we can learn what kind of code will be
-easy to write or impossible to express, and what types of problems the language
-was intended to solve.  Whether you’ve been using a language for years, or just
-now learning a new language for fun, take the time to find and learn about your
-language’s primitives. You might discover something you never knew, and will
-come away with a deeper understanding of how your programs work.&lt;/p&gt;
-&lt;p&gt;As an example today, I’m going to look at how arrays work in three languages:
-Ruby, Crystal and x86 Assembly Language.&lt;/p&gt;
-&lt;h2&gt;Retrieving an Array Element In Ruby&lt;/h2&gt;
-&lt;p&gt;In Ruby I can create an array and later access an element like this:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This code would be the same or almost the same in many other programming
-languages. It just means: “find the second element of the array and print it to
-stdout.”&lt;/p&gt;
-&lt;p&gt;But how does this actually work? In Ruby, the &lt;span class=&quot;code&quot;&gt;Array&lt;/span&gt;
-class and all of its methods are language primitives. This means array methods
-like &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; or &lt;span class=&quot;code&quot;&gt;[]=&lt;/span&gt; cannot be
-broken down into smaller pieces of Ruby code. As Wikipedia says, these methods
-are the smallest unit of processing available to Ruby programmers working with
-arrays.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;Ruby hides the details of how arrays actually work from us. To learn how Ruby
-actually saves and retrieves values from an array, we would need to switch
-languages and drop down a level of abstraction, and read the C implementation
-in the Ruby source code:
-&lt;a href=&quot;https://github.com/ruby/ruby/blob/master/array.c&quot;&gt;array.c&lt;/a&gt;. There’s nothing
-wrong with this, of course. Ruby developers use arrays every day without any
-trouble. But switching from Ruby to C makes understanding internal details much
-more difficult.&lt;/p&gt;
-&lt;h2&gt;Retrieving an Array Element In Crystal&lt;/h2&gt;
-&lt;p&gt;This Fall I decided to learn more about &lt;a href=&quot;https://crystal-lang.org&quot;&gt;Crystal&lt;/a&gt;, a
-statically typed language with syntax that resembles Ruby. I expected to find a
-similar &lt;span class=&quot;code&quot;&gt;Array#[]&lt;/span&gt; primitive.  But surprisingly, I was
-wrong!&lt;/p&gt;
-&lt;p&gt;The same code from above also works in Crystal:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;In Crystal, arrays are not language primitives because the Crystal standard
-library implements arrays using Crystal itself. The &lt;span
-class=&quot;code&quot;&gt;Array#[]&lt;/span&gt; method is not the smallest unit of processing
-available to Crystal programmers. Let’s dig into the details and divide up the
-&lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; method into smaller and smaller pieces to see how
-the Crystal team implemented it.&lt;/p&gt;
-&lt;p&gt;Reading
-&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/indexable.cr#L56&quot;&gt;src/indexable.cr&lt;/a&gt;
-in the Crystal standard library, here’s the implementation of &lt;span class=&quot;code&quot;&gt;Indexable#[]&lt;/span&gt;
-which the array class uses when I call &lt;span class=&quot;code&quot;&gt;arr[1]&lt;/span&gt; above:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# Returns the element at the given *index*.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Negative indices can be used to start counting from the end of the array.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Raises `IndexError` if trying to access an element outside the array&amp;#39;s range.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary = [&amp;#39;a&amp;#39;, &amp;#39;b&amp;#39;, &amp;#39;c&amp;#39;]
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[0]  # =&amp;gt; &amp;#39;a&amp;#39;
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[2]  # =&amp;gt; &amp;#39;c&amp;#39;
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[-1] # =&amp;gt; &amp;#39;c&amp;#39;
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[-2] # =&amp;gt; &amp;#39;b&amp;#39;
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[3]  # raises IndexError
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ary[-4] # raises IndexError
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;@[AlwaysInline]
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;[]&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  fetch(index) { &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;raise &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;IndexError&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;new &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;}
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;The Crystal team implemented &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; using another method
-called &lt;span class=&quot;code&quot;&gt;fetch&lt;/span&gt;:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# Returns the element at the given *index*, if in bounds,
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# otherwise executes the given block with the index and returns its value.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# a = [:foo, :bar]
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# a.fetch(0) { :default_value }    # =&amp;gt; :foo
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# a.fetch(2) { :default_value }    # =&amp;gt; :default_value
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# a.fetch(2) { |index| index * 3 } # =&amp;gt; 6
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;fetch&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  index &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;=&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; check_index_out_of_bounds(index) &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;do
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;    &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;return yield &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;index
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  unsafe_fetch(index)
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Neither the &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; operator nor the &lt;span
-class=&quot;code&quot;&gt;fetch&lt;/span&gt; method are language primitives. To find a language
-primitive, I need to keep dividing the code up into smaller and smaller pieces,
-until it can’t be divided any further. The same process a chemist would use to
-break up some material into smaller and smaller molecules until they are left
-with a set of atoms.&lt;/p&gt;
-&lt;p&gt;Let’s continue by reading &lt;span class=&quot;code&quot;&gt;unsafe_fetch&lt;/span&gt;:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# Returns the element at the given *index*, without doing any bounds check.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# `Indexable` makes sure to invoke this method with *index* in `0...size`,
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# so converting negative indices to positive ones is not needed here.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Clients never invoke this method directly. Instead, they access
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# elements with `#[](index)` and `#[]?(index)`.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# This method should only be directly invoked if you are absolutely
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# sure the index is in bounds, to avoid a bounds check for a small boost
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# of performance.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;abstract &lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unsafe_fetch&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int)&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Since &lt;span class=&quot;code&quot;&gt;Indexable#unsafe_fetch&lt;/span&gt; is an abstract method, I
-need to read how the &lt;span class=&quot;code&quot;&gt;Array&lt;/span&gt; class implements it back
-in
-&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr#L663&quot;&gt;src/array.cr&lt;/a&gt;:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;@[AlwaysInline]
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unsafe_fetch&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;T
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer[index]
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;div style=&quot;float: right; padding: 8px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/dig2.jpg&quot;&gt;&lt;br/&gt;
-	&lt;i&gt;&lt;small&gt;(source: &lt;a href=&quot;https://commons.wikimedia.org/wiki/File:Digging_in_permafrost.jpg&quot;&gt;Nick Bonzey via Wikimedia Commons&lt;/a&gt;)&lt;/small&gt;&lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;So far, I’ve drilled down through 3 levels of Crystal implementation:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;But I haven’t found a primitive function yet. Let’s keep digging!&lt;/p&gt;
-&lt;h2&gt;The Crystal Array Class&lt;/h2&gt;
-&lt;p&gt;To learn more, I need to scroll up and read the beginning of the Crystal &lt;span
-class=&quot;code&quot;&gt;Array&lt;/span&gt; class definition:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# An `Array` is an ordered, integer-indexed collection of objects of type T.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# Array indexing starts at 0. A negative index is assumed to be
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# relative to the end of the array: -1 indicates the last element,
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# -2 is the next to last element, and so on.&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;etc...&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# An `Array` is implemented using an internal buffer of some capacity
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# and is reallocated when elements are pushed to it when more capacity
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# is needed. This is normally known as a [dynamic array](http://en.wikipedia.org/wiki/Dynamic_array).
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;class &lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;Array&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(T)&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;etc...&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# The buffer where elements start.
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Pointer(T)&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;I’ve deleted some of the comments and code for clarity. You can read the full,
-original version in &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/array.cr&quot;&gt;src/array.cr.&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Now I get a sense of how the &lt;span class=&quot;code&quot;&gt;unsafe_fetch&lt;/span&gt; method
-above works. Let’s repeat that again:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;unsafe_fetch&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(index : Int) &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;T
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer[index]
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Crystal saves all of the elements in each array into a memory buffer called
-&lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt;. And when I access an element of the array
-like this:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Crystal first checks that the array index (1 in this example) is valid, and
-then loads the array element I want from the buffer using: &lt;span
-class=&quot;code&quot;&gt;@buffer[1]&lt;/span&gt;.&lt;/p&gt;
-&lt;h2&gt;The Crystal Pointer Class&lt;/h2&gt;
-&lt;p&gt;But how does &lt;span class=&quot;code&quot;&gt;@buffer[index]&lt;/span&gt; actually work? I haven’t learned anything yet! I’m
-just going around in circles. So far all I’ve been able to find is that Crystal
-implements &lt;span class=&quot;code&quot;&gt;Array#[]&lt;/span&gt; with a different &lt;span class=&quot;code&quot;&gt;[]&lt;/span&gt; operator, on a different class. What
-type of object is &lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt;? What does it do?&lt;/p&gt;
-&lt;p&gt;Reading the array class declaration again more carefully, I can see that
-&lt;span class=&quot;code&quot;&gt;@buffer&lt;/span&gt; is an instance of the &lt;span class=&quot;code&quot;&gt;Pointer&lt;/span&gt; class:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# The buffer where elements start.
-&lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;@&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;buffer &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;Pointer(T)&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Let’s read how Crystal implements &lt;span class=&quot;code&quot;&gt;Pointer#[]&lt;/span&gt; in
-&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/pointer.cr#L107&quot;&gt;src/pointer.cr:&lt;/a&gt;&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# Gets the value pointed at this pointer&amp;#39;s address plus `offset * sizeof(T)`.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr = Pointer.malloc(4) { |i| i + 10 }
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr[0] # =&amp;gt; 10
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr[1] # =&amp;gt; 11
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr[2] # =&amp;gt; 12
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr[3] # =&amp;gt; 13
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;[]&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;(offset)
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;  (self &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; offset).value
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Reading this, I discovered the Crystal team has written a class that represents
-pointers! Just like using a pointer in C, Crystal code can refer to and access
-any memory location directly. Because the &lt;span class=&quot;code&quot;&gt;Pointer&lt;/span&gt;
-class is part of the language, Crystal allows us to implement our own data
-structures and algorithms in a very detailed manner, allocating and accessing
-memory just like the Crystal team has while implementing arrays, hashes and
-other classes.&lt;/p&gt;
-&lt;p&gt;Now I’ve dug down through 4 levels of Crystal function calls, but I still
-haven’t found a language primitive yet.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;h2&gt;A Crystal Language Primitive&lt;/h2&gt;
-&lt;p&gt;We still haven’t discovered how arrays actually work - how pointers actually
-work. That is, reading this line of code above:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;(self &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;+&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; offset).value&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;…I understand the meaning and intent of pointer arithmetic, and how it’s used
-by Crystal arrays, but I still don’t see how or where Crystal actually obtains
-the array element referenced by a given pointer.&lt;/p&gt;
-&lt;p&gt;Digging deeper, let’s read the &lt;span class=&quot;code&quot;&gt;Pointer#value&lt;/span&gt; method
-to find out - this method’s implementation should tell me exactly how Crystal
-obtains the value:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a7adba;&quot;&gt;# Gets the value pointed by this pointer.
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;#
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr = Pointer(Int32).malloc(4)
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr.value = 42
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ptr.value # =&amp;gt; 42
-&lt;/span&gt;&lt;span style=&quot;color:#a7adba;&quot;&gt;# ```
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;@[Primitive(&lt;/span&gt;&lt;span style=&quot;color:#008080;&quot;&gt;:pointer_get&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;)]
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;value&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; : T
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;As you can see, this is a language primitive - it says “primitive” right there
-above the method definition!&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive4.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;Returning to Wikipedia’s definition of a language primitive, this is an atomic
-element of an expression. The Crystal compiler knows not to try to compile this
-code but to assume this behavior is part of the language. In fact, there is no
-implementation for &lt;span class=&quot;code&quot;&gt;Pointer#value&lt;/span&gt; here at all: the
-method is empty!&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#a71d5d;&quot;&gt;def &lt;/span&gt;&lt;span style=&quot;color:#795da3;&quot;&gt;value&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt; : T
-&lt;/span&gt;&lt;span style=&quot;color:#a71d5d;&quot;&gt;end&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;The empty &lt;span class=&quot;code&quot;&gt;value&lt;/span&gt; method above doesn’t tell us where
-the value actually comes from, or how Crystal obtains it. To learn that, we
-need to step down one level of abstraction - we need to use a lower level
-language, not Crystal.&lt;/p&gt;
-&lt;h2&gt;Retrieving an Array Element In x86 Assembly Language&lt;/h2&gt;
-&lt;div style=&quot;float: right; padding: 18px 0px 30px 30px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/cave.png&quot;&gt;&lt;br/&gt;
-&lt;/div&gt;
-&lt;p&gt;What lower level language should we use? Since the Crystal team used the &lt;a href=&quot;https://llvm.org&quot;&gt;Low
-Level Virtual Machine (LLVM)&lt;/a&gt; project to implement their
-compiler, I could look at LLVM’s low level instruction language. But since I’m
-not familiar with that, or with how the Crystal compiler works, I decided to
-jump down to the lowest level of abstraction available to me on my Intel Mac:
-x86 Assembly Language.&lt;/p&gt;
-&lt;p&gt;Here’s my Crystal program again:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;$ cat array_example.cr
-arr = [12345, 67890]
-puts arr[1]&lt;/pre&gt;
-&lt;p&gt;If I compile the program without running it, and then use the &lt;span
-class=&quot;code&quot;&gt;llvm-objdump&lt;/span&gt; command, LLVM will give me a version of my
-code converted into Intel x86 Assembly Language:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;$ crystal build array_example.cr
-$ llvm-objdump -D array_example &gt; array_example.a&lt;/pre&gt;
-&lt;p&gt;Now by reading the assembly produced by the Crystal compiler and LLVM, I can
-see how the &lt;span class=&quot;code&quot;&gt;Pointer#[]&lt;/span&gt; and &lt;span
-class=&quot;code&quot;&gt;Pointer#value&lt;/span&gt; methods actually work:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;0000000100089bb0 &lt;_*Pointer(Int32)@Pointer(T)#[]&lt;Int32&gt;:Int32&gt;:
-100089bb0: 50                           pushq %rax
-100089bb1: e8 0a 00 00 00               callq 0x100089bc0 &lt;_*Pointer(Int32)@Pointer(T)#+&lt;Int32&gt;:Pointer(Int32)&gt;
-100089bb6: 8b 00                        movl  (%rax), %eax
-100089bb8: 59                           popq  %rcx
-100089bb9: c3                           retq
-
-0000000100089bc0 &lt;_*Pointer(Int32)@Pointer(T)#+&lt;Int32&gt;:Pointer(Int32)&gt;:
-100089bc0: 48 63 c6                     movslq  %esi, %rax
-100089bc3: 48 c1 e0 02                  shlq  $2, %rax
-100089bc7: 48 01 c7                     addq  %rax, %rdi
-100089bca: 48 89 f8                     movq  %rdi, %rax
-100089bcd: c3                           retq&lt;/pre&gt;
-&lt;p&gt;Assembly language is just another programming language like any other, but with
-a different set of primitives. The primitives in this language are hardware
-instructions that my laptop’s CPU can understand and execute directly:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/primitive5.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;I won’t pretend to understand all the details here, but if you’re curious about
-what this code does - how my compiled Crystal program actually retrieves a
-value from an array - here are a few highlights you can look for:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/11/29/assembly-table.svg&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;If you’d like to learn more about x86 assembly language, I wrote an article a
-few years ago explaining some of the basics: &lt;a href=&quot;https://patshaughnessy.net/2016/11/26/learning-to-read-x86-assembly-language&quot;&gt;Learning to Read x86 Assembly
-Language&lt;/a&gt;.&lt;/p&gt;
-&lt;h2&gt;Understand the Primitives of the Language You Are Using&lt;/h2&gt;
-&lt;p&gt;Why did I bother with this exercise? To make sure I deeply understand the
-programming languages I’m using. Ruby hides much of its implementation in C, so
-I didn’t learn much looking at the Ruby array primitives in this example. And
-the primitive functions of assembly language are by definition the instructions
-my CPU can execute directly. It’s always fun trying to identify and understand
-machine level instructions!&lt;/p&gt;
-&lt;p&gt;But Crystal surprised me - I expected to see a set of primitive array functions
-like we have in Ruby, but I was wrong. Instead, I learned that Crystal supports
-pointers, just like C or other low level languages do. I discovered that
-Crystal, unlike Ruby, might be an appropriate choice for low level systems
-programming tasks. And I was able to learn all of this, along with the array
-implementation details, because the Crystal team implemented its standard
-library in the same, target language: Crystal. All I had to do was make an
-effort to read some code.&lt;/p&gt;
-&lt;p&gt;Dive into details and find out what the language primitives are in your
-favorite programming language. You might be surprised and discover that your
-language is capable of much more than you thought it was.&lt;/p&gt;
 </content></entry></feed>
