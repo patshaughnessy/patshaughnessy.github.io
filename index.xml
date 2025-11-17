@@ -1,4 +1,226 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-11-10T16:50:15Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>YARV’s Internal Stack and Your Ruby Stack</title><link href="https://patshaughnessy.net/2025/11/10/yarvs-internal-stack-and-your-ruby-stack" rel="alternate"></link><id href="https://patshaughnessy.net/2025/11/10/yarvs-internal-stack-and-your-ruby-stack" rel="alternate"></id><published>2025-11-10T00:00:00Z</published><updated>2025-11-10T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-11-17T18:07:52Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Compiling Ruby To Machine Language</title><link href="https://patshaughnessy.net/2025/11/17/compiling-ruby-to-machine-language" rel="alternate"></link><id href="https://patshaughnessy.net/2025/11/17/compiling-ruby-to-machine-language" rel="alternate"></id><published>2025-11-17T00:00:00Z</published><updated>2025-11-17T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;https://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;Here’s an excerpt</summary><content type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+href=&quot;https://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
+Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
+will take a while. Leave a comment or &lt;a
+href=&quot;mailto:pat@patshaughnessy.net?subject=Ruby Under a Microscope Update&quot;&gt;drop
+me a line&lt;/a&gt; and I'll email you when it's finished.&lt;/p&gt;
+&lt;p&gt;Here’s an excerpt from the completely new content for Chapter 4, about YJIT and
+ZJIT. I’m still finishing this up… so this content is fresh off the page! It’s
+been a lot of fun for me to learn about how JIT compilers work and to brush up
+on my Rust skills as well. And it’s very exciting to see all the impressive work
+the Ruby team at Shopify and other contributors have done to improve Ruby’s
+runtime performance.&lt;/p&gt;
+&lt;h2&gt;Chapter 4: Compiling Ruby To Machine Language&lt;/h2&gt;
+&lt;div style=&quot;font-size: small&quot;&gt;
+&lt;table id=&quot;toc&quot;&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Interpreting vs. Compiling Ruby Code&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Yet Another JIT (YJIT)&lt;/td&gt;&lt;td&gt;6&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Virtual Machines and Actual Machines&lt;/td&gt;&lt;td&gt;6&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Counting Method and Block Calls&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;YJIT Blocks&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;YJIT Branch Stubs&lt;/td&gt;&lt;td&gt;10&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Executing YJIT Blocks and Branches&lt;/td&gt;&lt;td&gt;11&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Deferred Compilation&lt;/td&gt;&lt;td&gt;12&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Regenerating a YJIT Branch&lt;/td&gt;&lt;td&gt;12&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;YJIT Guards&lt;/td&gt;&lt;td&gt;14&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Adding Two Integers Using Machine Language&lt;/td&gt;&lt;td&gt;15&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 4-1: Which Code Does YJIT Optimize?&lt;/td&gt;&lt;td&gt;18&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;How YJIT Recompiles Code&lt;/td&gt;&lt;td&gt;22&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Finding a Block Version&lt;/td&gt;&lt;td&gt;22&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Saving Multiple Block Versions&lt;/td&gt;&lt;td&gt;24&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;ZJIT, Ruby’s Next Generation JIT&lt;/td&gt;&lt;td&gt;26&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Counting Method and Block Calls&lt;/td&gt;&lt;td&gt;27&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;ZJIT Blocks&lt;/td&gt;&lt;td&gt;29&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Method Based JIT&lt;/td&gt;&lt;td&gt;31&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Rust Inside of Ruby&lt;/td&gt;&lt;td&gt;33&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Experiment 4-2: Reading  ZJIT HIR and LIR &lt;/td&gt;&lt;td&gt;35&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;Summary&lt;/td&gt;&lt;td&gt;37&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;h2&gt;Counting Method and Block Calls&lt;/h2&gt;
+&lt;p&gt;To find hot spots, YJIT counts how many times your program calls each function
+or block. When this count reaches a certain threshold, YJIT stops your program
+and converts that section of code into machine language. Later Ruby will execute
+the machine language version instead of the original YARV instructions.&lt;/p&gt;
+&lt;p&gt;To keep track of these counts, YJIT saves an internal counter nearby the YARV
+instruction sequence for each function or block.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;40%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/17/Figure-4-5.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 4-5: YJIT saves information adjacent to each set of YARV instructions
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 4-5 shows the YARV instruction sequence the main Ruby compiler created
+for the &lt;span class=&quot;code&quot;&gt;sum += i&lt;/span&gt; block at (3) in Listing 4-1. At the
+top, above the YARV instructions, Figure 4-5 shows two YJIT related values:
+&lt;span class=&quot;code&quot;&gt;jit_entry&lt;/span&gt; and &lt;span
+class=&quot;code&quot;&gt;jit_entry_calls&lt;/span&gt;. As we’ll see in a moment, &lt;span
+class=&quot;code&quot;&gt;jit_entry&lt;/span&gt; starts as a null value but will later hold a
+pointer to the machine language instructions YJIT produces for this Ruby block.
+Below &lt;span class=&quot;code&quot;&gt;jit_entry&lt;/span&gt;, Figure 4-5 also shows &lt;span
+class=&quot;code&quot;&gt;jit_entry_calls&lt;/span&gt;, YJIT’s internal counter.&lt;/p&gt;
+&lt;p&gt;Each time the program in Listing 4-1 calls this block, YJIT increments the value
+of &lt;span class=&quot;code&quot;&gt;jit_entry_calls&lt;/span&gt;. Since the range at (1) in Listing
+4-1 spans from 1 through 40, this counter will start at zero and increase by 1
+each time &lt;span class=&quot;code&quot;&gt;Range#each&lt;/span&gt; calls the block at (3).&lt;/p&gt;
+&lt;p&gt;When the &lt;span class=&quot;code&quot;&gt;jit_entry_calls&lt;/span&gt; reaches a particular
+threshold, YJIT will compile the YARV instructions into machine language. By
+default for small Ruby programs YJIT in Ruby 3.5 uses a threshold of 30. Larger
+programs, like Ruby on Rails web applications, will use a larger threshold value
+of 120. (You can also change the threshold by passing &lt;span
+class=&quot;code&quot;&gt;—yjit-call-threshold&lt;/span&gt; when you run your Ruby program.)&lt;/p&gt;
+&lt;h2&gt;YJIT Blocks&lt;/h2&gt;
+&lt;p&gt;While compiling your Ruby program, YJIT saves the machine language instructions
+it creates into &lt;em&gt;YJIT blocks&lt;/em&gt;. YJIT blocks, which are distinct from Ruby blocks,
+each contain a sequence of machine language instructions for a range of
+corresponding YARV instructions. By grouping YARV instructions and compiling
+each group into a YJIT block, YJIT can produce more optimized code that is
+tailored to your program’s behavior and avoid compiling code that your program
+doesn’t need.&lt;/p&gt;
+&lt;p&gt;As we’ll see next, a single YJIT block doesn’t correspond to a Ruby function or
+block. YJIT blocks instead represent smaller sections of code: individual YARV
+instructions or a small range of YARV instructions. Each Ruby function or block
+typically consists of several YJIT blocks.&lt;/p&gt;
+&lt;p&gt;Let’s see how this works for our example. After the program in Listing 4-1
+executes the Ruby block at (3) 29 times, YJIT will increment the &lt;span
+class=&quot;code&quot;&gt;jit_entry_calls&lt;/span&gt; counter again, just before Ruby runs the
+block for the 30th time. Since &lt;span class=&quot;code&quot;&gt;jit_entry_calls&lt;/span&gt; reaches
+the threshold value of 30, YJIT triggers the compilation process.&lt;/p&gt;
+&lt;p&gt;YJIT compiles the first YARV instruction &lt;span class=&quot;code&quot;&gt;getlocal_WC_1&lt;/span&gt;
+and saves machine language instructions that perform the same work as &lt;span
+class=&quot;code&quot;&gt;getlocal_WC_1&lt;/span&gt; into a new YJIT block:&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;75%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/17/Figure-4-6.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 4-6: Creating a YJIT block
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;On the left side, Figure 4-6 shows the YARV instructions for the &lt;span
+class=&quot;code&quot;&gt;sum += i&lt;/span&gt; Ruby block. On the right, Figure 4-6 shows the new
+YJIT block corresponding to &lt;span class=&quot;code&quot;&gt;getlocal_WC_1&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Next, the YJIT compiler continues and compiles the second YARV instruction from
+the left side of Figure 4-7: &lt;span class=&quot;code&quot;&gt;getlocal_WC_0&lt;/span&gt; at index 2.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;75%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/17/Figure-4-7.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 4-7: Appending to a YJIT block
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;On the left side, Figure 4-7 shows the same YARV instructions for the &lt;span
+class=&quot;code&quot;&gt;sum += i&lt;/span&gt; Ruby block that we saw above in Figure 4-6. But now
+the two dotted arrows indicate that the YJIT block on the right contains the
+machine language instructions equivalent to both &lt;span
+class=&quot;code&quot;&gt;getlocal_WC_1&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;getlocal_WC_0&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Let’s take a look inside this new block. YJIT compiles or translates the Ruby
+YARV instructions into machine language instructions. In this example, running
+on my Mac laptop, YJIT writes the following machine language instructions into
+this new block:&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;75%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/17/Figure-4-8.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 4-8: The contents of one YJIT block
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 4-8 shows a closer view of the new YJIT block that appeared on the right
+side of Figures 4-6 and 4-7. Inside the block, Figure 4-8 shows the assembly
+language acronyms corresponding to the ARM64 machine language instructions that
+YJIT generated for the two YARV instructions shown on the left. The YARV
+instructions on the left are: &lt;span class=&quot;code&quot;&gt;getlocal_WC_1&lt;/span&gt;, which
+loads a value from a local variable located in the previous stack frame and
+saves it on the YARV stack, and &lt;span class=&quot;code&quot;&gt;getlocal_WC_0&lt;/span&gt;, which
+loads a local variable from the current stack from and also saves it on the YARV
+stack. The machine language instructions on the right side of Figure 4-8 perform
+the same task, loading these values into registers on my M1 microprocessor:
+&lt;span class=&quot;code&quot;&gt;x1&lt;/span&gt; and &lt;span class=&quot;code&quot;&gt;x9&lt;/span&gt;. If you’re curious
+and would like to learn more about what the machine language instructions mean
+and how they work, the section “Adding Two Integers Using Machine Language”
+discusses the instructions for this example in more detail.&lt;/p&gt;
+&lt;h2&gt;YJIT Branch Stubs&lt;/h2&gt;
+&lt;p&gt;Next, YJIT continues down the sequence of YARV instructions and compiles the
+&lt;span class=&quot;code&quot;&gt;opt_plus&lt;/span&gt; YARV instruction at index 4 in Figures 4-6
+and 4-7. But this time, YJIT runs into a problem: It doesn’t know the type of
+the addition arguments. That is, will &lt;span class=&quot;code&quot;&gt;opt_plus&lt;/span&gt; add two
+integers? Or two strings, floating point numbers, or some other types?&lt;/p&gt;
+&lt;p&gt;Machine language is very specific. To add two 64-bit integers on an M1
+microprocessor, YJIT could use the &lt;span class=&quot;code&quot;&gt;adds&lt;/span&gt; assembly
+language instruction. But adding two floating pointer numbers would require
+different instructions. And, of course, adding or concatenating two strings is
+an entirely different operation altogether.&lt;/p&gt;
+&lt;p&gt;In order for YJIT to know which machine language instructions to save into the
+YJIT block for &lt;span class=&quot;code&quot;&gt;opt_plus&lt;/span&gt;, YJIT needs to know exactly
+what type of values the Ruby program might ever add at (3) in Listing 4-1. You
+and I can tell by reading Listing 4-1 that the Ruby code is adding integers. We
+know right away that the &lt;span class=&quot;code&quot;&gt;sum += 1&lt;/span&gt; block at (3) is
+always adding one integer to another. But YJIT doesn’t know this.&lt;/p&gt;
+&lt;p&gt;YJIT uses a clever trick to solve this problem. Instead of analyzing the entire
+program ahead of time to determine all of the possible types of values the &lt;span
+class=&quot;code&quot;&gt;opt_plus&lt;/span&gt; YARV instruction might ever need to add, YJIT
+simply waits until the block runs and observes which types the program actually
+passes in.&lt;/p&gt;
+&lt;p&gt;YJIT uses &lt;em&gt;branch stubs&lt;/em&gt; to achieve this wait-and-see compile behavior, as shown
+in Figure 4-9.&lt;/p&gt;
+&lt;div style=&quot;padding: 8px 30px 30px 0px; text-align: center; line-height:18px&quot;&gt;
+&lt;img width=&quot;75%&quot; src=&quot;https://patshaughnessy.net/assets/2025/11/17/Figure-4-9.svg&quot;&gt;&lt;br/&gt;
+&lt;span style=&quot;font-style: italic; font-size: small&quot;&gt;
+Figure 4-9: A YJIT block, branch and stub
+&lt;/span&gt;
+&lt;/div&gt;
+&lt;p&gt;Figure 4-9 shows the YARV instructions on the left, and the YJIT block for
+indexes 0000-0002 on the right. But note the bottom right corner of Figure 4-7,
+which shows an arrow pointing down from the block to a box labeled stub. This
+arrow represents a YJIT branch. Since this new branch doesn’t point to a block
+yet, YJIT sets up the branch to point to a branch stub instead.&lt;/p&gt;
+</content></entry><entry><title>YARV’s Internal Stack and Your Ruby Stack</title><link href="https://patshaughnessy.net/2025/11/10/yarvs-internal-stack-and-your-ruby-stack" rel="alternate"></link><id href="https://patshaughnessy.net/2025/11/10/yarvs-internal-stack-and-your-ruby-stack" rel="alternate"></id><published>2025-11-10T00:00:00Z</published><updated>2025-11-10T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;https://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
@@ -2017,278 +2239,4 @@ nodes have which types.&lt;/p&gt;
 variables, function calls and types in my code it is ready to generate the
 machine language code needed to execute my program. To do that, it will
 leverage the LLVM framework.&lt;/p&gt;
-</content></entry><entry><title>Reading Code Like a Compiler</title><link href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></link><id href="https://patshaughnessy.net/2021/12/22/reading-code-like-a-compiler" rel="alternate"></id><published>2021-12-22T00:00:00Z</published><updated>2021-12-22T00:00:00Z</updated><category>Crystal</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;Imagine trying to read an entire book while &lt;br/&gt;
-  focusing on only one or two words at a time
-  &lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;We use compilers every day to parse our code, find our programming mistakes and
-then help us fix them. But h</summary><content type="html">&lt;div style=&quot;float: left; padding: 8px 30px 0px 0px; text-align: center; line-height:18px&quot;&gt;
-  &lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/depth-of-field.jpg&quot;&gt;&lt;br/&gt;
-  &lt;i&gt;Imagine trying to read an entire book while &lt;br/&gt;
-  focusing on only one or two words at a time
-  &lt;/i&gt;
-&lt;/div&gt;
-&lt;p&gt;We use compilers every day to parse our code, find our programming mistakes and
-then help us fix them. But how do compilers read and understand our code? What
-does our code look like to them?&lt;/p&gt;
-&lt;p&gt;We tend to read code like we would read a human language like English. We
-don’t see letters; we see words and phrases. And in a very natural way we use
-what we just read, the proceeding sentence or paragraph, to give us the context
-we need to understand the following text. And sometimes we just skim over text
-quickly to gleam a bit of the meaning without even reading every word.&lt;/p&gt;
-&lt;div style=&quot;clear: both&quot;&gt;&lt;/div&gt;
-&lt;p&gt;Compilers aren’t as smart as we are. They can’t read and understand entire
-phrases or sentences all at once. They read text one letter, one word at at
-time, meticulously building up a record of what they have read so far.&lt;/p&gt;
-&lt;p&gt;I was curious to learn more about how compilers parse text, but where should I
-look? Which compiler should I study? Once again, like in my last few posts,
-Crystal was the answer.&lt;/p&gt;
-&lt;h2&gt;Crystal: A Compiler Accessible to Everyone&lt;/h2&gt;
-&lt;p&gt;&lt;a href=&quot;https://crystal-lang.org&quot;&gt;Crystal&lt;/a&gt; is a unique combination of simple, human
-syntax inspired by Ruby, with the speed and robustness enabled by static types
-and the use of &lt;a href=&quot;https://llvm.org&quot;&gt;LLVM&lt;/a&gt;. But for me the most exciting thing
-about Crystal is how the Crystal team implemented both its standard library and
-compiler using the target language: Crystal. This makes Crystal’s internal
-implementation accessible to anyone familiar with Ruby. For once, you don’t
-have to be a hard core C or C++ developer to learn how a compiler works.
-Reading code not much more complex than a Ruby on Rails web site, I can take a
-peek under the hood of a real world compiler to see how it works internally.&lt;/p&gt;
-&lt;p&gt;Not only did the Crystal team implement their compiler using Crystal, they also
-wrote it by hand. Parsing is such a tedious task that often developers use a
-parser generator, such as &lt;a href=&quot;https://www.gnu.org/software/bison/&quot;&gt;GNU Bison&lt;/a&gt;, to
-automatically generate the parse code given a set of rules. This is how Ruby
-works, for example. But the Crystal team wrote their parser directly in
-Crystal, which you can read in
-&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/parser.cr&quot;&gt;parser.cr&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Along with a readable compiler, I need a readable program to compile. I decided to
-reuse the same array snippet from my last post:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;This tiny Crystal program creates an array of two numbers and then prints out
-the second number. Simple enough: You and I can read and parse these two lines
-of code in one glance and in a fraction of a second understand what it does.
-Even if you’re not a Crystal or Ruby developer this syntax is so simple you can
-still understand it.&lt;/p&gt;
-&lt;p&gt;But the Crystal compiler can’t understand this code as easily as we can.
-Parsing even this simple program is a complex task for a compiler.&lt;/p&gt;
-&lt;h2&gt;How the Crystal Compiler Sees My Code&lt;/h2&gt;
-&lt;p&gt;Before parsing or running the code above, Crystal converts it into a series of
-tokens. To the Crystal compiler, my program looks like this:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/tokens.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;The first &lt;code&gt;IDENT&lt;/code&gt; token corresponds to the &lt;code&gt;arr&lt;/code&gt; variable at the beginning of the
-first line. You can also see two &lt;code&gt;NUMBER&lt;/code&gt; tokens: the &lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/lexer.cr&quot;&gt;Crystal tokenizer
-code&lt;/a&gt;
-converted each series of numerical digits into single tokens, one for 12345 and
-the other for 67890. Along with these tokens you can also see other tokens for
-punctuation used in Crystal syntax, like the equals sign and left and right
-square brackets. There is also a new line token and one for the end of the
-entire file.&lt;/p&gt;
-&lt;h2&gt;Reading a Book One Word at a Time&lt;/h2&gt;
-&lt;p&gt;To understand my code, Crystal processes these tokens one at a time, stepping
-tediously through the entire program. What a slow, painful process!&lt;/p&gt;
-&lt;p&gt;How would we read if we could only see one word at a time? I imagine covering
-the book I’m trying to read with a piece of paper or plastic that had a small
-hole in it… and that through the hole I could only see one word at a time. How
-would I read one entire page? Well, I’d have to move the paper around, showing
-one word and then another and another. And how would I know where to move the
-paper next? Would I simply move the paper forward one word at at time? What if
-I forgot some word I had seen earlier? I’d have to backtrack - but how far back
-to go? What if the meaning of the word I was looking at depended on the words
-that followed it? This sounds like a nightmare.&lt;/p&gt;
-&lt;p&gt;To read like this, if it was even possible at all, I’d have to have a well
-thought out strategy. I’d have to know exactly how to move that plastic screen
-around. When you can only read one word at a time, deciding which word to read
-next becomes incredibly important. I would need an algorithm to follow.&lt;/p&gt;
-&lt;p&gt;This is what a parser algorithm is: Some set of rules the parse code can use to
-interpret each word, and, equally important, to decide which word to read next.
-Crystal’s parse code is over 6000 lines long, so I won’t attempt to completely
-explain it here. But there’s an underlying, high level algorithm the parse code
-uses:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/pattern-recurse-record.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;First, the parser compares the current token, and possibly the following or
-previous tokens as well, to a series of expected patterns. These patterns
-define the syntax the parser is reading.  Second, the parser recurses. It calls
-itself to parse the next token, or possibly multiple next tokens depending on
-which pattern the parser just matched. Finally, the parser records what it saw:
-which pattern matched the current token and the results of the recursive calls
-to itself, for future reference.&lt;/p&gt;
-&lt;h2&gt;Matching a Pattern&lt;/h2&gt;
-&lt;p&gt;The best way to understand how this works is to see it in action. Let’s follow
-along with the Crystal compiler as it parses the code I showed above:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;Recall Crystal already converted this code into a token stream:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/token-line.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;(To be more accurate, Crystal actually converts my code into tokens as it goes.
-The parse code calls the tokenizer code each time it needs a new token. But
-this timing isn’t really important.)&lt;/p&gt;
-&lt;p&gt;As you might expect, Crystal starts with the first token, &lt;code&gt;IDENT&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;What does this mean? How does Crystal interpret &lt;code&gt;arr&lt;/code&gt;? &lt;code&gt;IDENT&lt;/code&gt; is short for
-identifier, but what role does this identifier play? What meaning does &lt;code&gt;arr&lt;/code&gt; have
-in my code?&lt;/p&gt;
-&lt;p&gt;To decide on the correct meaning, the Crystal parser compares the &lt;code&gt;IDENT&lt;/code&gt; token
-with a series of patterns. For example Crystal looks for patterns like:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;a ternary expression &lt;code&gt;a ? b : c&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;a range &lt;code&gt;a..b&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;an expression using a binary operator, such as: &lt;code&gt;a + b&lt;/code&gt;, etc.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;and many more…&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;It turns out none of these patterns apply in this case, and Crystal ends up
-selecting a default pattern which handles the most common code pattern: a
-function call. Crystal decides that when I wrote &lt;code&gt;arr&lt;/code&gt; I intended to call a
-function called &lt;code&gt;arr&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;I often tell people I work with at my day job that I have really bad memory.
-And it’s true. I constantly have to google the syntax or return values of
-functions. I often forget what some code means even just a month after I wrote
-it. And the Crystal compiler is no better: As soon as it processes that &lt;code&gt;IDENT&lt;/code&gt;
-token above, it has to write down what it decided that token meant or else it
-would forget.&lt;/p&gt;
-&lt;p&gt;To record the function call, Crystal creates an object:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/ast1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;As we’ll see in a moment, Crystal builds up a tree of these objects, called an
-&lt;a href=&quot;https://en.wikipedia.org/wiki/Abstract_syntax_tree&quot;&gt;Abstract Syntax
-Tree&lt;/a&gt; (AST). The AST will
-later serve as a record of the syntactic structure of my code.&lt;/p&gt;
-&lt;h2&gt;Recursively Calling Itself&lt;/h2&gt;
-&lt;p&gt;Parsing is inherently a recursive process. Unlike English text, Crystal
-expressions can be nested one inside another to any depth. Although I suppose
-English grammar is somewhat recursive and can be nested to some degree. I
-wonder if the grammars for some other human languages are more recursive than
-English? Interesting question.&lt;/p&gt;
-&lt;p&gt;For parsing a programming language like Crystal, the simplest thing for the
-parser code to do is recursively call itself. And it does this based on the
-pattern it just matched. For example, if Crystal had parsed a plus sign, it
-would need to recursively call itself to parse the values that appeared before
-and after the plus.&lt;/p&gt;
-&lt;p&gt;In this example, Crystal has to decide what arguments to pass to this call to
-the &lt;code&gt;arr&lt;/code&gt; function. Did I write &lt;code&gt;arr(1, 2, 3)&lt;/code&gt; or just &lt;code&gt;arr&lt;/code&gt;? Or &lt;code&gt;arr()&lt;/code&gt;? What were
-the values 1, 2 and 3? Each of these could be a complex expression in their own
-right, maybe appearing inside of parentheses, a compound value like an array or
-maybe yet another function call.&lt;/p&gt;
-&lt;p&gt;To find the arguments of the function call, inside the recursive call to the
-parse code Crystal proceeds forward to process the next two tokens:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;Crystal skips over the space, and then encounters the equals sign. Suddenly
-Crystal realizes it was wrong! The &lt;code&gt;arr&lt;/code&gt; identifier wasn’t a reference to a
-function at all, it was a variable declaration. Yes, sometimes compilers change
-their minds while reading, just like we do!&lt;/p&gt;
-&lt;h2&gt;Recording an AST Node&lt;/h2&gt;
-&lt;p&gt;To record this new, revised syntax, Crystal changes the &lt;code&gt;Call&lt;/code&gt; AST node it
-created earlier to an &lt;code&gt;Assign&lt;/code&gt; AST node, and creates a new &lt;code&gt;Var&lt;/code&gt; AST node to
-record the variable being assigned to:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/ast2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;Now the AST is starting to resemble a tree. Because of the recursive nature of
-parse algorithm, this tree structure is an ideal way of record what the
-compiler has parsed so far. Trees are recursive too: Each branch is a tree in
-its own right.&lt;/p&gt;
-&lt;h2&gt;Rinse and Repeat&lt;/h2&gt;
-&lt;p&gt;But what value should Crystal assign to that variable? What should appear in
-the AST as the value attribute of the &lt;code&gt;Assign&lt;/code&gt; node?&lt;/p&gt;
-&lt;p&gt;To find out, the Crystal compiler recursively calls the same parsing algorithm
-again, but starting with the &lt;code&gt;[&lt;/code&gt; token:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;Following the pattern match, record and recurse process, the Crystal compiler
-once again matches the new token, &lt;code&gt;[&lt;/code&gt;, with a series of expected patterns. This
-time, Crystal decides that the left bracket is the start of literal array
-expression and records a new AST node:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/array-literal1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;But before inserting it into the syntax tree, Crystal recursively calls itself
-to parse each of the values that appear in the array. The array literal pattern
-expects a series of values to appear separated by spaces, so Crystal proceeds
-to process the following tokens, looking for values separated by commas:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token4.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;After encountering the comma, Crystal recursively calls the same parse code
-again on the previous token or tokens that appeared before the comma, because
-the array value before the comma could be another expression of arbitrary depth
-and complexity. In this example, Crystal finds a simple numeric array element,
-and creates a new AST node to represent the numeric value:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/number-literal1.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;After reading the comma, Crystal calls its parser recursively again, and finds
-the second number:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/number-literal2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;Remember Crystal has a bad memory. With all these new AST nodes, Crystal will
-quickly forget what they mean. Fortunately, Crystal reads in the right square
-bracket and realizes I ended the array literal in my code:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/process-token5.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;Now those recursive calls to the parse code return, and Crystal assembles these
-new AST nodes:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/array-literal2.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;…and then places them inside the larger, surrounding AST:&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;https://patshaughnessy.net/assets/2021/12/22/ast3.png&quot;&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;p&gt;After this, these recursive calls return and the Crystal compiler moves on to
-parse the second line of my program.&lt;/p&gt;
-&lt;h2&gt;A Complete Abstract Syntax Tree&lt;/h2&gt;
-&lt;p&gt;After following the Crystal parser for a while, I added some debug logging code
-to the compiler so I could see the result. Here’s my example code again:&lt;/p&gt;
-&lt;pre style=&quot;background-color:#ffffff;&quot;&gt;
-&lt;span style=&quot;color:#000000;&quot;&gt;arr &lt;/span&gt;&lt;span style=&quot;color:#4f5b66;&quot;&gt;= &lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;12345&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;67890&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]
-&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;puts arr[&lt;/span&gt;&lt;span style=&quot;color:#d08770;&quot;&gt;1&lt;/span&gt;&lt;span style=&quot;color:#000000;&quot;&gt;]&lt;/span&gt;&lt;/pre&gt;
-
-&lt;p&gt;And here’s the complete AST the Crystal compiler generated after parsing my
-code. My debug logging indented each line to indicate the AST structure:&lt;/p&gt;
-&lt;pre type=&quot;console&quot;&gt;&amp;lt;Crystal::Expressions exp_count=3 &gt;
-  &amp;lt;Crystal::Require string=prelude &gt;
-  &amp;lt;Crystal::Assign target=Crystal::Var value=Crystal::ArrayLiteral &gt;
-    &amp;lt;Crystal::Var name=arr &gt;
-    &amp;lt;Crystal::ArrayLiteral element_count=2 of=Nil name=Nil &gt;
-      &amp;lt;Crystal::NumberLiteral number=12345 kind=i32 &gt;
-      &amp;lt;Crystal::NumberLiteral number=67890 kind=i32 &gt;
-  &amp;lt;Crystal::Call obj= name=puts arg_count=1 &gt;
-    &amp;lt;Crystal::Call obj=arr name=[] arg_count=1 &gt;
-      &amp;lt;Crystal::Var name=arr &gt;
-      &amp;lt;Crystal::NumberLiteral number=1 kind=i32 &gt;&lt;/pre&gt;
-&lt;p&gt;Each of these values is a subclass of the &lt;code&gt;Crystal::ASTNode&lt;/code&gt; superclass.
-Crystal defines all of these in the
-&lt;a href=&quot;https://github.com/crystal-lang/crystal/blob/master/src/compiler/crystal/syntax/ast.cr&quot;&gt;ast.cr&lt;/a&gt;
-file. Some interesting details to note:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;The top level node is called &lt;code&gt;Expressions&lt;/code&gt;, and more or less holds one
-expression per line of code.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;The second node, the first child node of &lt;code&gt;Expressions&lt;/code&gt;, is called &lt;code&gt;Require&lt;/code&gt;.
-The surprise here is that I didn’t even put a &lt;code&gt;require&lt;/code&gt; keyword in my
-program! Crystal silently inserts &lt;code&gt;require prelude&lt;/code&gt; to the beginning of
-all Crystal programs. The “prelude” is the Crystal standard library, the code
-that defines &lt;code&gt;Array&lt;/code&gt;, &lt;code&gt;String&lt;/code&gt; many other core classes. Reading the AST allows
-us to see how the Crystal compiler does this automatically.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;The third node and its children are the nodes we saw Crystal create above for
-my first line of code, the array literal and the variable it is assigned to.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Finally, the last branch of the tree shows the call to &lt;code&gt;puts&lt;/code&gt;. This time
-Crystal’s default guess about identifiers being function calls was correct.
-Another interesting detail here is that the inner call to the &lt;code&gt;[]&lt;/code&gt; function
-was not generated by an identifier, but by the &lt;code&gt;[&lt;/code&gt; token. This was one of the
-patterns the Crystal parser checked for after one of the recursive parse
-calls.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2&gt;Next Time&lt;/h2&gt;
-&lt;p&gt;What’s the point of all of this? What does the Crystal compiler do next with
-the AST? This tree structure is a fantastic summary of how Crystal parsed my
-code, and, as we’ll see later, also provides a convenient way for Crystal later
-to process my code and transform it in different ways.&lt;/p&gt;
-&lt;p&gt;When I have time, I plan to write a few more posts about more of the inner
-workings of the Crystal compiler and the LLVM framework, which Crystal later
-uses to generate my x86 executable program.&lt;/p&gt;
 </content></entry></feed>
