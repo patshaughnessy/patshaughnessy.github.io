@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-11-17T18:07:52Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Compiling Ruby To Machine Language</title><link href="https://patshaughnessy.net/2025/11/17/compiling-ruby-to-machine-language" rel="alternate"></link><id href="https://patshaughnessy.net/2025/11/17/compiling-ruby-to-machine-language" rel="alternate"></id><published>2025-11-17T00:00:00Z</published><updated>2025-11-17T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
+<?xml version="1.0" encoding="UTF-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>Pat Shaughnessy</title><id>http://patshaughnessy.net</id><updated>2025-11-20T15:06:52Z</updated><author><name>Pat Shaughnessy</name></author><entry><title>Compiling Ruby To Machine Language</title><link href="https://patshaughnessy.net/2025/11/17/compiling-ruby-to-machine-language" rel="alternate"></link><id href="https://patshaughnessy.net/2025/11/17/compiling-ruby-to-machine-language" rel="alternate"></id><published>2025-11-17T00:00:00Z</published><updated>2025-11-17T00:00:00Z</updated><category>Updating Ruby Under a Microscope</category><author><name>Pat Shaughnessy</name></author><summary type="html">&lt;p&gt;I've started working on a new edition of &lt;a
 href=&quot;https://patshaughnessy.net/ruby-under-a-microscope&quot;&gt;Ruby Under a
 Microscope&lt;/a&gt; that covers Ruby 3.x. I'm working on this in my spare time, so it
 will take a while. Leave a comment or &lt;a
@@ -193,7 +193,7 @@ the addition arguments. That is, will &lt;span class=&quot;code&quot;&gt;opt_plu
 integers? Or two strings, floating point numbers, or some other types?&lt;/p&gt;
 &lt;p&gt;Machine language is very specific. To add two 64-bit integers on an M1
 microprocessor, YJIT could use the &lt;span class=&quot;code&quot;&gt;adds&lt;/span&gt; assembly
-language instruction. But adding two floating pointer numbers would require
+language instruction. But adding two floating point numbers would require
 different instructions. And, of course, adding or concatenating two strings is
 an entirely different operation altogether.&lt;/p&gt;
 &lt;p&gt;In order for YJIT to know which machine language instructions to save into the

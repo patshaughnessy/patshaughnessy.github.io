@@ -220,7 +220,7 @@ integers? Or two strings, floating point numbers, or some other types?
 
 Machine language is very specific. To add two 64-bit integers on an M1
 microprocessor, YJIT could use the <span class="code">adds</span> assembly
-language instruction. But adding two floating pointer numbers would require
+language instruction. But adding two floating point numbers would require
 different instructions. And, of course, adding or concatenating two strings is
 an entirely different operation altogether.
 
